@@ -1,0 +1,7 @@
+[package]
+name = "world_connection"
+version = "0.1.0"
+authors = ["XueBin Li"]
+
+[dependencies]
+config = "0.8"
