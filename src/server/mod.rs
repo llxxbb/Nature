@@ -1,5 +1,3 @@
-struct Server;
+use biz::*;
 
-impl Server{
-    
-}
+

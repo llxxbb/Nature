@@ -5,3 +5,4 @@ authors = ["XueBin Li"]
 
 [dependencies]
 config = "0.8"
+hyper = "0.11"
