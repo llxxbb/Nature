@@ -1,5 +1,25 @@
-struct Server;
+use biz::WorldConnectionService;
+use biz::Data;
+use biz::WorldConnectionResult;
 
-impl Server{
-    
+///! World Connection Service provider
+pub struct Server {}
+
+
+impl WorldConnectionService for Server {
+    fn input(data: Data) -> WorldConnectionResult {
+        unimplemented!()
+    }
+
+    fn input_batch(batch: Vec<Data>) -> WorldConnectionResult {
+        unimplemented!()
+    }
+
+    fn converter_callback() -> WorldConnectionResult {
+        unimplemented!()
+    }
+
+    fn query() {
+        unimplemented!()
+    }
 }

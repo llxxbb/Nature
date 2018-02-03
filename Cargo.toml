@@ -4,4 +4,8 @@ version = "0.1.0"
 authors = ["XueBin Li"]
 
 [dependencies]
+chrono = "0.4.0"
+log = "0.4.1"
+fern = "0.5"
 config = "0.8"
+hyper = "0.11.15"
