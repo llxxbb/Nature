@@ -2,3 +2,7 @@
   {"port": "3000"}
 [2018-02-05][09:05:50][world_connection][INFO] ##### Server created ---------------------------
 [2018-02-05][09:05:50][world_connection][INFO] ##### Web service created ---------------------------
+[2018-02-05][19:04:50][world_connection::util][INFO] #### The settings.toml information are : 
+  {"port": "3000"}
+[2018-02-05][19:04:50][world_connection][INFO] ##### Server created ---------------------------
+[2018-02-05][19:04:50][world_connection][INFO] ##### Web server started at : 3000 ---------------------------

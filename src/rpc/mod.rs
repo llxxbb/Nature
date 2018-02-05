@@ -5,7 +5,15 @@ extern crate futures;
 use self::futures::future::Future;
 
 use self::hyper::header::ContentLength;
-use self::hyper::server::{Request, Response, Service};
+use self::hyper::server::{Http, Request, Response, Service};
+
+pub fn web_rpc(port: &str) {
+    let addr = format!("127.0.0.1:{}", port).parse().unwrap();
+    let web_server = Http::new().bind(&addr, || Ok(WebServer)).unwrap();
+    info!("##### Web server started at : {} ---------------------------", port);
+    web_server.run().unwrap();
+}
+
 
 pub struct WebServer;
 

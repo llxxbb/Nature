@@ -1,8 +1,9 @@
+/// convert Web Request to native request
 use biz::*;
 
 struct Web;
 
-impl Teller for Web {
+impl WorldConnectionService for Web {
     fn input(_d: WorldConnectionData) -> WorldConnectionResult {
         WorldConnectionResult {
             status: "OK".to_string(),
