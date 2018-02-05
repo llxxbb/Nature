@@ -1,15 +1,34 @@
+extern crate hyper;
 
-use std::net::TcpListener;
+#[macro_use]
+extern crate log;
+extern crate fern;
+extern crate world_connection;
+extern crate chrono;
+
+use world_connection::server::Server;
+use world_connection::rpc::WebServer;
+use hyper::server::Http;
+
 
 fn main() {
-    let port = 8080;
+    // init logger
+    world_connection::util::setup_logger();
 
-    let listener = TcpListener::bind(format!("127.0.0.1:{}", port)).unwrap();
+    // read config
+    let config = world_connection::util::get_settings();
 
-    println!("server started on port : {}", port );
-
-    for stream in listener.incoming() {
-        
-        let stream = stream.unwrap();
-    }
+    // create server
+    let server = Server {};
+    info!("##### Server created ---------------------------");
+    // create rpc server
+    web_rpc();
 }
+
+fn web_rpc() {
+    let addr = "127.0.0.1:3000".parse().unwrap();
+    let web_server = Http::new().bind(&addr, || Ok(WebServer)).unwrap();
+    info!("##### Web service created ---------------------------");
+    web_server.run().unwrap();
+}
+
