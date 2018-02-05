@@ -5,7 +5,7 @@ extern crate futures;
 use self::futures::future::Future;
 
 use self::hyper::header::ContentLength;
-use self::hyper::server::{Http, Request, Response, Service};
+use self::hyper::server::{Request, Response, Service};
 
 pub struct WebServer;
 

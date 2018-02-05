@@ -7,11 +7,11 @@ pub struct Server {}
 
 
 impl WorldConnectionService for Server {
-    fn input(data: Data) -> WorldConnectionResult {
+    fn input(_data: Data) -> WorldConnectionResult {
         unimplemented!()
     }
 
-    fn input_batch(batch: Vec<Data>) -> WorldConnectionResult {
+    fn input_batch(_batch: Vec<Data>) -> WorldConnectionResult {
         unimplemented!()
     }
 
