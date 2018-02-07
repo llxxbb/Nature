@@ -6,3 +6,40 @@
   {"port": "3000"}
 [2018-02-05][19:04:50][world_connection][INFO] ##### Server created ---------------------------
 [2018-02-05][19:04:50][world_connection][INFO] ##### Web server started at : 3000 ---------------------------
+[2018-02-05][20:15:41][world_connection::util][INFO] #### The settings.toml information are : 
+  {"port": "3000"}
+[2018-02-05][20:15:41][world_connection][INFO] ##### Server created ---------------------------
+[2018-02-05][20:15:41][world_connection::rpc][INFO] ##### Web server started at : 3000 ---------------------------
+[2018-02-07][16:39:22][world_connection::util][INFO] #### The settings.toml information are : 
+  {"port": "3000"}
+[2018-02-07][16:39:22][world_connection][INFO] ##### Server created ---------------------------
+[2018-02-07][16:39:22][world_connection::rpc][INFO] ##### Web server started at : 3000 ---------------------------
+[2018-02-07][16:52:15][hyper::server][ERROR] server connection error: (127.0.0.1:58203) invalid HTTP version specified
+[2018-02-07][16:53:09][hyper::server][ERROR] server connection error: (127.0.0.1:58229) invalid HTTP version specified
+[2018-02-07][16:53:47][world_connection::rpc][DEBUG] received data : Concat2 { inner: ConcatSafe { stream: Body(Chan { close_tx: Sender { inner: Inner { complete: AtomicBool(false), data: Lock { locked: AtomicBool(false), data: UnsafeCell }, rx_task: Lock { locked: AtomicBool(false), data: UnsafeCell }, tx_task: Lock { locked: AtomicBool(false), data: UnsafeCell } } }, rx: Receiver { inner: Inner { buffer: Some(0), state: AtomicUsize(9223372036854775808), message_queue: Queue { head: AtomicPtr(0x23c7d0), tail: UnsafeCell }, parked_queue: Queue { head: AtomicPtr(0x239ec0), tail: UnsafeCell }, num_senders: AtomicUsize(1), recv_task: Mutex { data: ReceiverTask { unparked: false, task: None } } } } }), extend: First } }
+[2018-02-07][17:03:10][world_connection::rpc][DEBUG] received data : Concat2 { inner: ConcatSafe { stream: Body(Chan { close_tx: Sender { inner: Inner { complete: AtomicBool(false), data: Lock { locked: AtomicBool(false), data: UnsafeCell }, rx_task: Lock { locked: AtomicBool(false), data: UnsafeCell }, tx_task: Lock { locked: AtomicBool(false), data: UnsafeCell } } }, rx: Receiver { inner: Inner { buffer: Some(0), state: AtomicUsize(9223372036854775808), message_queue: Queue { head: AtomicPtr(0x23c7d0), tail: UnsafeCell }, parked_queue: Queue { head: AtomicPtr(0x239f00), tail: UnsafeCell }, num_senders: AtomicUsize(1), recv_task: Mutex { data: ReceiverTask { unparked: false, task: None } } } } }), extend: First } }
+[2018-02-07][17:03:44][world_connection::util][INFO] #### The settings.toml information are : 
+  {"port": "3000"}
+[2018-02-07][17:03:44][world_connection][INFO] ##### Server created ---------------------------
+[2018-02-07][17:03:44][world_connection::rpc][INFO] ##### Web server started at : 3000 ---------------------------
+[2018-02-07][17:05:43][world_connection::util][INFO] #### The settings.toml information are : 
+  {"port": "3000"}
+[2018-02-07][17:05:43][world_connection][INFO] ##### Server created ---------------------------
+[2018-02-07][17:05:43][world_connection::rpc][INFO] ##### Web server started at : 3000 ---------------------------
+[2018-02-07][17:05:51][world_connection::rpc][DEBUG] call input
+[2018-02-07][17:06:44][world_connection::util][INFO] #### The settings.toml information are : 
+  {"port": "3000"}
+[2018-02-07][17:06:44][world_connection][INFO] ##### Server created ---------------------------
+[2018-02-07][17:06:44][world_connection::rpc][INFO] ##### Web server started at : 3000 ---------------------------
+[2018-02-07][19:37:42][world_connection::util][INFO] #### The settings.toml information are : 
+  {"port": "3000"}
+[2018-02-07][19:37:42][world_connection][INFO] ##### Server created ---------------------------
+[2018-02-07][19:37:42][world_connection::rpc][INFO] ##### Web server started at : 3000 ---------------------------
+[2018-02-07][20:11:57][world_connection::util][INFO] #### The settings.toml information are : 
+  {"port": "3000"}
+[2018-02-07][20:11:57][world_connection][INFO] ##### Server created ---------------------------
+[2018-02-07][20:11:58][world_connection::rpc][INFO] ##### Web server started at : 3000 ---------------------------
+[2018-02-07][20:13:50][world_connection::util][INFO] #### The settings.toml information are : 
+  {"port": "3000"}
+[2018-02-07][20:13:51][world_connection][INFO] ##### Server created ---------------------------
+[2018-02-07][20:13:51][world_connection::rpc][INFO] ##### Web server started at : 3000 ---------------------------
