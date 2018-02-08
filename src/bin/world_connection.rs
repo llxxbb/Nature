@@ -6,8 +6,8 @@ extern crate fern;
 extern crate world_connection;
 extern crate chrono;
 
-use world_connection::server::Server;
 use hyper::server::Http;
+use world_connection::server::Server;
 
 
 fn main() {
@@ -21,7 +21,7 @@ fn main() {
     let server = Server {};
     info!("##### Server created ---------------------------");
     // create rpc server
-    world_connection::rpc::web_rpc(config.get("port").unwrap());
+    world_connection::rpc::web::web_rpc(config.get("port").unwrap());
 }
 
 
