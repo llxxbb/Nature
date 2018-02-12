@@ -2,3 +2,186 @@
   {"port": "3000"}
 [2018-02-08][14:00:20][world_connection][INFO] ##### Server created ---------------------------
 [2018-02-08][14:00:20][world_connection::rpc][INFO] ##### Web server started at : 3000 ---------------------------
+[2018-02-11][11:02:36][world_connection::util][INFO] #### The settings.toml information are : 
+  {"port": "3000"}
+[2018-02-11][11:02:36][world_connection][INFO] ##### Server created ---------------------------
+[2018-02-11][11:02:36][world_connection::rpc::web][INFO] ##### Web server started at : 3000 ---------------------------
+[2018-02-11][18:42:20][world_connection::util][INFO] #### The settings.toml information are : 
+  {"port": "3000"}
+[2018-02-11][18:42:20][world_connection][INFO] ##### Server created ---------------------------
+[2018-02-11][18:42:20][world_connection::rpc::web][INFO] ##### Web server started at : 3000 ---------------------------
+[2018-02-11][18:50:02][world_connection::util][INFO] #### The settings.toml information are : 
+  {"port": "3000"}
+[2018-02-11][18:50:02][world_connection][INFO] ##### Server created ---------------------------
+[2018-02-11][18:50:02][world_connection::rpc::web][INFO] ##### Web server started at : 3000 ---------------------------
+[2018-02-11][18:50:40][world_connection::util][INFO] #### The settings.toml information are : 
+  {"port": "3000"}
+[2018-02-11][18:50:40][world_connection][INFO] ##### Server created ---------------------------
+[2018-02-11][18:50:40][world_connection::rpc::web][INFO] ##### Web server started at : 3000 ---------------------------
+[2018-02-11][18:52:46][world_connection::util][INFO] #### The settings.toml information are : 
+  {"port": "3000"}
+[2018-02-11][18:52:46][world_connection][INFO] ##### Server created ---------------------------
+[2018-02-11][18:52:46][world_connection::rpc::web][INFO] ##### Web server started at : 3000 ---------------------------
+[2018-02-11][19:14:02][world_connection::util][INFO] #### The settings.toml information are : 
+  {"port": "3000"}
+[2018-02-11][19:14:02][world_connection][INFO] ##### Server created ---------------------------
+[2018-02-11][19:14:02][world_connection::rpc::web][INFO] ##### Web server started at : 3000 ---------------------------
+[2018-02-11][19:17:58][world_connection::util][INFO] #### The settings.toml information are : 
+  {"port": "3000"}
+[2018-02-11][19:17:58][world_connection][INFO] ##### Server created ---------------------------
+[2018-02-11][19:17:58][world_connection::rpc::web][INFO] ##### Web server started at : 3000 ---------------------------
+[2018-02-11][19:18:41][world_connection::util][INFO] #### The settings.toml information are : 
+  {"port": "3000"}
+[2018-02-11][19:18:41][world_connection][INFO] ##### Server created ---------------------------
+[2018-02-11][19:18:41][world_connection::rpc::web][INFO] ##### Web server started at : 3000 ---------------------------
+[2018-02-11][19:22:51][world_connection::util][INFO] #### The settings.toml information are : 
+  {"port": "3000"}
+[2018-02-11][19:22:51][world_connection][INFO] ##### Server created ---------------------------
+[2018-02-11][19:22:51][world_connection::rpc::web][INFO] ##### Web server started at : 3000 ---------------------------
+[2018-02-11][19:23:03][world_connection::util][INFO] #### The settings.toml information are : 
+  {"port": "3000"}
+[2018-02-11][19:23:03][world_connection][INFO] ##### Server created ---------------------------
+[2018-02-11][19:23:03][world_connection::rpc::web][INFO] ##### Web server started at : 3000 ---------------------------
+[2018-02-11][19:25:14][world_connection::util][INFO] #### The settings.toml information are : 
+  {"port": "3000"}
+[2018-02-11][19:25:14][world_connection][INFO] ##### Server created ---------------------------
+[2018-02-11][19:25:14][tokio_core::reactor][DEBUG] adding a new I/O source
+[2018-02-11][19:25:14][world_connection::rpc::web][INFO] ##### Web server started at : 3000 ---------------------------
+[2018-02-11][19:25:14][tokio_core::reactor][DEBUG] consuming notification queue
+[2018-02-11][19:25:14][tokio_core::reactor][DEBUG] scheduling direction for: 0
+[2018-02-11][19:25:14][tokio_core::reactor][DEBUG] blocking
+[2018-02-11][19:25:14][tokio_core::reactor][DEBUG] loop poll - Duration { secs: 0, nanos: 22665 }
+[2018-02-11][19:25:14][tokio_core::reactor][DEBUG] loop time - Instant { t: 1636397009838 }
+[2018-02-11][19:25:14][tokio_core::reactor][DEBUG] consuming notification queue
+[2018-02-11][19:25:14][tokio_core::reactor][DEBUG] loop process - 1 events, Duration { secs: 0, nanos: 260869 }
+[2018-02-11][19:25:14][tokio_core::reactor][DEBUG] loop poll - Duration { secs: 0, nanos: 7270 }
+[2018-02-11][19:25:14][tokio_core::reactor][DEBUG] loop time - Instant { t: 1636397010656 }
+[2018-02-11][19:25:14][tokio_core::reactor][DEBUG] loop process - 0 events, Duration { secs: 0, nanos: 162081 }
+[2018-02-11][19:25:20][world_connection::util][INFO] #### The settings.toml information are : 
+  {"port": "3000"}
+[2018-02-11][19:25:20][world_connection][INFO] ##### Server created ---------------------------
+[2018-02-11][19:25:20][tokio_core::reactor][DEBUG] adding a new I/O source
+[2018-02-11][19:25:20][world_connection::rpc::web][INFO] ##### Web server started at : 3000 ---------------------------
+[2018-02-11][19:25:20][tokio_core::reactor][DEBUG] consuming notification queue
+[2018-02-11][19:25:20][tokio_core::reactor][DEBUG] scheduling direction for: 0
+[2018-02-11][19:25:20][tokio_core::reactor][DEBUG] blocking
+[2018-02-11][19:25:20][tokio_core::reactor][DEBUG] loop poll - Duration { secs: 0, nanos: 24803 }
+[2018-02-11][19:25:20][tokio_core::reactor][DEBUG] loop time - Instant { t: 1636411377108 }
+[2018-02-11][19:25:20][tokio_core::reactor][DEBUG] consuming notification queue
+[2018-02-11][19:25:20][tokio_core::reactor][DEBUG] loop process - 1 events, Duration { secs: 0, nanos: 266856 }
+[2018-02-11][19:25:20][tokio_core::reactor][DEBUG] loop poll - Duration { secs: 0, nanos: 8125 }
+[2018-02-11][19:25:20][tokio_core::reactor][DEBUG] loop time - Instant { t: 1636411377945 }
+[2018-02-11][19:25:20][tokio_core::reactor][DEBUG] loop process - 0 events, Duration { secs: 0, nanos: 337419 }
+[2018-02-11][19:25:40][tokio_core::reactor][DEBUG] loop poll - Duration { secs: 19, nanos: 268702188 }
+[2018-02-11][19:25:40][tokio_core::reactor][DEBUG] loop time - Instant { t: 1636456435898 }
+[2018-02-11][19:25:40][tokio_core::reactor][DEBUG] notifying a task handle
+[2018-02-11][19:25:40][tokio_core::reactor][DEBUG] loop process - 1 events, Duration { secs: 0, nanos: 549536 }
+[2018-02-11][19:25:40][tokio_core::reactor][DEBUG] loop poll - Duration { secs: 0, nanos: 16250 }
+[2018-02-11][19:25:40][tokio_core::reactor][DEBUG] loop time - Instant { t: 1636456437570 }
+[2018-02-11][19:25:40][tokio_core::reactor][DEBUG] loop process - 1 events, Duration { secs: 0, nanos: 282679 }
+[2018-02-11][19:25:40][tokio_core::reactor][DEBUG] adding a new I/O source
+[2018-02-11][19:25:40][tokio_core::reactor][DEBUG] scheduling direction for: 0
+[2018-02-11][19:25:40][tokio_core::reactor][DEBUG] blocking
+[2018-02-11][19:25:40][tokio_core::reactor][DEBUG] loop poll - Duration { secs: 0, nanos: 17106 }
+[2018-02-11][19:25:40][tokio_core::reactor][DEBUG] loop time - Instant { t: 1636456440224 }
+[2018-02-11][19:25:40][hyper::proto::h1::io][DEBUG] read 119 bytes
+[2018-02-11][19:25:40][hyper::proto::h1::io][DEBUG] parsed 3 headers (93 bytes)
+[2018-02-11][19:25:40][hyper::proto::h1::conn][DEBUG] incoming body is content-length (26 bytes)
+[2018-02-11][19:25:40][hyper::proto::h1::io][DEBUG] flushed 82 bytes
+[2018-02-11][19:25:40][tokio_core::reactor][DEBUG] loop process - 2 events, Duration { secs: 0, nanos: 2053597 }
+[2018-02-11][19:25:40][tokio_core::reactor][DEBUG] loop poll - Duration { secs: 0, nanos: 28652 }
+[2018-02-11][19:25:40][tokio_core::reactor][DEBUG] loop time - Instant { t: 1636456445640 }
+[2018-02-11][19:25:40][tokio_core::reactor][DEBUG] consuming notification queue
+[2018-02-11][19:25:40][tokio_core::reactor][DEBUG] dropping I/O source: 1
+[2018-02-11][19:25:40][tokio_core::reactor][DEBUG] loop process - 1 events, Duration { secs: 0, nanos: 909621 }
+[2018-02-11][19:25:40][tokio_core::reactor][DEBUG] loop poll - Duration { secs: 0, nanos: 21382 }
+[2018-02-11][19:25:40][tokio_core::reactor][DEBUG] loop time - Instant { t: 1636456448556 }
+[2018-02-11][19:25:40][tokio_core::reactor][DEBUG] loop process - 0 events, Duration { secs: 0, nanos: 425516 }
+[2018-02-11][19:31:03][world_connection::util][INFO] #### The settings.toml information are : 
+  {"port": "3000"}
+[2018-02-11][19:31:03][world_connection][INFO] ##### Server created ---------------------------
+[2018-02-11][19:31:03][tokio_core::reactor][DEBUG] adding a new I/O source
+[2018-02-11][19:31:03][world_connection::rpc::web][INFO] ##### Web server started at : 3000 ---------------------------
+[2018-02-11][19:31:03][tokio_core::reactor][DEBUG] consuming notification queue
+[2018-02-11][19:31:03][tokio_core::reactor][DEBUG] scheduling direction for: 0
+[2018-02-11][19:31:03][tokio_core::reactor][DEBUG] blocking
+[2018-02-11][19:31:03][tokio_core::reactor][DEBUG] loop poll - Duration { secs: 0, nanos: 35922 }
+[2018-02-11][19:31:03][tokio_core::reactor][DEBUG] loop time - Instant { t: 1637213288171 }
+[2018-02-11][19:31:03][tokio_core::reactor][DEBUG] consuming notification queue
+[2018-02-11][19:31:03][tokio_core::reactor][DEBUG] loop process - 1 events, Duration { secs: 0, nanos: 591018 }
+[2018-02-11][19:31:03][tokio_core::reactor][DEBUG] loop poll - Duration { secs: 0, nanos: 16678 }
+[2018-02-11][19:31:03][tokio_core::reactor][DEBUG] loop time - Instant { t: 1637213290033 }
+[2018-02-11][19:31:03][tokio_core::reactor][DEBUG] loop process - 0 events, Duration { secs: 0, nanos: 369493 }
+[2018-02-11][19:31:11][tokio_core::reactor][DEBUG] loop poll - Duration { secs: 8, nanos: 70251666 }
+[2018-02-11][19:31:11][tokio_core::reactor][DEBUG] loop time - Instant { t: 1637232162274 }
+[2018-02-11][19:31:11][tokio_core::reactor][DEBUG] notifying a task handle
+[2018-02-11][19:31:11][tokio_core::reactor][DEBUG] loop process - 1 events, Duration { secs: 0, nanos: 437918 }
+[2018-02-11][19:31:11][tokio_core::reactor][DEBUG] loop poll - Duration { secs: 0, nanos: 11974 }
+[2018-02-11][19:31:11][tokio_core::reactor][DEBUG] loop time - Instant { t: 1637232163577 }
+[2018-02-11][19:31:11][tokio_core::reactor][DEBUG] loop process - 1 events, Duration { secs: 0, nanos: 207840 }
+[2018-02-11][19:31:11][tokio_core::reactor][DEBUG] adding a new I/O source
+[2018-02-11][19:31:11][tokio_core::reactor][DEBUG] scheduling direction for: 0
+[2018-02-11][19:31:11][tokio_core::reactor][DEBUG] blocking
+[2018-02-11][19:31:11][tokio_core::reactor][DEBUG] loop poll - Duration { secs: 0, nanos: 11119 }
+[2018-02-11][19:31:11][tokio_core::reactor][DEBUG] loop time - Instant { t: 1637232165573 }
+[2018-02-11][19:31:11][hyper::proto::h1::io][DEBUG] read 119 bytes
+[2018-02-11][19:31:11][hyper::proto::h1::io][DEBUG] parsed 3 headers (93 bytes)
+[2018-02-11][19:31:11][hyper::proto::h1::conn][DEBUG] incoming body is content-length (26 bytes)
+[2018-02-11][19:31:11][hyper::proto::h1::io][DEBUG] flushed 82 bytes
+[2018-02-11][19:31:11][tokio_core::reactor][DEBUG] loop process - 2 events, Duration { secs: 0, nanos: 1578900 }
+[2018-02-11][19:31:11][tokio_core::reactor][DEBUG] loop poll - Duration { secs: 0, nanos: 17961 }
+[2018-02-11][19:31:11][tokio_core::reactor][DEBUG] loop time - Instant { t: 1637232169536 }
+[2018-02-11][19:31:11][tokio_core::reactor][DEBUG] consuming notification queue
+[2018-02-11][19:31:11][tokio_core::reactor][DEBUG] dropping I/O source: 1
+[2018-02-11][19:31:11][tokio_core::reactor][DEBUG] loop process - 1 events, Duration { secs: 0, nanos: 416107 }
+[2018-02-11][19:31:11][tokio_core::reactor][DEBUG] loop poll - Duration { secs: 0, nanos: 9408 }
+[2018-02-11][19:31:11][tokio_core::reactor][DEBUG] loop time - Instant { t: 1637232170730 }
+[2018-02-11][19:31:11][tokio_core::reactor][DEBUG] loop process - 0 events, Duration { secs: 0, nanos: 159515 }
+[2018-02-11][19:33:38][tokio_core::reactor][DEBUG] loop poll - Duration { secs: 146, nanos: 812409764 }
+[2018-02-11][19:33:38][tokio_core::reactor][DEBUG] loop time - Instant { t: 1637575468056 }
+[2018-02-11][19:33:38][tokio_core::reactor][DEBUG] notifying a task handle
+[2018-02-11][19:33:38][tokio_core::reactor][DEBUG] loop process - 1 events, Duration { secs: 0, nanos: 576478 }
+[2018-02-11][19:33:38][tokio_core::reactor][DEBUG] loop poll - Duration { secs: 0, nanos: 12829 }
+[2018-02-11][19:33:38][tokio_core::reactor][DEBUG] loop time - Instant { t: 1637575469630 }
+[2018-02-11][19:33:38][tokio_core::reactor][DEBUG] loop process - 1 events, Duration { secs: 0, nanos: 160370 }
+[2018-02-11][19:33:38][tokio_core::reactor][DEBUG] adding a new I/O source
+[2018-02-11][19:33:38][tokio_core::reactor][DEBUG] scheduling direction for: 0
+[2018-02-11][19:33:38][tokio_core::reactor][DEBUG] blocking
+[2018-02-11][19:33:38][tokio_core::reactor][DEBUG] loop poll - Duration { secs: 0, nanos: 9408 }
+[2018-02-11][19:33:38][tokio_core::reactor][DEBUG] loop time - Instant { t: 1637575471135 }
+[2018-02-11][19:33:38][hyper::proto::h1::io][DEBUG] read 119 bytes
+[2018-02-11][19:33:38][hyper::proto::h1::io][DEBUG] parsed 3 headers (93 bytes)
+[2018-02-11][19:33:38][hyper::proto::h1::conn][DEBUG] incoming body is content-length (26 bytes)
+[2018-02-11][19:33:38][hyper::proto::h1::io][DEBUG] flushed 82 bytes
+[2018-02-11][19:33:38][tokio_core::reactor][DEBUG] loop process - 2 events, Duration { secs: 0, nanos: 899785 }
+[2018-02-11][19:33:38][tokio_core::reactor][DEBUG] loop poll - Duration { secs: 0, nanos: 17961 }
+[2018-02-11][19:33:38][tokio_core::reactor][DEBUG] loop time - Instant { t: 1637575473572 }
+[2018-02-11][19:33:38][tokio_core::reactor][DEBUG] consuming notification queue
+[2018-02-11][19:33:38][tokio_core::reactor][DEBUG] dropping I/O source: 1
+[2018-02-11][19:33:38][tokio_core::reactor][DEBUG] loop process - 1 events, Duration { secs: 0, nanos: 401139 }
+[2018-02-11][19:33:38][tokio_core::reactor][DEBUG] loop poll - Duration { secs: 0, nanos: 10691 }
+[2018-02-11][19:33:38][tokio_core::reactor][DEBUG] loop time - Instant { t: 1637575474733 }
+[2018-02-11][19:33:38][tokio_core::reactor][DEBUG] loop process - 0 events, Duration { secs: 0, nanos: 164646 }
+[2018-02-11][21:26:05][world_connection::util][INFO] #### The settings.toml information are : 
+  {"port": "3000"}
+[2018-02-11][21:26:05][world_connection][INFO] ##### Server created ---------------------------
+[2018-02-11][21:26:05][tokio_core::reactor][DEBUG] adding a new I/O source
+[2018-02-11][21:26:05][world_connection::rpc::web][INFO] ##### Web server started at : 3000 ---------------------------
+[2018-02-11][21:26:05][tokio_core::reactor][DEBUG] consuming notification queue
+[2018-02-11][21:26:05][tokio_core::reactor][DEBUG] scheduling direction for: 0
+[2018-02-11][21:26:05][tokio_core::reactor][DEBUG] blocking
+[2018-02-11][21:26:05][tokio_core::reactor][DEBUG] loop poll - Duration { secs: 0, nanos: 52173 }
+[2018-02-11][21:26:05][tokio_core::reactor][DEBUG] loop time - Instant { t: 1653354254243 }
+[2018-02-11][21:26:05][tokio_core::reactor][DEBUG] consuming notification queue
+[2018-02-11][21:26:05][tokio_core::reactor][DEBUG] loop process - 1 events, Duration { secs: 0, nanos: 958801 }
+[2018-02-11][21:26:05][tokio_core::reactor][DEBUG] loop poll - Duration { secs: 0, nanos: 27797 }
+[2018-02-11][21:26:05][tokio_core::reactor][DEBUG] loop time - Instant { t: 1653354257296 }
+[2018-02-11][21:26:05][tokio_core::reactor][DEBUG] loop process - 0 events, Duration { secs: 0, nanos: 605986 }
+[2018-02-11][21:27:25][world_connection::util][INFO] #### The settings.toml information are : 
+  {"port": "3000"}
+[2018-02-11][21:27:25][world_connection][INFO] ##### Server created ---------------------------
+[2018-02-11][21:27:25][world_connection::rpc::web][INFO] ##### Web server started at : 3000 ---------------------------
+[2018-02-12][20:55:16][world_connection::util][INFO] #### The settings.toml information are : 
+  {"port": "3000"}
+[2018-02-12][20:55:16][world_connection][INFO] ##### Server created ---------------------------
+[2018-02-12][20:55:16][world_connection::rpc::web][INFO] ##### Web server started at : 3000 ---------------------------

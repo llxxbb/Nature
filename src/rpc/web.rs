@@ -46,7 +46,7 @@ impl Service for WebServer {
                     let body = format!("Hello {}, your number is {}", json["name"], json["number"]);
                     Response::new()
                         .with_header(ContentLength(body.len() as u64))
-                        .with_body(body)
+                        .with_body(body) 
                 }))
             }
             _ => {
