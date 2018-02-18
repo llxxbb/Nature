@@ -1,25 +1,20 @@
 ///! A public lib for outer user call
-///
+#[derive(Serialize, Deserialize)]
 pub struct DataDefineBase {
     pub biz: String,
     pub version: u32,
 }
 
-pub struct Data {
+#[derive(Serialize, Deserialize)]
+pub struct WorldConnectionInput {
     pub define: DataDefineBase,
     pub content: String,
     pub context: String,
 }
 
-
-pub enum WorldConnectionResult {
-    OkR(u32),
-    Err(String),
-}
-
-pub trait WorldConnectionService {
-    fn input(data: Data) -> WorldConnectionResult;
-    fn input_batch(batch: Vec<Data>) -> WorldConnectionResult;
-    fn converter_callback() -> WorldConnectionResult;
-    fn query();
+pub trait WorldConnectionService: Sync {
+    fn input(&self, data: WorldConnectionInput) -> Result<u64, String>;
+    fn input_batch(&self, batch: Vec<WorldConnectionInput>) -> Result<u64, String>;
+    fn converter_callback(&self) -> Result<u64, String>;
+    fn query(&self);
 }

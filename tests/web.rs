@@ -3,10 +3,10 @@ extern crate hyper;
 extern crate tokio_core;
 
 use futures::{Future, Stream};
-use self::hyper::client::Client;
-use self::hyper::{Method, Request, StatusCode};
-use self::hyper::header::{ContentLength, ContentType};
-use self::tokio_core::reactor::Core;
+use hyper::{Method, Request, StatusCode};
+use hyper::client::Client;
+use hyper::header::{ContentLength, ContentType};
+use tokio_core::reactor::Core;
 use std::io::*;
 use std::str;
 
@@ -25,7 +25,7 @@ fn it_works() {
 
     println!("test begin ----------------");
     let post = client.request(req).and_then(|res| {
-        assert!(res.status() == StatusCode::Ok);
+        assert_eq!(res.status(), StatusCode::Ok);
         res.body().concat2()
     });
 

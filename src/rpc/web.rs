@@ -1,22 +1,28 @@
+extern crate futures;
 ///! rpc server, collect data from different rpc client then call the server
-use super::futures::{future, Stream};
-use super::futures::future::Future;
-use super::hyper::{Error, Method, StatusCode};
-use super::hyper::header::ContentLength;
-use super::hyper::server::{Http, Request, Response, Service};
+extern crate hyper;
+
+use biz::WorldConnectionInput;
+use self::futures::{future, Stream};
+use self::futures::future::Future;
+use self::hyper::{Error, Method, StatusCode};
+use self::hyper::Chunk;
+use self::hyper::header::ContentLength;
+use self::hyper::server::{Http, Request, Response, Service};
+use service::SERVICE;
+use std::result::Result::*;
 use super::serde_json;
 
-pub fn web_rpc(port: &str) {
+
+struct WebServer;
+
+pub fn start_web_server(port: &str) {
     let addr = format!("127.0.0.1:{}", port).parse().unwrap();
-    let web_server = Http::new().bind(&addr, || Ok(WebServer)).unwrap();
+    let closure = move || Ok(WebServer);
+    let web_server = Http::new().bind(&addr, closure).unwrap();
     info!("##### Web server started at : {} ---------------------------", port);
     web_server.run().unwrap();
 }
-
-
-pub struct WebServer;
-
-static MISSING: &[u8] = b"Missing field";
 
 impl Service for WebServer {
     type Request = Request;
@@ -28,30 +34,48 @@ impl Service for WebServer {
         match (req.method(), req.path()) {
             (&Method::Post, "/input") => {
                 Box::new(req.body().concat2().map(|b| {
-                    let json: serde_json::Value = if let Ok(j) = serde_json::from_slice(b.as_ref()) {
-                        j
-                    } else {
-                        return Response::new()
-                            .with_status(StatusCode::BadRequest)
-                            .with_body(MISSING);
-                    };
-                    // Validate the request parameters, returning
-                    // early if an invalid input is detected.
-                    if json["name"] == serde_json::Value::Null {
-                        return Response::new()
-                            .with_status(StatusCode::BadRequest)
-                            .with_body("name field not found");
+                    match handle_input_para(b) {
+                        Ok(input) => {
+                            let rtn = SERVICE.input(input);
+                            match rtn {
+                                Ok(sn) => {
+                                    return Response::new()
+                                        .with_status(StatusCode::Ok)
+                                        .with_body(sn.to_string());
+                                }
+                                Err(msg) => {
+                                    return Response::new()
+                                        .with_status(StatusCode::UnprocessableEntity)
+                                        .with_header(ContentLength(msg.len() as u64))
+                                        .with_body(msg);
+                                }
+                            }
+                        }
+                        Err(msg) => {
+                            return Response::new()
+                                .with_status(StatusCode::UnprocessableEntity)
+                                .with_header(ContentLength(msg.len() as u64))
+                                .with_body(msg);
+                        }
                     }
-
-                    let body = format!("Hello {}, your number is {}", json["name"], json["number"]);
-                    Response::new()
-                        .with_header(ContentLength(body.len() as u64))
-                        .with_body(body) 
-                }))
+                }
+                ))
             }
             _ => {
                 Box::new(future::ok(Response::new().with_status(StatusCode::NotFound)))
             }
         }
     }
+}
+
+fn handle_input_para(chunk: Chunk) -> Result<WorldConnectionInput, String> {
+    let json: WorldConnectionInput = if let Ok(j) = serde_json::from_slice(chunk.as_ref()) {
+        j
+    } else {
+        return Err(String::from("Incorrect json for [WorldConnectionInput]"));
+    };
+    if json.define.biz.is_empty() {
+        return Err(String::from("[biz] must not be empty!"));
+    }
+    Ok(json)
 }

@@ -1,27 +1,20 @@
+extern crate chrono;
+extern crate fern;
 extern crate hyper;
-
 #[macro_use]
 extern crate log;
-extern crate fern;
 extern crate world_connection;
-extern crate chrono;
-
-use hyper::server::Http;
-use world_connection::server::Server;
-
 
 fn main() {
     // init logger
-    world_connection::util::setup_logger();
+    world_connection::util::setup_logger().unwrap();
 
     // read config
     let config = world_connection::util::get_settings();
 
-    // create server
-    let server = Server {};
     info!("##### Server created ---------------------------");
     // create rpc server
-    world_connection::rpc::web::web_rpc(config.get("port").unwrap());
+    world_connection::rpc::start_web_server(config.get("port").unwrap());
 }
 
 
