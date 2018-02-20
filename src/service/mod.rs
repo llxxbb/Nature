@@ -2,12 +2,13 @@
 use biz::WorldConnectionInput;
 use biz::WorldConnectionService;
 
-pub static SERVICE: &WorldConnectionService = &Service {};
-
 pub struct Service {}
 
 impl WorldConnectionService for Service {
-    fn input(&self, _data: WorldConnectionInput) -> Result<u64, String> {
+    fn input(&self, data: WorldConnectionInput) -> Result<u64, String> {
+        if data.define.biz.is_empty() {
+            return Err(String::from("[biz] must not be empty!"));
+        }
         unimplemented!()
     }
 

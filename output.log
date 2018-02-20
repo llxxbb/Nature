@@ -185,3 +185,7 @@
   {"port": "3000"}
 [2018-02-12][20:55:16][world_connection][INFO] ##### Server created ---------------------------
 [2018-02-12][20:55:16][world_connection::rpc::web][INFO] ##### Web server started at : 3000 ---------------------------
+[2018-02-18][21:05:10][world_connection::util][INFO] #### The settings.toml information are : 
+  {"port": "3000"}
+[2018-02-18][21:05:10][world_connection][INFO] ##### Server created ---------------------------
+[2018-02-18][21:05:10][world_connection::rpc::web][INFO] ##### Web server started at : 3000 ---------------------------

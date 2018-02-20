@@ -1,7 +1,7 @@
-extern crate fern;
 extern crate chrono;
-extern crate log;
 extern crate config;
+extern crate fern;
+extern crate log;
 
 use std;
 use std::collections::HashMap;
