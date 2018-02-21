@@ -2,7 +2,10 @@
 
 extern crate serde_json;
 
-pub mod web;
-pub use self::web::start_web_server;
+pub use self::hyper::start_hyper_server;
+pub use self::rocket::start_rocket_server;
 
+pub mod hyper;
+
+pub mod rocket;
 

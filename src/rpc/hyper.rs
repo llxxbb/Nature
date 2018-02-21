@@ -12,7 +12,7 @@ use self::hyper::server::{Http, Request, Response, Service};
 use std::result::Result::*;
 use super::serde_json;
 
-pub fn start_web_server<T: WorldConnectionService>(port: &str, server: &'static T) {
+pub fn start_hyper_server<T: WorldConnectionService>(port: &str, server: &'static T) {
     let addr = format!("127.0.0.1:{}", port).parse().unwrap();
     let closure = move || Ok(WebServer { service: server });
     let web_server = Http::new().bind(&addr, closure).unwrap();

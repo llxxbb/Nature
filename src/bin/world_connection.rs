@@ -1,10 +1,10 @@
 extern crate chrono;
 extern crate fern;
-extern crate hyper;
 #[macro_use]
 extern crate log;
 extern crate world_connection;
 
+use world_connection::rpc::*;
 use world_connection::service::Service;
 
 
@@ -19,7 +19,8 @@ fn main() {
     static SERVICE: Service = Service {};
     info!("##### Server created ---------------------------");
     // create rpc server
-    world_connection::rpc::start_web_server(config.get("port").unwrap(), &SERVICE);
+//    start_hyper_server(config.get("port").unwrap(), &SERVICE);
+    start_rocket_server(&SERVICE).launch();
 }
 
 
