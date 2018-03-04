@@ -1,58 +1,49 @@
 use biz::*;
+use mockers::Scenario;
 use rocket::http::ContentType;
 use rocket::http::Status;
 use rocket::local::Client;
-use super::*;
 
-
-struct MyService;
-
-
-impl WorldConnectionService for MyService {
-    fn input(&self, data: WorldConnectionInput) -> Result<u64, String> {
-        unimplemented!()
-    }
-
-    fn input_batch(&self, batch: Vec<WorldConnectionInput>) -> Result<u64, String> {
-        unimplemented!()
-    }
-
-    fn converter_callback(&self) -> Result<u64, String> {
-        unimplemented!()
-    }
-
-    fn query(&self) {
-        unimplemented!()
+mock! {
+    WorldConnectionServiceMock,  // Mock type name
+//    world_connection::biz, // This is mocked trait's package
+    ::biz,
+    trait WorldConnectionService {
+        fn input(&self, data: WorldConnectionInput) -> Result<u64, &str>;
+        fn input_batch(&self, batch: Vec<WorldConnectionInput>) -> Result<u64, &str>;
+        fn converter_callback(&self) -> Result<u64, &str>;
+        fn query(&self);
     }
 }
 
-static SERVICE: MockWorldConnectionService = MockWorldConnectionService::new();
 
 #[test]
 fn input() {
+    let scenario = Scenario::new();
+    let mock = scenario.create_mock::<WorldConnectionServiceMock>() ;
+    let mock : &'static (WorldConnectionService + Sync)  = &mock;
 //    let mock: &'static WorldConnectionService = &MockWorldConnectionService::new();
-    let rocket = super::start_rocket_server(&SERVICE);
+    let rocket = super::start_rocket_server(mock);
     let client = Client::new(rocket).expect("valid rocket instance");
-//    let json = ::serde_json::to_string()
-//        let json = ::serde_json::to_string(&(
-//            WorldConnectionInput {
-//                define: DataDefineBase {
-//                    biz: String::from("test"),
-//                    version: 1
-//                },
-//                content: String::from("hello"),
-//                context: String::new(),
-//            })).unwrap();
-    let json = r#"
-        {
-            "define":{
-                "biz":"test",
-                "version": 1
+    let json = ::serde_json::to_string(&(
+        WorldConnectionInput {
+            define: DataDefineBase {
+                biz: String::from("test"),
+                version: 1,
             },
-            "content":"hello",
-            "context":""
-        }
-        "#;
+            content: String::from("hello"),
+            context: String::new(),
+        })).unwrap();
+//    let json = r#"
+//        {
+//            "define":{
+//                "biz":"test",
+//                "version": 1
+//            },
+//            "content":"hello",
+//            "context":""
+//        }
+//        "#;
     println!("{:?}", json);
     let mut response = client.post("/input")
         .body(json)

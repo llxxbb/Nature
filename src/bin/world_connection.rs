@@ -13,11 +13,12 @@ fn main() {
     world_connection::util::setup_logger().unwrap();
 
     // read config
-    let config = world_connection::util::get_settings();
+//    let config = world_connection::util::get_settings();
 
     // create server
     static SERVICE: Service = Service {};
     info!("##### Server created ---------------------------");
+
     // create rpc server
 //    start_hyper_server(config.get("port").unwrap(), &SERVICE);
     start_rocket_server(&SERVICE).launch();
