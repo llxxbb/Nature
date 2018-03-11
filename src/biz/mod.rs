@@ -16,9 +16,9 @@ pub struct WorldConnectionInput {
 }
 
 pub trait WorldConnectionService {
-    fn input(&self, data: WorldConnectionInput) -> Result<u64, &str>;
-    fn input_batch(&self, batch: Vec<WorldConnectionInput>) -> Result<u64, &str>;
-    fn converter_callback(&self) -> Result<u64, &str>;
-    fn query(&self);
+    fn input(&self, data: WorldConnectionInput) -> Result<u64, String>;
+//    fn input_batch(&self, batch: Vec<WorldConnectionInput>) -> Result<u64, String>;
+//    fn converter_callback(&self) -> Result<u64, String>;
+//    fn query(&self);
 }
 

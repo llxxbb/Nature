@@ -2,26 +2,15 @@
 use biz::WorldConnectionInput;
 use biz::WorldConnectionService;
 
-pub struct Service {}
+pub struct Service;
 
-impl WorldConnectionService for Service{
-    fn input(&self, data: WorldConnectionInput) -> Result<u64, &str> {
+
+impl WorldConnectionService for Service {
+    fn input(&self, data: WorldConnectionInput) -> Result<u64, String> {
         if data.define.biz.is_empty() {
-            return Err("[biz] must not be empty!");
+            return Err("[biz] must not be empty!".to_string());
         }
-        unimplemented!()
-    }
-
-    fn input_batch(&self, _batch: Vec<WorldConnectionInput>) -> Result<u64, &str> {
-        unimplemented!()
-    }
-
-    fn converter_callback(&self) -> Result<u64, &str> {
-        unimplemented!()
-    }
-
-    fn query(&self) {
-        unimplemented!()
+        Ok(1)
     }
 }
 

@@ -1,29 +1,42 @@
 use biz::*;
-use mockers::Scenario;
 use rocket::http::ContentType;
 use rocket::http::Status;
 use rocket::local::Client;
+use std::sync::atomic::AtomicUsize;
+use std::sync::atomic::Ordering;
 
-mock! {
-    WorldConnectionServiceMock,  // Mock type name
-//    world_connection::biz, // This is mocked trait's package
-    ::biz,
-    trait WorldConnectionService {
-        fn input(&self, data: WorldConnectionInput) -> Result<u64, &str>;
-        fn input_batch(&self, batch: Vec<WorldConnectionInput>) -> Result<u64, &str>;
-        fn converter_callback(&self) -> Result<u64, &str>;
-        fn query(&self);
+
+#[derive(Debug, Default)]
+struct MyWorldConnectionService {
+    input_counter: AtomicUsize,
+}
+
+impl WorldConnectionService for MyWorldConnectionService {
+    fn input(&self, _data: WorldConnectionInput) -> Result<u64, &str> {
+        Ok(self.input_counter.fetch_add(1, Ordering::SeqCst) as u64)
+    }
+
+    fn input_batch(&self, _batch: Vec<WorldConnectionInput>) -> Result<u64, &str> {
+        unimplemented!()
+    }
+
+    fn converter_callback(&self) -> Result<u64, &str> {
+        unimplemented!()
+    }
+
+    fn query(&self) {
+        unimplemented!()
     }
 }
 
 
 #[test]
 fn input() {
-    let scenario = Scenario::new();
-    let mock = scenario.create_mock::<WorldConnectionServiceMock>() ;
-    let mock : &'static (WorldConnectionService + Sync)  = &mock;
-//    let mock: &'static WorldConnectionService = &MockWorldConnectionService::new();
-    let rocket = super::start_rocket_server(mock);
+    lazy_static! {
+        static ref MOCK : MyWorldConnectionService  = MyWorldConnectionService::default();
+    }
+
+    let rocket = super::start_rocket_server(&*MOCK);
     let client = Client::new(rocket).expect("valid rocket instance");
     let json = ::serde_json::to_string(&(
         WorldConnectionInput {
