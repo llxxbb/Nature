@@ -5,7 +5,7 @@ use biz::{WorldConnectionInput, WorldConnectionService};
 use self::rocket_contrib::Json;
 use super::super::rocket::{ignite, Rocket, State};
 
-type WS= &'static (WorldConnectionService + Send + Sync);
+type WS= &'static (WorldConnectionService + Sync);
 
 pub fn start_rocket_server(svc: WS) -> Rocket {
     ignite()

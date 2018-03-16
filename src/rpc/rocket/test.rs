@@ -12,20 +12,8 @@ struct MyWorldConnectionService {
 }
 
 impl WorldConnectionService for MyWorldConnectionService {
-    fn input(&self, _data: WorldConnectionInput) -> Result<u64, &str> {
+    fn input(&self, _data: WorldConnectionInput) -> Result<u64, String> {
         Ok(self.input_counter.fetch_add(1, Ordering::SeqCst) as u64)
-    }
-
-    fn input_batch(&self, _batch: Vec<WorldConnectionInput>) -> Result<u64, &str> {
-        unimplemented!()
-    }
-
-    fn converter_callback(&self) -> Result<u64, &str> {
-        unimplemented!()
-    }
-
-    fn query(&self) {
-        unimplemented!()
     }
 }
 
@@ -65,5 +53,5 @@ fn input() {
 
     assert_eq!(response.status(), Status::Ok);
     assert_eq!(response.content_type(), Some(ContentType::JSON));
-    assert_eq!(response.body_string(), Some(r#"{"Ok":123}"#.into()));
+    assert_eq!(response.body_string(), Some(r#"{"Ok":0}"#.into()));
 }
