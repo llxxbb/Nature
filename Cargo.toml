@@ -1,6 +1,6 @@
 [package]
-name = "world_connection"
-version = "0.1.0"
+name = "nature"
+version = "0.0.1"
 authors = ["XueBin Li"]
 
 [dependencies]
