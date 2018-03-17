@@ -1,13 +1,13 @@
 extern crate chrono;
 extern crate fern;
-extern crate world_connection;
+extern crate nature;
 
-use world_connection::rpc::*;
-use world_connection::service::Service;
+use nature::rpc::*;
+use nature::service::Service;
 
 fn main() {
     // init logger
-    world_connection::util::setup_logger().unwrap();
+    nature::util::setup_logger().unwrap();
 
     // read config
 //    let config = world_connection::util::get_settings();

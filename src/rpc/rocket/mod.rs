@@ -1,11 +1,11 @@
 extern crate rocket_contrib;
 
 /// convert Web Request to native request
-use biz::{WorldConnectionInput, WorldConnectionService};
+use biz::{Nature, ThingInstance};
 use self::rocket_contrib::Json;
 use super::super::rocket::{ignite, Rocket, State};
 
-type WS= &'static (WorldConnectionService + Sync);
+type WS = &'static (Nature + Sync);
 
 pub fn start_rocket_server(svc: WS) -> Rocket {
     ignite()
@@ -14,8 +14,8 @@ pub fn start_rocket_server(svc: WS) -> Rocket {
 }
 
 #[post("/input", format = "application/json", data = "<data>")]
-fn input(data: Json<WorldConnectionInput>, svc: State<WS>) -> Json<Result<u64, String>> {
-    let x = svc.input(data.0);
+fn input(data: Json<ThingInstance>, svc: State<WS>) -> Json<Result<[u8; 16], String>> {
+    let x = svc.transform(data.0);
     Json(x)
 }
 

@@ -11,8 +11,8 @@ struct MyWorldConnectionService {
     input_counter: AtomicUsize,
 }
 
-impl WorldConnectionService for MyWorldConnectionService {
-    fn input(&self, _data: WorldConnectionInput) -> Result<u64, String> {
+impl Nature for MyWorldConnectionService {
+    fn input(&self, _data: ThingInstance) -> Result<u64, String> {
         Ok(self.input_counter.fetch_add(1, Ordering::SeqCst) as u64)
     }
 }
@@ -27,9 +27,9 @@ fn input() {
     let rocket = super::start_rocket_server(&*MOCK);
     let client = Client::new(rocket).expect("valid rocket instance");
     let json = ::serde_json::to_string(&(
-        WorldConnectionInput {
-            define: DataDefineBase {
-                biz: String::from("test"),
+        ThingInstance {
+            thing: Thing {
+                id: String::from("test"),
                 version: 1,
             },
             content: String::from("hello"),
