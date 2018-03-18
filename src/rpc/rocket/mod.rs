@@ -1,7 +1,7 @@
 extern crate rocket_contrib;
 
 /// convert Web Request to native request
-use biz::{Nature, ThingInstance};
+use define::{Nature, ThingInstance};
 use self::rocket_contrib::Json;
 use super::super::rocket::{ignite, Rocket, State};
 

@@ -1,9 +1,10 @@
-use biz::*;
+use define::*;
 use rocket::http::ContentType;
 use rocket::http::Status;
 use rocket::local::Client;
 use std::sync::atomic::AtomicUsize;
 use std::sync::atomic::Ordering;
+use uuid::{UuidBytes,NAMESPACE_DNS,Uuid};
 
 
 #[derive(Debug, Default)]
@@ -12,8 +13,9 @@ struct MyWorldConnectionService {
 }
 
 impl Nature for MyWorldConnectionService {
-    fn input(&self, _data: ThingInstance) -> Result<u64, String> {
-        Ok(self.input_counter.fetch_add(1, Ordering::SeqCst) as u64)
+    fn transform(&self, _data: ThingInstance) -> Result<UuidBytes, String> {
+        self.input_counter.fetch_add(1, Ordering::SeqCst);
+        Ok(*Uuid::new_v3(&NAMESPACE_DNS,"hello").as_bytes())
     }
 }
 
@@ -32,13 +34,16 @@ fn input() {
                 id: String::from("test"),
                 version: 1,
             },
+            instance_id: *Uuid::new_v3(&NAMESPACE_DNS, "hello").as_bytes(),
+            execute_time: 0,
+            operate_time: 0,
             content: String::from("hello"),
             context: String::new(),
         })).unwrap();
 //    let json = r#"
 //        {
-//            "define":{
-//                "biz":"test",
+//            "thing":{
+//                "id":"test",
 //                "version": 1
 //            },
 //            "content":"hello",
@@ -53,5 +58,5 @@ fn input() {
 
     assert_eq!(response.status(), Status::Ok);
     assert_eq!(response.content_type(), Some(ContentType::JSON));
-    assert_eq!(response.body_string(), Some(r#"{"Ok":0}"#.into()));
+    assert_eq!(response.body_string().unwrap().contains("Ok"), true);
 }

@@ -1,3 +1,5 @@
+use uuid::UuidBytes;
+
 ///! A public lib for outer user call
 ///
 ///
@@ -41,12 +43,15 @@ pub struct ThingExtended{
 #[derive(Debug)]
 pub struct ThingInstance {
     pub thing: Thing,
+    pub instance_id: UuidBytes,
+    pub execute_time:u64,
+    pub operate_time:u64,
     pub content: String,
     pub context: String,
 }
 
 pub trait Nature {
-    fn transform(&self, instance: ThingInstance) -> Result<[u8; 16], String>;
+    fn transform(&self, instance: ThingInstance) -> Result<UuidBytes, String>;
 //    fn input_batch(&self, batch: Vec<WorldConnectionInput>) -> Result<u64, String>;
 //    fn converter_callback(&self) -> Result<u64, String>;
 //    fn query(&self);

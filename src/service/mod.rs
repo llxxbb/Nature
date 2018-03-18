@@ -1,8 +1,8 @@
 ///! World Connection Service provider
 extern crate uuid;
 
-use biz::ThingInstance;
-use biz::Nature;
+use define::ThingInstance;
+use define::Nature;
 use self::uuid::Uuid;
 use self::uuid::NAMESPACE_DNS;
 pub struct Service;

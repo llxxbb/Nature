@@ -14,9 +14,11 @@ extern crate serde;
 #[macro_use]
 extern crate serde_derive;
 extern crate serde_json;
+extern crate uuid;
+extern crate chrono;
 
 
-pub mod biz;
+pub mod define;
 pub mod service;
 pub mod rpc;
 pub mod util;
