@@ -6,19 +6,17 @@ use uuid::UuidBytes;
 
 
 /// `Thing`'s basic information
-#[derive(Serialize, Deserialize)]
-#[derive(Debug)]
+#[derive(Serialize, Deserialize, Debug, Default)]
 pub struct Thing {
-    /// To identify a `Thing`.
+    /// # Identify a `Thing`.
+    ///
     /// A `Thing` may have a lots of `ThingInstance`s, so it's a **Class** for ThingInstance`.
     /// Because there are huge quantity of `Thing`s , so we need a way to organize `Thing`s.
     /// A way is to set name with hierarchical structures,
     ///
-    /// # Example
+    /// # Value Example
     ///
-    /// ```
-    ///     "shop/order"
-    /// ```
+    /// shop/order
     pub key: String,
 
     /// A `Thing` can be changed in future, the `version` will support this without effect the old ones
@@ -26,6 +24,7 @@ pub struct Thing {
 }
 
 /// `Thing`'s extended information
+#[derive(Serialize, Deserialize, Debug, Default)]
 pub struct ThingExtended {
     pub thing: Thing,
 
@@ -37,19 +36,40 @@ pub struct ThingExtended {
 }
 
 
-#[derive(Serialize, Deserialize)]
-#[derive(Debug)]
-pub struct ThingInstance {
+/// A snapshot for a particular `Thing`
+#[derive(Serialize, Deserialize, Debug, Default)]
+pub struct InstanceNoID {
+    /// This instance's Type
     pub thing: Thing,
-    pub id: UuidBytes,
+    /// The time which plan to flow for this instance
     pub execute_time: u64,
-    pub operate_time: u64,
+    /// When this instance created
+    pub create_time: u64,
+    /// What contend in this instance for the `Thing`
     pub content: String,
+    /// Is a json for a `Map[key, value]` which contents other instance for other `Thing`'s.
+    /// `Nature` can transform those to `Instance`'s by flowing.
+    ///
+    /// # Key
+    ///
+    /// context name
+    ///
+    /// # Value
+    ///
+    /// json data for a `Instance`.
     pub context: String,
 }
 
+/// A snapshot for a particular `Thing`
+#[derive(Serialize, Deserialize, Debug, Default)]
+pub struct Instance {
+    /// Used to distinguish other instance
+    pub id: UuidBytes,
+    pub data: InstanceNoID,
+}
+
 pub trait Nature {
-    fn flow(&self, thing: ThingInstance) -> Result<UuidBytes, String>;
+    fn flow(&self, thing: Instance) -> Result<UuidBytes, String>;
 //    fn input_batch(&self, batch: Vec<WorldConnectionInput>) -> Result<u64, String>;
 //    fn converter_callback(&self) -> Result<u64, String>;
 //    fn query(&self);

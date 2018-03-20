@@ -4,7 +4,7 @@ use rocket::http::Status;
 use rocket::local::Client;
 use std::sync::atomic::AtomicUsize;
 use std::sync::atomic::Ordering;
-use uuid::{UuidBytes,NAMESPACE_DNS,Uuid};
+use uuid::{NAMESPACE_DNS, Uuid, UuidBytes};
 
 
 #[derive(Debug, Default)]
@@ -13,15 +13,15 @@ struct MyWorldConnectionService {
 }
 
 impl Nature for MyWorldConnectionService {
-    fn flow(&self, _data: ThingInstance) -> Result<UuidBytes, String> {
+    fn flow(&self, _data: Instance) -> Result<UuidBytes, String> {
         self.input_counter.fetch_add(1, Ordering::SeqCst);
-        Ok(*Uuid::new_v3(&NAMESPACE_DNS,"hello").as_bytes())
+        Ok(*Uuid::new_v3(&NAMESPACE_DNS, "hello").as_bytes())
     }
 }
 
 
 #[test]
-fn input() {
+fn flow() {
     lazy_static! {
         static ref MOCK : MyWorldConnectionService  = MyWorldConnectionService::default();
     }
@@ -29,16 +29,18 @@ fn input() {
     let rocket = super::start_rocket_server(&*MOCK);
     let client = Client::new(rocket).expect("valid rocket instance");
     let json = ::serde_json::to_string(&(
-        ThingInstance {
-            thing: Thing {
-                key: String::from("test"),
-                version: 1,
-            },
+        Instance {
             id: *Uuid::new_v3(&NAMESPACE_DNS, "hello").as_bytes(),
-            execute_time: 0,
-            operate_time: 0,
-            content: String::from("hello"),
-            context: String::new(),
+            data: InstanceNoID {
+                thing: Thing {
+                    key: String::from("test"),
+                    version: 1,
+                },
+                execute_time: 0,
+                create_time: 0,
+                content: String::from("hello"),
+                context: String::new(),
+            },
         })).unwrap();
 //    let json = r#"
 //        {
