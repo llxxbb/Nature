@@ -1,14 +1,14 @@
 #![feature(plugin, proc_macro)]
 #![plugin(rocket_codegen)]
-#![plugin(mockers_macros)]
+//#![plugin(mockers_macros)]
 extern crate fern;
 #[macro_use]
 #[cfg(test)]
 extern crate lazy_static;
 #[macro_use]
 extern crate log;
-#[cfg(test)]
-extern crate mockers;
+//#[cfg(test)]
+//extern crate mockers;
 extern crate rocket;
 extern crate serde;
 #[macro_use]

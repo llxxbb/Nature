@@ -13,7 +13,7 @@ struct MyWorldConnectionService {
 }
 
 impl Nature for MyWorldConnectionService {
-    fn transform(&self, _data: ThingInstance) -> Result<UuidBytes, String> {
+    fn flow(&self, _data: ThingInstance) -> Result<UuidBytes, String> {
         self.input_counter.fetch_add(1, Ordering::SeqCst);
         Ok(*Uuid::new_v3(&NAMESPACE_DNS,"hello").as_bytes())
     }
@@ -31,10 +31,10 @@ fn input() {
     let json = ::serde_json::to_string(&(
         ThingInstance {
             thing: Thing {
-                id: String::from("test"),
+                key: String::from("test"),
                 version: 1,
             },
-            instance_id: *Uuid::new_v3(&NAMESPACE_DNS, "hello").as_bytes(),
+            id: *Uuid::new_v3(&NAMESPACE_DNS, "hello").as_bytes(),
             execute_time: 0,
             operate_time: 0,
             content: String::from("hello"),
