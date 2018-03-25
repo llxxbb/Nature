@@ -3,6 +3,7 @@ use serde_json;
 #[derive(Serialize, Deserialize, Debug)]
 pub enum NatureError {
     SerializeError(String),
+    VerifyError(String),
 }
 
 impl From<serde_json::error::Error> for NatureError{

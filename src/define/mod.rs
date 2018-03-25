@@ -1,5 +1,6 @@
-use uuid::UuidBytes;
 use std;
+pub use store::Store as Store;
+use uuid::UuidBytes;
 
 
 ///! A public lib for outer user call
@@ -78,9 +79,6 @@ pub trait Nature {
 //    fn converter_callback(&self) -> Result<u64, String>;
 //    fn query(&self);
 }
-
-
-
 
 pub mod error;
 

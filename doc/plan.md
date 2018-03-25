@@ -2,7 +2,8 @@
 
 ## for the near term
 
-* handle error
+* implement transmit service
+* implement store service
 * implement service
 
 ## future
