@@ -1,11 +1,11 @@
 use define::Instance;
 use define::InstanceNoID;
 use define::Thing;
-use service::Service;
+use service::NatureService;
 
 #[test]
 fn id_generate() {
-    let svr = Service;
+    let svr = NatureService;
     let instance = Instance {
         id: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ],
         data: InstanceNoID {
@@ -22,7 +22,7 @@ fn id_generate() {
 
 #[test]
 fn id_ignore() {
-    let svr = Service;
+    let svr = NatureService;
     let instance = Instance {
         id: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, ],
         data: InstanceNoID {
@@ -36,3 +36,4 @@ fn id_ignore() {
     let result = svr.id_generate_if_not_set(instance).unwrap();
     assert_eq!(result.id, [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0]);
 }
+

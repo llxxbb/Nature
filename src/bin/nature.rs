@@ -3,7 +3,7 @@ extern crate fern;
 extern crate nature;
 
 use nature::rpc::*;
-use nature::service::Service;
+use nature::service::NatureService;
 
 fn main() {
     // init logger
@@ -12,7 +12,7 @@ fn main() {
     // read config
 //    let config = world_connection::util::get_settings();
 
-    start_rocket_server(&Service).launch();
+    start_rocket_server(&NatureService).launch();
 }
 
 
