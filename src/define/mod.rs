@@ -1,4 +1,6 @@
 use uuid::UuidBytes;
+use std;
+
 
 ///! A public lib for outer user call
 ///
@@ -68,13 +70,19 @@ pub struct Instance {
     pub data: InstanceNoID,
 }
 
+pub type Result<T> = std::result::Result<T, error::NatureError>;
+
 pub trait Nature {
-    fn flow(&self, thing: Instance) -> Result<UuidBytes, String>;
+    fn flow(&self, thing: Instance) -> Result<UuidBytes>;
 //    fn input_batch(&self, batch: Vec<WorldConnectionInput>) -> Result<u64, String>;
 //    fn converter_callback(&self) -> Result<u64, String>;
 //    fn query(&self);
 }
 
+
+
+
+pub mod error;
 
 #[cfg(test)]
 mod tests;
