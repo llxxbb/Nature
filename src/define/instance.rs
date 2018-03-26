@@ -1,4 +1,5 @@
 use dao::instance::InstanceDao;
+use dao::thing::ThingDao;
 use define::*;
 use uuid::UuidBytes;
 
@@ -11,7 +12,7 @@ pub struct Instance {
 }
 
 impl Instance {
-    pub fn verify<T: InstanceDao>(&self, dao: &T) -> Result<()> {
+    pub fn verify<T: ThingDao>(&self, dao: &T) -> Result<()> {
         if self.data.thing.key.is_empty() {
             return Err(NatureError::VerifyError("[biz] must not be empty!".to_string()));
         }

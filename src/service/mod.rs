@@ -8,6 +8,7 @@ use self::uuid::Uuid;
 use self::uuid::UuidBytes;
 use serde_json;
 use serde_json::Error;
+use dao::thing::THING_DAO;
 
 pub struct NatureService;
 
@@ -28,8 +29,7 @@ impl NatureService {
 
 impl Nature for NatureService {
     fn flow(&self, thing: Instance) -> Result<UuidBytes> {
-        // TODO
-//        thing.verify()?;
+        thing.verify(&THING_DAO)?;
         let thing = self.id_generate_if_not_set(thing)?;
         thing.store(&INSTANCE_DAO)
     }

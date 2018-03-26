@@ -9,7 +9,7 @@ use uuid::UuidBytes;
 
 
 /// `Thing`'s basic information
-#[derive(Serialize, Deserialize, Debug, Default)]
+#[derive(Serialize, Deserialize, PartialEq, Eq, Hash, Debug, Default, Clone, Ord, PartialOrd)]
 pub struct Thing {
     /// # Identify a `Thing`.
     ///
@@ -78,4 +78,4 @@ pub mod error;
 
 
 #[cfg(test)]
-mod tests;
+mod test_instance_without_id;
