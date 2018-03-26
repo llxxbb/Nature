@@ -59,11 +59,5 @@ things + motion = nature
 ### 去接口
 数据就是接口。接口只是一种技术形式。我们真正关心的是数据。因此我们不需要定义接口只需要定义数据！
 
-### versus other solutions
-
-#### map-reduce framework(MRF)
-
-* MRF's data are defined at low level(by programer).
-* Nature's data are defined at high level by businness manager.
 
 

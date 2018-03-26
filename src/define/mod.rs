@@ -1,11 +1,11 @@
+pub use self::error::NatureError;
+pub use self::instance::Instance;
 use std;
-pub use store::Store as Store;
+pub use store::Store;
 use uuid::UuidBytes;
 
 
 ///! A public lib for outer user call
-///
-///
 
 
 /// `Thing`'s basic information
@@ -63,15 +63,8 @@ pub struct InstanceNoID {
     pub context: String,
 }
 
-/// A snapshot for a particular `Thing`
-#[derive(Serialize, Deserialize, Debug, Default)]
-pub struct Instance {
-    /// Used to distinguish other instance
-    pub id: UuidBytes,
-    pub data: InstanceNoID,
-}
 
-pub type Result<T> = std::result::Result<T, error::NatureError>;
+pub type Result<T> = std::result::Result<T, NatureError>;
 
 pub trait Nature {
     fn flow(&self, thing: Instance) -> Result<UuidBytes>;
@@ -80,7 +73,9 @@ pub trait Nature {
 //    fn query(&self);
 }
 
+pub mod instance;
 pub mod error;
+
 
 #[cfg(test)]
 mod tests;

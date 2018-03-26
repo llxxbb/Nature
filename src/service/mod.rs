@@ -1,9 +1,8 @@
 ///! World Connection Service provider
 extern crate uuid;
 
-use dao::instance::InstanceDaoService;
+use dao::instance::*;
 use define::*;
-use define::error::NatureError;
 use self::uuid::NAMESPACE_DNS;
 use self::uuid::Uuid;
 use self::uuid::UuidBytes;
@@ -26,20 +25,13 @@ impl NatureService {
     }
 }
 
-static INSTANCE_DAO: InstanceDaoService = InstanceDaoService;
 
 impl Nature for NatureService {
     fn flow(&self, thing: Instance) -> Result<UuidBytes> {
-        if thing.data.thing.key.is_empty() {
-            return Err(NatureError::VerifyError("[biz] must not be empty!".to_string()));
-        }
-
+        // TODO
+//        thing.verify()?;
         let thing = self.id_generate_if_not_set(thing)?;
-
-        thing.store(&INSTANCE_DAO);
-
-        let v3 = Uuid::new_v3(&NAMESPACE_DNS, "dfsadf");
-        Ok(*v3.as_bytes())
+        thing.store(&INSTANCE_DAO)
     }
 }
 

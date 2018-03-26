@@ -11,3 +11,5 @@ impl InstanceDao for InstanceDaoService{
         unimplemented!()
     }
 }
+
+pub static INSTANCE_DAO: InstanceDaoService = InstanceDaoService;
