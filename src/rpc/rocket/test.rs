@@ -13,7 +13,7 @@ struct MyWorldConnectionService {
 }
 
 impl Nature for MyWorldConnectionService {
-    fn flow(&self, _data: Instance) -> Result<UuidBytes, String> {
+    fn flow(&self, _data: Instance) -> Result<UuidBytes> {
         self.input_counter.fetch_add(1, Ordering::SeqCst);
         Ok(*Uuid::new_v3(&NAMESPACE_DNS, "hello").as_bytes())
     }

@@ -26,7 +26,6 @@ impl NatureService {
     }
 }
 
-
 impl Nature for NatureService {
     fn flow(&self, thing: Instance) -> Result<UuidBytes> {
         thing.verify(&THING_DAO)?;
