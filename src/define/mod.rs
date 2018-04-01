@@ -1,6 +1,11 @@
-pub use self::error::NatureError;
-pub use self::instance::Instance;
+extern crate diesel;
+
+use chrono::prelude::*;
+use dao::*;
+pub use self::error::*;
+pub use self::instance::*;
 use std;
+use std::rc::Rc;
 pub use store::Store;
 use uuid::UuidBytes;
 
@@ -27,15 +32,24 @@ pub struct Thing {
 }
 
 /// `Thing`'s extended information
-#[derive(Serialize, Deserialize, Debug, Default)]
-pub struct ThingExtended {
-    pub thing: Thing,
+#[derive(Serialize, Deserialize, Debug, Queryable)]
+pub struct ThingDefine {
+    pub key: String,
 
     /// For human readable what the `Thing` is.
-    pub name: String,
+    pub description: String,
+
+    /// version of the `Thing`
+    pub version: u32,
+
+    pub have_states: bool,
+
+    pub states: Option<String>,
 
     /// Define whats the `Thing` should include
-    pub define: String,
+    pub fields: Option<String>,
+
+    pub create_time: DateTime<Utc>,
 }
 
 
@@ -65,13 +79,6 @@ pub struct InstanceNoID {
 
 
 pub type Result<T> = std::result::Result<T, NatureError>;
-
-pub trait Nature {
-    fn flow(&self, thing: Instance) -> Result<UuidBytes>;
-//    fn input_batch(&self, batch: Vec<WorldConnectionInput>) -> Result<u64, String>;
-//    fn converter_callback(&self) -> Result<u64, String>;
-//    fn query(&self);
-}
 
 pub mod instance;
 pub mod error;

@@ -1,15 +1,14 @@
 use define::Instance;
 
 pub trait InstanceDao {
-    fn insert(instance: Instance);
+    fn insert(&self, instance: Instance);
 }
 
 pub struct InstanceDaoService;
 
-impl InstanceDao for InstanceDaoService{
-    fn insert(instance: Instance) {
+impl InstanceDao for InstanceDaoService {
+    fn insert(&self, instance: Instance) {
         unimplemented!()
     }
 }
 
-pub static INSTANCE_DAO: InstanceDaoService = InstanceDaoService;

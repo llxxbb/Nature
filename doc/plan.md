@@ -2,6 +2,7 @@
 
 ## for the near term
 
+* add sqlite
 * verify input
 * implement transmit service
 * implement store service
@@ -17,7 +18,7 @@
 
 ### Thing
 
-* add define verify
+* verify input fields of thing. report error for undefined fields
 
 
 
