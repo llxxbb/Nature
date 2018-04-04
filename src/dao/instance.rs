@@ -7,7 +7,7 @@ pub trait InstanceDao {
 pub struct InstanceDaoService;
 
 impl InstanceDao for InstanceDaoService {
-    fn insert(&self, instance: Instance) {
+    fn insert(&self, _instance: Instance) {
         unimplemented!()
     }
 }

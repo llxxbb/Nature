@@ -1,13 +1,20 @@
-use dao::*;
 use define::*;
 use serde_json;
 use uuid::*;
 
-pub trait Nature<T: ThingDao<CONN>, I: InstanceDao> {
-    fn flow(&self, thing: Instance, thing_dao: &T, instance_dao: &I) -> Result<UuidBytes>;
+pub trait Nature {
+    fn flow(&self, thing: Instance) -> Result<UuidBytes>;
 }
 
 pub struct NatureService;
+
+impl Nature for NatureService {
+    fn flow(&self, thing: Instance) -> Result<UuidBytes> {
+        thing.verify()?;
+        let thing = self.id_generate_if_not_set(thing)?;
+        thing.store()
+    }
+}
 
 impl NatureService {
     fn id_generate_if_not_set(&self, thing: Instance) -> Result<Instance> {
@@ -20,13 +27,5 @@ impl NatureService {
         } else {
             return Ok(thing);
         }
-    }
-}
-
-impl<T: ThingDao<CONN>, I: InstanceDao> Nature<T, I> for NatureService {
-    fn flow(&self, thing: Instance, thing_dao: &T, instance_dao: &I) -> Result<UuidBytes> {
-        thing.verify(thing_dao)?;
-        let thing = self.id_generate_if_not_set(thing)?;
-        thing.store(instance_dao)
     }
 }

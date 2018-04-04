@@ -2,22 +2,19 @@
 extern crate uuid;
 
 use dao::*;
-use define::*;
 use diesel::sqlite::SqliteConnection;
+use r2d2::Pool;
 use r2d2_diesel::ConnectionManager;
 pub use self::nature::*;
-use self::uuid::NAMESPACE_DNS;
-use self::uuid::Uuid;
-use self::uuid::UuidBytes;
-use serde_json;
-use serde_json::Error;
-use std::rc::Rc;
+use std::sync::Mutex;
 
+pub type CONN = SqliteConnection;
 
-struct Service {
-    thins_dao: Rc<Box<ThingDao<CONN>>>,
-    nature: Rc<Box<Nature<ThingDao<CONN>, InstanceDao>>>,
-}
+lazy_static! {
+        pub static ref  POOL :Pool<ConnectionManager<CONN>> = create_pool::<SqliteConnection>();
+        pub static ref  DEFINE_DAO : Mutex<ThingDefineDaoService>  =  Mutex::new(ThingDefineDaoService::new());
+        pub static ref  INSTANCE_DAO : InstanceDaoService  =  InstanceDaoService{};
+    }
 
 
 pub mod nature;

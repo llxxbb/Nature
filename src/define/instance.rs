@@ -1,9 +1,9 @@
 extern crate r2d2;
 
-use dao::*;
 use define::*;
-use self::r2d2::{ManageConnection, Pool};
+use service::*;
 use uuid::UuidBytes;
+use dao::thing::ThingDefineDao;
 
 /// A snapshot for a particular `Thing`
 #[derive(Serialize, Deserialize, Debug, Default)]
@@ -14,11 +14,9 @@ pub struct Instance {
 }
 
 impl Instance {
-    pub fn verify<T: ThingDao<CONN>>(&mut self, dao: &T, conn: Pool<CONN>) -> Result<()> {
-        if self.data.thing.key.is_empty() {
-            return Err(NatureError::VerifyError("[biz] must not be empty!".to_string()));
-        }
-        dao.get(&self.data.thing, conn);
+    pub fn verify(&self) -> Result<()> {
+        let mut dao = DEFINE_DAO.lock().unwrap();
+        let _def = dao.get(&self.data.thing);
         // TODO whether key configured
         Ok(())
     }

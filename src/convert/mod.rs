@@ -1,4 +1,4 @@
 pub struct StoreTask{
-    data: Vec<u8>,
+    _data: Vec<u8>,
 
 }

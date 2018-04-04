@@ -1,13 +1,10 @@
 extern crate diesel;
 
 use chrono::prelude::*;
-use dao::*;
 pub use self::error::*;
 pub use self::instance::*;
 use std;
-use std::rc::Rc;
 pub use store::Store;
-use uuid::UuidBytes;
 
 
 ///! A public lib for outer user call

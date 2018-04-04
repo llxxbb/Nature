@@ -1,20 +1,20 @@
 extern crate rocket_contrib;
 
+use ::rocket::{ignite, Rocket, State};
 /// convert Web Request to native request
 use define::*;
 use self::rocket_contrib::Json;
-use service::NatureService;
-use super::super::rocket::{ignite, Rocket, State};
+use service::*;
 use uuid::UuidBytes;
 
-pub fn start_rocket_server(svc: NatureService) -> Rocket {
+pub fn start_rocket_server() -> Rocket {
     ignite()
-        .manage(svc)
+        .manage(NatureService)
         .mount("/", routes![input])
 }
 
 #[post("/input", format = "application/json", data = "<instance>")]
-pub fn input(instance: Json<Instance>, svc: State<NatureService>) -> Json<Result<UuidBytes>> {
+fn input(instance: Json<Instance>, svc: State<NatureService>) -> Json<Result<UuidBytes>> {
     let x = svc.flow(instance.0);
     Json(x)
 }
