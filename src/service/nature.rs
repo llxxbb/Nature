@@ -1,6 +1,5 @@
 use define::*;
 use instance::Instance;
-use serde_json;
 use uuid::*;
 
 pub trait Nature {

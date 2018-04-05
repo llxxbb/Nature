@@ -78,5 +78,4 @@ pub type Result<T> = std::result::Result<T, NatureError>;
 pub mod error;
 
 
-#[cfg(test)]
-mod test_instance_without_id;
+

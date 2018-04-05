@@ -1,11 +1,12 @@
 use define::*;
+use instance::Instance;
 use rocket::http::ContentType;
 use rocket::http::Status;
 use rocket::local::Client;
+use service::nature::Nature;
 use std::sync::atomic::AtomicUsize;
 use std::sync::atomic::Ordering;
 use uuid::{NAMESPACE_DNS, Uuid, UuidBytes};
-use service::nature::Nature;
 
 
 #[derive(Debug, Default)]
@@ -23,11 +24,11 @@ impl Nature for MyWorldConnectionService {
 
 #[test]
 fn flow() {
-    lazy_static! {
-        static ref MOCK : MyWorldConnectionService  = MyWorldConnectionService::default();
-    }
+//    lazy_static! {
+//        static ref MOCK : MyWorldConnectionService  = MyWorldConnectionService::default();
+//    }
 
-    let rocket = super::start_rocket_server(&*MOCK);
+    let rocket = super::start_rocket_server();
     let client = Client::new(rocket).expect("valid rocket instance");
     let json = ::serde_json::to_string(&(
         Instance {
@@ -61,5 +62,7 @@ fn flow() {
 
     assert_eq!(response.status(), Status::Ok);
     assert_eq!(response.content_type(), Some(ContentType::JSON));
-    assert_eq!(response.body_string().unwrap().contains("Ok"), true);
+    let rtn = response.body_string().unwrap();
+    println!("{:?}", rtn);
+    assert_eq!(rtn, r#"{"Ok":[11,172,237,228,64,20,63,157,183,32,23,63,104,161,201,51]}"#);
 }

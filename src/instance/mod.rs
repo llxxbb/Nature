@@ -42,3 +42,5 @@ impl Instance {
     }
 }
 
+#[cfg(test)]
+mod tests;

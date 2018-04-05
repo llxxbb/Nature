@@ -2,6 +2,7 @@
 
 ## for the near term
 
+* test input
 * verify input
 * implement transmit service
 * implement store service
