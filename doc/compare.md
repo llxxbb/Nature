@@ -38,4 +38,10 @@ https://mp.weixin.qq.com/s?__biz=MjM5MDE0Mjc4MA==&mid=2651006475&idx=3&sn=7b8da1
 
 Spark streaming的本质还是一款基于 microbatch计算的引擎。这种引擎一个天生的缺点就是每个 microbatch的调度开销比较大。Kafka streaming是从一个日志系统做起来的，它的设计目标是足够轻量，足够简洁易用。这一点很难满足对大体量的复杂计算的需求。Storm是一个没有批处理能力的数据流处理器，除此之外 Storm只提供了非常底层的 API，用户需要自己实现很多复杂的逻辑。
 
+### business relation
+
+Find relation Forward versus backward.
+
+static relation versus dynamic relation.
+
 

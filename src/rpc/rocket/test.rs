@@ -5,6 +5,7 @@ use rocket::local::Client;
 use std::sync::atomic::AtomicUsize;
 use std::sync::atomic::Ordering;
 use uuid::{NAMESPACE_DNS, Uuid, UuidBytes};
+use service::nature::Nature;
 
 
 #[derive(Debug, Default)]

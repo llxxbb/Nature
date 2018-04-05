@@ -1,9 +1,9 @@
 #![feature(plugin, proc_macro)]
 #![plugin(rocket_codegen)]
+//#![plugin(mockers_macros)]
 extern crate chrono;
 #[macro_use]
 extern crate diesel;
-//#![plugin(mockers_macros)]
 extern crate fern;
 #[macro_use]
 extern crate lazy_static;
@@ -30,4 +30,4 @@ pub mod util;
 pub mod transmit;
 pub mod convert;
 pub mod dao;
-pub mod store;
+pub mod instance;

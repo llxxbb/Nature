@@ -2,9 +2,7 @@ extern crate diesel;
 
 use chrono::prelude::*;
 pub use self::error::*;
-pub use self::instance::*;
 use std;
-pub use store::Store;
 
 
 ///! A public lib for outer user call
@@ -77,7 +75,6 @@ pub struct InstanceNoID {
 
 pub type Result<T> = std::result::Result<T, NatureError>;
 
-pub mod instance;
 pub mod error;
 
 

@@ -1,8 +1,9 @@
 extern crate rocket_contrib;
 
 use ::rocket::{ignite, Rocket, State};
-/// convert Web Request to native request
 use define::*;
+use instance::Instance;
+/// convert Web Request to native request
 use self::rocket_contrib::Json;
 use service::*;
 use uuid::UuidBytes;

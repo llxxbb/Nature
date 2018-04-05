@@ -21,7 +21,7 @@ fern = "0.5"        # Simple, efficient logging
 #config
 config = "0.8"
 
-# web
+# webup
 rocket = "0.3"
 rocket_codegen = "0.3"
 rocket_contrib = "0.3"

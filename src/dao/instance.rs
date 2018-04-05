@@ -1,4 +1,4 @@
-use define::Instance;
+use instance::Instance;
 
 pub trait InstanceDao {
     fn insert(&self, instance: Instance);

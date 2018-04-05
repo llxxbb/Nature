@@ -2,7 +2,6 @@
 
 ## for the near term
 
-* add sqlite
 * verify input
 * implement transmit service
 * implement store service
