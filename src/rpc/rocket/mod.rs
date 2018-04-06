@@ -3,12 +3,12 @@ extern crate rocket_contrib;
 use ::rocket::{ignite, Rocket, State};
 use define::*;
 use instance::Instance;
+use nature::Nature;
 use self::rocket_contrib::Json;
-use service::*;
 use uuid::UuidBytes;
 
 
-pub fn start_rocket_server(svc: &'static Nature) -> Rocket {
+pub fn start_rocket_server<N:Nature>(svc: &'static N) -> Rocket {
     ignite()
         .manage(svc)
         .mount("/", routes![input])
