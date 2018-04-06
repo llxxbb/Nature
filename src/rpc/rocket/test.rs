@@ -1,11 +1,12 @@
 use define::*;
-use instance::Instance;
+use instance::*;
 use rocket::http::ContentType;
 use rocket::http::Status;
 use rocket::local::Client;
-use service::nature::Nature;
+use service::*;
 use std::sync::atomic::AtomicUsize;
 use std::sync::atomic::Ordering;
+use thing::*;
 use uuid::{NAMESPACE_DNS, Uuid, UuidBytes};
 
 
@@ -27,8 +28,8 @@ fn flow() {
 //    lazy_static! {
 //        static ref MOCK : MyWorldConnectionService  = MyWorldConnectionService::default();
 //    }
-
-    let rocket = super::start_rocket_server();
+//    let svc = MyWorldConnectionService::default();
+    let rocket = super::start_rocket_server(&NatureService);
     let client = Client::new(rocket).expect("valid rocket instance");
     let json = ::serde_json::to_string(&(
         Instance {

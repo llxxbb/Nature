@@ -3,6 +3,7 @@ extern crate r2d2;
 use define::*;
 use lru_time_cache::LruCache;
 use std::time::Duration;
+use thing::*;
 
 pub trait ThingDefineDao: Send + Sync + 'static {
     fn get(&mut self, thing: &Thing) -> Result<&ThingDefine>;
