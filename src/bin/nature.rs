@@ -4,6 +4,7 @@ extern crate nature;
 
 use nature::rpc::*;
 use nature::service::*;
+use nature::nature::*;
 use nature::task::*;
 
 fn main() {

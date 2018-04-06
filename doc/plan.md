@@ -2,7 +2,6 @@
 
 ## for the near term
 
-* create creator
 * test NatureService
 * test input
 * verify input

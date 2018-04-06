@@ -1,14 +1,13 @@
 use define::*;
 use instance::*;
+use nature::*;
 use rocket::http::ContentType;
 use rocket::http::Status;
 use rocket::local::Client;
-use service::*;
 use std::sync::atomic::AtomicUsize;
 use std::sync::atomic::Ordering;
 use thing::*;
 use uuid::{NAMESPACE_DNS, Uuid, UuidBytes};
-
 
 #[derive(Debug, Default)]
 struct MyWorldConnectionService {

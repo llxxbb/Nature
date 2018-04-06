@@ -3,9 +3,9 @@ extern crate r2d2;
 use dao::thing::ThingDefineDao;
 use define::*;
 use serde_json;
-use service::*;
 use thing::*;
 use uuid::*;
+use std::sync::Mutex;
 
 /// A snapshot for a particular `Thing`
 #[derive(Serialize, Deserialize, Debug, Default)]
@@ -16,10 +16,10 @@ pub struct Instance {
 }
 
 impl Instance {
-    pub fn verify(&mut self) -> Result<UuidBytes> {
-        let mut dao = DEFINE_DAO.lock().unwrap();
-        let _def = dao.get(&self.data.thing);
-        // TODO whether key configured
+    pub fn verify(&mut self, dao : &Mutex<ThingDefineDao>) -> Result<UuidBytes> {
+        // just see whether it was configured.
+        let mut dao = dao.lock().unwrap();
+        let _def = dao.get(&self.data.thing)?;
         self.id_generate_if_not_set()
     }
 

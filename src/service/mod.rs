@@ -7,7 +7,6 @@ use diesel::sqlite::SqliteConnection;
 use processor::*;
 use r2d2::Pool;
 use r2d2_diesel::ConnectionManager;
-pub use self::nature::*;
 use std::sync::*;
 use task::*;
 
@@ -20,8 +19,3 @@ lazy_static! {
         pub static ref  PROCESSOR_ROUTE : Processor<Carrier<StoreTask>>  =  Processor::new();
     }
 
-
-pub mod nature;
-
-#[cfg(test)]
-mod test;
