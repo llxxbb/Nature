@@ -4,7 +4,6 @@ extern crate nature;
 
 use nature::rpc::*;
 use nature::service::*;
-use nature::nature::*;
 use nature::task::*;
 
 fn main() {
@@ -15,7 +14,7 @@ fn main() {
 
     start_task_route(&PROCESSOR_ROUTE.receiver);
 
-    start_rocket_server(&NatureService).launch();
+    start_rocket_server().launch();
 }
 
 

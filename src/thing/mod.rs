@@ -19,6 +19,7 @@ pub struct Thing {
 }
 
 /// `Thing`'s extended information
+/// `DateTime` is not implement `Default` trait
 #[derive(Serialize, Deserialize, Debug, Queryable)]
 pub struct ThingDefine {
     pub key: String,
@@ -36,5 +37,5 @@ pub struct ThingDefine {
     /// Define whats the `Thing` should include
     pub fields: Option<String>,
 
-    pub create_time: DateTime<Utc>,
+    pub create_time: DateTime<Local>,
 }

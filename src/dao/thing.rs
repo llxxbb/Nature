@@ -5,7 +5,8 @@ use lru_time_cache::LruCache;
 use std::time::Duration;
 use thing::*;
 
-pub trait ThingDefineDao: Send + Sync + 'static {
+
+pub trait ThingDefineDao {
     fn get(&mut self, thing: &Thing) -> Result<&ThingDefine>;
 }
 

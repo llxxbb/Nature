@@ -2,9 +2,8 @@
 
 ## for the near term
 
-* test NatureService
-* test input
 * verify input
+* test born
 * implement transmit service
 * implement store service
 * implement service
@@ -14,7 +13,7 @@
 * quick start
 * give a demo
 * support multiple rpc types, such as web and gRpc
-* monitor
+* monitor point
 * think about a graph db like **Titan**
 
 ### Thing

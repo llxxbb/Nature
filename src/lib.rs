@@ -1,6 +1,5 @@
 #![feature(plugin, proc_macro)]
 #![plugin(rocket_codegen)]
-//#![plugin(mockers_macros)]
 extern crate chrono;
 #[macro_use]
 extern crate diesel;
@@ -12,8 +11,6 @@ extern crate log;
 extern crate lru_time_cache;
 extern crate r2d2;
 extern crate r2d2_diesel;
-//#[cfg(test)]
-//extern crate mockers;
 extern crate rocket;
 extern crate serde;
 #[macro_use]
@@ -34,4 +31,3 @@ pub mod stream;
 pub mod thing;
 pub mod task;
 pub mod processor;
-pub mod nature;
