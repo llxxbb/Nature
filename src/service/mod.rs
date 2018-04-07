@@ -20,6 +20,7 @@ pub type CONN = SqliteConnection;
 lazy_static! {
         pub static ref  POOL :Pool<ConnectionManager<CONN>> = create_pool::<CONN>();
         pub static ref  DEFINE_DAO : Mutex<ThingDefineDaoService>  =  Mutex::new(ThingDefineDaoService::new());
+//        pub static ref  CARRIER_DAO : Arc<CarrierDaoService>  =  Arc::new(CarrierDaoService);
         pub static ref  INSTANCE_DAO : InstanceDaoService  =  InstanceDaoService{};
         pub static ref  PROCESSOR_ROUTE : Processor<Carrier<StoreTask>>  =  Processor::new();
     }

@@ -16,6 +16,13 @@ fn born_verified_failed() {
 /// verified ok
 #[test]
 fn born_carrier_error() {
+
+
+    //set mode to error
+    let mut guard = MODE.lock().unwrap();
+    *guard = Mode::Err;
+    drop(guard);
+
     let mut instance = Instance::default();
     instance.data.thing.key = "ok".to_string();
     let rtn = InstanceImpl::born(instance);

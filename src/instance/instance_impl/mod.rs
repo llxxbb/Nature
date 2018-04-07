@@ -1,11 +1,11 @@
 use carrier::*;
+use dao::*;
 use instance::instance_trait::InstanceTrait;
 use serde_json;
 use service::*;
 use std::thread;
 use super::*;
 use task::*;
-use dao::*;
 
 pub struct InstanceImpl;
 
@@ -32,7 +32,8 @@ impl InstanceTrait for InstanceImpl {
         let mut instance = instance;
         let uuid = InstanceImpl::verify(&mut instance)?;
         let task = StoreTask(instance);
-        let carrier = Carrier::new(task)?;
+        let carrier = Carrier { data: task };
+        let _cid = CarrierDaoService::insert(&carrier)?;
         carrier.take_it_over()?;
         let sender = PROCESSOR_ROUTE.sender.lock().unwrap().clone();
         thread::spawn(move || {

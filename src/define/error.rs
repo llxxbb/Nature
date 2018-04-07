@@ -5,6 +5,7 @@ pub enum NatureError {
     SerializeError(String),
     VerifyError(String),
     ThingNotDefined(String),
+    CarrierDaoError(String),
 }
 
 impl From<serde_json::error::Error> for NatureError{

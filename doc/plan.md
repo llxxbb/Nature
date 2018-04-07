@@ -2,8 +2,8 @@
 
 ## for the near term
 
-* verify input
-* test born
+* add carrier dao
+* test carrier for born
 * implement transmit service
 * implement store service
 * implement service

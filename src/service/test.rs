@@ -1,12 +1,13 @@
 use chrono::prelude::*;
 use define::*;
-//use instance::*;
 use super::*;
 use thing::*;
 
 lazy_static! {
 //        pub static ref  POOL :Pool<ConnectionManager<CONN>> = create_pool::<CONN>();
         pub static ref  DEFINE_DAO : Mutex<ThingDefineDaoMock>  =  Mutex::new(ThingDefineDaoMock::new());
+//        pub static ref  CARRIER_DAO : Mutex<CarrierDaoService>  =  Mutex::new(CarrierDaoService(Mode::Ok));
+
 //        pub static ref  INSTANCE_DAO : InstanceDaoService  =  InstanceDaoService{};
         pub static ref  PROCESSOR_ROUTE : Processor<Carrier<StoreTask>>  =  Processor::new();
     }

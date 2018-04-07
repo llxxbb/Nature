@@ -3,6 +3,8 @@ extern crate r2d2;
 use define::*;
 #[cfg(not(test))]
 pub use self::instance_impl::*;
+#[cfg(test)]
+pub use self::test::*;
 pub use self::instance_trait::*;
 use thing::*;
 use uuid::*;
@@ -42,4 +44,6 @@ pub struct InstanceNoID {
 
 pub mod instance_trait;
 pub mod instance_impl;
+
+pub mod test;
 

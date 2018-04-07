@@ -3,8 +3,6 @@ extern crate rocket_contrib;
 use ::rocket::{ignite, Rocket};
 use define::*;
 use instance::*;
-#[cfg(test)]
-use self::test::InstanceImpl;
 use self::rocket_contrib::Json;
 use uuid::UuidBytes;
 
