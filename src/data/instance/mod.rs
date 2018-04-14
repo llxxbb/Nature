@@ -5,7 +5,6 @@ use data::thing::*;
 use define::*;
 #[cfg(not(test))]
 pub use self::instance_impl::*;
-pub use self::instance_trait::*;
 #[cfg(test)]
 pub use self::mock::*;
 use service::*;
@@ -56,7 +55,14 @@ pub struct SerialBatchInstance {
     pub instance: Vec<Instance>,
 }
 
-pub mod instance_trait;
+pub trait InstanceTrait {
+    /// born an instance which is the beginning of the changes.
+    fn born(instance: Instance) -> Result<UuidBytes>;
+    fn serial(batch: SerialBatchInstance) ->Result<()>;
+    fn parallel(batch: ParallelBatchInstance) ->Result<()>;
+}
+
+
 pub mod instance_impl;
 #[cfg(test)]
 pub mod mock;

@@ -62,6 +62,7 @@ impl InstanceTrait for InstanceImpl {
         carrier.take_it_over()?;
         let sender = CHANNEL_ROUTE.sender.lock().unwrap().clone();
         thread::spawn(move || {
+            println!("send instance after store");
             sender.send(carrier.data.0).unwrap();
         });
         Ok(uuid)

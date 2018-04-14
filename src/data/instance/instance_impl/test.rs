@@ -54,9 +54,9 @@ fn store_task_error() {
 
 #[test]
 fn received_instance() {
-    pub fn start_task_route(receiver: &'static Mutex<Receiver<Instance>>) {
-        println!("Create Receiver Thread");
+    pub fn start_route(receiver: &'static Mutex<Receiver<Instance>>) {
         thread::spawn(move || {
+            println!("Create Receiver Thread");
             let receiver = receiver.lock().unwrap();
             let mut iter = receiver.iter();
             while let Some(next) = iter.next()
@@ -67,7 +67,7 @@ fn received_instance() {
         });
     }
 
-    start_task_route(&CHANNEL_ROUTE.receiver);
+    start_route(&CHANNEL_ROUTE.receiver);
 
     change_mode(&CARRIER_DAO_MODE, CarrierDaoMode::Ok);
 
@@ -78,8 +78,8 @@ fn received_instance() {
     let rtn = InstanceImpl::born(instance);
     match rtn {
         Err(x) => {
-            println!("{:?}", x);
-            panic!("should got error!");
+            println!("my err : {:?}", x);
+            panic!("should not got error!");
         },
         Ok(x) => {
             println!("{:?}", x);
