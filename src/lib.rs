@@ -18,16 +18,10 @@ extern crate serde_derive;
 extern crate serde_json;
 extern crate uuid;
 
-
 pub mod define;
 pub mod service;
 pub mod rpc;
 pub mod util;
-pub mod carrier;
 pub mod convert;
-pub mod dao;
-pub mod instance;
-pub mod stream;
-pub mod thing;
 pub mod task;
-pub mod processor;
+pub mod data;

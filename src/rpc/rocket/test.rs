@@ -1,4 +1,4 @@
-use instance::*;
+use data::instance::*;
 use rocket::http::ContentType;
 use rocket::local::Client;
 

@@ -2,10 +2,11 @@
 
 ## for the near term
 
-* add carrier dao
-* test carrier for born
+* batch process for serial
+* batch process for parallel
+* virtual instance for batch
+* implement store task service, need process serial first
 * implement transmit service
-* implement store service
 * implement service
 
 ## future
@@ -14,7 +15,6 @@
 * give a demo
 * support multiple rpc types, such as web and gRpc
 * monitor point
-* think about a graph db like **Titan**
 
 ### Thing
 

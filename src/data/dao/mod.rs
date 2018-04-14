@@ -1,9 +1,9 @@
 extern crate r2d2_diesel;
 
-pub use dao::instance::*;
-pub use dao::thing::*;
-pub use dao::orm::*;
-pub use dao::carrier::*;
+pub use self::instance::*;
+pub use self::thing::*;
+pub use self::orm::*;
+pub use self::carrier::*;
 
 pub mod instance;
 pub mod transmit;

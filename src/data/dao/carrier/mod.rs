@@ -1,9 +1,9 @@
-use carrier::*;
+use data::carrier::*;
 use define::*;
 #[cfg(not(test))]
 pub use self::carrier_impl::*;
 #[cfg(test)]
-pub use self::test::*;
+pub use self::mock::*;
 use uuid::*;
 
 pub trait CarrierDao {
@@ -14,4 +14,4 @@ pub trait CarrierDao {
 pub mod carrier_impl;
 
 #[cfg(test)]
-pub mod test;
+pub mod mock;

@@ -6,6 +6,7 @@ pub enum NatureError {
     VerifyError(String),
     ThingNotDefined(String),
     CarrierDaoError(String),
+    StoreTaskError(String),
 }
 
 impl From<serde_json::error::Error> for NatureError{

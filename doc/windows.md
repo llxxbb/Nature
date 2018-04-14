@@ -15,6 +15,15 @@ SQLITE3_LIB_DIR = sqlite3.lib path
 
 + attach dll path to `PATH` ENV， this is critical step
 
+* add config for cargo
+
+```toml
+[target.x86_64-pc-windows-msvc.sqlite3]
+rustc-link-lib = ["sqlite3"]
+rustc-link-search = ["D:/common/sqlite3230100"]
+root = "D:/common/sqlite3230100"
+```
+
 ## install diesel_cli
 
 cargo install diesel_cli --no-default-features --features sqlite
@@ -23,6 +32,6 @@ cargo install diesel_cli --no-default-features --features sqlite
 
 Maybe you need 
 
-## Chocolatey
+### Chocolatey
            
 A package manager for windows: [install](https://chocolatey.org/install#install-with-powershellexe)

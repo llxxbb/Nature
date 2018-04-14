@@ -3,25 +3,25 @@ use std::sync::Mutex;
 use super::*;
 
 #[derive(Debug)]
-pub enum Mode {
+pub enum CarrierDaoMode {
     Ok,
     Err,
 }
+
 lazy_static! {
-    pub static ref MODE: Mutex<Mode> = Mutex::new(Mode::Ok);
+    pub static ref CARRIER_DAO_MODE: Mutex<CarrierDaoMode> = Mutex::new(CarrierDaoMode::Ok);
 }
 
 pub struct CarrierDaoService;
 
 impl CarrierDao for CarrierDaoService {
     fn insert<T>(_carrier: &Carrier<T>) -> Result<UuidBytes> {
-        let mode = MODE.lock().unwrap();
-        println!("CarrierDao calling {:?}", mode);
+        let mode = CARRIER_DAO_MODE.lock().unwrap();
         let mode = &*mode;
         println!("CarrierDao calling {:?}", mode);
         match mode {
-            Mode::Ok => Ok([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]),
-            Mode::Err => Err(NatureError::CarrierDaoError("some error".to_string()))
+            CarrierDaoMode::Ok => Ok([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]),
+            CarrierDaoMode::Err => Err(NatureError::CarrierDaoError("some error".to_string()))
         }
     }
 }
