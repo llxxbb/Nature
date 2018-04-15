@@ -1,9 +1,10 @@
 extern crate rocket_contrib;
 
 use ::rocket::{ignite, Rocket};
+use data::*;
 use global::*;
-use data::instance::*;
 use self::rocket_contrib::Json;
+use task::*;
 use uuid::UuidBytes;
 
 pub fn start_rocket_server() -> Rocket {
@@ -13,9 +14,10 @@ pub fn start_rocket_server() -> Rocket {
         .mount("/parallel_batch", routes![batch_for_parallel])
 }
 
+/// **Note** This do not receive System `Thing`'s instances
 #[post("/input", format = "application/json", data = "<instance>")]
 fn input(instance: Json<Instance>) -> Json<Result<UuidBytes>> {
-    let x = InstanceImpl::born(instance.0);
+    let x = ProcessLine::store(instance.0, Root::Business);
     Json(x)
 }
 

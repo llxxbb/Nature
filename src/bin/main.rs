@@ -12,7 +12,7 @@ fn main() {
     // read config
 //    let config = world_connection::util::get_settings();
 
-    start_task_route(&CHANNEL_ROUTE.receiver);
+    start_route_thread(&CHANNEL_ROUTE.receiver);
 
     start_rocket_server().launch();
 }

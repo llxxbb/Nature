@@ -21,7 +21,6 @@ extern crate uuid;
 pub mod global;
 pub mod util;
 pub mod rpc;
-pub mod convert;
 pub mod task;
 pub mod data;
 pub mod dao;

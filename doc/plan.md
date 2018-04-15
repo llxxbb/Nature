@@ -2,10 +2,15 @@
 
 ## for the near term
 
-* batch process for serial
-* batch process for parallel
-* virtual instance for batch
-* implement store task service, need process serial first
+### implement main path
+
+* implement route for `ProcessLine`
+* mapping between `Thing`
+* convert action
+* converted to store
+
+### other
+* implement store task service
 * implement transmit service
 * implement service
 
@@ -15,6 +20,14 @@
 * give a demo
 * support multiple rpc types, such as web and gRpc
 * monitor point
+
+### Retry transmit
+
+### Batch
+
+* batch process for serial
+* batch process for parallel
+* virtual instance for batch
 
 ### Thing
 

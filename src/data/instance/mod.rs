@@ -1,7 +1,7 @@
 extern crate r2d2;
 
 use chrono::prelude::*;
-use data::thing::*;
+use data::*;
 use global::*;
 #[cfg(not(test))]
 pub use self::instance_impl::*;
@@ -81,9 +81,6 @@ pub struct SerialBatchInstance {
 }
 
 pub trait InstanceTrait {
-    /// born an instance which is the beginning of the changes.
-    /// **Note** This do not receive System `Thing`'s instances
-    fn born(instance: Instance) -> Result<UuidBytes>;
     fn serial(batch: SerialBatchInstance) -> Result<()>;
     fn parallel(batch: ParallelBatchInstance) -> Result<()>;
 }

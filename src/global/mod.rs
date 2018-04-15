@@ -1,7 +1,7 @@
 ///! World Connection Service provider
 extern crate uuid;
 
-use data::instance::*;
+use data::*;
 pub use self::error::*;
 #[cfg(test)]
 pub use self::mock::*;
@@ -12,7 +12,6 @@ use std::sync::*;
 use util::*;
 use std::time::Duration;
 use lru_time_cache::LruCache;
-use data::thing::*;
 
 pub type Result<T> = std::result::Result<T, NatureError>;
 

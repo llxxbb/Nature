@@ -1,4 +1,4 @@
-use data::carrier::*;
+use data::*;
 use global::*;
 #[cfg(not(test))]
 pub use self::carrier_impl::*;

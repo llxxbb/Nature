@@ -1,4 +1,4 @@
-use data::thing::*;
+use data::*;
 use global::*;
 #[cfg(test)]
 pub use self::mock::*;

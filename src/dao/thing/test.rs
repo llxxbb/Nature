@@ -1,4 +1,4 @@
-use data::thing::*;
+use data::*;
 use super::thing_impl::*;
 use super::ThingDefineDao;
 

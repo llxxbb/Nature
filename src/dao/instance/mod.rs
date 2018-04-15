@@ -1,4 +1,4 @@
-use data::instance::*;
+use data::*;
 use global::*;
 #[cfg(not(test))]
 pub use self::instance_impl::*;

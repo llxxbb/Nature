@@ -4,6 +4,7 @@ use super::*;
 pub struct StoreTask(pub Instance);
 
 impl Task for StoreTask {
+    /// Persistent `Instance` to DB
     fn take_it_over(&self) -> Result<()> {
         // TODO
         InstanceDaoService::insert(&self.0)?;

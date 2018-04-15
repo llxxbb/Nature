@@ -1,8 +1,6 @@
 use dao::*;
-use data::carrier::*;
-use std::thread;
+use data::*;
 use super::*;
-use task::*;
 
 pub struct InstanceImpl;
 
@@ -27,19 +25,6 @@ impl InstanceImpl {
 }
 
 impl InstanceTrait for InstanceImpl {
-    fn born(instance: Instance) -> Result<UuidBytes> {
-        let mut instance = instance;
-        let uuid = InstanceImpl::verify(&mut instance, Root::Business)?;
-        let task = StoreTask(instance);
-        let carrier = Carrier { data: task };
-        let _cid = CarrierDaoService::insert(&carrier)?;
-        carrier.take_it_over()?;
-        let sender = CHANNEL_ROUTE.sender.lock().unwrap().clone();
-        thread::spawn(move || {
-            sender.send(carrier.data.0).unwrap();
-        });
-        Ok(uuid)
-    }
     fn serial(_batch: SerialBatchInstance) -> Result<()> {
         // TODO
         unimplemented!()
