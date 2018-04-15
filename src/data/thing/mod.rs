@@ -1,20 +1,58 @@
+use global::*;
+
+/// separator for `Thing`'s key
+pub static PATH_SEPARATOR: char = '/';
+
+/// the root for system `Thing`
+pub static SYS_ROOT: &'static str = "/S";
+
+/// the root for business `Thing`
+pub static BIZ_ROOT: &'static str = "/B";
+
+/// Every `Thing` must have a root
+#[derive(Debug)]
+pub enum Root {
+    Business,
+    System,
+}
 
 /// `Thing`'s basic information
 #[derive(Serialize, Deserialize, PartialEq, Eq, Hash, Debug, Default, Clone, Ord, PartialOrd)]
 pub struct Thing {
     /// # Identify a `Thing`.
     ///
-    /// A `Thing` may have a lots of `ThingInstance`s, so it's a **Class** for ThingInstance`.
+    /// A `Thing` may have a lots of `Instance`s, so it's a **Class** for Instance`.
     /// Because there are huge quantity of `Thing`s , so we need a way to organize `Thing`s.
     /// A way is to set name with hierarchical structures,
     ///
     /// # Value Example
     ///
-    /// shop/order
+    /// /shop/order
     pub key: String,
 
     /// A `Thing` can be changed in future, the `version` will support this without effect the old ones
     pub version: u32,
+}
+
+impl Thing {
+    /// prefix "/B(usiness)" to the head of the string,.to avoid outer use"/S(ystem)" prefix.
+    pub fn key_standardize(biz: &mut String, root: Root) -> Result<()> {
+        if biz.ends_with(PATH_SEPARATOR) {
+            let last = biz.len() - 1;
+            biz.remove(last);
+        }
+        if biz.is_empty() {
+            return Err(NatureError::VerifyError("key length can't be zero".to_string()));
+        }
+        if !biz.starts_with(PATH_SEPARATOR) {
+            biz.insert(0, PATH_SEPARATOR);
+        }
+        match root {
+            Root::Business => biz.insert_str(0, BIZ_ROOT),
+            Root::System => biz.insert_str(0, SYS_ROOT),
+        }
+        Ok(())
+    }
 }
 
 /// `Thing`'s extended information
@@ -38,3 +76,6 @@ pub struct ThingDefine {
 
     pub create_time: u64,
 }
+
+#[cfg(test)]
+mod test;

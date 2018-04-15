@@ -16,7 +16,7 @@ lazy_static! {
 pub struct InstanceImpl;
 
 impl InstanceImpl{
-    pub fn verify(_instance: &mut Instance) -> Result<UuidBytes> {
+    pub fn verify(_instance: &mut Instance, _root: Root) -> Result<UuidBytes> {
         let mode = INSTANCE_VERIFY_MODE.lock().unwrap();
         let mode = &*mode;
         println!("INSTANCE_VERIFY_MODE {:?}", mode);

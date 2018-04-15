@@ -2,8 +2,6 @@
 
 ## for the near term
 
-* unit test for InstanceImpl::verify
-* revise define dao
 * batch process for serial
 * batch process for parallel
 * virtual instance for batch

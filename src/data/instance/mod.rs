@@ -22,7 +22,7 @@ impl Instance {
     pub fn new_batch_for_serial(batch: &mut SerialBatchInstance) -> Result<Instance> {
         // veriry all
         for mut instance in &mut batch.instance {
-            InstanceImpl::verify(&mut instance)?;
+            InstanceImpl::verify(&mut instance, Root::Business)?;
         }
         let instance = Instance {
             id: {
@@ -82,6 +82,7 @@ pub struct SerialBatchInstance {
 
 pub trait InstanceTrait {
     /// born an instance which is the beginning of the changes.
+    /// **Note** This do not receive System `Thing`'s instances
     fn born(instance: Instance) -> Result<UuidBytes>;
     fn serial(batch: SerialBatchInstance) -> Result<()>;
     fn parallel(batch: ParallelBatchInstance) -> Result<()>;

@@ -1,5 +1,5 @@
-use data::carrier::*;
 use dao::*;
+use data::carrier::*;
 use std::thread;
 use super::*;
 use task::*;
@@ -15,7 +15,11 @@ impl InstanceImpl {
         Ok(instance.id)
     }
 
-    pub fn verify(instance: &mut Instance) -> Result<UuidBytes> {
+
+    /// check key whether defined
+    /// generate id by hashing if it is not set.
+    pub fn verify(instance: &mut Instance, root: Root) -> Result<UuidBytes> {
+        Thing::key_standardize(&mut instance.data.thing.key, root)?;
         // just see whether it was configured.
         ThingDefineDaoService::get(&instance.data.thing)?;
         Self::id_generate_if_not_set(instance)
@@ -25,7 +29,7 @@ impl InstanceImpl {
 impl InstanceTrait for InstanceImpl {
     fn born(instance: Instance) -> Result<UuidBytes> {
         let mut instance = instance;
-        let uuid = InstanceImpl::verify(&mut instance)?;
+        let uuid = InstanceImpl::verify(&mut instance, Root::Business)?;
         let task = StoreTask(instance);
         let carrier = Carrier { data: task };
         let _cid = CarrierDaoService::insert(&carrier)?;

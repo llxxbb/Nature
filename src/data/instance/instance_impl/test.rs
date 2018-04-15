@@ -4,6 +4,22 @@ use super::*;
 use util::change_mode;
 
 #[test]
+fn verify_un_configured() {
+    let mut instance = Instance::default();
+    instance.data.thing.key = "err".to_string();
+    let result = InstanceImpl::verify(&mut instance, Root::Business);
+    assert!(result.is_err());
+}
+
+#[test]
+fn verify_id_generated() {
+    let mut instance = Instance::default();
+    instance.data.thing.key = "ok".to_string();
+    let result = InstanceImpl::verify(&mut instance, Root::Business);
+    assert!(result.is_ok());
+}
+
+#[test]
 fn born_verified_failed() {
     let instance = Instance::default();
     let rtn = InstanceImpl::born(instance);
@@ -80,7 +96,7 @@ fn received_instance() {
         Err(x) => {
             println!("my err : {:?}", x);
             panic!("should not got error!");
-        },
+        }
         Ok(x) => {
             println!("{:?}", x);
         }
