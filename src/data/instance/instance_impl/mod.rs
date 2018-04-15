@@ -1,5 +1,5 @@
 use data::carrier::*;
-use data::dao::*;
+use dao::*;
 use std::thread;
 use super::*;
 use task::*;

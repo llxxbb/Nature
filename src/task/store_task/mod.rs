@@ -1,5 +1,5 @@
 #[cfg(not(test))]
-use data::dao::*;
+use dao::*;
 #[cfg(test)]
 pub use self::mock::*;
 #[cfg(not(test))]

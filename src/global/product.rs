@@ -1,4 +1,4 @@
-use data::dao::*;
+use dao::*;
 use diesel::sqlite::SqliteConnection;
 use r2d2::Pool;
 use r2d2_diesel::ConnectionManager;
