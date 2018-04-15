@@ -2,12 +2,12 @@ extern crate r2d2;
 
 use chrono::prelude::*;
 use data::thing::*;
-use define::*;
+use global::*;
 #[cfg(not(test))]
 pub use self::instance_impl::*;
 #[cfg(test)]
 pub use self::mock::*;
-use service::*;
+use util::*;
 use uuid::*;
 
 /// A snapshot for a particular `Thing`
@@ -18,7 +18,32 @@ pub struct Instance {
     pub data: InstanceNoID,
 }
 
-
+impl Instance {
+    pub fn new_batch_for_serial(batch: &mut SerialBatchInstance) -> Result<Instance> {
+        // veriry all
+        for mut instance in &mut batch.instance {
+            InstanceImpl::verify(&mut instance)?;
+        }
+        let instance = Instance {
+            id: {
+                // id based on instance list in `SerialBatchInstance`
+                let vec = batch.instance.iter().map(|x| &x.id).collect::<Vec<_>>();
+                generate_id(&vec)?
+            },
+            data: InstanceNoID {
+                thing: Thing {
+                    key: SYS_KEY_BATCH_SERIAL.to_string(),
+                    version: 1,
+                },
+                execute_time: Local::now().timestamp_millis(),
+                create_time: Local::now().timestamp_millis(),
+                content: String::new(),
+                context: String::new(),
+            },
+        };
+        Ok(instance)
+    }
+}
 
 
 /// A snapshot for a particular `Thing`
@@ -58,11 +83,13 @@ pub struct SerialBatchInstance {
 pub trait InstanceTrait {
     /// born an instance which is the beginning of the changes.
     fn born(instance: Instance) -> Result<UuidBytes>;
-    fn serial(batch: SerialBatchInstance) ->Result<()>;
-    fn parallel(batch: ParallelBatchInstance) ->Result<()>;
+    fn serial(batch: SerialBatchInstance) -> Result<()>;
+    fn parallel(batch: ParallelBatchInstance) -> Result<()>;
 }
 
 
 pub mod instance_impl;
 #[cfg(test)]
 pub mod mock;
+#[cfg(test)]
+pub mod test;

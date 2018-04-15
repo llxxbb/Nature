@@ -1,6 +1,6 @@
 use uuid::*;
 use serde_json;
-use define::*;
+use global::*;
 use serde::Serialize;
 
 pub fn generate_id<T:?Sized + Serialize>(value : &T)-> Result<UuidBytes>{

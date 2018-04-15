@@ -1,5 +1,5 @@
 use data::instance::*;
-use define::*;
+use global::*;
 #[cfg(not(test))]
 pub use self::instance_impl::*;
 #[cfg(test)]

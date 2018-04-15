@@ -87,7 +87,6 @@ fn received_instance() {
     }
 }
 
-
 #[test]
 fn id_generate() {
     let mut instance = Instance {

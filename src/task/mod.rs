@@ -1,9 +1,9 @@
-use define::*;
+use data::instance::*;
+use global::*;
 pub use self::store_task::*;
 use std::sync::mpsc::Receiver;
 use std::sync::Mutex;
 use std::thread;
-use data::instance::*;
 
 pub trait Task {
     fn take_it_over(&self) -> Result<()>;

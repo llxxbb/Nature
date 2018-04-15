@@ -18,8 +18,7 @@ extern crate serde_derive;
 extern crate serde_json;
 extern crate uuid;
 
-pub mod define;
-pub mod service;
+pub mod global;
 pub mod rpc;
 pub mod util;
 pub mod convert;

@@ -9,7 +9,6 @@ pub mod instance;
 pub mod transmit;
 pub mod thing;
 pub mod orm;
-pub mod sqlite;
 
 pub mod carrier;
 

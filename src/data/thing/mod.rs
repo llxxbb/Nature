@@ -1,4 +1,3 @@
-use chrono::prelude::*;
 
 /// `Thing`'s basic information
 #[derive(Serialize, Deserialize, PartialEq, Eq, Hash, Debug, Default, Clone, Ord, PartialOrd)]
@@ -20,7 +19,7 @@ pub struct Thing {
 
 /// `Thing`'s extended information
 /// `DateTime` is not implement `Default` trait
-#[derive(Serialize, Deserialize, Debug, Queryable)]
+#[derive(Serialize, Deserialize, Debug, Queryable, Default, Clone)]
 pub struct ThingDefine {
     pub key: String,
 
@@ -37,5 +36,5 @@ pub struct ThingDefine {
     /// Define whats the `Thing` should include
     pub fields: Option<String>,
 
-    pub create_time: DateTime<Local>,
+    pub create_time: u64,
 }

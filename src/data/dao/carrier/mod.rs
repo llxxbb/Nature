@@ -1,5 +1,5 @@
 use data::carrier::*;
-use define::*;
+use global::*;
 #[cfg(not(test))]
 pub use self::carrier_impl::*;
 #[cfg(test)]

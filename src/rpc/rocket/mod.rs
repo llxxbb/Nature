@@ -1,7 +1,7 @@
 extern crate rocket_contrib;
 
 use ::rocket::{ignite, Rocket};
-use define::*;
+use global::*;
 use data::instance::*;
 use self::rocket_contrib::Json;
 use uuid::UuidBytes;
