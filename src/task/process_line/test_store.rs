@@ -2,8 +2,9 @@ use super::*;
 use util::*;
 
 #[test]
-fn born_verified_failed() {
-    let instance = Instance::default();
+fn store_verified_failed() {
+    let mut instance = Instance::default();
+    instance.data.thing.key = "/B/err".to_string();
     let rtn = ProcessLine::store(instance, Root::Business);
     match rtn {
         Err(x) => println!("{:?}", x),
@@ -16,12 +17,12 @@ fn born_verified_failed() {
 
 /// verified ok
 #[test]
-fn born_carrier_error() {
+fn store_carrier_error() {
     //set mode to error
     change_mode(&CARRIER_DAO_MODE, CarrierDaoMode::Err);
 
     let mut instance = Instance::default();
-    instance.data.thing.key = "ok".to_string();
+    instance.data.thing.key = "/B/ok".to_string();
     let rtn = ProcessLine::store(instance, Root::Business);
     match rtn {
         Err(x) => println!("{:?}", x),
@@ -39,7 +40,7 @@ fn store_task_error() {
     change_mode(&STORE_TASK_MODE, StoreTaskMode::Err);
 
     let mut instance = Instance::default();
-    instance.data.thing.key = "ok".to_string();
+    instance.data.thing.key = "/B/ok".to_string();
     let rtn = ProcessLine::store(instance, Root::Business);
     match rtn {
         Err(x) => println!("{:?}", x),
@@ -57,11 +58,10 @@ fn received_instance() {
             println!("Create Receiver Thread");
             let receiver = receiver.lock().unwrap();
             let mut iter = receiver.iter();
-            while let Some(next) = iter.next()
-                {
-                    println!("Break receive fro {:?}", next);
-                    panic!();
-                }
+            while let Some(next) = iter.next() {
+                println!("Break receive fro {:?}", next);
+                panic!();
+            }
         });
     }
 
@@ -72,7 +72,7 @@ fn received_instance() {
     change_mode(&STORE_TASK_MODE, StoreTaskMode::Ok);
 
     let mut instance = Instance::default();
-    instance.data.thing.key = "ok".to_string();
+    instance.data.thing.key = "/B/ok".to_string();
     let rtn = ProcessLine::store(instance, Root::Business);
     match rtn {
         Err(x) => {
