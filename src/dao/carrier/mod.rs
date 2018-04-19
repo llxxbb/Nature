@@ -4,10 +4,12 @@ use global::*;
 pub use self::carrier_impl::*;
 #[cfg(test)]
 pub use self::mock::*;
+use serde::Serialize;
 use uuid::*;
 
 pub trait CarrierDao {
-    fn insert<T>(carrier: &Carrier<T>) -> Result<UuidBytes>;
+    fn insert<T: Sized + Serialize>(carrier: &Carrier<T>) -> Result<UuidBytes>;
+    fn delete(id: UuidBytes);
 }
 
 

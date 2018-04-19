@@ -15,7 +15,7 @@ lazy_static! {
 pub struct CarrierDaoService;
 
 impl CarrierDao for CarrierDaoService {
-    fn insert<T>(_carrier: &Carrier<T>) -> Result<UuidBytes> {
+    fn insert<T: Sized + Serialize>(_carrier: &Carrier<T>) -> Result<UuidBytes> {
         let mode = CARRIER_DAO_MODE.lock().unwrap();
         let mode = &*mode;
         println!("CarrierDao calling {:?}", mode);
@@ -23,5 +23,8 @@ impl CarrierDao for CarrierDaoService {
             CarrierDaoMode::Ok => Ok([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]),
             CarrierDaoMode::Err => Err(NatureError::CarrierDaoError("some error".to_string()))
         }
+    }
+    fn delete(_id: UuidBytes) {
+        unimplemented!()
     }
 }

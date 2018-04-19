@@ -53,7 +53,7 @@ fn store_task_error() {
 
 #[test]
 fn received_instance() {
-    pub fn start_route(receiver: &'static Mutex<Receiver<Instance>>) {
+    pub fn start_route(receiver: &'static Mutex<Receiver<Carrier<StoreTask>>>) {
         thread::spawn(move || {
             println!("Create Receiver Thread");
             let receiver = receiver.lock().unwrap();
