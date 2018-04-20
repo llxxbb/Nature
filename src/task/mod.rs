@@ -1,5 +1,6 @@
 use data::*;
 use global::*;
+pub use self::converter_task::*;
 #[cfg(test)]
 pub use self::mock::*;
 #[cfg(not(test))]
@@ -13,20 +14,15 @@ pub trait Task {
     fn take_it_over(&self) -> Result<()>;
 }
 
-pub fn start_route_thread(receiver: &'static Mutex<Receiver<Carrier<StoreTask>>>) {
-    thread::spawn(move || {
-        let receiver = receiver.lock().unwrap();
-        let mut iter = receiver.iter();
-        while let Some(next) = iter.next() {
-            ProcessLine::route(next);
-        }
-    });
+#[derive(Debug, Serialize, Deserialize)]
+pub struct RouteInfo {
+    pub instance: Instance,
+    pub maps: Vec<Mapping>,
 }
-
 
 pub mod store_task;
 
-pub mod dispatch_task;
+pub mod converter_task;
 
 pub mod process_line;
 

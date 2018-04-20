@@ -2,7 +2,6 @@ extern crate chrono;
 extern crate fern;
 extern crate nature;
 
-use nature::global::*;
 use nature::rpc::*;
 use nature::task::*;
 
@@ -12,7 +11,7 @@ fn main() {
     // read config
 //    let config = world_connection::util::get_settings();
 
-    start_route_thread(&CHANNEL_ROUTE.receiver);
+    start_receive_threads();
 
     start_rocket_server().launch();
 }

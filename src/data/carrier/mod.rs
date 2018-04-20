@@ -9,10 +9,10 @@ use uuid::UuidBytes;
 #[derive(Debug)]
 pub struct Carrier<T> where T: Sized + Serialize {
     pub data: T,
-    id: UuidBytes,
+    pub id: UuidBytes,
     //    _transmitted_times: u8,
-    create_time: i64,
-    execute_time: i64,
+    pub create_time: i64,
+    pub execute_time: i64,
 }
 
 impl<T> Carrier<T> where T: Sized + Serialize {

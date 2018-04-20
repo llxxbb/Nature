@@ -24,7 +24,7 @@ impl CarrierDao for CarrierDaoService {
             CarrierDaoMode::Err => Err(NatureError::CarrierDaoError("some error".to_string()))
         }
     }
-    fn delete(_id: UuidBytes) {
+    fn delete(_id: &UuidBytes) -> Result<()> {
         unimplemented!()
     }
 }

@@ -8,7 +8,7 @@ impl CarrierDao for CarrierDaoService {
     fn insert<T: Sized + Serialize>(_carrier: &Carrier<T>) -> Result<UuidBytes> {
         unimplemented!()
     }
-    fn delete(_id: UuidBytes) {
+    fn delete(_id: &UuidBytes) -> Result<()> {
         unimplemented!()
     }
 }

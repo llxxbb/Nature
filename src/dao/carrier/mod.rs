@@ -9,7 +9,7 @@ use uuid::*;
 
 pub trait CarrierDao {
     fn insert<T: Sized + Serialize>(carrier: &Carrier<T>) -> Result<UuidBytes>;
-    fn delete(id: UuidBytes);
+    fn delete(id: &UuidBytes) -> Result<()>;
 }
 
 

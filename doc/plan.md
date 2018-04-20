@@ -4,10 +4,7 @@
 
 ### implement main path
 
-* carrier::new()
-
-* remove carrier by dao
-* implement module for dispatch task
+* dispatch
 * remove previous carrier after store
 * implement route for `ProcessLine`
 * mapping between `Thing`
