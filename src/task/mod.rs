@@ -6,6 +6,7 @@ pub use self::mock::*;
 #[cfg(not(test))]
 pub use self::process_line::*;
 pub use self::store_task::*;
+pub use self::carry_error::*;
 use std::sync::mpsc::Receiver;
 use std::sync::Mutex;
 use std::thread;
@@ -19,6 +20,9 @@ pub struct RouteInfo {
     pub instance: Instance,
     pub maps: Vec<Mapping>,
 }
+
+
+pub mod carry_error;
 
 pub mod store_task;
 

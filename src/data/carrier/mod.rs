@@ -6,11 +6,10 @@ use util::*;
 use uuid::UuidBytes;
 
 /// carry every kinds of **Task Info** to process which stayed at `Ready` table
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Carrier<T> where T: Sized + Serialize {
     pub data: T,
     pub id: UuidBytes,
-    //    _transmitted_times: u8,
     pub create_time: i64,
     pub execute_time: i64,
 }

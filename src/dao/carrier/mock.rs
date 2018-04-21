@@ -27,4 +27,7 @@ impl CarrierDao for CarrierDaoService {
     fn delete(_id: &UuidBytes) -> Result<()> {
         unimplemented!()
     }
+    fn move_to_error<T: Sized + Serialize>(_err: CarryError<T>) {
+        unimplemented!()
+    }
 }

@@ -1,6 +1,6 @@
 use super::*;
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct ConverterTask(pub Instance, pub Mapping);
 
 impl Task for ConverterTask {

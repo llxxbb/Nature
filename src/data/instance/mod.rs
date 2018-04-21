@@ -11,7 +11,7 @@ use util::*;
 use uuid::*;
 
 /// A snapshot for a particular `Thing`
-#[derive(Serialize, Deserialize, Debug, Default)]
+#[derive(Serialize, Deserialize, Debug, Default, Clone)]
 pub struct Instance {
     /// A unique value used to distinguish other instance
     pub id: UuidBytes,
@@ -47,7 +47,7 @@ impl Instance {
 
 
 /// A snapshot for a particular `Thing`
-#[derive(Serialize, Deserialize, Debug, Default)]
+#[derive(Serialize, Deserialize, Debug, Default, Clone)]
 pub struct InstanceNoID {
     /// This instance's Type
     pub thing: Thing,

@@ -4,10 +4,6 @@
 
 ### implement main path
 
-* dispatch
-* remove previous carrier after store
-* implement route for `ProcessLine`
-* mapping between `Thing`
 * convert action
 * converted to store
 

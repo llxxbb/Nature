@@ -1,4 +1,5 @@
 use dao::*;
+pub use self::threads::*;
 use serde::Serialize;
 use super::*;
 use uuid::UuidBytes;
@@ -14,64 +15,63 @@ impl ProcessLine {
         let carrier = Carrier::new(task)?;
         let _cid = CarrierDaoService::insert(&carrier)?;
         carrier.take_it_over()?;
-        let sender = CHANNEL_ROUTE.sender.lock().unwrap().clone();
-        thread::spawn(move || {
-            sender.send(carrier).unwrap();
-        });
+        send_carrier(CHANNEL_ROUTE.sender.lock().unwrap().clone(), carrier);
         Ok(uuid)
     }
 
     fn route(carrier: Carrier<StoreTask>) {
         if let Ok(x) = MappingDaoService::get_relations(&carrier.data.0) {
             if let Some(y) = x {
-                if let Ok(new_carrier) = Carrier::new(y) {
-                    // insert new first carrier
-                    if let Ok(_) = CarrierDaoService::insert(&new_carrier) {
-                        // then delete old carrier
-                        if let Ok(_) = CarrierDaoService::delete(&carrier.id) {
-                            let sender = CHANNEL_DISPATCH.sender.lock().unwrap().clone();
-                            thread::spawn(move || {
-                                sender.send(new_carrier).unwrap();
-                            });
+                let _ = match Carrier::new(y) {
+                    Ok(new_carrier) => {
+                        // insert new first carrier
+                        if let Ok(_) = CarrierDaoService::insert(&new_carrier) {
+                            // then delete old carrier
+                            if let Ok(_) = CarrierDaoService::delete(&carrier.id) {
+                                send_carrier(CHANNEL_DISPATCH.sender.lock().unwrap().clone(), new_carrier);
+                            };
                         };
-                    };
+                    }
+                    Err(err) => Self::move_to_err(err, carrier)
                 };
             };
         };
     }
 
-    fn dispatch(_carrier: Carrier<RouteInfo>) {
-        // TODO
-//        let new_carrier = carrier.data.maps.iter().map(|m|{
-//            let task = ConverterTask(carrier.instance,*m);
-//            Carrier::new(task)
-//        }).collect::<Carrier<ConverterTask>>();
-//        for _map in carrier.data.maps {
-//
-//        }
+    fn dispatch(carrier: Carrier<RouteInfo>) {
+        let mut new_carriers: Vec<Carrier<ConverterTask>> = Vec::new();
+        let instance = carrier.instance.clone();
+        let maps = carrier.data.maps.clone();
+        for c in maps {
+            let task = ConverterTask(instance.clone(), c);
+            match Carrier::new(task) {
+                Ok(x) => new_carriers.push(x),
+                Err(err) => {
+                    Self::move_to_err(err, carrier);
+                    return;
+                }
+            }
+        }
+        let to_send = new_carriers.clone();
+        // save news
+        for n in new_carriers {
+            let _ = CarrierDaoService::insert(&n);
+        }
+        // remove old
+        let _ = CarrierDaoService::delete(&carrier.id);
+        // do task
+        for task in to_send {
+            send_carrier(CHANNEL_CONVERTER.sender.lock().unwrap().clone(), task)
+        }
+    }
+
+    fn move_to_err<T>(err: NatureError, carrier: Carrier<T>) where T: Sized + Serialize {
+        let _ = CarrierDaoService::move_to_error(CarryError { err, carrier });
     }
 }
 
-pub fn start_receive_threads() {
-    start_thread(&CHANNEL_ROUTE.receiver,ProcessLine::route );
-    start_thread(&CHANNEL_DISPATCH.receiver,ProcessLine::dispatch );
-}
 
-fn start_thread<T, F>(receiver: &'static Mutex<Receiver<Carrier<T>>>, f: F)
-    where
-        T: Serialize + Send,
-        F: 'static + Fn(Carrier<T>) + Send
-{
-    thread::spawn(move || {
-        let receiver = receiver.lock().unwrap();
-        let mut iter = receiver.iter();
-        while let Some(next) = iter.next() {
-            f(next);
-        }
-    });
-}
-
-
+mod threads;
 
 #[cfg(test)]
 mod test_store;
