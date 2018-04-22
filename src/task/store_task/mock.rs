@@ -9,7 +9,7 @@ lazy_static! {
     pub static ref STORE_TASK_MODE: Mutex<StoreTaskMode> = Mutex::new(StoreTaskMode::Ok);
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct StoreTask(pub Instance);
 
 impl Task for StoreTask {

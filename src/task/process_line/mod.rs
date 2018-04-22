@@ -9,15 +9,11 @@ pub struct ProcessLine;
 
 impl ProcessLine {
     /// born an instance which is the beginning of the changes.
-    pub fn single_input(instance: Instance, root: Root) -> Result<UuidBytes> {
-        let mut instance = instance;
-        let uuid = InstanceImpl::verify(&mut instance, root)?;
+    pub fn single_input(instance: Instance) -> Result<UuidBytes> {
         let task = StoreTask(instance);
         let carrier = Carrier::new(task)?;
-        let _cid = CarrierDaoService::insert(&carrier)?;
-        carrier.take_it_over()?;
-        send_carrier(CHANNEL_ROUTE.sender.lock().unwrap().clone(), carrier);
-        Ok(uuid)
+        let _ = CarrierDaoService::insert(&carrier)?;
+        Self::store(carrier, Root::Business)
     }
 
     fn route(carrier: Carrier<StoreTask>) {
@@ -111,9 +107,19 @@ impl ProcessLine {
         };
     }
 
-    fn store(_task: Carrier<StoreTask>) {
-        // TODO
-        unimplemented!()
+    fn store(carrier: Carrier<StoreTask>, root: Root) -> Result<UuidBytes> {
+        let mut carrier = carrier;
+        let uuid = InstanceImpl::verify(&mut carrier.data.0, root)?;
+        InstanceDaoService::insert(&carrier.data.0)?;
+        send_carrier(CHANNEL_ROUTE.sender.lock().unwrap().clone(), carrier);
+        Ok(uuid)
+    }
+
+    fn store_for_receive(carrier: Carrier<StoreTask>) {
+        let cp = carrier.clone();
+        if let Err(err) = Self::store(carrier, Root::Business) {
+            Self::move_to_err(err, cp)
+        };
     }
 
     fn move_to_err<T>(err: NatureError, carrier: Carrier<T>) where T: Sized + Serialize {

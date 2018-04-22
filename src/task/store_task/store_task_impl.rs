@@ -1,7 +1,7 @@
 use dao::*;
 use super::*;
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct StoreTask(pub Instance);
 
 impl Task for StoreTask {

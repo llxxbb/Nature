@@ -6,7 +6,7 @@ There are all **Things** in Nature, and **Things** always transform into other t
 
 以黑底白字为主：
 
-韵味：真理是简单的明了了。
+韵味：真理就是简单明了。
 
 如星空（广阔、深邃，未知）。
 

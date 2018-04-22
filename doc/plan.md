@@ -4,10 +4,10 @@
 
 ### implement main path
 
-* thread for store
+* remove `Task` trait
 * convert action
 
-* converter filter : context and status
+* route filter : context and status
 * single delivery will reuse the id to increase the performance
 * converted to store
 

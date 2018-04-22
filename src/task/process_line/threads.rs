@@ -13,7 +13,7 @@ pub fn start_receive_threads() {
     start_thread(&CHANNEL_ROUTE.receiver, ProcessLine::route);
     start_thread(&CHANNEL_DISPATCH.receiver, ProcessLine::dispatch);
     start_thread(&CHANNEL_CONVERT.receiver, ProcessLine::convert);
-    start_thread(&CHANNEL_STORE.receiver, ProcessLine::store);
+    start_thread(&CHANNEL_STORE.receiver, ProcessLine::store_for_receive);
 }
 
 fn start_thread<T, F>(receiver: &'static Mutex<Receiver<Carrier<T>>>, f: F)

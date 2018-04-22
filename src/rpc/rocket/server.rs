@@ -16,7 +16,7 @@ pub fn start_rocket_server() -> Rocket {
 /// **Note** This do not receive System `Thing`'s instances
 #[post("/input", format = "application/json", data = "<instance>")]
 fn input(instance: Json<Instance>) -> Json<Result<UuidBytes>> {
-    let x = ProcessLine::single_input(instance.0, Root::Business);
+    let x = ProcessLine::single_input(instance.0);
     Json(x)
 }
 
