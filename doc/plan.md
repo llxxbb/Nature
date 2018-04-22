@@ -4,15 +4,14 @@
 
 ### implement main path
 
-* remove `Task` trait
-* convert action
-
 * route filter : context and status
 * single delivery will reuse the id to increase the performance
 * converted to store
 
 ### other
 
+* call out
+* callback
 * add cache to mapping dao
 * mapping 's from and to should unique. 
 * implement store task service

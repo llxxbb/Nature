@@ -3,6 +3,8 @@ use util::*;
 
 #[test]
 fn store_verified_failed() {
+    change_mode(&INSTANCE_VERIFY_MODE, InstanceVerifyMode::Err);
+
     let mut instance = Instance::default();
     instance.data.thing.key = "/B/err".to_string();
     let rtn = ProcessLine::single_input(instance);
@@ -18,7 +20,7 @@ fn store_verified_failed() {
 /// verified ok
 #[test]
 fn store_carrier_error() {
-    //set mode to error
+    change_mode(&INSTANCE_VERIFY_MODE, InstanceVerifyMode::Ok);
     change_mode(&CARRIER_DAO_MODE, CarrierDaoMode::Err);
 
     let mut instance = Instance::default();
@@ -34,10 +36,10 @@ fn store_carrier_error() {
 }
 
 #[test]
-fn store_task_error() {
+fn store_persistence_error() {
+    change_mode(&INSTANCE_VERIFY_MODE, InstanceVerifyMode::Ok);
     change_mode(&CARRIER_DAO_MODE, CarrierDaoMode::Ok);
-
-    change_mode(&STORE_TASK_MODE, StoreTaskMode::Err);
+    change_mode(&INSTANCE_DAO_MODE, InstanceDaoMode::Err);
 
     let mut instance = Instance::default();
     instance.data.thing.key = "/B/ok".to_string();
@@ -59,7 +61,7 @@ fn received_instance() {
             let receiver = receiver.lock().unwrap();
             let mut iter = receiver.iter();
             while let Some(next) = iter.next() {
-                println!("Break receive fro {:?}", next);
+                println!("Break receive for {:?}", next);
                 panic!();
             }
         });
@@ -67,9 +69,9 @@ fn received_instance() {
 
     start_route(&CHANNEL_ROUTE.receiver);
 
+    change_mode(&INSTANCE_VERIFY_MODE, InstanceVerifyMode::Ok);
     change_mode(&CARRIER_DAO_MODE, CarrierDaoMode::Ok);
-
-    change_mode(&STORE_TASK_MODE, StoreTaskMode::Ok);
+    change_mode(&INSTANCE_DAO_MODE, InstanceDaoMode::Ok);
 
     let mut instance = Instance::default();
     instance.data.thing.key = "/B/ok".to_string();
