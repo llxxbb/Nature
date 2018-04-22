@@ -1,4 +1,5 @@
 use dao::*;
+use rpc::rocket::*;
 pub use self::threads::*;
 use serde::Serialize;
 use super::*;
@@ -8,7 +9,7 @@ pub struct ProcessLine;
 
 impl ProcessLine {
     /// born an instance which is the beginning of the changes.
-    pub fn store(instance: Instance, root: Root) -> Result<UuidBytes> {
+    pub fn single_input(instance: Instance, root: Root) -> Result<UuidBytes> {
         let mut instance = instance;
         let uuid = InstanceImpl::verify(&mut instance, root)?;
         let task = StoreTask(instance);
@@ -20,20 +21,24 @@ impl ProcessLine {
     }
 
     fn route(carrier: Carrier<StoreTask>) {
-        if let Ok(x) = MappingDaoService::get_relations(&carrier.data.0) {
-            if let Some(y) = x {
-                let _ = match Carrier::new(y) {
-                    Ok(new_carrier) => {
-                        // insert new first carrier
-                        if let Ok(_) = CarrierDaoService::insert(&new_carrier) {
-                            // then delete old carrier
-                            if let Ok(_) = CarrierDaoService::delete(&carrier.id) {
-                                send_carrier(CHANNEL_DISPATCH.sender.lock().unwrap().clone(), new_carrier);
-                            };
+        let instance = &carrier.data.0.clone();
+        if let Ok(maps) = MappingDaoService::get_relations(&instance.data.thing) {
+            if maps.len() == 0 {
+                let _ = CarrierDaoService::delete(&carrier.id);
+                return;
+            }
+            let route = RouteInfo { instance: instance.clone(), maps };
+            let _ = match Carrier::new(route) {
+                Ok(new_carrier) => {
+                    // insert new first carrier
+                    if let Ok(_) = CarrierDaoService::insert(&new_carrier) {
+                        // then delete old carrier
+                        if let Ok(_) = CarrierDaoService::delete(&carrier.id) {
+                            send_carrier(CHANNEL_DISPATCH.sender.lock().unwrap().clone(), new_carrier);
                         };
-                    }
-                    Err(err) => Self::move_to_err(err, carrier)
-                };
+                    };
+                }
+                Err(err) => Self::move_to_err(err, carrier)
             };
         };
     }
@@ -61,8 +66,54 @@ impl ProcessLine {
         let _ = CarrierDaoService::delete(&carrier.id);
         // do task
         for task in to_send {
-            send_carrier(CHANNEL_CONVERTER.sender.lock().unwrap().clone(), task)
+            send_carrier(CHANNEL_CONVERT.sender.lock().unwrap().clone(), task)
         }
+    }
+
+    fn convert(carrier: Carrier<ConverterTask>) {
+        let _ = match convert(&carrier) {
+            Ok(instances) => {
+                // make plan
+                let mut plan = StorePlan {
+                    from_id: carrier.data.0.id,
+                    to: carrier.data.1.to.clone(),
+                    plan: instances,
+                };
+                if let Ok(_) = StorePlanDaoService::save(&mut plan) {
+                    let mut new_tasks: Vec<Carrier<StoreTask>> = Vec::new();
+                    for instance in plan.plan {
+                        let _ = match Carrier::new(StoreTask(instance)) {
+                            Ok(c) => {
+                                let _ = match CarrierDaoService::insert(&c) {
+                                    Ok(_) => new_tasks.push(c),
+                                    Err(_) => return // retry next time
+                                };
+                            }
+                            Err(err) => {
+                                Self::move_to_err(err, carrier);
+                                return;
+                            }
+                        };
+                    }
+                    if let Ok(_) = CarrierDaoService::delete(&carrier.id) {
+                        for task in new_tasks {
+                            send_carrier(CHANNEL_STORE.sender.lock().unwrap().clone(), task)
+                        }
+                    };
+                };
+            }
+            Err(err) => match err {
+                // only **Environment Error** will be retry
+                NatureError::ConverterEnvironmentError(_) => (),
+                // other error will drop into error
+                _ => Self::move_to_err(err, carrier)
+            }
+        };
+    }
+
+    fn store(_task: Carrier<StoreTask>) {
+        // TODO
+        unimplemented!()
     }
 
     fn move_to_err<T>(err: NatureError, carrier: Carrier<T>) where T: Sized + Serialize {

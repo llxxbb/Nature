@@ -7,6 +7,8 @@ pub enum NatureError {
     ThingNotDefined(String),
     CarrierDaoError(String),
     StoreTaskError(String),
+    ConverterLogicalError(String),
+    ConverterEnvironmentError(String),
 }
 
 impl From<serde_json::error::Error> for NatureError{

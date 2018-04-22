@@ -4,10 +4,9 @@ use global::*;
 pub use self::dao_impl::*;
 #[cfg(test)]
 pub use self::mock::*;
-use task::RouteInfo;
 
 pub trait MappingDao {
-    fn get_relations(instance: &Instance) -> Result<Option<RouteInfo>>;
+    fn get_relations(from: &Thing) -> Result<Vec<Mapping>>;
 }
 
 pub mod dao_impl;

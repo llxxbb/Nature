@@ -5,7 +5,7 @@ use util::*;
 fn store_verified_failed() {
     let mut instance = Instance::default();
     instance.data.thing.key = "/B/err".to_string();
-    let rtn = ProcessLine::store(instance, Root::Business);
+    let rtn = ProcessLine::single_input(instance, Root::Business);
     match rtn {
         Err(x) => println!("{:?}", x),
         Ok(x) => {
@@ -23,7 +23,7 @@ fn store_carrier_error() {
 
     let mut instance = Instance::default();
     instance.data.thing.key = "/B/ok".to_string();
-    let rtn = ProcessLine::store(instance, Root::Business);
+    let rtn = ProcessLine::single_input(instance, Root::Business);
     match rtn {
         Err(x) => println!("{:?}", x),
         Ok(x) => {
@@ -41,7 +41,7 @@ fn store_task_error() {
 
     let mut instance = Instance::default();
     instance.data.thing.key = "/B/ok".to_string();
-    let rtn = ProcessLine::store(instance, Root::Business);
+    let rtn = ProcessLine::single_input(instance, Root::Business);
     match rtn {
         Err(x) => println!("{:?}", x),
         Ok(x) => {
@@ -73,7 +73,7 @@ fn received_instance() {
 
     let mut instance = Instance::default();
     instance.data.thing.key = "/B/ok".to_string();
-    let rtn = ProcessLine::store(instance, Root::Business);
+    let rtn = ProcessLine::single_input(instance, Root::Business);
     match rtn {
         Err(x) => {
             println!("my err : {:?}", x);

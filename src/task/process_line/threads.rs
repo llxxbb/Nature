@@ -12,6 +12,8 @@ pub fn send_carrier<T>(sender: Sender<Carrier<T>>, carrier: Carrier<T>)
 pub fn start_receive_threads() {
     start_thread(&CHANNEL_ROUTE.receiver, ProcessLine::route);
     start_thread(&CHANNEL_DISPATCH.receiver, ProcessLine::dispatch);
+    start_thread(&CHANNEL_CONVERT.receiver, ProcessLine::convert);
+    start_thread(&CHANNEL_STORE.receiver, ProcessLine::store);
 }
 
 fn start_thread<T, F>(receiver: &'static Mutex<Receiver<Carrier<T>>>, f: F)
