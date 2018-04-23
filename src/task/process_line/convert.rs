@@ -1,6 +1,6 @@
 use super::*;
 
-pub fn do_convert(carrier: Carrier<ConverterTask>) {
+pub fn do_convert(carrier: Carrier<ConverterInfo>) {
     let _ = match convert(&carrier) {
         Ok(instances) => on_success(carrier, instances),
         Err(err) => match err {
@@ -12,7 +12,7 @@ pub fn do_convert(carrier: Carrier<ConverterTask>) {
     };
 }
 
-fn on_success(carrier: Carrier<ConverterTask>, instances: Vec<Instance>) {
+fn on_success(carrier: Carrier<ConverterInfo>, instances: Vec<Instance>) {
     // make plan
     let mut plan = StorePlan {
         from_id: carrier.data.0.id,
@@ -25,10 +25,10 @@ fn on_success(carrier: Carrier<ConverterTask>, instances: Vec<Instance>) {
     // if store plan error wait to retry
 }
 
-fn to_store(carrier: Carrier<ConverterTask>, plan: StorePlan) {
-    let mut new_tasks: Vec<Carrier<StoreTask>> = Vec::new();
+fn to_store(carrier: Carrier<ConverterInfo>, plan: StorePlan) {
+    let mut new_tasks: Vec<Carrier<StoreInfo>> = Vec::new();
     for instance in plan.plan {
-        let _ = match Carrier::new(StoreTask(instance)) {
+        let _ = match Carrier::new(StoreInfo(instance)) {
             Ok(c) => {
                 let _ = match CarrierDaoService::insert(&c) {
                     Ok(_) => new_tasks.push(c),

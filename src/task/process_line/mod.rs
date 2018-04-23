@@ -13,19 +13,19 @@ pub struct ProcessLine;
 impl ProcessLine {
     /// born an instance which is the beginning of the changes.
     pub fn single_input(instance: Instance) -> Result<UuidBytes> {
-        let task = StoreTask(instance);
+        let task = StoreInfo(instance);
         let carrier = Carrier::new(task)?;
         let _ = CarrierDaoService::insert(&carrier)?;
         Self::store(carrier, Root::Business)
     }
 
-    fn route(carrier: Carrier<StoreTask>) { do_route(carrier); }
+    fn route(carrier: Carrier<StoreInfo>) { do_route(carrier); }
 
     fn dispatch(carrier: Carrier<RouteInfo>) { do_dispatch(carrier); }
 
-    fn convert(carrier: Carrier<ConverterTask>) { do_convert(carrier); }
+    fn convert(carrier: Carrier<ConverterInfo>) { do_convert(carrier); }
 
-    fn store(carrier: Carrier<StoreTask>, root: Root) -> Result<UuidBytes> {
+    fn store(carrier: Carrier<StoreInfo>, root: Root) -> Result<UuidBytes> {
         let mut carrier = carrier;
         let uuid = InstanceImpl::verify(&mut carrier.data.0, root)?;
         InstanceDaoService::insert(&carrier.data.0)?;
@@ -33,7 +33,7 @@ impl ProcessLine {
         Ok(uuid)
     }
 
-    fn store_for_receive(carrier: Carrier<StoreTask>) {
+    fn store_for_receive(carrier: Carrier<StoreInfo>) {
         let cp = carrier.clone();
         if let Err(err) = Self::store(carrier, Root::Business) {
             Self::move_to_err(err, cp)

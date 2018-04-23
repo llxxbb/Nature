@@ -19,12 +19,12 @@ pub fn do_dispatch(carrier: Carrier<RouteInfo>) {
     }
 }
 
-fn generate_carriers(carrier: Carrier<RouteInfo>) -> Vec<Carrier<ConverterTask>> {
-    let mut new_carriers: Vec<Carrier<ConverterTask>> = Vec::new();
+fn generate_carriers(carrier: Carrier<RouteInfo>) -> Vec<Carrier<ConverterInfo>> {
+    let mut new_carriers: Vec<Carrier<ConverterInfo>> = Vec::new();
     let instance = carrier.instance.clone();
     let maps = carrier.data.maps.clone();
     for c in maps {
-        let task = ConverterTask(instance.clone(), c);
+        let task = ConverterInfo(instance.clone(), c);
         match Carrier::new(task) {
             Ok(x) => new_carriers.push(x),
             Err(err) => {

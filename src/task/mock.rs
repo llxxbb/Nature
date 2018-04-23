@@ -7,6 +7,6 @@ impl ProcessLine {
         Ok([11, 172, 237, 228, 64, 20, 63, 157, 183, 32, 23, 63, 104, 161, 201, 51])
     }
 
-    pub fn route(_carrier: Carrier<StoreTask>) {}
+    pub fn route(_carrier: Carrier<StoreInfo>) {}
 }
 

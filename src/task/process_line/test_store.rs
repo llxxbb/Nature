@@ -55,7 +55,7 @@ fn store_persistence_error() {
 
 #[test]
 fn received_instance() {
-    pub fn start_route(receiver: &'static Mutex<Receiver<Carrier<StoreTask>>>) {
+    pub fn start_route(receiver: &'static Mutex<Receiver<Carrier<StoreInfo>>>) {
         thread::spawn(move || {
             println!("Create Receiver Thread");
             let receiver = receiver.lock().unwrap();

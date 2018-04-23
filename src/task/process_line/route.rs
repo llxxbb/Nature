@@ -1,6 +1,6 @@
 use super::*;
 
-pub fn do_route(carrier: Carrier<StoreTask>) {
+pub fn do_route(carrier: Carrier<StoreInfo>) {
     let instance = &carrier.data.0.clone();
     if let Ok(relations) = MappingDaoService::get_relations(&instance.data.thing) {
         // no relations
@@ -12,7 +12,7 @@ pub fn do_route(carrier: Carrier<StoreTask>) {
     };
 }
 
-fn delivery_relations(carrier: Carrier<StoreTask>, instance: &Instance, maps: Vec<Mapping>) {
+fn delivery_relations(carrier: Carrier<StoreInfo>, instance: &Instance, maps: Vec<Mapping>) {
     let route = RouteInfo { instance: instance.clone(), maps };
     let _ = match Carrier::new(route) {
         Ok(new_carrier) => {

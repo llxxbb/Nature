@@ -24,10 +24,10 @@ pub struct CarryError<T> where T: Sized + Serialize {
 
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct ConverterTask(pub Instance, pub Mapping);
+pub struct ConverterInfo(pub Instance, pub Mapping);
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct StoreTask(pub Instance);
+pub struct StoreInfo(pub Instance);
 
 
 pub mod process_line;
