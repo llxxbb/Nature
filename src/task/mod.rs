@@ -1,12 +1,10 @@
 use data::*;
 use global::*;
-pub use self::carry_error::*;
-pub use self::converter_task::*;
 #[cfg(test)]
 pub use self::mock::*;
 #[cfg(not(test))]
 pub use self::process_line::*;
-pub use self::store_task::*;
+use serde::Serialize;
 use std::sync::mpsc::Receiver;
 use std::sync::Mutex;
 use std::thread;
@@ -18,12 +16,19 @@ pub struct RouteInfo {
     pub maps: Vec<Mapping>,
 }
 
+#[derive(Debug)]
+pub struct CarryError<T> where T: Sized + Serialize {
+    pub err: NatureError,
+    pub carrier: Carrier<T>,
+}
 
-pub mod carry_error;
 
-pub mod store_task;
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct ConverterTask(pub Instance, pub Mapping);
 
-pub mod converter_task;
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct StoreTask(pub Instance);
+
 
 pub mod process_line;
 

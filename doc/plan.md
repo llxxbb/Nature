@@ -6,7 +6,8 @@
 
 * route filter : context and status
 * single delivery will reuse the id to increase the performance
-* converted to store
+
+### Retry transmit
 
 ### other
 
@@ -14,9 +15,6 @@
 * callback
 * add cache to mapping dao
 * mapping 's from and to should unique. 
-* implement store task service
-* implement transmit service
-* implement service
 
 ## future
 
@@ -24,8 +22,6 @@
 * give a demo
 * support multiple rpc types, such as web and gRpc
 * monitor point
-
-### Retry transmit
 
 ### Batch
 
