@@ -2,8 +2,10 @@
 
 ## for the near term
 
-* route filter : context and status
-
+* route filter : context, status, weight
+* converter support banlance
+* add status vertion to instance
+* instance status conflict
 * single delivery will reuse the id to increase the performance
 * callback
 * Retry transmit

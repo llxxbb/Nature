@@ -7,6 +7,8 @@ use global::*;
 pub use self::instance_impl::*;
 #[cfg(test)]
 pub use self::mock::*;
+use std::collections::HashMap;
+use std::collections::HashSet;
 use util::*;
 use uuid::*;
 
@@ -38,7 +40,8 @@ impl Instance {
                 execute_time: Local::now().timestamp_millis(),
                 create_time: Local::now().timestamp_millis(),
                 content: String::new(),
-                context: String::new(),
+                context: HashMap::new(),
+                status: HashSet::new(),
             },
         };
         Ok(instance)
@@ -67,7 +70,8 @@ pub struct InstanceNoID {
     /// # Value
     ///
     /// json data for a `Instance`.
-    pub context: String,
+    pub context: HashMap<String, String>,
+    pub status: HashSet<String>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Default)]

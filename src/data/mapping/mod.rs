@@ -7,17 +7,18 @@ pub struct Mapping {
     pub from: Thing,
     pub to: Thing,
     pub how: Converter,
-    pub option: Demand,
-    pub gray: Weight,
+    pub demand: Demand,
+    pub weight: Weight,
 }
+
 
 /// used to gray deploy
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Weight {
     /// Used to distinguish converters which are same `Mapping::from` and `Mapping::to`
-    label: String,
+    pub label: String,
     /// indicate the proportion of the whole stream, the whole will the sum of the participate `Weight::proportion`
-    proportion: u8,
+    pub proportion: u8,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

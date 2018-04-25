@@ -25,7 +25,8 @@ fn id_generate() {
             execute_time: 0,
             create_time: 0,
             content: String::new(),
-            context: String::new(),
+            context: HashMap::new(),
+            status: HashSet::new(),
         },
     };
     InstanceImpl::id_generate_if_not_set(&mut instance).unwrap();
