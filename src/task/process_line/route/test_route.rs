@@ -1,6 +1,4 @@
 use super::*;
-use rand::{Rng, thread_rng};
-
 
 #[test]
 fn test_random(){

@@ -2,7 +2,9 @@
 
 ## for the near term
 
-* route filter : context, status, weight
+* route by weight
+
+* route filter : context, status
 * converter support banlance
 * add status vertion to instance
 * instance status conflict

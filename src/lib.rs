@@ -1,4 +1,5 @@
 #![feature(plugin, proc_macro)]
+#![feature(range_contains)]
 #![plugin(rocket_codegen)]
 extern crate chrono;
 #[macro_use]
