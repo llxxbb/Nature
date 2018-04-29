@@ -1,6 +1,3 @@
-extern crate rand;
-
-use self::rand::{Rng, thread_rng};
 pub use self::weight::*;
 use std::collections::HashMap;
 use std::collections::HashSet;
@@ -66,5 +63,3 @@ mod weight;
 #[cfg(test)]
 mod test_route;
 
-#[cfg(test)]
-mod test_weight;

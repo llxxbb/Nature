@@ -2,10 +2,10 @@
 
 ## for the near term
 
-* route by weight
-
 * route filter : context, status
-* converter support banlance
+
+* carrier avoid repeat
+* converter support balance
 * add status vertion to instance
 * instance status conflict
 * single delivery will reuse the id to increase the performance

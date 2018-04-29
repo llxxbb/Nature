@@ -1,28 +1,41 @@
+extern crate rand;
+
+use self::rand::{Rng, thread_rng};
 use std::ops::Range;
-use super::*;
 use std::ptr;
+use super::*;
 
 pub fn get_relations(from: &Thing) -> Result<Vec<Mapping>> {
-    let relations = MappingDaoService::get_relations(from)?;
-
-    let label_groups = get_label_groups(&relations);
-
-    let map = weight_calculate(&label_groups);
-    // TODO
-    Ok(Vec::new())
+    let (relations, balances) = get_balanced(from)?;
+    Ok(weight_filter(&relations, &balances))
 }
 
-
-fn weight_check(mapping: &Mapping, balance: &HashMap<Thing, f32>) -> bool {
-    match balance.get(&mapping.to) {
-        // no balance setting then permit through
-        None => true,
-        // `thread_rng().gen` will generate a number between 0 and 1.
-        Some(weight) => thread_rng().gen::<f32>() * weight >= 0.5
+fn get_balanced(from: &Thing) -> Result<(Vec<Mapping>, HashMap<Thing, Range<f32>>)> {
+    let mut cache = MAPPING_CACHE.lock().unwrap();
+    if let Some(balances) = cache.get(from) {
+        return Ok(balances.clone());
     }
+    let relations = MappingDaoService::get_relations(from)?;
+    let label_groups = get_label_groups(&relations);
+    let rtn = (relations, weight_calculate(&label_groups));
+    let rtn_clone = rtn.clone();
+    cache.insert(from.clone(), rtn);
+    Ok(rtn_clone)
 }
 
-
+fn weight_filter(relations: &Vec<Mapping>, balances: &HashMap<Thing, Range<f32>>) -> Vec<Mapping> {
+    let mut rtn: Vec<Mapping> = Vec::new();
+    let rnd = thread_rng().gen::<f32>();
+    for m in relations {
+        let _ = match balances.get(&m.to) {
+            Some(rng) => if rng.contains(&rnd) {
+                rtn.push(m.clone());
+            },
+            None => rtn.push(m.clone())
+        };
+    }
+    rtn
+}
 
 /// weight group will be cached
 fn weight_calculate(labels: &HashMap<String, Vec<Mapping>>) -> HashMap<Thing, Range<f32>> {
@@ -38,7 +51,7 @@ fn weight_calculate(labels: &HashMap<String, Vec<Mapping>>) -> HashMap<Thing, Ra
         for m in group {
             let w = m.weight.proportion as f32 / sum as f32;
             let end = begin + w;
-            if ptr::eq(m,last) {
+            if ptr::eq(m, last) {
                 // last must great 1
                 rtn.insert(m.to.clone(), begin..1.1);
             } else {
@@ -65,3 +78,5 @@ fn get_label_groups(maps: &Vec<Mapping>) -> HashMap<String, Vec<Mapping>> {
     labels
 }
 
+#[cfg(test)]
+mod test_weight;

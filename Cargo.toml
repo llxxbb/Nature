@@ -38,6 +38,3 @@ r2d2-diesel = "1.0"
 cdrs = "1.2"
 #rusqlite = {version = "0.13", features=["bundled"]}
 
-#test
-#mockers = "0.9"
-#mockers_derive = "0.10"
