@@ -1,4 +1,4 @@
-pub use self::weight::*;
+pub use self::relation::*;
 use std::collections::HashMap;
 use std::collections::HashSet;
 use super::*;
@@ -31,14 +31,32 @@ fn filter_relations(instance: &Instance, maps: Vec<Mapping>) -> Vec<Mapping> {
 }
 
 
-fn context_check(_contexts: &HashMap<String, String>, _mapping: &Mapping) -> bool {
-    // TODO
-    false
+fn context_check(contexts: &HashMap<String, String>, mapping: &Mapping) -> bool {
+    for exclude in &mapping.demand.context_exclude {
+        if contexts.contains_key(exclude) {
+            return false;
+        }
+    }
+    for include in &mapping.demand.context_include {
+        if !contexts.contains_key(include) {
+            return false;
+        }
+    }
+    true
 }
 
-fn status_check(_status: &HashSet<String>, _mapping: &Mapping) -> bool {
-    // TODO
-    false
+fn status_check(status: &HashSet<String>, mapping: &Mapping) -> bool {
+    for exclude in &mapping.demand.status_exclude {
+        if status.contains(exclude) {
+            return false;
+        }
+    }
+    for include in &mapping.demand.status_include {
+        if !status.contains(include) {
+            return false;
+        }
+    }
+    true
 }
 
 fn delivery_relations(carrier: Carrier<StoreInfo>, instance: &Instance, maps: Vec<Mapping>) {
@@ -58,7 +76,7 @@ fn delivery_relations(carrier: Carrier<StoreInfo>, instance: &Instance, maps: Ve
     };
 }
 
-mod weight;
+mod relation;
 
 #[cfg(test)]
 mod test_route;

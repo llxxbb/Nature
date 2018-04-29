@@ -27,8 +27,8 @@ pub struct Converter {}
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Demand {
-    status_include: HashSet<String>,
-    status_exclude: HashSet<String>,
-    context_include: HashSet<String>,
-    context_exclude: HashSet<String>,
+    pub status_include: HashSet<String>,
+    pub status_exclude: HashSet<String>,
+    pub context_include: HashSet<String>,
+    pub context_exclude: HashSet<String>,
 }

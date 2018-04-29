@@ -16,6 +16,7 @@ pub struct Carrier<T> where T: Sized + Serialize {
 
 impl<T> Carrier<T> where T: Sized + Serialize {
     pub fn new(task: T) -> Result<Carrier<T>> {
+        // this can avoid regenerate same content with different id
         let new_id = generate_id(&task)?;
         Ok(Carrier {
             data: task,

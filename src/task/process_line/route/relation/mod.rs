@@ -79,4 +79,4 @@ fn get_label_groups(maps: &Vec<Mapping>) -> HashMap<String, Vec<Mapping>> {
 }
 
 #[cfg(test)]
-mod test_weight;
+mod test_relation;

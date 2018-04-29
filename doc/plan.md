@@ -2,11 +2,10 @@
 
 ## for the near term
 
-* route filter : context, status
 
-* carrier avoid repeat
-* converter support balance
+
 * add status vertion to instance
+
 * instance status conflict
 * single delivery will reuse the id to increase the performance
 * callback
@@ -31,6 +30,7 @@
 * support multiple rpc types, such as web and gRpc
 * monitor point
 * verify input fields of thing. report error for undefined fields
+* converter support balance
 
 
 
