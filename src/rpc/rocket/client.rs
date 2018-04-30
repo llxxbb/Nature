@@ -1,5 +1,5 @@
 use super::*;
 
-pub fn convert(_carrier: &Carrier<ConverterInfo>) -> Result<Vec<Instance>> {
+pub fn convert(_para: &ParaForCallOut) -> Result<Vec<Instance>> {
     unimplemented!()
 }

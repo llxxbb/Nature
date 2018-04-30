@@ -3,6 +3,10 @@ use super::*;
 pub fn do_dispatch(carrier: Carrier<RouteInfo>) {
     let id = &carrier.id.clone();
     let new_carriers = generate_carriers(carrier);
+    if new_carriers.is_err() {
+        return;
+    }
+    let new_carriers = new_carriers.unwrap();
     if new_carriers.len() == 0 {
         return;
     }
@@ -19,19 +23,28 @@ pub fn do_dispatch(carrier: Carrier<RouteInfo>) {
     }
 }
 
-fn generate_carriers(carrier: Carrier<RouteInfo>) -> Vec<Carrier<ConverterInfo>> {
+pub fn re_dispatch(convert_info: ConverterInfo) -> Result<()> {
+    let carrier = Carrier::new(convert_info)?;
+    let _ = CarrierDaoService::insert(&carrier);
+    send_carrier(CHANNEL_CONVERT.sender.lock().unwrap().clone(), carrier);
+    Ok(())
+}
+
+fn generate_carriers(carrier: Carrier<RouteInfo>) -> Result<Vec<Carrier<ConverterInfo>>> {
     let mut new_carriers: Vec<Carrier<ConverterInfo>> = Vec::new();
-    let instance = carrier.instance.clone();
     let maps = carrier.data.maps.clone();
     for c in maps {
-        let task = ConverterInfo(instance.clone(), c);
+        let task = ConverterInfo {
+            from: carrier.instance.clone(),
+            mapping: c,
+        };
         match Carrier::new(task) {
             Ok(x) => new_carriers.push(x),
             Err(err) => {
                 ProcessLine::move_to_err(err, carrier);
-                return new_carriers;
+                return Ok(new_carriers);
             }
         }
     }
-    new_carriers
+    Ok(new_carriers)
 }

@@ -2,13 +2,11 @@
 
 ## for the near term
 
+* verify converter returned
 
-
-* add status vertion to instance
-
-* instance status conflict
-* single delivery will reuse the id to increase the performance
 * callback
+
+* single delivery will reuse the id to increase the performance
 * Retry transmit
 
 ### Batch

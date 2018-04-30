@@ -1,3 +1,4 @@
+use dao::thing::*;
 use global::*;
 
 /// separator for `Thing`'s key
@@ -75,6 +76,18 @@ pub struct ThingDefine {
     pub fields: Option<String>,
 
     pub create_time: u64,
+}
+
+impl ThingDefine {
+    pub fn is_status(&self) -> bool {
+        !self.states.is_none()
+    }
+}
+
+impl ThingDefine {
+    pub fn new(value: Thing) -> Result<Self> {
+        ThingDefineDaoService::get(&value)
+    }
 }
 
 #[cfg(test)]

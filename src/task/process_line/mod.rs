@@ -1,8 +1,10 @@
 use dao::*;
+use global::*;
 use rpc::rocket::*;
 pub use self::convert::*;
 pub use self::dispatch::*;
 pub use self::route::*;
+pub use self::store::*;
 pub use self::threads::*;
 use serde::Serialize;
 use super::*;
@@ -13,7 +15,7 @@ pub struct ProcessLine;
 impl ProcessLine {
     /// born an instance which is the beginning of the changes.
     pub fn single_input(instance: Instance) -> Result<UuidBytes> {
-        let task = StoreInfo(instance);
+        let task = StoreInfo { instance, converter: None };
         let carrier = Carrier::new(task)?;
         let _ = CarrierDaoService::insert(&carrier)?;
         Self::store(carrier, Root::Business)
@@ -25,13 +27,7 @@ impl ProcessLine {
 
     fn convert(carrier: Carrier<ConverterInfo>) { do_convert(carrier); }
 
-    fn store(carrier: Carrier<StoreInfo>, root: Root) -> Result<UuidBytes> {
-        let mut carrier = carrier;
-        let uuid = InstanceImpl::verify(&mut carrier.data.0, root)?;
-        InstanceDaoService::insert(&carrier.data.0)?;
-        send_carrier(CHANNEL_ROUTE.sender.lock().unwrap().clone(), carrier);
-        Ok(uuid)
-    }
+    fn store(carrier: Carrier<StoreInfo>, root: Root) -> Result<UuidBytes> { do_store(carrier, root) }
 
     fn store_for_receive(carrier: Carrier<StoreInfo>) {
         let cp = carrier.clone();
@@ -50,6 +46,8 @@ mod route;
 mod dispatch;
 
 mod convert;
+
+mod store;
 
 mod threads;
 

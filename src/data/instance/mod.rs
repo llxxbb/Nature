@@ -42,6 +42,7 @@ impl Instance {
                 content: String::new(),
                 context: HashMap::new(),
                 status: HashSet::new(),
+                status_version: 0,
             },
         };
         Ok(instance)
@@ -72,6 +73,7 @@ pub struct InstanceNoID {
     /// json data for a `Instance`.
     pub context: HashMap<String, String>,
     pub status: HashSet<String>,
+    pub status_version: u32,
 }
 
 #[derive(Serialize, Deserialize, Debug, Default)]

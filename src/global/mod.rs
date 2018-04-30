@@ -25,11 +25,14 @@ lazy_static! {
     pub static ref CHANNEL_CONVERT : Channel<Carrier<ConverterInfo>> = Channel::new();
     pub static ref CHANNEL_STORE : Channel<Carrier<StoreInfo>> = Channel::new();
 
-    pub static ref THING_DEFINE_CACHE: Mutex<LruCache<Thing, ThingDefine>> = Mutex::new(LruCache::<Thing, ThingDefine>::with_expiry_duration(Duration::from_secs(3600)));
-    pub static ref MAPPING_CACHE: Mutex<LruCache<Thing, (Vec<Mapping>, HashMap<Thing, Range<f32>>)>> = Mutex::new(LruCache::<Thing, (Vec<Mapping>, HashMap<Thing, Range<f32>>)>::with_expiry_duration(Duration::from_secs(3600)));
+    pub static ref CACHE_THING_DEFINE: Mutex<LruCache<Thing, ThingDefine>> = Mutex::new(LruCache::<Thing, ThingDefine>::with_expiry_duration(Duration::from_secs(3600)));
+    pub static ref CACHE_MAPPING: Mutex<LruCache<Thing, (Vec<Mapping>, HashMap<Thing, Range<f32>>)>> = Mutex::new(LruCache::<Thing, (Vec<Mapping>, HashMap<Thing, Range<f32>>)>::with_expiry_duration(Duration::from_secs(3600)));
 
     pub static ref SYS_KEY_BATCH_SERIAL : String = "/sys/batch/serial".to_string();
     pub static ref SYS_KEY_BATCH_PARALLEL : String = "/sys/batch/parallel".to_string();
+
+    pub static ref CONTEXT_STATUS_INSTANCE_ID : String = "status_instance_id".to_string();
+
 }
 
 #[cfg(not(test))]

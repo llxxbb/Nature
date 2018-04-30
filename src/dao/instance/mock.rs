@@ -14,12 +14,18 @@ lazy_static! {
 pub struct InstanceDaoService;
 
 impl InstanceDao for InstanceDaoService {
-    fn insert(_instance: &Instance) -> Result<UuidBytes> {
+    fn insert(_instance: &Instance) -> Result<()> {
         let mode = &*INSTANCE_DAO_MODE.lock().unwrap();
         println!("InstanceDao mode is {:?}", mode);
         match mode {
-            InstanceDaoMode::Ok => Ok([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]),
-            InstanceDaoMode::Err => Err(NatureError::InstanceDaoError("some error".to_string()))
+            InstanceDaoMode::Ok => Ok(()),
+            InstanceDaoMode::Err => Err(NatureError::DaoEnvironmentError("some error".to_string()))
         }
+    }
+    fn get_last_status_by_id(_id: &UuidBytes) -> Result<Option<Instance>> {
+        unimplemented!()
+    }
+    fn source_stored(_instance: &Instance) -> Result<bool> {
+        unimplemented!()
     }
 }

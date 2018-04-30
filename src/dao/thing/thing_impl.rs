@@ -9,7 +9,7 @@ impl ThingDefineDao for ThingDefineDaoService {
         if thing.key.is_empty() {
             return Err(NatureError::VerifyError("[biz] must not be empty!".to_string()));
         }
-        let mut cache = THING_DEFINE_CACHE.lock().unwrap();
+        let mut cache = CACHE_THING_DEFINE.lock().unwrap();
         let rtn = cache.get(thing);
         match rtn {
             None => {

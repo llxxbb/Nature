@@ -22,6 +22,7 @@ There are all **Things** in Nature, and **Things** always transform into other t
 
 ### 演进
 
+流程不是一蹴而就的，而是一个不断演化的过程。如何快速的迭代系统？
 成长过程
 
 订单的处理工程
@@ -49,6 +50,8 @@ There are all **Things** in Nature, and **Things** always transform into other t
 ### 历史不可改变
 
  我们只能看到事务某一时刻的样子。
+ 
+### 自我治理
 
 ## Nature
 
@@ -56,8 +59,15 @@ things + motion = nature
 
 ## 技术意义
 
-### 去接口
+* 去接口
 数据就是接口。接口只是一种技术形式。我们真正关心的是数据。因此我们不需要定义接口只需要定义数据！
+
+* 內建状态数据版本冲突机制
+* 异步回调
+* 批处理
+* 并行处理与串行处理
+  - 并行中的串行
+  - 串行中的并行
 
 ## any db you want
 

@@ -1,8 +1,27 @@
 use super::*;
 
 pub fn do_convert(carrier: Carrier<ConverterInfo>) {
-    let _ = match convert(&carrier) {
-        Ok(instances) => on_success(carrier, instances),
+    let para = match ParaForCallOut::new(&carrier.data) {
+        Ok(ci) => ci,
+        Err(NatureError::DaoEnvironmentError(_)) => return,
+        Err(err) => {
+            ProcessLine::move_to_err(err, carrier);
+            return;
+        }
+    };
+    let _ = match convert(&para) {
+        Ok(instances) => {
+            // check status version to avoid loop
+            if let Err(err) = verify(&instances) {
+                ProcessLine::move_to_err(err, carrier);
+                return;
+            }
+            match StorePlan::new(&carrier.data, &instances) {
+                Ok(plan) => to_store(carrier, plan),
+                // if store plan error wait to retry
+                _ => (),
+            }
+        }
         Err(err) => match err {
             // only **Environment Error** will be retry
             NatureError::ConverterEnvironmentError(_) => (),
@@ -12,23 +31,23 @@ pub fn do_convert(carrier: Carrier<ConverterInfo>) {
     };
 }
 
-fn on_success(carrier: Carrier<ConverterInfo>, instances: Vec<Instance>) {
-    // make plan
-    let mut plan = StorePlan {
-        from_id: carrier.data.0.id,
-        to: carrier.data.1.to.clone(),
-        plan: instances,
-    };
-    if let Ok(_) = StorePlanDaoService::save(&mut plan) {
-        to_store(carrier, plan);
-    };
-    // if store plan error wait to retry
+fn verify(_instances: &Vec<Instance>) -> Result<()> {
+    // TODO only one status instance should return
+
+    // TODO all biz must same
+
+    // TODO status version must equal old + 1
+    Ok(())
 }
 
 fn to_store(carrier: Carrier<ConverterInfo>, plan: StorePlan) {
     let mut new_tasks: Vec<Carrier<StoreInfo>> = Vec::new();
     for instance in plan.plan {
-        let _ = match Carrier::new(StoreInfo(instance)) {
+        let store_carrier = Carrier::new(StoreInfo {
+            instance,
+            converter: Some(carrier.data.clone()),
+        });
+        let _ = match store_carrier {
             Ok(c) => {
                 let _ = match CarrierDaoService::insert(&c) {
                     Ok(_) => new_tasks.push(c),

@@ -11,7 +11,7 @@ pub fn get_relations(from: &Thing) -> Result<Vec<Mapping>> {
 }
 
 fn get_balanced(from: &Thing) -> Result<(Vec<Mapping>, HashMap<Thing, Range<f32>>)> {
-    let mut cache = MAPPING_CACHE.lock().unwrap();
+    let mut cache = CACHE_MAPPING.lock().unwrap();
     if let Some(balances) = cache.get(from) {
         return Ok(balances.clone());
     }

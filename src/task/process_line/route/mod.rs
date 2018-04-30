@@ -4,7 +4,7 @@ use std::collections::HashSet;
 use super::*;
 
 pub fn do_route(carrier: Carrier<StoreInfo>) {
-    let instance = &carrier.data.0.clone();
+    let instance = &carrier.data.instance.clone();
     if let Ok(relations) = get_relations(&instance.data.thing) {
         // no relations
         if relations.len() == 0 {

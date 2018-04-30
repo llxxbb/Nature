@@ -21,7 +21,7 @@ impl CarrierDao for CarrierDaoService {
         println!("CarrierDao calling {:?}", mode);
         match mode {
             CarrierDaoMode::Ok => Ok([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]),
-            CarrierDaoMode::Err => Err(NatureError::CarrierDaoError("some error".to_string()))
+            CarrierDaoMode::Err => Err(NatureError::DaoEnvironmentError("some error".to_string()))
         }
     }
     fn delete(_id: &UuidBytes) -> Result<()> {
