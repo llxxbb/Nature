@@ -9,7 +9,7 @@ impl ParaForCallOut {
     /// * uuid parse
     ///
     pub fn new(converter_info: &ConverterInfo) -> Result<ParaForCallOut> {
-        let define = ThingDefine::new(converter_info.mapping.to.clone())?;
+        let define = ThingDefine::new(&converter_info.mapping.to)?;
         // target is a no status thing
         if !define.is_status() {
             return Ok(ParaForCallOut {

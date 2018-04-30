@@ -85,8 +85,8 @@ impl ThingDefine {
 }
 
 impl ThingDefine {
-    pub fn new(value: Thing) -> Result<Self> {
-        ThingDefineDaoService::get(&value)
+    pub fn new(value: &Thing) -> Result<Self> {
+        ThingDefineDaoService::get(value)
     }
 }
 

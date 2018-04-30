@@ -2,8 +2,6 @@
 
 ## for the near term
 
-* verify converter returned
-
 * callback
 
 * single delivery will reuse the id to increase the performance

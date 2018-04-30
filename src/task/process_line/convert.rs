@@ -12,10 +12,14 @@ pub fn do_convert(carrier: Carrier<ConverterInfo>) {
     let _ = match convert(&para) {
         Ok(instances) => {
             // check status version to avoid loop
-            if let Err(err) = verify(&instances) {
-                ProcessLine::move_to_err(err, carrier);
-                return;
-            }
+            let instances = match verify(&carrier.mapping.to, &instances) {
+                Ok(ins) => ins,
+                Err(NatureError::DaoEnvironmentError(_)) => return,
+                Err(err) => {
+                    ProcessLine::move_to_err(err, carrier);
+                    return;
+                }
+            };
             match StorePlan::new(&carrier.data, &instances) {
                 Ok(plan) => to_store(carrier, plan),
                 // if store plan error wait to retry
@@ -31,13 +35,34 @@ pub fn do_convert(carrier: Carrier<ConverterInfo>) {
     };
 }
 
-fn verify(_instances: &Vec<Instance>) -> Result<()> {
-    // TODO only one status instance should return
+fn verify(to: &Thing, instances: &Vec<Instance>) -> Result<Vec<Instance>> {
+    let mut rtn: Vec<Instance> = Vec::new();
 
-    // TODO all biz must same
+    // only one status instance should return
+    let define = ThingDefine::new(to)?;
+    if define.is_status() {
+        if instances.len() > 1 {
+            return Err(NatureError::ConverterLogicalError("[status thing] must return less 2 instances!".to_string()));
+        }
 
-    // TODO status version must equal old + 1
-    Ok(())
+        // status version must equal old + 1
+        if instances.len() == 1 {
+            let mut ins = instances[0].clone();
+            ins.data.status_version += 1;
+            ins.data.thing = to.clone();
+            rtn.push(ins);
+        }
+        return Ok(rtn);
+    }
+
+    // all biz must same to "to"
+    for mut r in instances {
+        let mut instance = r.clone();
+        instance.data.thing = to.clone();
+        rtn.push(instance);
+    }
+
+    Ok(rtn)
 }
 
 fn to_store(carrier: Carrier<ConverterInfo>, plan: StorePlan) {
