@@ -68,6 +68,8 @@ things + motion = nature
 * 并行处理与串行处理
   - 并行中的串行
   - 串行中的并行
+  
+* 延时与定时执行
 
 ## any db you want
 

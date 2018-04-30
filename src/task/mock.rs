@@ -8,5 +8,9 @@ impl ProcessLine {
     }
 
     pub fn route(_carrier: Carrier<StoreInfo>) {}
+
+    pub fn callback(_delayed: DelayedInstances) {
+        // TODO
+    }
 }
 

@@ -2,10 +2,8 @@
 
 ## for the near term
 
-* callback
-
 * single delivery will reuse the id to increase the performance
-* Retry transmit
+* Retry carry
 
 ### Batch
 

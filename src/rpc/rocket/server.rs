@@ -20,6 +20,13 @@ fn input(instance: Json<Instance>) -> Json<Result<UuidBytes>> {
     Json(x)
 }
 
+#[post("/callback", format = "application/json", data = "<delayed>")]
+fn callback(delayed: Json<DelayedInstances>) -> Json<Result<()>> {
+    ProcessLine::callback(delayed.0);
+    Json(Ok(()))
+}
+
+
 #[post("/serial_batch", format = "application/json", data = "<serial_batch>")]
 fn batch_for_serial(serial_batch: Json<SerialBatchInstance>) -> Json<Result<()>> {
     let x = InstanceImpl::serial(serial_batch.0);

@@ -9,8 +9,8 @@ pub use self::instance_impl::*;
 pub use self::mock::*;
 use std::collections::HashMap;
 use std::collections::HashSet;
+use std::ops::Deref;
 use util::*;
-use uuid::*;
 
 /// A snapshot for a particular `Thing`
 #[derive(Serialize, Deserialize, Debug, Default, Clone)]
@@ -18,6 +18,14 @@ pub struct Instance {
     /// A unique value used to distinguish other instance
     pub id: UuidBytes,
     pub data: InstanceNoID,
+}
+
+impl Deref for Instance {
+    type Target = InstanceNoID;
+
+    fn deref(&self) -> &<Self as Deref>::Target {
+        &self.data
+    }
 }
 
 impl Instance {

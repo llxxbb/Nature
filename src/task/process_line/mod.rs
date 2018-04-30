@@ -30,15 +30,16 @@ impl ProcessLine {
     fn store(carrier: Carrier<StoreInfo>, root: Root) -> Result<UuidBytes> { do_store(carrier, root) }
 
     fn store_for_receive(carrier: Carrier<StoreInfo>) {
-        let cp = carrier.clone();
-        if let Err(err) = Self::store(carrier, Root::Business) {
-            Self::move_to_err(err, cp)
+        if let Err(err) = Self::store(carrier.clone(), Root::Business) {
+            Self::move_to_err(err, carrier)
         };
     }
 
     fn move_to_err<T>(err: NatureError, carrier: Carrier<T>) where T: Sized + Serialize {
         let _ = CarrierDaoService::move_to_error(CarryError { err, carrier });
     }
+
+    pub fn callback(delayed: DelayedInstances) { do_callback(delayed) }
 }
 
 mod route;

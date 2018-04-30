@@ -10,21 +10,20 @@ pub fn do_dispatch(carrier: Carrier<RouteInfo>) {
     if new_carriers.len() == 0 {
         return;
     }
-    let to_send = new_carriers.clone();
-    // save news
-    for n in new_carriers {
-        let _ = CarrierDaoService::insert(&n);
+    for n in &new_carriers {
+        let _ = CarrierDaoService::insert(n);
     }
     // remove old
     let _ = CarrierDaoService::delete(id);
     // to carry
-    for task in to_send {
+    for task in new_carriers {
         send_carrier(CHANNEL_CONVERT.sender.lock().unwrap().clone(), task)
     }
 }
 
 pub fn re_dispatch(convert_info: ConverterInfo) -> Result<()> {
-    let carrier = Carrier::new(convert_info)?;
+    let task = ConverterInfo::new(&convert_info.from, &convert_info.mapping)?;
+    let carrier = Carrier::new(task)?;
     let _ = CarrierDaoService::insert(&carrier);
     send_carrier(CHANNEL_CONVERT.sender.lock().unwrap().clone(), carrier);
     Ok(())
@@ -34,10 +33,7 @@ fn generate_carriers(carrier: Carrier<RouteInfo>) -> Result<Vec<Carrier<Converte
     let mut new_carriers: Vec<Carrier<ConverterInfo>> = Vec::new();
     let maps = carrier.data.maps.clone();
     for c in maps {
-        let task = ConverterInfo {
-            from: carrier.instance.clone(),
-            mapping: c,
-        };
+        let task = ConverterInfo::new(&carrier.instance, &c)?;
         match Carrier::new(task) {
             Ok(x) => new_carriers.push(x),
             Err(err) => {

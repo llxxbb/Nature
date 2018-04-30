@@ -1,4 +1,5 @@
 use super::*;
+use uuid::*;
 
 #[test]
 fn verify_un_configured() {

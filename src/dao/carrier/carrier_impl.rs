@@ -11,7 +11,13 @@ impl CarrierDao for CarrierDaoService {
     fn delete(_id: &UuidBytes) -> Result<()> {
         unimplemented!()
     }
-    fn move_to_error<T: Sized + Serialize>(_err: CarryError<T>) {
+    fn move_to_error<T: Sized + Serialize>(_err: CarryError<T>) -> Result<()> {
+        unimplemented!()
+    }
+    fn update_execute_time(_id: UuidBytes, _new_time: i64) -> Result<()> {
+        unimplemented!()
+    }
+    fn get<T: Sized + Serialize>(_id: UuidBytes) -> Result<Carrier<T>> {
         unimplemented!()
     }
 }
