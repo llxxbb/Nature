@@ -2,10 +2,15 @@
 
 ## for the nearer term
 
+* add teller
+
 * Batch
-  * batch process for serial
   * batch process for parallel
+  
+  * batch process for serial
   * virtual instance for batch
+  
+* ProcessLine::callback should return `Result`
 
 ### Retry carry
 

@@ -16,13 +16,13 @@ pub fn start_rocket_server() -> Rocket {
 /// **Note** This do not receive System `Thing`'s instances
 #[post("/input", format = "application/json", data = "<instance>")]
 fn input(instance: Json<Instance>) -> Json<Result<UuidBytes>> {
-    let x = ProcessLine::single_input(instance.0);
+    let x = Teller::single_input(instance.0);
     Json(x)
 }
 
 #[post("/callback", format = "application/json", data = "<delayed>")]
 fn callback(delayed: Json<DelayedInstances>) -> Json<Result<()>> {
-    ProcessLine::callback(delayed.0);
+    Teller::callback(delayed.0);
     Json(Ok(()))
 }
 

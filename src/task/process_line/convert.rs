@@ -86,7 +86,7 @@ fn to_store(carrier: &Carrier<ConverterInfo>, plan: StorePlan) {
             converter: Some(carrier.data.clone()),
         }
     }).collect();
-    let new_tasks = create_batch_and_finish_carrier(store_infos, carrier.to_owned());
+    let new_tasks = Delivery::create_batch_and_finish_carrier(store_infos, carrier.to_owned());
     if new_tasks.is_err() {
         return;
     }

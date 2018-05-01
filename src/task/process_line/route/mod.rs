@@ -61,7 +61,7 @@ fn status_check(status: &HashSet<String>, mapping: &Mapping) -> bool {
 
 fn delivery_relations(carrier: Carrier<StoreInfo>, instance: &Instance, maps: Vec<Mapping>) {
     let route = RouteInfo { instance: instance.clone(), maps };
-    match create_and_finish_carrier(route, carrier) {
+    match Delivery::create_and_finish_carrier(route, carrier) {
         Ok(new) => send_carrier(CHANNEL_DISPATCH.sender.lock().unwrap().clone(), new),
         Err(_) => ()
     }

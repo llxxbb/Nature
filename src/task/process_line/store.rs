@@ -21,12 +21,12 @@ fn handle_duplicated(carrier: Carrier<StoreInfo>, instance: Instance) -> Result<
     let define = ThingDefineDaoService::get(&instance.data.thing)?;
     // **None Status Thing** won't try again
     if !define.is_status() {
-        finish_carrier(&carrier.id)?;
+        Delivery::finish_carrier(&carrier.id)?;
         return Ok(());
     }
     // same source of **Status Thing** can't store more than once.
     if let Ok(true) = InstanceDaoService::source_stored(&instance) {
-        finish_carrier(&carrier.id)?;
+        Delivery::finish_carrier(&carrier.id)?;
         return Ok(());
     };
     re_dispatch(carrier)

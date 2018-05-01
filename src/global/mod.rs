@@ -24,6 +24,7 @@ lazy_static! {
     pub static ref CHANNEL_DISPATCH : Channel<Carrier<RouteInfo>> = Channel::new();
     pub static ref CHANNEL_CONVERT : Channel<Carrier<ConverterInfo>> = Channel::new();
     pub static ref CHANNEL_STORE : Channel<Carrier<StoreInfo>> = Channel::new();
+    pub static ref CHANNEL_PARALLEL : Channel<Carrier<ParallelBatchInstance>> = Channel::new();
 
     pub static ref CACHE_THING_DEFINE: Mutex<LruCache<Thing, ThingDefine>> = Mutex::new(LruCache::<Thing, ThingDefine>::with_expiry_duration(Duration::from_secs(3600)));
     pub static ref CACHE_MAPPING: Mutex<LruCache<Thing, (Vec<Mapping>, HashMap<Thing, Range<f32>>)>> = Mutex::new(LruCache::<Thing, (Vec<Mapping>, HashMap<Thing, Range<f32>>)>::with_expiry_duration(Duration::from_secs(3600)));

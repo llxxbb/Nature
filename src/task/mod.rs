@@ -1,10 +1,8 @@
 use data::*;
 use global::*;
 pub use self::converter_info_impl::*;
-#[cfg(test)]
-pub use self::mock::*;
-#[cfg(not(test))]
 pub use self::process_line::*;
+pub use self::teller::*;
 use serde::Serialize;
 use std::sync::mpsc::Receiver;
 use std::sync::Mutex;
@@ -61,10 +59,10 @@ pub enum ConverterReturned {
     Instances(Vec<Instance>),
 }
 
-pub mod process_line;
+mod process_line;
+
+mod teller;
 
 mod converter_info_impl;
 
-#[cfg(test)]
-mod mock;
 

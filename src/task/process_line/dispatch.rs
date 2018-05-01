@@ -2,7 +2,7 @@ use super::*;
 
 pub fn do_dispatch(carrier: Carrier<RouteInfo>) {
     if carrier.data.maps.len() == 0 {
-        let _ = finish_carrier(&carrier.id);
+        let _ = Delivery::finish_carrier(&carrier.id);
         return;
     }
 
@@ -15,7 +15,7 @@ pub fn do_dispatch(carrier: Carrier<RouteInfo>) {
         }
     };
 
-    let new_carriers = match create_batch_and_finish_carrier(converters, carrier) {
+    let new_carriers = match Delivery::create_batch_and_finish_carrier(converters, carrier) {
         Ok(ncs) => ncs,
         Err(_) => return,
     };
@@ -32,7 +32,7 @@ pub fn re_dispatch(carrier: Carrier<StoreInfo>) -> Result<()> {
     }
     let converter = &carrier.data.converter.clone().unwrap();
     let task = ConverterInfo::new(&converter.from, &converter.mapping)?;
-    let carrier = create_and_finish_carrier(task, carrier)?;
+    let carrier = Delivery::create_and_finish_carrier(task, carrier)?;
     send_carrier(CHANNEL_CONVERT.sender.lock().unwrap().clone(), carrier);
     Ok(())
 }

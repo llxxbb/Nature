@@ -85,7 +85,7 @@ pub struct InstanceNoID {
 }
 
 #[derive(Serialize, Deserialize, Debug, Default)]
-pub struct ParallelBatchInstance(Vec<Instance>);
+pub struct ParallelBatchInstance(pub Vec<Instance>);
 
 #[derive(Serialize, Deserialize, Debug, Default)]
 pub struct SerialBatchInstance {
