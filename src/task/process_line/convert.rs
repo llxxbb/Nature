@@ -80,28 +80,17 @@ fn verify(to: &Thing, instances: &Vec<Instance>) -> Result<Vec<Instance>> {
 }
 
 fn to_store(carrier: &Carrier<ConverterInfo>, plan: StorePlan) {
-    let mut new_tasks: Vec<Carrier<StoreInfo>> = Vec::new();
-    for instance in plan.plan {
-        let store_carrier = Carrier::new(StoreInfo {
-            instance,
+    let store_infos: Vec<StoreInfo> = plan.plan.iter().map(|instance| {
+        StoreInfo {
+            instance:instance.clone(),
             converter: Some(carrier.data.clone()),
-        });
-        let _ = match store_carrier {
-            Ok(c) => {
-                let _ = match CarrierDaoService::insert(&c) {
-                    Ok(_) => new_tasks.push(c),
-                    Err(_) => return // retry next time
-                };
-            }
-            Err(err) => {
-                ProcessLine::move_to_err(err, carrier.clone());
-                return;
-            }
-        };
-    }
-    if let Ok(_) = CarrierDaoService::delete(&carrier.id) {
-        for task in new_tasks {
-            send_carrier(CHANNEL_STORE.sender.lock().unwrap().clone(), task)
         }
-    };
+    }).collect();
+    let new_tasks = create_batch_and_finish_carrier(store_infos, carrier.to_owned());
+    if new_tasks.is_err() {
+        return;
+    }
+    for task in new_tasks.unwrap() {
+        send_carrier(CHANNEL_STORE.sender.lock().unwrap().clone(), task)
+    }
 }

@@ -2,6 +2,7 @@ use dao::*;
 use global::*;
 use rpc::rocket::*;
 pub use self::convert::*;
+pub use self::delivery::*;
 pub use self::dispatch::*;
 pub use self::route::*;
 pub use self::store::*;
@@ -16,8 +17,7 @@ impl ProcessLine {
     /// born an instance which is the beginning of the changes.
     pub fn single_input(instance: Instance) -> Result<UuidBytes> {
         let task = StoreInfo { instance, converter: None };
-        let carrier = Carrier::new(task)?;
-        let _ = CarrierDaoService::insert(&carrier)?;
+        let carrier = create_carrier(task)?;
         Self::store(carrier, Root::Business)
     }
 
@@ -51,6 +51,8 @@ mod convert;
 mod store;
 
 mod threads;
+
+mod delivery;
 
 #[cfg(test)]
 mod test_store;

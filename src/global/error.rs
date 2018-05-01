@@ -1,7 +1,7 @@
 use serde_json;
 use uuid;
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub enum NatureError {
     // outer input verify errors
     SerializeError(String),
@@ -17,6 +17,7 @@ pub enum NatureError {
     // internal errors
     DaoEnvironmentError(String),
     DaoDuplicated,
+    SystemError(String),
 }
 
 impl From<serde_json::error::Error> for NatureError {

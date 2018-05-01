@@ -1,15 +1,13 @@
 # plan
 
-## for the near term
+## for the nearer term
 
-* single delivery will reuse the id to increase the performance
-* Retry carry
+* Batch
+  * batch process for serial
+  * batch process for parallel
+  * virtual instance for batch
 
-### Batch
-
-* batch process for serial
-* batch process for parallel
-* virtual instance for batch
+### Retry carry
 
 ### other
 

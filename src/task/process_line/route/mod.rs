@@ -61,19 +61,10 @@ fn status_check(status: &HashSet<String>, mapping: &Mapping) -> bool {
 
 fn delivery_relations(carrier: Carrier<StoreInfo>, instance: &Instance, maps: Vec<Mapping>) {
     let route = RouteInfo { instance: instance.clone(), maps };
-    let _ = match Carrier::new(route) {
-        Ok(new_carrier) => {
-            // insert new first carrier
-            if let Ok(_) = CarrierDaoService::insert(&new_carrier) {
-                // then delete old carrier
-                if let Ok(_) = CarrierDaoService::delete(&carrier.id) {
-                    // carry
-                    send_carrier(CHANNEL_DISPATCH.sender.lock().unwrap().clone(), new_carrier);
-                };
-            };
-        }
-        Err(err) => ProcessLine::move_to_err(err, carrier)
-    };
+    match create_and_finish_carrier(route, carrier) {
+        Ok(new) => send_carrier(CHANNEL_DISPATCH.sender.lock().unwrap().clone(), new),
+        Err(_) => ()
+    }
 }
 
 mod relation;
