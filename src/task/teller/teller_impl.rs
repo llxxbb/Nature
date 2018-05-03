@@ -13,4 +13,8 @@ impl Teller {
     pub fn callback(delayed: DelayedInstances) { do_callback(delayed) }
 
     pub fn parallel(batch: ParallelBatchInstance) -> Result<()> { do_parallel(batch) }
+    pub fn serial(_batch: SerialBatchInstance) -> Result<()> {
+        // TODO
+        Ok(())
+    }
 }

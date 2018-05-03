@@ -24,18 +24,6 @@ impl InstanceImpl {
     }
 }
 
-impl InstanceTrait for InstanceImpl {
-    fn serial(_batch: SerialBatchInstance) -> Result<()> {
-        // TODO
-        unimplemented!()
-    }
-
-    fn parallel(_batch: ParallelBatchInstance) -> Result<()> {
-        // TODO
-        unimplemented!()
-    }
-}
-
 
 #[cfg(test)]
 mod test;

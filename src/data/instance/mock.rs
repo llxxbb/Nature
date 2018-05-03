@@ -27,13 +27,3 @@ impl InstanceImpl{
     }
 }
 
-impl InstanceTrait for InstanceImpl {
-    fn serial(_batch: SerialBatchInstance) -> Result<()> {
-        unimplemented!()
-    }
-
-    fn parallel(_batch: ParallelBatchInstance) -> Result<()> {
-        unimplemented!()
-    }
-}
-

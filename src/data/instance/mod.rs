@@ -94,11 +94,6 @@ pub struct SerialBatchInstance {
     pub instance: Vec<Instance>,
 }
 
-pub trait InstanceTrait {
-    fn serial(batch: SerialBatchInstance) -> Result<()>;
-    fn parallel(batch: ParallelBatchInstance) -> Result<()>;
-}
-
 
 pub mod instance_impl;
 #[cfg(test)]

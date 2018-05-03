@@ -3,9 +3,11 @@
 ## for the nearer term
 
 * add teller
-
 * Batch
   * batch process for parallel
+    * add thread for parallel process
+    * save delivery
+    * generate storeTask
   
   * batch process for serial
   * virtual instance for batch
