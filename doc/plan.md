@@ -2,6 +2,8 @@
 
 ## for the nearer term
 
+* route
+  exclude status for source and target
 * add teller
 * Batch
   * batch process for parallel
@@ -30,6 +32,7 @@
 * monitor point
 * verify input fields of thing. report error for undefined fields
 * converter support balance
+* traffic limit
 
 
 
