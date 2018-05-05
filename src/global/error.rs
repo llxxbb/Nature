@@ -14,6 +14,10 @@ pub enum NatureError {
     ConverterLogicalError(String),
     ConverterEnvironmentError(String),
 
+    // Business Contract errors
+    TargetInstanceNotIncludeStatus(String),
+    TargetInstanceContainsExcludeStatus(String),
+
     // internal errors
     DaoEnvironmentError(String),
     DaoDuplicated,

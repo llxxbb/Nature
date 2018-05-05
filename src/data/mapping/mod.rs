@@ -6,7 +6,7 @@ use std::collections::HashSet;
 pub struct Mapping {
     pub from: Thing,
     pub to: Thing,
-    pub how: Converter,
+    pub who: Converter,
     pub demand: Demand,
     pub weight: Weight,
 }
@@ -27,8 +27,10 @@ pub struct Converter {}
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Demand {
-    pub status_include: HashSet<String>,
-    pub status_exclude: HashSet<String>,
+    pub source_status_include: HashSet<String>,
+    pub source_status_exclude: HashSet<String>,
+    pub target_status_include: HashSet<String>,
+    pub target_status_exclude: HashSet<String>,
     pub context_include: HashSet<String>,
     pub context_exclude: HashSet<String>,
 }

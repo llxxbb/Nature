@@ -2,8 +2,6 @@
 
 ## for the nearer term
 
-* route
-  exclude status for source and target
 * add teller
 * Batch
   * batch process for parallel
@@ -17,6 +15,17 @@
 * ProcessLine::callback should return `Result`
 
 ### Retry carry
+
+### Unit and Integrate test
+
+#### Integrate test
+* parallel
+* context select
+* status select
+* before convert: target status include and exclude
+* callback
+
+
 
 ### other
 

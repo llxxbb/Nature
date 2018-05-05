@@ -34,7 +34,7 @@ lazy_static! {
     pub static ref SYS_KEY_BATCH_PARALLEL : String = "/sys/batch/parallel".to_string();
 
     // sys context define
-    pub static ref CONTEXT_STATUS_INSTANCE_ID : String = "sys.status_instance_id".to_string();
+    pub static ref CONTEXT_TARGET_INSTANCE_ID : String = "sys.target_instance_id".to_string();
 
 }
 

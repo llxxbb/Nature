@@ -1,4 +1,5 @@
 use dao::*;
+use std::collections::HashSet;
 use super::*;
 use uuid::Uuid;
 
@@ -12,7 +13,7 @@ impl ConverterInfo {
         let last_target = match define.is_status() {
             false => None,
             true => {
-                match instance.context.get(&*CONTEXT_STATUS_INSTANCE_ID) {
+                match instance.context.get(&*CONTEXT_TARGET_INSTANCE_ID) {
                     // context have target id
                     Some(status_id) => {
                         let status_id = Uuid::parse_str(status_id)?;
@@ -22,11 +23,28 @@ impl ConverterInfo {
                 }
             }
         };
+        if let Some(ref last) = last_target {
+            Self::check_last(&last.status, &mapping.demand)?;
+        };
         let rtn = ConverterInfo {
             from: instance.clone(),
             mapping: mapping.clone(),
             last_status: last_target,
         };
         Ok(rtn)
+    }
+
+    fn check_last(last: &HashSet<String>, demand: &Demand) -> Result<()> {
+        for s in &demand.target_status_include {
+            if !last.contains(s) {
+                return Err(NatureError::TargetInstanceNotIncludeStatus(s.clone()));
+            }
+        }
+        for s in &demand.target_status_include {
+            if last.contains(s) {
+                return Err(NatureError::TargetInstanceContainsExcludeStatus(s.clone()));
+            }
+        }
+        Ok(())
     }
 }

@@ -46,12 +46,12 @@ fn context_check(contexts: &HashMap<String, String>, mapping: &Mapping) -> bool 
 }
 
 fn status_check(status: &HashSet<String>, mapping: &Mapping) -> bool {
-    for exclude in &mapping.demand.status_exclude {
+    for exclude in &mapping.demand.source_status_exclude {
         if status.contains(exclude) {
             return false;
         }
     }
-    for include in &mapping.demand.status_include {
+    for include in &mapping.demand.source_status_include {
         if !status.contains(include) {
             return false;
         }
