@@ -1,22 +1,23 @@
 use super::*;
 
-pub fn do_parallel(batch: ParallelBatchInstance) -> Result<()> {
+pub fn submit_parallel(batch: ParallelBatchInstance) -> Result<()> {
     match Delivery::create_carrier(batch) {
         Ok(carrier) => {
-            let id = carrier.id.clone();
-            to_store(carrier.data)?;
-            Delivery::finish_carrier(&id)
+            // to process asynchronous
+            send_carrier(CHANNEL_PARALLEL.sender.lock().unwrap().clone(), carrier);
+            Ok(())
         }
         Err(err) => Err(err),
     }
 }
 
-fn to_store(batch: ParallelBatchInstance) -> Result<()> {
-    for _instance in batch.0{
-//        StoreInfo{
-//            instance,
-//            converter: None,
-//        }
+pub fn do_parallel(carrier: Carrier<ParallelBatchInstance>) {
+    let tasks: Vec<StoreInfo> = carrier.data.0.iter().map(|instance| StoreInfo { instance: instance.clone(), converter: None }).collect();
+    let new_carriers = Delivery::create_batch_and_finish_carrier(tasks, carrier);
+    if let Ok(nc) = new_carriers {
+        for c in nc {
+            send_carrier(CHANNEL_STORE.sender.lock().unwrap().clone(), c);
+        }
     }
-    Ok(())
 }
+

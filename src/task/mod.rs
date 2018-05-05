@@ -58,6 +58,12 @@ pub enum ConverterReturned {
     Instances(Vec<Instance>),
 }
 
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct SerialFinished {
+    succeeded_id: Vec<UuidBytes>,
+    errors: Vec<String>,
+}
+
 mod process_line;
 
 

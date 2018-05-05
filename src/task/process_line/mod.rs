@@ -6,6 +6,7 @@ pub use self::delivery::*;
 pub use self::dispatch::*;
 pub use self::parallel::*;
 pub use self::route::*;
+pub use self::serial::*;
 pub use self::store::*;
 pub use self::threads::*;
 use serde::Serialize;
@@ -29,12 +30,17 @@ impl ProcessLine {
         };
     }
 
+    fn parallel(carrier: Carrier<ParallelBatchInstance>) { do_parallel(carrier) }
+    fn serial(carrier: Carrier<SerialBatchInstance>) { do_serial(carrier) }
+
     fn move_to_err<T>(err: NatureError, carrier: Carrier<T>) where T: Sized + Serialize {
         let _ = CarrierDaoService::move_to_error(CarryError { err, carrier });
     }
 }
 
 mod parallel;
+
+mod serial;
 
 mod route;
 

@@ -25,13 +25,13 @@ lazy_static! {
     pub static ref CHANNEL_CONVERT : Channel<Carrier<ConverterInfo>> = Channel::new();
     pub static ref CHANNEL_STORE : Channel<Carrier<StoreInfo>> = Channel::new();
     pub static ref CHANNEL_PARALLEL : Channel<Carrier<ParallelBatchInstance>> = Channel::new();
+    pub static ref CHANNEL_SERIAL : Channel<Carrier<SerialBatchInstance>> = Channel::new();
 
     pub static ref CACHE_THING_DEFINE: Mutex<LruCache<Thing, ThingDefine>> = Mutex::new(LruCache::<Thing, ThingDefine>::with_expiry_duration(Duration::from_secs(3600)));
     pub static ref CACHE_MAPPING: Mutex<LruCache<Thing, (Vec<Mapping>, HashMap<Thing, Range<f32>>)>> = Mutex::new(LruCache::<Thing, (Vec<Mapping>, HashMap<Thing, Range<f32>>)>::with_expiry_duration(Duration::from_secs(3600)));
 
     // sys biz define
-    pub static ref SYS_KEY_BATCH_SERIAL : String = "/sys/batch/serial".to_string();
-    pub static ref SYS_KEY_BATCH_PARALLEL : String = "/sys/batch/parallel".to_string();
+    pub static ref SYS_KEY_SERIAL : String = "/serial".to_string();
 
     // sys context define
     pub static ref CONTEXT_TARGET_INSTANCE_ID : String = "sys.target_instance_id".to_string();

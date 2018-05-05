@@ -2,21 +2,13 @@
 
 ## for the nearer term
 
-* add teller
-* Batch
-  * batch process for parallel
-    * add thread for parallel process
-    * save delivery
-    * generate storeTask
-  
-  * batch process for serial
-  * virtual instance for batch
-  
 * ProcessLine::callback should return `Result`
+
+* init system : check "/S/serial" whether defined, if not create one
 
 ### Retry carry
 
-### Unit and Integrate test
+### Unit and Integrate test 
 
 #### Integrate test
 * parallel
@@ -42,7 +34,7 @@
 * verify input fields of thing. report error for undefined fields
 * converter support balance
 * traffic limit
-
+* introduce thread pool
 
 
 

@@ -1,6 +1,5 @@
 extern crate r2d2;
 
-use chrono::prelude::*;
 use data::*;
 use global::*;
 #[cfg(not(test))]
@@ -25,35 +24,6 @@ impl Deref for Instance {
 
     fn deref(&self) -> &<Self as Deref>::Target {
         &self.data
-    }
-}
-
-impl Instance {
-    pub fn new_batch_for_serial(batch: &mut SerialBatchInstance) -> Result<Instance> {
-        // veriry all
-        for mut instance in &mut batch.instance {
-            InstanceImpl::verify(&mut instance, Root::Business)?;
-        }
-        let instance = Instance {
-            id: {
-                // id based on instance list in `SerialBatchInstance`
-                let vec = batch.instance.iter().map(|x| &x.id).collect::<Vec<_>>();
-                generate_id(&vec)?
-            },
-            data: InstanceNoID {
-                thing: Thing {
-                    key: SYS_KEY_BATCH_SERIAL.to_string(),
-                    version: 1,
-                },
-                execute_time: Local::now().timestamp_millis(),
-                create_time: Local::now().timestamp_millis(),
-                content: String::new(),
-                context: HashMap::new(),
-                status: HashSet::new(),
-                status_version: 0,
-            },
-        };
-        Ok(instance)
     }
 }
 
@@ -87,16 +57,13 @@ pub struct InstanceNoID {
 #[derive(Serialize, Deserialize, Debug, Default)]
 pub struct ParallelBatchInstance(pub Vec<Instance>);
 
-#[derive(Serialize, Deserialize, Debug, Default)]
+#[derive(Serialize, Deserialize, Debug, Default, Clone)]
 pub struct SerialBatchInstance {
     pub context_for_finish: String,
-    pub ignore_error: bool,
-    pub instance: Vec<Instance>,
+    pub instances: Vec<Instance>,
 }
 
 
 pub mod instance_impl;
 #[cfg(test)]
 pub mod mock;
-#[cfg(test)]
-pub mod test;
