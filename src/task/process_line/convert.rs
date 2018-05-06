@@ -3,7 +3,15 @@ use super::*;
 pub fn do_convert(carrier: Carrier<ConverterInfo>) {
     let para = CallOutParameter::new(&carrier);
     let _ = match convert(para) {
-        Ok(ConverterReturned::Instances(instances)) => handle_instances(&carrier, &instances),
+        Ok(ConverterReturned::Instances(instances)) => {
+            match handle_instances(&carrier, &instances) {
+                Ok(_) => (),
+                Err(NatureError::DaoEnvironmentError(_)) => (),
+                Err(err) => {
+                    ProcessLine::move_to_err(err, carrier.clone());
+                }
+            }
+        }
         Ok(ConverterReturned::Delay(delay)) => {
             let _ = CarrierDaoService::update_execute_time(carrier.id, carrier.execute_time + delay as i64);
             ()
@@ -17,36 +25,24 @@ pub fn do_convert(carrier: Carrier<ConverterInfo>) {
     };
 }
 
-pub fn do_callback(delayed: DelayedInstances) {
-    match CarrierDaoService::get::<ConverterInfo>(delayed.carrier_id) {
-        Ok(carrier) => {
-            match delayed.result {
-                CallbackResult::Err(err) => {
-                    let err = NatureError::ConverterLogicalError(err);
-                    ProcessLine::move_to_err(err, carrier)
-                }
-                CallbackResult::Instances(ins) => handle_instances(&carrier, &ins)
-            }
+pub fn do_callback(delayed: DelayedInstances) -> Result<()> {
+    let carrier = CarrierDaoService::get::<ConverterInfo>(delayed.carrier_id)?;
+    match delayed.result {
+        CallbackResult::Err(err) => {
+            let err = NatureError::ConverterLogicalError(err);
+            ProcessLine::move_to_err(err, carrier);
+            Ok(())
         }
-        _ => ()
+        CallbackResult::Instances(ins) => handle_instances(&carrier, &ins)
     }
 }
 
-fn handle_instances(carrier: &Carrier<ConverterInfo>, instances: &Vec<Instance>) {
+fn handle_instances(carrier: &Carrier<ConverterInfo>, instances: &Vec<Instance>) -> Result<()> {
 // check status version to avoid loop
-    let instances = match verify(&carrier.mapping.to, &instances) {
-        Ok(ins) => ins,
-        Err(NatureError::DaoEnvironmentError(_)) => return,
-        Err(err) => {
-            ProcessLine::move_to_err(err, carrier.clone());
-            return;
-        }
-    };
-    match StorePlan::new(&carrier.data, &instances) {
-        Ok(plan) => to_store(carrier, plan),
-        // if store plan error wait to retry
-        _ => (),
-    }
+    let instances = verify(&carrier.mapping.to, &instances)?;
+    let plan = StorePlan::new(&carrier.data, &instances)?;
+    to_store(carrier, plan);
+    Ok(())
 }
 
 fn verify(to: &Thing, instances: &Vec<Instance>) -> Result<Vec<Instance>> {
@@ -82,7 +78,7 @@ fn verify(to: &Thing, instances: &Vec<Instance>) -> Result<Vec<Instance>> {
 fn to_store(carrier: &Carrier<ConverterInfo>, plan: StorePlan) {
     let store_infos: Vec<StoreInfo> = plan.plan.iter().map(|instance| {
         StoreInfo {
-            instance:instance.clone(),
+            instance: instance.clone(),
             converter: Some(carrier.data.clone()),
         }
     }).collect();

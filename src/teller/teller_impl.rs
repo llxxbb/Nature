@@ -10,7 +10,7 @@ impl Teller {
         ProcessLine::store(carrier, Root::Business)
     }
 
-    pub fn callback(delayed: DelayedInstances) { do_callback(delayed) }
+    pub fn callback(delayed: DelayedInstances) -> Result<()> { do_callback(delayed) }
 
     pub fn parallel(batch: ParallelBatchInstance) -> Result<()> { submit_parallel(batch) }
     pub fn serial(_batch: SerialBatchInstance) -> Result<()> {

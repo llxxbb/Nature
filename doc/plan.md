@@ -2,7 +2,7 @@
 
 ## for the nearer term
 
-* ProcessLine::callback should return `Result`
+* implement dao
 
 * init system : check "/S/serial" whether defined, if not create one
 

@@ -2,8 +2,8 @@ extern crate rocket_contrib;
 
 use ::rocket::{ignite, Rocket};
 use self::rocket_contrib::Json;
-use uuid::UuidBytes;
 use super::*;
+use uuid::UuidBytes;
 
 
 pub fn start_rocket_server() -> Rocket {
@@ -22,8 +22,8 @@ fn input(instance: Json<Instance>) -> Json<Result<UuidBytes>> {
 
 #[post("/callback", format = "application/json", data = "<delayed>")]
 fn callback(delayed: Json<DelayedInstances>) -> Json<Result<()>> {
-    Teller::callback(delayed.0);
-    Json(Ok(()))
+    let x = Teller::callback(delayed.0);
+    Json(x)
 }
 
 

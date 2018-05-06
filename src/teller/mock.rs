@@ -9,8 +9,9 @@ impl Teller {
 
     pub fn route(_carrier: Carrier<StoreInfo>) {}
 
-    pub fn callback(_delayed: DelayedInstances) {
+    pub fn callback(_delayed: DelayedInstances) -> Result<()>{
         // TODO
+        Ok(())
     }
     pub fn parallel(_batch: ParallelBatchInstance) -> Result<()> { Ok(()) }
     pub fn serial(_batch: SerialBatchInstance) -> Result<()> { Ok(()) }
