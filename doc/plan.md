@@ -3,6 +3,15 @@
 ## for the nearer term
 
 * implement dao
+  * ThingDefine
+
+* converter : diesel::result::Error => NatureError
+* diesel::  
+* implement dao
+  * Instance
+  * Mapping
+  * Carrier
+  * StorePlan
 
 * init system : check "/S/serial" whether defined, if not create one
 

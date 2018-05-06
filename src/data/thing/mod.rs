@@ -1,5 +1,7 @@
+use chrono::prelude::*;
 use dao::thing::*;
 use global::*;
+
 
 /// separator for `Thing`'s key
 pub static PATH_SEPARATOR: char = '/';
@@ -32,7 +34,7 @@ pub struct Thing {
     pub key: String,
 
     /// A `Thing` can be changed in future, the `version` will support this without effect the old ones
-    pub version: u32,
+    pub version: i32,
 }
 
 impl Thing {
@@ -58,24 +60,35 @@ impl Thing {
 
 /// `Thing`'s extended information
 /// `DateTime` is not implement `Default` trait
-#[derive(Serialize, Deserialize, Debug, Queryable, Default, Clone)]
+#[derive(Serialize, Deserialize, Debug, Queryable, Clone)]
 pub struct ThingDefine {
     pub key: String,
 
     /// For human readable what the `Thing` is.
-    pub description: String,
+    pub description: Option<String>,
 
     /// version of the `Thing`
-    pub version: u32,
-
-    pub have_states: bool,
+    pub version: i32,
 
     pub states: Option<String>,
 
     /// Define whats the `Thing` should include
     pub fields: Option<String>,
 
-    pub create_time: u64,
+    pub create_time: NaiveDateTime,
+}
+
+impl Default for ThingDefine {
+    fn default() -> Self {
+        ThingDefine {
+            key: String::new(),
+            description: None,
+            version: 0,
+            states: None,
+            fields: None,
+            create_time: Local::now().naive_local(),
+        }
+    }
 }
 
 impl ThingDefine {

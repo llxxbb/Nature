@@ -20,7 +20,9 @@ pub enum NatureError {
 
     // internal errors
     DaoEnvironmentError(String),
-    DaoDuplicated,
+    DaoLogicalError(String),
+        DaoDuplicated,
+    R2D2Error(String),
     SystemError(String),
 }
 
@@ -35,3 +37,4 @@ impl From<uuid::ParseError> for NatureError {
         NatureError::UuidParseError
     }
 }
+

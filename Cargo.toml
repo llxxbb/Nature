@@ -32,7 +32,7 @@ futures = "0.1"
 tokio-core = "0.1"
 
 # db
-diesel = { version = "1.2", default-features = false, features = ["sqlite"] }
+diesel = { version = "1.2", default-features = false, features = ["sqlite","chrono"] }
 r2d2 = "0.8"
 r2d2-diesel = "1.0"
 cdrs = "1.2"

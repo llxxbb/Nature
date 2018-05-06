@@ -1,11 +1,27 @@
-table! {
-    thing_defines (key) {
-        key -> Text,
-        description -> Nullable<Text>,
-        version -> Integer,
-        have_states -> Integer,
-        states -> Nullable<Text>,
-        fields -> Nullable<Text>,
-        create_time -> Nullable<Timestamp>,
+use diesel::result::*;
+use global::*;
+pub use self::conn::*;
+pub use self::models::*;
+pub use self::table::*;
+
+impl From<diesel::result::Error> for NatureError {
+    // TODO put aside because can't find diesel's Timeout Error
+    fn from(err: Error) -> Self {
+        match err {
+            Error::DatabaseError(kind, info) => {
+                match kind {
+                    DatabaseErrorKind::UniqueViolation => NatureError::DaoDuplicated,
+                    DatabaseErrorKind::__Unknown => NatureError::DaoEnvironmentError(format!("{:?}", info)),
+                    _ => NatureError::DaoLogicalError(format!("{:?}", info)),
+                }
+            }
+            _ => NatureError::DaoLogicalError(err.to_string()),
+        }
     }
 }
+
+mod table;
+
+mod conn;
+
+mod models;
