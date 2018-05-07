@@ -25,8 +25,6 @@ impl ThingDefineDao for ThingDefineDaoService {
         if let Some(x) = rtn {
             return Ok(x.clone());
         }
-        drop(rtn);
-        drop(cache);
         let conn = DBPool::get_connection()?;
         let def = thing_defines.filter(key.eq(&thing.key))
             .filter(version.eq(thing.version))

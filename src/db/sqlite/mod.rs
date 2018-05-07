@@ -4,7 +4,7 @@ pub use self::conn::*;
 pub use self::models::*;
 pub use self::table::*;
 
-impl From<diesel::result::Error> for NatureError {
+impl From<Error> for NatureError {
     // TODO put aside because can't find diesel's Timeout Error
     fn from(err: Error) -> Self {
         match err {

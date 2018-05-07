@@ -1,12 +1,12 @@
 extern crate dotenv;
 
 use diesel::sqlite::SqliteConnection;
-use r2d2::{Pool, PooledConnection};
+use global::*;
+use global::error::NatureError;
+use r2d2::{Error, Pool, PooledConnection};
 use r2d2_diesel::ConnectionManager;
 use self::dotenv::dotenv;
 use std::env;
-use global::error::NatureError;
-use global::*;
 
 
 
@@ -14,8 +14,8 @@ lazy_static! {
     pub static ref POOL : Pool<ConnectionManager<SqliteConnection>> = make_db_connection_pool();
 }
 
-impl From<r2d2::Error> for NatureError {
-    fn from(err: r2d2::Error) -> Self {
+impl From<Error> for NatureError {
+    fn from(err: Error) -> Self {
         NatureError::R2D2Error(err.to_string())
     }
 }
@@ -27,7 +27,7 @@ fn make_db_connection_pool() -> Pool<ConnectionManager<SqliteConnection>> {
         .expect("DATABASE_URL must be set");
 
     let manager = ConnectionManager::<SqliteConnection>::new(database_url);
-    r2d2::Pool::builder().build(manager).expect("Failed to create pool.")
+    Pool::builder().build(manager).expect("Failed to create pool.")
 }
 
 pub struct DBPool;
