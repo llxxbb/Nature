@@ -99,7 +99,7 @@ impl ThingDefine {
 
 impl ThingDefine {
     pub fn new(value: &Thing) -> Result<Self> {
-        ThingDefineDaoService::get(value)
+        ThingDefineServiceImpl::get(value)
     }
 }
 

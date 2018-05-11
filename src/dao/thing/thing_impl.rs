@@ -1,10 +1,7 @@
 extern crate r2d2;
 
-use db::DBPool;
-use db::thing_defines::dsl::*;
-use diesel::prelude::*;
+use db::*;
 use lru_time_cache::LruCache;
-use std::ops::Deref;
 use std::sync::Mutex;
 use std::time::Duration;
 use super::*;
@@ -13,9 +10,9 @@ lazy_static! {
     pub static ref CACHE_THING_DEFINE: Mutex<LruCache<Thing, ThingDefine>> = Mutex::new(LruCache::<Thing, ThingDefine>::with_expiry_duration(Duration::from_secs(3600)));
 }
 
-pub struct ThingDefineDaoService;
+pub struct ThingDefineServiceImpl;
 
-impl ThingDefineDao for ThingDefineDaoService {
+impl ThingDefineService for ThingDefineServiceImpl {
     fn get(thing: &Thing) -> Result<ThingDefine> {
         if thing.key.is_empty() {
             return Err(NatureError::VerifyError("[biz] must not be empty!".to_string()));
@@ -25,15 +22,16 @@ impl ThingDefineDao for ThingDefineDaoService {
         if let Some(x) = rtn {
             return Ok(x.clone());
         }
-        let conn = DBPool::get_connection()?;
-        let def = thing_defines.filter(key.eq(&thing.key))
-            .filter(version.eq(thing.version))
-            .load::<ThingDefine>(conn.deref())?;
-        if def.len() == 0 {
-            return Err(NatureError::ThingNotDefined(format!("{} not defined", thing.key)));
+        match TableThingDefine::get(&thing)? {
+            None => return Err(NatureError::ThingNotDefined(format!("{} not defined", thing.key))),
+            Some(def) => {
+                let mut cache = CACHE_THING_DEFINE.lock().unwrap();
+                cache.insert(thing.clone(), def.clone());
+                Ok(def)
+            }
         }
-        let mut cache = CACHE_THING_DEFINE.lock().unwrap();
-        cache.insert(thing.clone(), def[0].clone());
-        Ok(def[0].clone())
+    }
+    fn insert(define: &ThingDefine) -> Result<()> {
+        unimplemented!()
     }
 }

@@ -18,7 +18,7 @@ pub fn do_store(carrier: Carrier<StoreInfo>, root: Root) -> Result<UuidBytes> {
 }
 
 fn handle_duplicated(carrier: Carrier<StoreInfo>, instance: Instance) -> Result<()> {
-    let define = ThingDefineDaoService::get(&instance.data.thing)?;
+    let define = ThingDefineServiceImpl::get(&instance.data.thing)?;
     // **None Status Thing** won't try again
     if !define.is_status() {
         Delivery::finish_carrier(&carrier.id)?;

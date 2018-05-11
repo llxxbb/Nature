@@ -19,7 +19,7 @@ impl InstanceImpl {
     pub fn verify(instance: &mut Instance, root: Root) -> Result<UuidBytes> {
         Thing::key_standardize(&mut instance.data.thing.key, root)?;
         // just see whether it was configured.
-        ThingDefineDaoService::get(&instance.data.thing)?;
+        ThingDefineServiceImpl::get(&instance.data.thing)?;
         Self::id_generate_if_not_set(instance)
     }
 }

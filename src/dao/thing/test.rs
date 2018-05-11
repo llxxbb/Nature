@@ -1,12 +1,12 @@
 use data::*;
 use super::thing_impl::*;
-use super::ThingDefineDao;
+use super::ThingDefineService;
 
 #[test]
 fn get_from_db() {
     // TODO
     let thing = Thing::default();
-    let rtn = ThingDefineDaoService::get(&thing);
+    let rtn = ThingDefineServiceImpl::get(&thing);
     assert!(rtn.is_err());
 }
 
