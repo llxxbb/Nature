@@ -2,13 +2,10 @@ extern crate dotenv;
 
 use diesel::sqlite::SqliteConnection;
 use global::*;
-use global::error::NatureError;
 use r2d2::{Error, Pool, PooledConnection};
 use r2d2_diesel::ConnectionManager;
 use self::dotenv::dotenv;
 use std::env;
-
-
 
 lazy_static! {
     pub static ref POOL : Pool<ConnectionManager<SqliteConnection>> = make_db_connection_pool();

@@ -1,4 +1,3 @@
-use db::schema::thing_defines::dsl::*;
 use diesel::prelude::*;
 use global::*;
 use std::ops::Deref;
@@ -6,15 +5,10 @@ use super::*;
 
 pub struct TableThingDefine;
 
-// #[derive(Debug)]
-// #[derive(Insertable)]
-// #[table_name="thing_defines"]
-// struct NewThingDefine{      
-
-// }
 
 impl TableThingDefine {
     pub fn get(thing: &Thing) -> Result<Option<ThingDefine>> {
+        use db::schema::thing_defines::dsl::*;
         let conn = DBPool::get_connection()?;
         let def = thing_defines.filter(key.eq(&thing.key))
             .filter(version.eq(thing.version))
@@ -26,12 +20,22 @@ impl TableThingDefine {
         }
     }
 
-    fn insert(define: &ThingDefine) -> Result<()> {
+    pub fn insert(define: &ThingDefine) -> Result<()> {
+        use db::schema::thing_defines;
         let conn = DBPool::get_connection()?;
         // TODO
-        // diesel::insert_into(thing_defines)
-        //     .values(define)
-        //     .get_result(conn.deref())
+        let _ = diesel::insert_into(thing_defines::table)
+            .values(NewThingDefine::new(define))
+            .execute(conn.deref());
+        Ok(())
+    }
+
+    pub fn delete(thing: &Thing) -> Result<()> {
+        use db::schema::thing_defines::dsl::*;
+        let conn = DBPool::get_connection()?;
+        // TODO
+        let _ = diesel::delete(thing_defines.filter(key.eq(&thing.key)).filter(version.eq(thing.version)))
+            .execute(conn.deref());
         Ok(())
     }
 }

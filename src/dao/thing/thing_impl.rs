@@ -31,7 +31,7 @@ impl ThingDefineService for ThingDefineServiceImpl {
             }
         }
     }
-    fn insert(define: &ThingDefine) -> Result<()> {
+    fn insert(_define: &ThingDefine) -> Result<()> {
         unimplemented!()
     }
 }

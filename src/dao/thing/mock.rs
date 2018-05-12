@@ -2,9 +2,9 @@ use global::*;
 use super::*;
 
 
-pub struct ThingDefineDaoService;
+pub struct ThingDefineServiceImpl;
 
-impl ThingDefineService for ThingDefineDaoService {
+impl ThingDefineService for ThingDefineServiceImpl {
     fn get(thing: &Thing) -> Result<ThingDefine> {
         match thing.key.as_ref() {
             "/B/ok" => Ok(ThingDefine::default()),

@@ -17,9 +17,9 @@ pub enum CallbackResult {
     Instances(Vec<Instance>),
 }
 
-pub mod instance;
-pub mod thing;
-pub mod carrier;
-pub mod mapping;
-pub mod store_plan;
+mod instance;
+mod thing;
+mod carrier;
+mod mapping;
+mod store_plan;
 

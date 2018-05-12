@@ -1,4 +1,3 @@
-use dao::*;
 use data::*;
 use diesel::result::*;
 use global::*;
@@ -29,3 +28,6 @@ mod dao_thing_define;
 mod conn;
 
 mod models;
+
+#[cfg(test)]
+mod test_define;
