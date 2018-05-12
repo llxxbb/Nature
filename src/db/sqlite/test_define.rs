@@ -5,20 +5,22 @@ use super::*;
 fn insert_define() {
     let define = ThingDefine {
         key: "/test".to_string(),
-        description: Some("for test".to_string()),
-        version: 1,
-        states: None,
-        fields: None,
+        description: Some("description".to_string()),
+        version: 100,
+        states: Some("status".to_string()),
+        fields: Some("fields".to_string()),
         create_time: Local::now().naive_local(),
     };
     let thing = Thing {
         key: "/test".to_string(),
-        version: 1,
+        version: 100,
     };
     if let Ok(Some(_)) = TableThingDefine::get(&thing) {
         let _ = TableThingDefine::delete(&thing);
     }
-    let _ = TableThingDefine::insert(&define);
-    let _ = TableThingDefine::get(&thing).unwrap().unwrap();
+    let rtn = TableThingDefine::insert(&define);
+    println!("insert result : {:?}", rtn);
+    let row = TableThingDefine::get(&thing).unwrap().unwrap();
+    assert_eq!(row, define);
     TableThingDefine::delete(&thing).unwrap();
 }

@@ -15,9 +15,6 @@ mod conn;
 
 mod models;
 
-#[cfg(test)]
-mod test_define;
-
 impl From<Error> for NatureError {
     // TODO put aside because can't find diesel's Timeout Error
     fn from(err: Error) -> Self {
@@ -33,3 +30,6 @@ impl From<Error> for NatureError {
         }
     }
 }
+
+#[cfg(test)]
+mod test_define;

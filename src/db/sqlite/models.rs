@@ -1,6 +1,6 @@
 use chrono::prelude::*;
 use data::*;
-use db::schema::thing_defines;
+use super::schema::thing_defines;
 
 #[derive(Debug)]
 #[derive(Insertable)]

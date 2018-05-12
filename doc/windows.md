@@ -23,7 +23,7 @@ SQLITE3_LIB_DIR = sqlite3.lib path
 [target.x86_64-pc-windows-msvc.sqlite3]
 rustc-link-lib = ["sqlite3"]
 rustc-link-search = ["D:/common/sqlite3230100"]
-root = "D:/common/sqlite3230100"
+root = "D:/common/sqlite3230100" 
 ```
 
 ## install diesel_cli

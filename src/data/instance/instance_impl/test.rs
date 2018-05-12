@@ -29,10 +29,10 @@ fn id_generate() {
             context: HashMap::new(),
             status: HashSet::new(),
             status_version: 0,
-            from: FromInstance::default()
+            from: FromInstance::default(),
         },
     };
     InstanceImpl::id_generate_if_not_set(&mut instance).unwrap();
     println!("{:?}", Uuid::from_bytes(&instance.id));
-    assert_eq!(instance.id, [165, 241, 215, 161, 16, 234, 48, 14, 158, 3, 199, 245, 149, 195, 12, 44]);
+    assert_eq!(instance.id, [110, 177, 76, 33, 110, 202, 61, 89, 147, 142, 239, 19, 228, 213, 190, 176]);
 }

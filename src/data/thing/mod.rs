@@ -59,7 +59,7 @@ impl Thing {
 
 /// `Thing`'s extended information
 /// `DateTime` is not implement `Default` trait
-#[derive(Serialize, Deserialize, Debug, Queryable, Clone)]
+#[derive(Serialize, Deserialize, Debug, Queryable, Clone, PartialOrd, PartialEq)]
 pub struct ThingDefine {
     pub key: String,
 

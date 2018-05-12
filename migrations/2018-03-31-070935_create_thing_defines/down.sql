@@ -1,3 +1,3 @@
 -- This file should undo anything in `up.sql`
-DROP INDEX `idx_thing_define`;
+DROP TABLE `instances`;
 DROP TABLE `thing_defines`;

@@ -9,7 +9,18 @@ CREATE TABLE `thing_defines` (
 	PRIMARY KEY(`key`,`version`)
 );
 
-CREATE UNIQUE INDEX `idx_thing_define` ON `thing_defines` (
-	`key`,
-	`version`	DESC
+CREATE TABLE `instances` (
+	`id`	INTEGER NOT NULL UNIQUE,
+	`thing`	TEXT NOT NULL,
+	`version`	INTEGER NOT NULL,
+	`content`	TEXT,
+	`context`	TEXT,
+	`status`	TEXT,
+	`status_version`	INTEGER NOT NULL,
+	`from_thing`	TEXT,
+	`from_version`	INTEGER,
+	`from_status_version`	INTEGER,
+	`execute_time`	DATETIME NOT NULL,
+	`create_time`	DATETIME NOT NULL,
+	PRIMARY KEY(`id`)
 );

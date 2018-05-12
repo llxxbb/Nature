@@ -7,7 +7,7 @@ pub struct TableThingDefine;
 
 impl TableThingDefine {
     pub fn get(thing: &Thing) -> Result<Option<ThingDefine>> {
-        use db::schema::thing_defines::dsl::*;
+        use self::schema::thing_defines::dsl::*;
         let conn = DBPool::get_connection()?;
         let def = thing_defines.filter(key.eq(&thing.key))
             .filter(version.eq(thing.version))
@@ -20,7 +20,7 @@ impl TableThingDefine {
     }
 
     pub fn insert(define: &ThingDefine) -> Result<()> {
-        use db::schema::thing_defines;
+        use self::schema::thing_defines;
         let conn = DBPool::get_connection()?;
         // TODO
         let _ = diesel::insert_into(thing_defines::table)
@@ -30,7 +30,7 @@ impl TableThingDefine {
     }
 
     pub fn delete(thing: &Thing) -> Result<()> {
-        use db::schema::thing_defines::dsl::*;
+        use self::schema::thing_defines::dsl::*;
         let conn = DBPool::get_connection()?;
         // TODO
         let _ = diesel::delete(thing_defines.filter(key.eq(&thing.key)).filter(version.eq(thing.version)))

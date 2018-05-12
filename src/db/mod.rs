@@ -9,7 +9,8 @@ pub use self::mock::*;
 pub use self::sqlite::*;
 use uuid::UuidBytes;
 
-#[cfg(not(test))]
+// open this cause test unable to run
+//#[cfg(not(test))]
 mod sqlite;
 #[cfg(test)]
 mod mock;
