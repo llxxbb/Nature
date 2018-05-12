@@ -51,14 +51,14 @@ pub struct InstanceNoID {
     /// json data for a `Instance`.
     pub context: HashMap<String, String>,
     pub status: HashSet<String>,
-    pub status_version: u32,
-    pub from: FromInstance,
+    pub status_version: i32,
+    pub from: Option<FromInstance>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Default, Clone)]
 pub struct FromInstance {
     pub thing: Thing,
-    pub status_version: u32,
+    pub status_version: i32,
 }
 
 #[derive(Serialize, Deserialize, Debug, Default)]

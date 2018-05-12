@@ -10,10 +10,10 @@ CREATE TABLE `thing_defines` (
 );
 
 CREATE TABLE `instances` (
-	`id`	INTEGER NOT NULL UNIQUE,
+	`id`	BLOB NOT NULL UNIQUE,
 	`thing`	TEXT NOT NULL,
 	`version`	INTEGER NOT NULL,
-	`content`	TEXT,
+	`content`	TEXT NOT NULL,
 	`context`	TEXT,
 	`status`	TEXT,
 	`status_version`	INTEGER NOT NULL,

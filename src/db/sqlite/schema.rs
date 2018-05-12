@@ -1,9 +1,9 @@
 table! {
     instances (id) {
-        id -> Integer,
+        id -> Binary,
         thing -> Text,
         version -> Integer,
-        content -> Nullable<Text>,
+        content -> Text,
         context -> Nullable<Text>,
         status -> Nullable<Text>,
         status_version -> Integer,

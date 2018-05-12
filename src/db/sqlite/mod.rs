@@ -6,13 +6,9 @@ pub use self::table_thing_define::*;
 use super::*;
 
 pub mod schema;
-
 mod table_thing_define;
-
 mod table_instance;
-
 mod conn;
-
 mod models;
 
 impl From<Error> for NatureError {
@@ -32,4 +28,4 @@ impl From<Error> for NatureError {
 }
 
 #[cfg(test)]
-mod test_define;
+mod test;

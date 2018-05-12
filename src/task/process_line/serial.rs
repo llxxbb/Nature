@@ -55,7 +55,7 @@ fn new_virtual_instance(carrier: &Carrier<SerialBatchInstance>, sf: SerialFinish
             context,
             status: HashSet::new(),
             status_version: 0,
-            from: FromInstance::default(),
+            from: None,
         },
     })
 }

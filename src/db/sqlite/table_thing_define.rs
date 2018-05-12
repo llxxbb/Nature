@@ -1,7 +1,6 @@
-use diesel::prelude::*;
-use global::*;
-use std::ops::Deref;
 use super::*;
+use std::ops::Deref;
+use diesel::prelude::*;
 
 pub struct TableThingDefine;
 
