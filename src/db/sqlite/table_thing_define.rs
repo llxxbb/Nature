@@ -5,7 +5,6 @@ use super::*;
 
 pub struct TableThingDefine;
 
-
 impl TableThingDefine {
     pub fn get(thing: &Thing) -> Result<Option<ThingDefine>> {
         use db::schema::thing_defines::dsl::*;

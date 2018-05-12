@@ -52,6 +52,13 @@ pub struct InstanceNoID {
     pub context: HashMap<String, String>,
     pub status: HashSet<String>,
     pub status_version: u32,
+    pub from: FromInstance,
+}
+
+#[derive(Serialize, Deserialize, Debug, Default, Clone)]
+pub struct FromInstance {
+    pub thing: Thing,
+    pub status_version: u32,
 }
 
 #[derive(Serialize, Deserialize, Debug, Default)]

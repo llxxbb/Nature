@@ -1,5 +1,6 @@
 use dao::*;
 use data::*;
+use db::*;
 use super::*;
 
 pub struct InstanceImpl;
@@ -19,7 +20,7 @@ impl InstanceImpl {
     pub fn verify(instance: &mut Instance, root: Root) -> Result<UuidBytes> {
         Thing::key_standardize(&mut instance.data.thing.key, root)?;
         // just see whether it was configured.
-        ThingDefineServiceImpl::get(&instance.data.thing)?;
+        ThingDefineCache::get(&instance.data.thing)?;
         Self::id_generate_if_not_set(instance)
     }
 }

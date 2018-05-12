@@ -1,4 +1,5 @@
 use super::*;
+use rpc::*;
 
 pub fn do_convert(carrier: Carrier<ConverterInfo>) {
     let para = CallOutParameter::new(&carrier);
@@ -49,7 +50,7 @@ fn verify(to: &Thing, instances: &Vec<Instance>) -> Result<Vec<Instance>> {
     let mut rtn: Vec<Instance> = Vec::new();
 
     // only one status instance should return
-    let define = ThingDefine::new(to)?;
+    let define = ThingDefineCache::get(to)?;
     if define.is_status() {
         if instances.len() > 1 {
             return Err(NatureError::ConverterLogicalError("[status thing] must return less 2 instances!".to_string()));

@@ -1,9 +1,22 @@
-use data::*;
 use diesel::result::*;
-use global::*;
 pub use self::conn::*;
 pub use self::models::*;
-pub use self::dao_thing_define::*;
+pub use self::table_instance::*;
+pub use self::table_thing_define::*;
+use super::*;
+
+pub mod schema;
+
+mod table_thing_define;
+
+mod table_instance;
+
+mod conn;
+
+mod models;
+
+#[cfg(test)]
+mod test_define;
 
 impl From<Error> for NatureError {
     // TODO put aside because can't find diesel's Timeout Error
@@ -20,14 +33,3 @@ impl From<Error> for NatureError {
         }
     }
 }
-
-pub mod schema;
-
-mod dao_thing_define;
-
-mod conn;
-
-mod models;
-
-#[cfg(test)]
-mod test_define;

@@ -29,6 +29,7 @@ fn id_generate() {
             context: HashMap::new(),
             status: HashSet::new(),
             status_version: 0,
+            from: FromInstance::default()
         },
     };
     InstanceImpl::id_generate_if_not_set(&mut instance).unwrap();

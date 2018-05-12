@@ -2,16 +2,12 @@
 
 ## for the nearer term
 
-* implement dao
-  * ThingDefine
-
-* converter : diesel::result::Error => NatureError
-* diesel::  
-* implement dao
+* implement sqlite
   * Instance
   * Mapping
   * Carrier
   * StorePlan
+* diesel::result::Error => NatureError
 
 * init system : check "/S/serial" whether defined, if not create one
 

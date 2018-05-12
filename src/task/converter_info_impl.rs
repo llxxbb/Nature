@@ -9,7 +9,7 @@ impl ConverterInfo {
     /// * DefineNotFind
     /// * uuid parse
     pub fn new(instance: &Instance, mapping: &Mapping) -> Result<ConverterInfo> {
-        let define = ThingDefine::new(&mapping.to)?;
+        let define = ThingDefineCache::get(&mapping.to)?;
         let last_target = match define.is_status() {
             false => None,
             true => {
@@ -17,7 +17,7 @@ impl ConverterInfo {
                     // context have target id
                     Some(status_id) => {
                         let status_id = Uuid::parse_str(status_id)?;
-                        InstanceDaoService::get_last_status_by_id(&status_id.as_bytes())?
+                        TableInstance::get_last_status_by_id(&status_id.as_bytes())?
                     }
                     None => None,
                 }

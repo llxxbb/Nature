@@ -1,10 +1,9 @@
-use global::*;
 use super::*;
 
 
-pub struct ThingDefineServiceImpl;
+pub struct TableThingDefine;
 
-impl ThingDefineService for ThingDefineServiceImpl {
+impl ThingDefineDao for TableThingDefine {
     fn get(thing: &Thing) -> Result<ThingDefine> {
         match thing.key.as_ref() {
             "/B/ok" => Ok(ThingDefine::default()),
@@ -12,6 +11,18 @@ impl ThingDefineService for ThingDefineServiceImpl {
             _ => Err(NatureError::VerifyError("unknown".to_string())),
         }
     }
+    fn insert(_define: &ThingDefine) -> Result<()> {
+        unimplemented!()
+    }
+}
+
+pub struct ThingDefineCache;
+
+impl ThingDefineDao for ThingDefineCache {
+    fn get(_thing: &Thing) -> Result<ThingDefine> {
+        unimplemented!()
+    }
+
     fn insert(_define: &ThingDefine) -> Result<()> {
         unimplemented!()
     }

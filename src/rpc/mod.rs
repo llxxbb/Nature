@@ -2,7 +2,7 @@
 
 extern crate serde_json;
 
-pub use self::rocket::start_rocket_server;
+pub use self::rocket::*;
 
 pub mod rocket;
 

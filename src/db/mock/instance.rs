@@ -11,9 +11,9 @@ lazy_static! {
 }
 
 
-pub struct InstanceDaoService;
+pub struct TableInstance;
 
-impl InstanceDao for InstanceDaoService {
+impl InstanceDao for TableInstance {
     fn insert(_instance: &Instance) -> Result<()> {
         let mode = &*INSTANCE_DAO_MODE.lock().unwrap();
         println!("InstanceDao mode is {:?}", mode);

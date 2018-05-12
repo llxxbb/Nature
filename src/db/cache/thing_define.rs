@@ -10,9 +10,9 @@ lazy_static! {
     pub static ref CACHE_THING_DEFINE: Mutex<LruCache<Thing, ThingDefine>> = Mutex::new(LruCache::<Thing, ThingDefine>::with_expiry_duration(Duration::from_secs(3600)));
 }
 
-pub struct ThingDefineServiceImpl;
+pub struct ThingDefineCache;
 
-impl ThingDefineService for ThingDefineServiceImpl {
+impl ThingDefineDao for ThingDefineCache {
     fn get(thing: &Thing) -> Result<ThingDefine> {
         if thing.key.is_empty() {
             return Err(NatureError::VerifyError("[biz] must not be empty!".to_string()));

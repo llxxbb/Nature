@@ -1,5 +1,4 @@
 use chrono::prelude::*;
-use dao::thing::*;
 use global::*;
 
 
@@ -94,12 +93,6 @@ impl Default for ThingDefine {
 impl ThingDefine {
     pub fn is_status(&self) -> bool {
         !self.states.is_none()
-    }
-}
-
-impl ThingDefine {
-    pub fn new(value: &Thing) -> Result<Self> {
-        ThingDefineServiceImpl::get(value)
     }
 }
 

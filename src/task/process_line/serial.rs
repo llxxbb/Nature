@@ -55,6 +55,7 @@ fn new_virtual_instance(carrier: &Carrier<SerialBatchInstance>, sf: SerialFinish
             context,
             status: HashSet::new(),
             status_version: 0,
+            from: FromInstance::default(),
         },
     })
 }
@@ -67,7 +68,7 @@ fn store_batch_items(carrier: &Carrier<SerialBatchInstance>) -> Result<SerialFin
             errors.push(format!("{:?}", err));
             continue;
         }
-        match InstanceDaoService::insert(&instance) {
+        match TableInstance::insert(&instance) {
             Ok(_) => succeeded_id.push(instance.id),
             Err(NatureError::DaoEnvironmentError(err)) => return Err(NatureError::DaoEnvironmentError(err)),
             Err(NatureError::DaoDuplicated) => succeeded_id.push(instance.id),
