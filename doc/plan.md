@@ -4,6 +4,11 @@
 
 * implement sqlite
   * Instance
+    * get_last_status_by_id
+    * source_stored
+    * unit test
+
+* change other test like thing_define_cache unit test to avoid parallel test problem
   
 * implement sqlite
   * Mapping

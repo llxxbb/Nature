@@ -1,13 +1,12 @@
 use diesel::result::*;
 pub use self::conn::*;
 pub use self::models::*;
-pub use self::table_instance::*;
-pub use self::table_thing_define::*;
+pub use self::dao::*;
+
 use super::*;
 
 pub mod schema;
-mod table_thing_define;
-mod table_instance;
+
 mod conn;
 mod models;
 
@@ -29,3 +28,5 @@ impl From<Error> for NatureError {
 
 #[cfg(test)]
 mod test;
+
+mod dao;

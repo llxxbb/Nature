@@ -7,7 +7,7 @@ use std::time::Duration;
 use super::*;
 
 lazy_static! {
-    pub static ref CACHE_THING_DEFINE: Mutex<LruCache<Thing, ThingDefine>> = Mutex::new(LruCache::<Thing, ThingDefine>::with_expiry_duration(Duration::from_secs(3600)));
+    static ref CACHE_THING_DEFINE: Mutex<LruCache<Thing, ThingDefine>> = Mutex::new(LruCache::<Thing, ThingDefine>::with_expiry_duration(Duration::from_secs(3600)));
 }
 
 pub struct ThingDefineCache;
@@ -18,14 +18,14 @@ impl ThingDefineDao for ThingDefineCache {
             return Err(NatureError::VerifyError("[biz] must not be empty!".to_string()));
         }
         let mut cache = CACHE_THING_DEFINE.lock().unwrap();
-        let rtn = cache.get(thing);
-        if let Some(x) = rtn {
-            return Ok(x.clone());
-        }
+        {   // An explicit scope to avoid cache.insert error
+            if let Some(x) = cache.get(thing) {
+                return Ok(x.clone());
+            };
+        };
         match TableThingDefine::get(&thing)? {
             None => return Err(NatureError::ThingNotDefined(format!("{} not defined", thing.key))),
             Some(def) => {
-                let mut cache = CACHE_THING_DEFINE.lock().unwrap();
                 cache.insert(thing.clone(), def.clone());
                 Ok(def)
             }
@@ -35,3 +35,6 @@ impl ThingDefineDao for ThingDefineCache {
         unimplemented!()
     }
 }
+
+#[cfg(test)]
+mod test_thing_define;

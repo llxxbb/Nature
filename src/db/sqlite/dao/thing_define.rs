@@ -21,7 +21,6 @@ impl TableThingDefine {
     pub fn insert(define: &ThingDefine) -> Result<()> {
         use self::schema::thing_defines;
         let conn = DBPool::get_connection()?;
-        // TODO
         let _ = diesel::insert_into(thing_defines::table)
             .values(NewThingDefine::new(define))
             .execute(conn.deref());
@@ -31,7 +30,6 @@ impl TableThingDefine {
     pub fn delete(thing: &Thing) -> Result<()> {
         use self::schema::thing_defines::dsl::*;
         let conn = DBPool::get_connection()?;
-        // TODO
         let _ = diesel::delete(thing_defines.filter(key.eq(&thing.key)).filter(version.eq(thing.version)))
             .execute(conn.deref());
         Ok(())

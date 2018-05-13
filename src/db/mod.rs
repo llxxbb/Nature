@@ -12,7 +12,6 @@ use uuid::UuidBytes;
 // open this cause test unable to run
 //#[cfg(not(test))]
 mod sqlite;
+mod cache;
 #[cfg(test)]
 mod mock;
-#[cfg(not(test))]
-mod cache;
