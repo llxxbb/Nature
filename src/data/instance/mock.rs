@@ -1,29 +1,19 @@
-use super::*;
+use std::ops::Deref;
 use std::sync::*;
-
-#[derive(Debug)]
-pub enum InstanceVerifyMode {
-    Ok,
-    Err,
-}
+use super::*;
 
 lazy_static! {
-    pub static ref INSTANCE_VERIFY_MODE: Mutex<InstanceVerifyMode> = Mutex::new(InstanceVerifyMode::Ok);
+    pub static ref INSTANCE_LOCK: Mutex<u8> = Mutex::new(1);
+    pub static ref INSTANCE_RESULT: Mutex<Result<UuidBytes>> = Mutex::new(Ok(UuidBytes::default()));
 }
 
 
 
 pub struct InstanceImpl;
 
-impl InstanceImpl{
+impl InstanceImpl {
     pub fn verify(_instance: &mut Instance, _root: Root) -> Result<UuidBytes> {
-        let mode = INSTANCE_VERIFY_MODE.lock().unwrap();
-        let mode = &*mode;
-        println!("INSTANCE_VERIFY_MODE {:?}", mode);
-        match mode {
-            InstanceVerifyMode::Ok => Ok([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]),
-            InstanceVerifyMode::Err => Err(NatureError::VerifyError("some error".to_string()))
-        }
+        INSTANCE_RESULT.lock().unwrap().deref().clone()
     }
 }
 

@@ -4,6 +4,7 @@ use rocket::local::Client;
 
 #[test]
 fn born() {
+    println!("----------------- born --------------------");
     let rocket = super::start_rocket_server();
     let client = Client::new(rocket).expect("valid rocket instance");
     let json = ::serde_json::to_string(&(

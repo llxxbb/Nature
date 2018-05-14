@@ -3,6 +3,7 @@ use super::*;
 
 #[test]
 fn insert_define() {
+    println!("----------------- insert_define --------------------");
     let define = ThingDefine {
         key: "/test".to_string(),
         description: Some("description".to_string()),

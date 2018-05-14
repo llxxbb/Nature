@@ -3,6 +3,7 @@ use uuid::*;
 
 #[test]
 fn verify_un_configured() {
+    println!("----------------- verify_un_configured --------------------");
     let mut instance = Instance::default();
     instance.data.thing.key = "err".to_string();
     let result = InstanceImpl::verify(&mut instance, Root::Business);
@@ -11,6 +12,7 @@ fn verify_un_configured() {
 
 #[test]
 fn verify_id_generated() {
+    println!("----------------- verify_id_generated --------------------");
     let mut instance = Instance::default();
     instance.data.thing.key = "ok".to_string();
     let result = InstanceImpl::verify(&mut instance, Root::Business);
@@ -19,6 +21,7 @@ fn verify_id_generated() {
 
 #[test]
 fn id_generate() {
+    println!("----------------- id_generate --------------------");
     let mut instance = Instance {
         id: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ],
         data: InstanceNoID {

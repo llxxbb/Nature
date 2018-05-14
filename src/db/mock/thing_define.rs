@@ -4,7 +4,7 @@ use super::*;
 
 lazy_static! {
     pub static ref THING_DEFINE_LOCK:Mutex<u8> = Mutex::new(1);
-    pub static ref THING_DEFINE_VALUE:Mutex<Result<Option<ThingDefine>>> = Mutex::new(Ok(None));
+    pub static ref THING_DEFINE_GET_VALUE:Mutex<Result<Option<ThingDefine>>> = Mutex::new(Ok(None));
 }
 
 pub struct TableThingDefine;
@@ -12,7 +12,7 @@ pub struct TableThingDefine;
 impl TableThingDefine {
     pub fn get(_thing: &Thing) -> Result<Option<ThingDefine>> {
         println!("---------------- TableThingDefine mock get ----------------------");
-        THING_DEFINE_VALUE.lock().unwrap().deref().clone()
+        THING_DEFINE_GET_VALUE.lock().unwrap().deref().clone()
     }
 
     pub fn insert(_define: &ThingDefine) -> Result<()> {

@@ -10,6 +10,7 @@ use std::collections::HashMap;
 use std::collections::HashSet;
 use std::ops::Deref;
 use util::*;
+use uuid::UuidBytes;
 
 /// A snapshot for a particular `Thing`
 #[derive(Serialize, Deserialize, Debug, Default, Clone)]
