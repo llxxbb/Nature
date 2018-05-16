@@ -76,7 +76,7 @@ fn load_from_db() {
         create_time: Local::now().naive_local(),
     };
     // insert to db
-    let mut rtn = THING_DEFINE_VALUE.lock().unwrap();
+    let mut rtn = THING_DEFINE_GET_VALUE.lock().unwrap();
     *rtn = Ok(Some(def));
     drop(rtn);
     println!("----------------halted!!!!!!---------------");
@@ -92,6 +92,6 @@ fn load_from_db() {
         x => panic!("should not get {:?}", x)
     }
     // clean
-    let mut rtn = THING_DEFINE_VALUE.lock().unwrap();
+    let mut rtn = THING_DEFINE_GET_VALUE.lock().unwrap();
     *rtn = Ok(None);
 }

@@ -4,7 +4,6 @@
 
 * implement sqlite
   * Instance
-    * get_last_status_by_id
     * source_stored
     * unit test
 
@@ -17,6 +16,7 @@
 * diesel::result::Error => NatureError
 
 * init system : check "/S/serial" whether defined, if not create one
+* Thing's key support parametrization
 
 ### Retry carry
 

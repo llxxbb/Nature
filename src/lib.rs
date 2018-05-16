@@ -2,6 +2,7 @@
 #![plugin(rocket_codegen)]
 #![feature(range_contains)]
 #![feature(extern_prelude)]
+#![feature(trace_macros)]
 
 extern crate chrono;
 #[macro_use]

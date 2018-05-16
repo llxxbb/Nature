@@ -1,6 +1,6 @@
-pub use self::thing_defin_new::*;
-pub use self::instance_new::*;
+pub use self::thing_define::*;
+pub use self::instance::*;
 use super::*;
 
-mod thing_defin_new;
-mod instance_new;
+mod thing_define;
+mod instance;

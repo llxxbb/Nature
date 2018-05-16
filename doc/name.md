@@ -1,5 +1,9 @@
 # 曾经用过的名字
 
+# Nature
+
+The world was made up things and relations between things.
+
 ## World Connection
 
 The Virtual World is made of data, VW is made of connection also. Data is static and present at certain time, connection is dynamic and along the time make date to connect each other. So the tow important abstraction made the VM running.

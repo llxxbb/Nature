@@ -51,7 +51,3 @@ mod store;
 mod threads;
 
 mod delivery;
-
-#[cfg(test)]
-mod test_store;
-

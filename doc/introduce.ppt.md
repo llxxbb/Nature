@@ -10,6 +10,8 @@ There are all **Things** in Nature, and **Things** always transform into other t
 
 如星空（广阔、深邃，未知）。
 
+自然：就是世间的万物及其之间的联系。
+
 ## Things
 
 空间：space
