@@ -1,16 +1,15 @@
-use super::*;
-use std::ops::Deref;
 use diesel::prelude::*;
+use super::*;
 
 pub struct TableThingDefine;
 
 impl TableThingDefine {
     pub fn get(thing: &Thing) -> Result<Option<ThingDefine>> {
         use self::schema::thing_defines::dsl::*;
-        let conn = DBPool::get_connection()?;
+        let conn: &SqliteConnection = &CONN.lock().unwrap();
         let def = thing_defines.filter(key.eq(&thing.key))
             .filter(version.eq(thing.version))
-            .load::<ThingDefine>(conn.deref())?;
+            .load::<ThingDefine>(conn)?;
         match def.len() {
             0 => Ok(None),
             1 => Ok(Some(def[0].clone())),
@@ -18,20 +17,26 @@ impl TableThingDefine {
         }
     }
 
-    pub fn insert(define: &ThingDefine) -> Result<()> {
+    pub fn insert(define: &ThingDefine) -> Result<usize> {
         use self::schema::thing_defines;
-        let conn = DBPool::get_connection()?;
-        let _ = diesel::insert_into(thing_defines::table)
+        let conn: &SqliteConnection = &CONN.lock().unwrap();
+        let rtn = diesel::insert_into(thing_defines::table)
             .values(NewThingDefine::new(define))
-            .execute(conn.deref());
-        Ok(())
+            .execute(conn);
+        match rtn {
+            Ok(x) => Ok(x),
+            Err(e) => Err(NatureError::from(e))
+        }
     }
 
-    pub fn delete(thing: &Thing) -> Result<()> {
+    pub fn delete(thing: &Thing) -> Result<usize> {
         use self::schema::thing_defines::dsl::*;
-        let conn = DBPool::get_connection()?;
-        let _ = diesel::delete(thing_defines.filter(key.eq(&thing.key)).filter(version.eq(thing.version)))
-            .execute(conn.deref());
-        Ok(())
+        let conn: &SqliteConnection = &CONN.lock().unwrap();
+        let rtn = diesel::delete(thing_defines.filter(key.eq(&thing.key)).filter(version.eq(thing.version)))
+            .execute(conn);
+        match rtn {
+            Ok(x) => Ok(x),
+            Err(err) => Err(NatureError::from(err))
+        }
     }
 }

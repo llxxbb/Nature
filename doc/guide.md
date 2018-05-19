@@ -39,3 +39,6 @@ The given context will contains two list as a Json:
     errors: Vec<String>,
 }
 ```
+
+支持业务ID
+可以大幅度简化业务端与Datahub集成的复杂度

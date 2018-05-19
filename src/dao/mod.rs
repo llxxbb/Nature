@@ -14,10 +14,10 @@ mod carrier;
 mod store_plan;
 
 pub trait InstanceDao {
-    fn insert(instance: &Instance) -> Result<()>;
+    fn insert(instance: &Instance) -> Result<usize>;
     fn get_last_status_by_id(id: &UuidBytes) -> Result<Option<Instance>>;
     /// check whether source stored earlier
-    fn source_stored(instance: &Instance) -> Result<bool>;
+    fn is_exists(instance: &Instance) -> Result<bool>;
 }
 
 pub trait ThingDefineDao {

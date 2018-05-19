@@ -2,8 +2,9 @@ use chrono::prelude::*;
 use super::*;
 
 #[test]
-fn insert_define() {
-    println!("----------------- insert_define --------------------");
+fn define_test() {
+    println!("----------------- define_test --------------------");
+    // prepare data to insert
     let define = ThingDefine {
         key: "/test".to_string(),
         description: Some("description".to_string()),
@@ -16,12 +17,16 @@ fn insert_define() {
         key: "/test".to_string(),
         version: 100,
     };
+    // delete if it exists 
     if let Ok(Some(_)) = TableThingDefine::get(&thing) {
         let _ = TableThingDefine::delete(&thing);
     }
+    // insert
     let rtn = TableThingDefine::insert(&define);
     println!("insert result : {:?}", rtn);
+    // find inserted
     let row = TableThingDefine::get(&thing).unwrap().unwrap();
     assert_eq!(row, define);
+    // delete it
     TableThingDefine::delete(&thing).unwrap();
 }

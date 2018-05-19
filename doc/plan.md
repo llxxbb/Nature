@@ -1,13 +1,6 @@
 # plan
 
 ## for the nearer term
-
-* implement sqlite
-  * Instance
-    * source_stored
-    * unit test
-
-* change other test like thing_define_cache unit test to avoid parallel test problem
   
 * implement sqlite
   * Mapping

@@ -10,7 +10,7 @@ CREATE TABLE `thing_defines` (
 );
 
 CREATE TABLE `instances` (
-	`id`	BLOB NOT NULL UNIQUE,
+	`id`	BLOB NOT NULL,
 	`thing`	TEXT NOT NULL,
 	`version`	INTEGER NOT NULL,
 	`content`	TEXT NOT NULL,
@@ -22,5 +22,5 @@ CREATE TABLE `instances` (
 	`from_status_version`	INTEGER,
 	`execute_time`	DATETIME NOT NULL,
 	`create_time`	DATETIME NOT NULL,
-	PRIMARY KEY(`id`)
+	PRIMARY KEY(`id`,`thing`,`version`,`status_version`)
 );

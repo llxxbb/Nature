@@ -25,7 +25,7 @@ fn handle_duplicated(carrier: Carrier<StoreInfo>, instance: Instance) -> Result<
         return Ok(());
     }
     // same source of **Status Thing** can't store more than once.
-    if let Ok(true) = TableInstance::source_stored(&instance) {
+    if let Ok(true) = TableInstance::is_exists(&instance) {
         Delivery::finish_carrier(&carrier.id)?;
         return Ok(());
     };

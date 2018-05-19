@@ -1,7 +1,7 @@
 use serde_json;
 use uuid;
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub enum NatureError {
     // outer input verify errors
     SerializeError(String),
