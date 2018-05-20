@@ -1,4 +1,4 @@
-use dao::*;
+use db::*;
 use global::*;
 use super::*;
 use task::ConverterInfo;

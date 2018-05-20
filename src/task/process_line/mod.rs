@@ -9,7 +9,6 @@ pub use self::threads::*;
 use serde::Serialize;
 use super::*;
 use uuid::UuidBytes;
-use dao::*;
 
 pub struct ProcessLine;
 

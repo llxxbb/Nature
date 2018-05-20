@@ -5,7 +5,7 @@ pub use self::store_plan::*;
 pub use self::thing::*;
 use uuid::UuidBytes;
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, Default)]
 pub struct DelayedInstances {
     pub carrier_id: UuidBytes,
     pub result: CallbackResult,
@@ -15,6 +15,12 @@ pub struct DelayedInstances {
 pub enum CallbackResult {
     Err(String),
     Instances(Vec<Instance>),
+}
+
+impl Default for CallbackResult {
+    fn default() -> Self {
+        CallbackResult::Instances(Vec::new())
+    }
 }
 
 mod instance;

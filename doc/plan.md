@@ -2,12 +2,15 @@
 
 ## for the nearer term
   
+* test task
+  * process line
+  * 
+  
 * implement sqlite
   * Mapping
   * Carrier
   * StorePlan
 * diesel::result::Error => NatureError
-
 * init system : check "/S/serial" whether defined, if not create one
 * Thing's key support parametrization
 

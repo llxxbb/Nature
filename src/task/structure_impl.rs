@@ -1,4 +1,3 @@
-use dao::*;
 use std::collections::HashSet;
 use super::*;
 use uuid::Uuid;
@@ -46,5 +45,15 @@ impl ConverterInfo {
             }
         }
         Ok(())
+    }
+}
+
+impl CallOutParameter {
+    pub fn new(internal: &Carrier<ConverterInfo>) -> Self {
+        CallOutParameter {
+            from: internal.from.clone(),
+            last_status: internal.last_status.clone(),
+            carrier_id: internal.id.clone(),
+        }
     }
 }

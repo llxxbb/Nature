@@ -1,6 +1,18 @@
 use super::*;
 use rpc::*;
 
+pub fn submit_callback(delayed: DelayedInstances) -> Result<()> {
+    let carrier = CarrierDaoService::get::<ConverterInfo>(delayed.carrier_id)?;
+    match delayed.result {
+        CallbackResult::Err(err) => {
+            let err = NatureError::ConverterLogicalError(err);
+            ProcessLine::move_to_err(err, carrier);
+            Ok(())
+        }
+        CallbackResult::Instances(ins) => handle_instances(&carrier, &ins)
+    }
+}
+
 pub fn do_convert(carrier: Carrier<ConverterInfo>) {
     let para = CallOutParameter::new(&carrier);
     let _ = match convert(para) {
@@ -24,18 +36,6 @@ pub fn do_convert(carrier: Carrier<ConverterInfo>) {
             _ => ProcessLine::move_to_err(err, carrier)
         }
     };
-}
-
-pub fn do_callback(delayed: DelayedInstances) -> Result<()> {
-    let carrier = CarrierDaoService::get::<ConverterInfo>(delayed.carrier_id)?;
-    match delayed.result {
-        CallbackResult::Err(err) => {
-            let err = NatureError::ConverterLogicalError(err);
-            ProcessLine::move_to_err(err, carrier);
-            Ok(())
-        }
-        CallbackResult::Instances(ins) => handle_instances(&carrier, &ins)
-    }
 }
 
 fn handle_instances(carrier: &Carrier<ConverterInfo>, instances: &Vec<Instance>) -> Result<()> {

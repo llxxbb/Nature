@@ -1,14 +1,17 @@
 use data::*;
-use global::*;
 use db::*;
-pub use self::converter_info_impl::*;
+use global::*;
+pub use self::channel::*;
+#[cfg(test)]
+pub use self::mock::*;
+#[cfg(not(test))]
 pub use self::process_line::*;
+pub use self::structure_impl::*;
 use serde::Serialize;
 use std::sync::mpsc::Receiver;
 use std::sync::Mutex;
 use std::thread;
 use uuid::UuidBytes;
-
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct RouteInfo {
@@ -37,16 +40,6 @@ pub struct CallOutParameter {
     pub carrier_id: UuidBytes,
 }
 
-impl CallOutParameter {
-    pub fn new(internal: &Carrier<ConverterInfo>) -> Self {
-        CallOutParameter {
-            from: internal.from.clone(),
-            last_status: internal.last_status.clone(),
-            carrier_id: internal.id.clone(),
-        }
-    }
-}
-
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct StoreInfo {
     pub instance: Instance,
@@ -67,7 +60,14 @@ pub struct SerialFinished {
 
 mod process_line;
 
+mod structure_impl;
 
-mod converter_info_impl;
+mod channel;
+
+#[cfg(test)]
+mod mock;
+
+#[cfg(test)]
+mod test;
 
 
