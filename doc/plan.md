@@ -4,7 +4,9 @@
   
 * test task
   * process line
-  * 
+    * store
+  * new converter info 
+  * new call-out-parameter
   
 * implement sqlite
   * Mapping

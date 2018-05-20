@@ -1,5 +1,6 @@
 use data::*;
 use global::*;
+#[cfg(not(test))]
 pub use self::cache::*;
 pub use self::dao_impl::*;
 #[cfg(test)]

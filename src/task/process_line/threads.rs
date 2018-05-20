@@ -1,5 +1,18 @@
+use std::sync::mpsc::Receiver;
 use std::sync::mpsc::Sender;
+use std::sync::Mutex;
+use std::thread;
 use super::*;
+use util::*;
+
+lazy_static! {
+    pub static ref CHANNEL_ROUTE : Channel<Carrier<StoreInfo>> = Channel::new();
+    pub static ref CHANNEL_DISPATCH : Channel<Carrier<RouteInfo>> = Channel::new();
+    pub static ref CHANNEL_CONVERT : Channel<Carrier<ConverterInfo>> = Channel::new();
+    pub static ref CHANNEL_STORE : Channel<Carrier<StoreInfo>> = Channel::new();
+    pub static ref CHANNEL_PARALLEL : Channel<Carrier<ParallelBatchInstance>> = Channel::new();
+    pub static ref CHANNEL_SERIAL : Channel<Carrier<SerialBatchInstance>> = Channel::new();
+}
 
 pub fn send_carrier<T>(sender: Sender<Carrier<T>>, carrier: Carrier<T>)
     where T: 'static + Sized + Serialize + Sync + Send {
@@ -8,14 +21,13 @@ pub fn send_carrier<T>(sender: Sender<Carrier<T>>, carrier: Carrier<T>)
     });
 }
 
-
 pub fn start_receive_threads() {
-    start_thread(&CHANNEL_ROUTE.receiver, ProcessLine::route);
-    start_thread(&CHANNEL_DISPATCH.receiver, ProcessLine::dispatch);
-    start_thread(&CHANNEL_CONVERT.receiver, ProcessLine::convert);
-    start_thread(&CHANNEL_STORE.receiver, ProcessLine::store_for_receive);
-    start_thread(&CHANNEL_PARALLEL.receiver, ProcessLine::parallel);
-    start_thread(&CHANNEL_SERIAL.receiver, ProcessLine::serial);
+    start_thread(&CHANNEL_ROUTE.receiver, do_route);
+    start_thread(&CHANNEL_DISPATCH.receiver, do_dispatch);
+    start_thread(&CHANNEL_CONVERT.receiver, do_convert);
+    start_thread(&CHANNEL_STORE.receiver, Store::store_for_receive);
+    start_thread(&CHANNEL_PARALLEL.receiver, do_parallel);
+    start_thread(&CHANNEL_SERIAL.receiver, do_serial);
 }
 
 fn start_thread<T, F>(receiver: &'static Mutex<Receiver<Carrier<T>>>, f: F)

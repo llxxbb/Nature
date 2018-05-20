@@ -1,9 +1,7 @@
-extern crate r2d2_diesel;
-
-use super::*;
-use uuid::UuidBytes;
 use serde::Serialize;
+use super::*;
 use task::CarryError;
+use uuid::UuidBytes;
 
 pub trait ThingDefineDao {
     fn get(thing: &Thing) -> Result<ThingDefine>;

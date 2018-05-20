@@ -1,13 +1,26 @@
 extern crate rand;
 
+use lru_time_cache::LruCache;
 use self::rand::{Rng, thread_rng};
+use std::collections::HashMap;
 use std::ops::Range;
 use std::ptr;
+use std::sync::Mutex;
+use std::time::Duration;
 use super::*;
 
-pub fn get_relations(from: &Thing) -> Result<Vec<Mapping>> {
-    let (relations, balances) = get_balanced(from)?;
-    Ok(weight_filter(&relations, &balances))
+lazy_static! {
+    static ref CACHE_MAPPING: Mutex<LruCache<Thing, (Vec<Mapping>, HashMap<Thing, Range<f32>>)>> = Mutex::new(LruCache::<Thing, (Vec<Mapping>, HashMap<Thing, Range<f32>>)>::with_expiry_duration(Duration::from_secs(3600)));
+
+}
+
+pub struct Relation;
+
+impl Relation {
+    pub fn get(from: &Thing) -> Result<Vec<Mapping>> {
+        let (relations, balances) = get_balanced(from)?;
+        Ok(weight_filter(&relations, &balances))
+    }
 }
 
 fn get_balanced(from: &Thing) -> Result<(Vec<Mapping>, HashMap<Thing, Range<f32>>)> {

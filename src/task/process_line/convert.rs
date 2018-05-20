@@ -6,7 +6,7 @@ pub fn submit_callback(delayed: DelayedInstances) -> Result<()> {
     match delayed.result {
         CallbackResult::Err(err) => {
             let err = NatureError::ConverterLogicalError(err);
-            ProcessLine::move_to_err(err, carrier);
+            Delivery::move_to_err(err, carrier);
             Ok(())
         }
         CallbackResult::Instances(ins) => handle_instances(&carrier, &ins)
@@ -21,7 +21,7 @@ pub fn do_convert(carrier: Carrier<ConverterInfo>) {
                 Ok(_) => (),
                 Err(NatureError::DaoEnvironmentError(_)) => (),
                 Err(err) => {
-                    ProcessLine::move_to_err(err, carrier.clone());
+                    Delivery::move_to_err(err, carrier.clone());
                 }
             }
         }
@@ -33,7 +33,7 @@ pub fn do_convert(carrier: Carrier<ConverterInfo>) {
             // only **Environment Error** will be retry
             NatureError::ConverterEnvironmentError(_) => (),
             // other error will drop into error
-            _ => ProcessLine::move_to_err(err, carrier)
+            _ => Delivery::move_to_err(err, carrier)
         }
     };
 }

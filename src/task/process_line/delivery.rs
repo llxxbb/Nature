@@ -21,7 +21,7 @@ impl Delivery {
         let mut carrier = match Carrier::new(valuable) {
             Ok(new) => new,
             Err(err) => {
-                ProcessLine::move_to_err(err.clone(), old);
+                Delivery::move_to_err(err.clone(), old);
                 return Err(err);
             }
         };
@@ -40,7 +40,7 @@ impl Delivery {
                     rtn.push(new);
                 }
                 Err(err) => {
-                    ProcessLine::move_to_err(err.clone(), old);
+                    Delivery::move_to_err(err.clone(), old);
                     return Err(err);
                 }
             };
@@ -51,5 +51,9 @@ impl Delivery {
 
     pub fn finish_carrier(id: &UuidBytes) -> Result<()> {
         CarrierDaoService::delete(&id)
+    }
+
+    pub fn move_to_err<T>(err: NatureError, carrier: Carrier<T>) where T: Sized + Serialize {
+        let _ = CarrierDaoService::move_to_error(CarryError { err, carrier });
     }
 }

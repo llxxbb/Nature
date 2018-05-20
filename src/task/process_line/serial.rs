@@ -25,7 +25,7 @@ pub fn do_serial(carrier: Carrier<SerialBatchInstance>) {
 
     let instance = match new_virtual_instance(&carrier, sf.unwrap()) {
         Err(err) => {
-            ProcessLine::move_to_err(err, carrier);
+            Delivery::move_to_err(err, carrier);
             return;
         }
         Ok(ins) => ins,

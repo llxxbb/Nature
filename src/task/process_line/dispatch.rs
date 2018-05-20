@@ -10,7 +10,7 @@ pub fn do_dispatch(carrier: Carrier<RouteInfo>) {
         Ok(new) => new,
         Err(NatureError::DaoEnvironmentError(_)) => return,
         Err(err) => {
-            ProcessLine::move_to_err(err, carrier);
+            Delivery::move_to_err(err, carrier);
             return;
         }
     };
@@ -27,7 +27,7 @@ pub fn do_dispatch(carrier: Carrier<RouteInfo>) {
 
 pub fn re_dispatch(carrier: Carrier<StoreInfo>) -> Result<()> {
     if carrier.converter.is_none() {
-        ProcessLine::move_to_err(NatureError::InstanceStatusVersionConflict, carrier);
+        Delivery::move_to_err(NatureError::InstanceStatusVersionConflict, carrier);
         return Err(NatureError::InstanceStatusVersionConflict);
     }
     let converter = &carrier.data.converter.clone().unwrap();

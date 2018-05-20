@@ -13,7 +13,7 @@ use util::*;
 use uuid::UuidBytes;
 
 /// A snapshot for a particular `Thing`
-#[derive(Serialize, Deserialize, Debug, Default, Clone)]
+#[derive(Serialize, Deserialize, Debug, Default, Clone, PartialEq)]
 pub struct Instance {
     /// A unique value used to distinguish other instance
     pub id: UuidBytes,
@@ -30,7 +30,7 @@ impl Deref for Instance {
 
 
 /// A snapshot for a particular `Thing`
-#[derive(Serialize, Deserialize, Debug, Default, Clone)]
+#[derive(Serialize, Deserialize, Debug, Default, Clone, PartialEq)]
 pub struct InstanceNoID {
     /// This instance's Type
     pub thing: Thing,
@@ -56,7 +56,7 @@ pub struct InstanceNoID {
     pub from: Option<FromInstance>,
 }
 
-#[derive(Serialize, Deserialize, Debug, Default, Clone)]
+#[derive(Serialize, Deserialize, Debug, Default, Clone, PartialEq)]
 pub struct FromInstance {
     pub thing: Thing,
     pub status_version: i32,

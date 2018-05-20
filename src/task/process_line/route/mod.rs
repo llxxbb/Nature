@@ -1,11 +1,10 @@
-pub use self::relation::*;
 use std::collections::HashMap;
 use std::collections::HashSet;
 use super::*;
 
 pub fn do_route(carrier: Carrier<StoreInfo>) {
     let instance = &carrier.data.instance.clone();
-    if let Ok(relations) = get_relations(&instance.data.thing) {
+    if let Ok(relations) = Relation::get(&instance.data.thing) {
         // no relations
         if relations.len() == 0 {
             let _ = CarrierDaoService::delete(&carrier.id);
@@ -66,8 +65,6 @@ fn delivery_relations(carrier: Carrier<StoreInfo>, instance: &Instance, maps: Ve
         Err(_) => ()
     }
 }
-
-mod relation;
 
 #[cfg(test)]
 mod test_route;
