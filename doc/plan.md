@@ -5,6 +5,11 @@
 * test task
   * process line
     * store
+    * convert
+    * serial
+    * parallel
+    * delivery
+    * dispatch
   * new converter info 
   * new call-out-parameter
   

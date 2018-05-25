@@ -59,6 +59,17 @@ There are all **Things** in Nature, and **Things** always transform into other t
 
 things + motion = nature
 
+## theory
+
+### retry
+
+generate new tasks and finished older task, when it was broken retry it.
+
+### idempotent
+
+If instance or task exists new comers will be dropped.
+When instance changed, Nature don't update it but version it, so you can have a whole changes list of history
+
 ## 技术意义
 
 * 去接口

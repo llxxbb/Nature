@@ -2,8 +2,8 @@ use super::*;
 
 pub struct Delivery;
 
-impl Delivery {
-    pub fn create_carrier<T>(valuable: T) -> Result<Carrier<T>>
+impl DeliveryTrait for Delivery {
+    fn create_carrier<T>(valuable: T) -> Result<Carrier<T>>
         where T: Sized + Serialize
     {
         let carrier = Carrier::new(valuable)?;
@@ -15,7 +15,7 @@ impl Delivery {
     /// That way we need not to communicate with DB for create new and delete old carrier.
     /// But for failure we must redo from beginning. but I think it has small chance.
     /// Another disadvantage is the failure information will be attached to the beginning.
-    pub fn create_and_finish_carrier<T, U>(valuable: T, old: Carrier<U>) -> Result<Carrier<T>>
+    fn create_and_finish_carrier<T, U>(valuable: T, old: Carrier<U>) -> Result<Carrier<T>>
         where T: Sized + Serialize, U: Sized + Serialize,
     {
         let mut carrier = match Carrier::new(valuable) {
@@ -29,7 +29,7 @@ impl Delivery {
         Ok(carrier)
     }
 
-    pub fn create_batch_and_finish_carrier<T, U>(valuables: Vec<T>, old: Carrier<U>) -> Result<Vec<Carrier<T>>>
+    fn create_batch_and_finish_carrier<T, U>(valuables: Vec<T>, old: Carrier<U>) -> Result<Vec<Carrier<T>>>
         where T: Sized + Serialize, U: Sized + Serialize,
     {
         let mut rtn: Vec<Carrier<T>> = Vec::new();
@@ -49,11 +49,11 @@ impl Delivery {
         Ok(rtn)
     }
 
-    pub fn finish_carrier(id: &UuidBytes) -> Result<()> {
+    fn finish_carrier(id: &UuidBytes) -> Result<()> {
         CarrierDaoService::delete(&id)
     }
 
-    pub fn move_to_err<T>(err: NatureError, carrier: Carrier<T>) where T: Sized + Serialize {
+    fn move_to_err<T>(err: NatureError, carrier: Carrier<T>) where T: Sized + Serialize {
         let _ = CarrierDaoService::move_to_error(CarryError { err, carrier });
     }
 }
