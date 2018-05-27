@@ -1,21 +1,10 @@
 use super::*;
-
-#[test]
-fn target_not_initialized() {
-    let instance = Instance::default();
-    let mapping = Mapping::default();
-    match ConverterInfo::new(&instance, &mapping) {
-        Err(NatureError::VerifyError(err)) => assert_eq!("ThingDefineCache mock : unknown", err),
-        _ => panic!("should not go here"),
-    };
-}
+use util::*;
 
 #[test]
 fn target_not_defined() {
-    let instance = Instance::default();
-    let mut mapping = Mapping::default();
-    mapping.to.key = "/B/err".to_string();
-    match ConverterInfo::new(&instance, &mapping) {
+    let _lock_define_cache = lock_and_set_mock_value(&THING_DEFINE_LOCK, &THING_DEFINE_CACHE_VALUE, Err(NatureError::VerifyError("ThingDefineCache mock : not defined".to_string())));
+    match ConverterInfo::new(&Instance::default(), &Mapping::default()) {
         Err(NatureError::VerifyError(err)) => assert_eq!("ThingDefineCache mock : not defined", err),
         _ => panic!("should not go here"),
     };
@@ -31,7 +20,7 @@ fn target_is_not_a_status_one() {
             assert_eq!(x.from, instance);
             assert_eq!(x.mapping, mapping);
             assert_eq!(x.last_status, None);
-        },
+        }
         _ => panic!("should not go here"),
     };
 }

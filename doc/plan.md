@@ -4,14 +4,16 @@
 
 * test task
   * process line
+    * dispatch
+    
+* test task
+  * process line
     * convert
     * serial
     * parallel
     * delivery
-    * dispatch
   * new converter info 
   * new call-out-parameter
-  
 * Thing's key support parametrization
 * diesel 1.3 have compile problem with last nightly rust. 2018年5月26日
 https://github.com/rust-lang/rust/issues/50825

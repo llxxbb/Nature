@@ -13,7 +13,7 @@ use uuid::UuidBytes;
 
 // open this cause test unable to run
 //#[cfg(not(test))]
-mod sqlite;
+pub mod sqlite;
 mod cache;
 mod dao_impl;
 mod orm;

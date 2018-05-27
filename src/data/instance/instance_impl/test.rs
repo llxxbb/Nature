@@ -14,7 +14,8 @@ fn verify_un_configured() {
 fn verify_id_generated() {
     println!("----------------- verify_id_generated --------------------");
     let mut instance = Instance::default();
-    instance.data.thing.key = "ok".to_string();
+    instance.data.thing.key = "/id/test".to_string();
+    let _lock_define_cache = lock_and_set_mock_value(&THING_DEFINE_LOCK, &THING_DEFINE_CACHE_VALUE, Ok(ThingDefine::default()));
     let result = InstanceImpl::verify(&mut instance, Root::Business);
     assert!(result.is_ok());
 }

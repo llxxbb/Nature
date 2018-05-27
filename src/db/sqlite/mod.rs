@@ -13,4 +13,4 @@ mod models;
 #[cfg(test)]
 mod test;
 
-mod dao;
+pub mod dao;
