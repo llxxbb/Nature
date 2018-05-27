@@ -1,10 +1,9 @@
 # plan
 
 ## for the nearer term
-  
+
 * test task
   * process line
-    * store
     * convert
     * serial
     * parallel
@@ -13,13 +12,17 @@
   * new converter info 
   * new call-out-parameter
   
+* Thing's key support parametrization
+* diesel 1.3 have compile problem with last nightly rust. 2018年5月26日
+https://github.com/rust-lang/rust/issues/50825
+https://github.com/rust-lang/rust/pull/51042
 * implement sqlite
   * Mapping
   * Carrier
   * StorePlan
 * diesel::result::Error => NatureError
 * init system : check "/S/serial" whether defined, if not create one
-* Thing's key support parametrization
+
 
 ### Retry carry
 
@@ -31,8 +34,6 @@
 * status select
 * before convert: target status include and exclude
 * callback
-
-
 
 ### other
 
@@ -50,6 +51,4 @@
 * converter support balance
 * traffic limit
 * introduce thread pool
-
-
-
+* create mock **crate** for generate Lock and Return Value.

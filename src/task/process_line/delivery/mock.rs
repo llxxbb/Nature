@@ -1,11 +1,11 @@
-use std::mem;
 use std::ops::Deref;
 use std::sync::*;
 use super::*;
 
 lazy_static! {
-    pub static ref DELIVERY_LOCK: Mutex<u8> = Mutex::new(1);
+    pub static ref DELIVERY_LOCK: Mutex<u8> = Mutex::new(0);
     pub static ref DELIVERY_VALUE: Mutex<Value> = Mutex::new(Value::Err);
+    pub static ref DELIVERY_FINISH_CARRIER_VALUE: Mutex<Value> = Mutex::new(Value::Err);
 }
 
 #[derive(Clone)]
@@ -13,7 +13,6 @@ pub enum Value {
     Ok,
     Err,
 }
-
 
 pub struct Delivery;
 
@@ -35,10 +34,12 @@ impl DeliveryTrait for Delivery {
     }
 
     fn finish_carrier(_id: &[u8; 16]) -> Result<()> {
-        unimplemented!()
+        let x: Value = DELIVERY_FINISH_CARRIER_VALUE.lock().unwrap().deref().clone();
+        match x {
+            Value::Ok => Ok(()),
+            Value::Err => Err(NatureError::DaoEnvironmentError("delivery mock finish_carrier".to_string()))
+        }
     }
 
-    fn move_to_err<T>(_err: NatureError, _carrier: Carrier<T>) where T: Sized + Serialize {
-        unimplemented!()
-    }
+    fn move_to_err<T>(_err: NatureError, _carrier: Carrier<T>) where T: Sized + Serialize { () }
 }

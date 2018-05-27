@@ -30,7 +30,7 @@ pub struct CallOutParameter {
     pub carrier_id: UuidBytes,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone, Default)]
 pub struct StoreInfo {
     pub instance: Instance,
     /// save outside has non converter info.

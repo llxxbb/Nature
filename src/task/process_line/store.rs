@@ -36,15 +36,13 @@ impl Store {
 
 fn handle_duplicated(carrier: Carrier<StoreInfo>, instance: Instance) -> Result<()> {
     let define = ThingDefineCache::get(&instance.data.thing)?;
-    // **None Status Thing** won't try again
-    if !define.is_status() {
+    if define.is_status() {
+        // status need to retry and correct the status version.
+        re_dispatch(carrier)
+    }else {
+        // **None Status Thing** won't try again
         Delivery::finish_carrier(&carrier.id)?;
-        return Ok(());
+        Ok(())
     }
-    // same source of **Status Thing** can't store more than once.
-    if let Ok(true) = TableInstance::is_exists(&instance) {
-        Delivery::finish_carrier(&carrier.id)?;
-        return Ok(());
-    };
-    re_dispatch(carrier)
+
 }

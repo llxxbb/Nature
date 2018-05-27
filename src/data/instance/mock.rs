@@ -7,8 +7,6 @@ lazy_static! {
     pub static ref INSTANCE_RESULT: Mutex<Result<UuidBytes>> = Mutex::new(Ok(UuidBytes::default()));
 }
 
-
-
 pub struct InstanceImpl;
 
 impl InstanceImpl {

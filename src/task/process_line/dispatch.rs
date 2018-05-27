@@ -25,6 +25,7 @@ pub fn do_dispatch(carrier: Carrier<RouteInfo>) {
     }
 }
 
+/// Get last status version and re-convert
 pub fn re_dispatch(carrier: Carrier<StoreInfo>) -> Result<()> {
     if carrier.converter.is_none() {
         Delivery::move_to_err(NatureError::InstanceStatusVersionConflict, carrier);
