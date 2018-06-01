@@ -1,15 +1,8 @@
 use data::*;
-use db::*;
 use global::*;
-use std::any::Any;
-use std::thread;
-use std::time;
 use super::super::delivery::*;
 use super::super::store::Store;
-use super::super::threads::*;
-use task::struct_define::StoreInfo;
 use util::*;
-use uuid::UuidBytes;
 
 #[test]
 fn submit_and_delivery_error() {

@@ -1,3 +1,4 @@
+use db::dao_impl::*;
 use std::collections::HashMap;
 use std::collections::HashSet;
 use super::*;
@@ -69,10 +70,9 @@ fn get_last_status() {
     instance.data.status_version = 111;
     assert_eq!(Ok(1), TableInstance::insert(&instance));
     // get last
-    if let Ok(Some(x)) = TableInstance::get_last_status_by_id(&instance.id){
+    if let Ok(Some(x)) = TableInstance::get_last_status_by_id(&instance.id) {
         assert_eq!(123, x.status_version);
-    }else
-    {
+    } else {
         panic!("shouldn't get error");
     }
     // delete after test

@@ -124,7 +124,7 @@ fn do_store_ok() {
         _ => panic!("should not match this arm!"),
     }
 
-    thread::sleep(time::Duration::from_millis(1));
+    thread::sleep(time::Duration::from_millis(10));
     let received = RECEIVED_VALUES.lock().unwrap();
     let x: &Vec<Box<Any + Send + Sync>> = received.deref();
     assert_eq!(1, x.len());
