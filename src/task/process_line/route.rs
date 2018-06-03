@@ -60,12 +60,10 @@ fn status_check(status: &HashSet<String>, mapping: &Mapping) -> bool {
 
 fn delivery_relations(carrier: Carrier<StoreInfo>, instance: &Instance, maps: Vec<Mapping>) {
     let route = RouteInfo { instance: instance.clone(), maps };
-    match Delivery::create_and_finish_carrier(route, carrier) {
+    match DeliveryImpl::create_and_finish_carrier(route, carrier) {
         Ok(new) => send_carrier(CHANNEL_DISPATCH.sender.lock().unwrap().clone(), new),
         Err(_) => ()
     }
 }
 
-#[cfg(test)]
-mod test_route;
 

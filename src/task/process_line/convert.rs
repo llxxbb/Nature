@@ -6,7 +6,7 @@ pub fn submit_callback(delayed: DelayedInstances) -> Result<()> {
     match delayed.result {
         CallbackResult::Err(err) => {
             let err = NatureError::ConverterLogicalError(err);
-            Delivery::move_to_err(err, carrier);
+            DeliveryImpl::move_to_err(err, carrier);
             Ok(())
         }
         CallbackResult::Instances(ins) => handle_instances(&carrier, &ins)
@@ -21,7 +21,7 @@ pub fn do_convert(carrier: Carrier<ConverterInfo>) {
                 Ok(_) => (),
                 Err(NatureError::DaoEnvironmentError(_)) => (),
                 Err(err) => {
-                    Delivery::move_to_err(err, carrier.clone());
+                    DeliveryImpl::move_to_err(err, carrier.clone());
                 }
             }
         }
@@ -33,7 +33,7 @@ pub fn do_convert(carrier: Carrier<ConverterInfo>) {
             // only **Environment Error** will be retry
             NatureError::ConverterEnvironmentError(_) => (),
             // other error will drop into error
-            _ => Delivery::move_to_err(err, carrier)
+            _ => DeliveryImpl::move_to_err(err, carrier)
         }
     };
 }
@@ -83,7 +83,7 @@ fn to_store(carrier: &Carrier<ConverterInfo>, plan: StorePlan) {
             converter: Some(carrier.data.clone()),
         }
     }).collect();
-    let new_tasks = Delivery::create_batch_and_finish_carrier(store_infos, carrier.to_owned());
+    let new_tasks = DeliveryImpl::create_batch_and_finish_carrier(store_infos, carrier.to_owned());
     if new_tasks.is_err() {
         return;
     }

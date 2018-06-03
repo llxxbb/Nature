@@ -1,8 +1,42 @@
+use std::sync::Arc;
+use std::sync::mpsc::Receiver;
+use std::sync::mpsc::Sender;
+use std::sync::Mutex;
+use std::thread;
 use super::*;
 
-pub struct Delivery;
+pub trait DeliveryTrait {
+    fn create_carrier<T>(valuable: T) -> Result<Carrier<T>> where T: Sized + Serialize;
+    fn create_and_finish_carrier<T, U>(valuable: T, old: Carrier<U>) -> Result<Carrier<T>> where T: Sized + Serialize, U: Sized + Serialize;
+    fn create_batch_and_finish_carrier<T, U>(valuables: Vec<T>, old: Carrier<U>) -> Result<Vec<Carrier<T>>> where T: Sized + Serialize, U: Sized + Serialize;
+    fn finish_carrier(id: &UuidBytes) -> Result<()>;
+    fn move_to_err<T>(err: NatureError, carrier: Carrier<T>) where T: Sized + Serialize;
+}
 
-impl DeliveryTrait for Delivery {
+pub fn send_carrier<T>(sender: Sender<Carrier<T>>, carrier: Carrier<T>)
+    where T: 'static + Sized + Serialize + Sync + Send {
+    thread::spawn(move || {
+        sender.send(carrier).unwrap();
+    });
+}
+
+pub fn start_thread<T, F>(receiver: &'static Mutex<Receiver<Carrier<T>>>, f: F)
+    where
+        T: Serialize + Send,
+        F: 'static + Fn(Carrier<T>) + Send
+{
+    thread::spawn(move || {
+        let receiver = receiver.lock().unwrap();
+        let mut iter = receiver.iter();
+        while let Some(next) = iter.next() {
+            f(next);
+        }
+    });
+}
+
+pub struct DeliveryImpl;
+
+impl DeliveryTrait for DeliveryImpl {
     fn create_carrier<T>(valuable: T) -> Result<Carrier<T>>
         where T: Sized + Serialize
     {
@@ -21,7 +55,7 @@ impl DeliveryTrait for Delivery {
         let mut carrier = match Carrier::new(valuable) {
             Ok(new) => new,
             Err(err) => {
-                Delivery::move_to_err(err.clone(), old);
+                DeliveryImpl::move_to_err(err.clone(), old);
                 return Err(err);
             }
         };
@@ -40,7 +74,7 @@ impl DeliveryTrait for Delivery {
                     rtn.push(new);
                 }
                 Err(err) => {
-                    Delivery::move_to_err(err.clone(), old);
+                    DeliveryImpl::move_to_err(err.clone(), old);
                     return Err(err);
                 }
             };
@@ -56,4 +90,8 @@ impl DeliveryTrait for Delivery {
     fn move_to_err<T>(err: NatureError, carrier: Carrier<T>) where T: Sized + Serialize {
         let _ = CarrierDaoService::move_to_error(CarryError { err, carrier });
     }
+}
+
+lazy_static! {
+    pub static ref TASK_DELIVERY : Arc<DeliveryImpl> = Arc::new(DeliveryImpl);
 }

@@ -2,12 +2,19 @@
 
 ## for the nearer term
 
+* integrate test
+    * simple_input
+        * rpc test
+        * task test
+          * dilivery store
+          * instance store
+          * dispatch
+    callback
+    batch_serial
+    batch_parallel
 * test task
   * process line
     * dispatch
-    
-* test task
-  * process line
     * convert
     * serial
     * parallel

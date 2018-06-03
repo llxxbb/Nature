@@ -3,6 +3,8 @@ pub use self::instance::*;
 pub use self::mapping::*;
 pub use self::store_plan::*;
 pub use self::thing::*;
+#[cfg(test)]
+pub use self::test::*;
 use uuid::UuidBytes;
 
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
@@ -28,4 +30,6 @@ mod thing;
 mod carrier;
 mod mapping;
 mod store_plan;
+#[cfg(test)]
+mod test;
 

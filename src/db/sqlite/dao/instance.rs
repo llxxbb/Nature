@@ -1,4 +1,5 @@
 use diesel::prelude::*;
+use std::sync::Arc;
 use super::*;
 
 pub struct TableInstance;
@@ -64,4 +65,8 @@ impl TableInstance {
             Err(err) => Err(NatureError::from(err))
         }
     }
+}
+
+lazy_static! {
+    pub static ref DAO_INSTANCE : Arc<TableInstance> = Arc::new(TableInstance);
 }

@@ -2,15 +2,13 @@ extern crate r2d2;
 
 use data::*;
 use global::*;
-#[cfg(not(test))]
-pub use self::instance_impl::*;
-#[cfg(test)]
-pub use self::mock::*;
 use std::collections::HashMap;
 use std::collections::HashSet;
 use std::ops::Deref;
 use util::*;
 use uuid::UuidBytes;
+use db::*;
+use std::sync::Arc;
 
 /// A snapshot for a particular `Thing`
 #[derive(Serialize, Deserialize, Debug, Default, Clone, PartialEq)]
@@ -71,7 +69,34 @@ pub struct SerialBatchInstance {
     pub instances: Vec<Instance>,
 }
 
+pub trait InstanceTrait {
+    fn verify(instance: &mut Instance, root: Root) -> Result<UuidBytes>;
+}
 
-pub mod instance_impl;
-#[cfg(test)]
-pub mod mock;
+pub struct InstanceImpl;
+
+impl InstanceTrait for InstanceImpl {
+    /// check key whether defined
+    /// generate id by hashing if it is not set.
+    fn verify(instance: &mut Instance, root: Root) -> Result<UuidBytes> {
+        Thing::key_standardize(&mut instance.data.thing.key, root)?;
+        // just see whether it was configured.
+        ThingDefineCache::get(&instance.data.thing)?;
+        Self::id_generate_if_not_set(instance)
+    }
+}
+
+impl InstanceImpl {
+    fn id_generate_if_not_set(instance: &mut Instance) -> Result<UuidBytes> {
+        let zero = instance.id.into_iter().all(|x| *x == 0);
+        if zero {
+            instance.id = generate_id(&instance.data)?;
+        }
+        Ok(instance.id)
+    }
+}
+
+lazy_static! {
+    pub static ref DATA_INSTANCE: Arc<InstanceImpl> = Arc::new(InstanceImpl);
+}
+

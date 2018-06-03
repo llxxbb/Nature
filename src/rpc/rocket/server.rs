@@ -4,6 +4,7 @@ use ::rocket::{ignite, Rocket};
 use self::rocket_contrib::Json;
 use super::*;
 use uuid::UuidBytes;
+use std::ops::Deref;
 
 
 pub fn start_rocket_server() -> Rocket {
@@ -17,7 +18,11 @@ pub fn start_rocket_server() -> Rocket {
 /// **Note** This do not receive System `Thing`'s instances
 #[post("/input", format = "application/json", data = "<instance>")]
 fn input(instance: Json<Instance>) -> Json<Result<UuidBytes>> {
-    let x = Store::submit_single(instance.0);
+    let x = StoreTaskImpl::submit_single(
+        TASK_DELIVERY.clone().deref(),
+        DATA_INSTANCE.clone().deref(),
+        DAO_INSTANCE.clone().deref(),
+        instance.0);
     Json(x)
 }
 

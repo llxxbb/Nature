@@ -2,7 +2,7 @@ use super::*;
 
 pub fn do_dispatch(carrier: Carrier<RouteInfo>) {
     if carrier.data.maps.len() == 0 {
-        let _ = Delivery::finish_carrier(&carrier.id);
+        let _ = DeliveryImpl::finish_carrier(&carrier.id);
         return;
     }
 
@@ -10,12 +10,12 @@ pub fn do_dispatch(carrier: Carrier<RouteInfo>) {
         Ok(new) => new,
         Err(NatureError::DaoEnvironmentError(_)) => return,
         Err(err) => {
-            Delivery::move_to_err(err, carrier);
+            DeliveryImpl::move_to_err(err, carrier);
             return;
         }
     };
 
-    let new_carriers = match Delivery::create_batch_and_finish_carrier(converters, carrier) {
+    let new_carriers = match DeliveryImpl::create_batch_and_finish_carrier(converters, carrier) {
         Ok(ncs) => ncs,
         Err(_) => return,
     };
@@ -28,12 +28,12 @@ pub fn do_dispatch(carrier: Carrier<RouteInfo>) {
 /// Get last status version and re-convert
 pub fn re_dispatch(carrier: Carrier<StoreInfo>) -> Result<()> {
     if carrier.converter.is_none() {
-        Delivery::move_to_err(NatureError::InstanceStatusVersionConflict, carrier);
+        DeliveryImpl::move_to_err(NatureError::InstanceStatusVersionConflict, carrier);
         return Err(NatureError::InstanceStatusVersionConflict);
     }
     let converter = &carrier.data.converter.clone().unwrap();
     let task = ConverterInfo::new(&converter.from, &converter.mapping)?;
-    let carrier = Delivery::create_and_finish_carrier(task, carrier)?;
+    let carrier = DeliveryImpl::create_and_finish_carrier(task, carrier)?;
     send_carrier(CHANNEL_CONVERT.sender.lock().unwrap().clone(), carrier);
     Ok(())
 }

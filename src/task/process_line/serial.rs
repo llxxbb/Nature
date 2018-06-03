@@ -2,10 +2,11 @@ use chrono::prelude::*;
 use serde_json;
 use std::collections::HashMap;
 use std::collections::HashSet;
+use std::ops::Deref;
 use super::*;
 
 pub fn submit_serial(batch: SerialBatchInstance) -> Result<()> {
-    match Delivery::create_carrier(batch) {
+    match DeliveryImpl::create_carrier(batch) {
         Ok(carrier) => {
             // to process asynchronous
             send_carrier(CHANNEL_SERIAL.sender.lock().unwrap().clone(), carrier);
@@ -16,7 +17,7 @@ pub fn submit_serial(batch: SerialBatchInstance) -> Result<()> {
 }
 
 pub fn do_serial(carrier: Carrier<SerialBatchInstance>) {
-    let sf = store_batch_items(&carrier);
+    let sf = store_batch_items(DATA_INSTANCE.clone().deref(), &carrier);
     if sf.is_err() {
         // retry if environment error occurs,
         // item error will not break the process and insert into error list of `SerialFinished`
@@ -25,14 +26,14 @@ pub fn do_serial(carrier: Carrier<SerialBatchInstance>) {
 
     let instance = match new_virtual_instance(&carrier, sf.unwrap()) {
         Err(err) => {
-            Delivery::move_to_err(err, carrier);
+            DeliveryImpl::move_to_err(err, carrier);
             return;
         }
         Ok(ins) => ins,
     };
 
     let si = StoreInfo { instance, converter: None };
-    if let Ok(route) = Delivery::create_and_finish_carrier(si, carrier) {
+    if let Ok(route) = DeliveryImpl::create_and_finish_carrier(si, carrier) {
         send_carrier(CHANNEL_ROUTE.sender.lock().unwrap().clone(), route);
     }
 }
@@ -60,11 +61,14 @@ fn new_virtual_instance(carrier: &Carrier<SerialBatchInstance>, sf: SerialFinish
     })
 }
 
-fn store_batch_items(carrier: &Carrier<SerialBatchInstance>) -> Result<SerialFinished> {
+fn store_batch_items<F>(_: &F, carrier: &Carrier<SerialBatchInstance>) -> Result<SerialFinished>
+    where
+        F: InstanceTrait
+{
     let mut errors: Vec<String> = Vec::new();
     let mut succeeded_id: Vec<UuidBytes> = Vec::new();
     for mut instance in carrier.data.instances.clone() {
-        if let Err(err) = InstanceImpl::verify(&mut instance, Root::Business) {
+        if let Err(err) = F::verify(&mut instance, Root::Business) {
             errors.push(format!("{:?}", err));
             continue;
         }

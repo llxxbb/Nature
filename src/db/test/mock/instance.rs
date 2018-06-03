@@ -1,5 +1,6 @@
+use db::dao_impl::InstanceDao;
 use std::ops::Deref;
-use std::sync::*;
+use uuid::UuidBytes;
 use super::*;
 
 lazy_static! {
@@ -7,9 +8,9 @@ lazy_static! {
     pub static ref TABLE_INSTANCE_INSERT_VALUE: Mutex<Result<usize>> = Mutex::new(Ok(0));
 }
 
-pub struct TableInstance;
+pub struct MockTableInstance;
 
-impl InstanceDao for TableInstance {
+impl InstanceDao for MockTableInstance {
     fn insert(_instance: &Instance) -> Result<usize> {
         println!("------------ InstanceDao insert-----------------");
         TABLE_INSTANCE_INSERT_VALUE.lock().unwrap().deref().clone()
