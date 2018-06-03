@@ -22,13 +22,14 @@ fn input(instance: Json<Instance>) -> Json<Result<UuidBytes>> {
         TASK_DELIVERY.clone().deref(),
         DATA_INSTANCE.clone().deref(),
         DAO_INSTANCE.clone().deref(),
+        CACHE_THING_DEFINE.clone().deref(),
         instance.0);
     Json(x)
 }
 
 #[post("/callback", format = "application/json", data = "<delayed>")]
 fn callback(delayed: Json<DelayedInstances>) -> Json<Result<()>> {
-    let x = submit_callback(delayed.0);
+    let x = ConvertTaskImpl::submit_callback(delayed.0);
     Json(x)
 }
 

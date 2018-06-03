@@ -7,6 +7,13 @@ use task::DeliveryTrait;
 lazy_static! {
     pub static ref TASK_DELIVERY_LOCK: Mutex<u8> = Mutex::new(0);
     pub static ref TASK_DELIVERY_VALUE: Mutex<Value> = Mutex::new(Value::Err);
+
+    // counter
+    pub static ref TASK_DELIVERY_CREATE_COUNTER: Mutex<usize> = Mutex::new(0);
+    pub static ref TASK_DELIVERY_CREATE_AND_FINISH_COUNTER: Mutex<usize> = Mutex::new(0);
+    pub static ref TASK_DELIVERY_BATCH_AND_FINISH_COUNTER: Mutex<usize> = Mutex::new(0);
+    pub static ref TASK_DELIVERY_FINISH_COUNTER: Mutex<usize> = Mutex::new(0);
+    pub static ref TASK_DELIVERY_ERROR_COUNTER: Mutex<usize> = Mutex::new(0);
 }
 
 #[derive(Clone)]
@@ -21,6 +28,8 @@ pub struct MockDeliveryTrait;
 impl DeliveryTrait for MockDeliveryTrait {
     fn create_carrier<T>(valuable: T) -> Result<Carrier<T>> where T: Sized + Serialize {
         print!("    MockDeliveryTrait : create_carrier");
+        let mut cnt = TASK_DELIVERY_CREATE_COUNTER.lock().unwrap();
+        *cnt = cnt.deref() + 1;
         let x: Value = TASK_DELIVERY_VALUE.lock().unwrap().deref().clone();
         match x {
             Value::Ok => Carrier::new(valuable),
@@ -29,6 +38,8 @@ impl DeliveryTrait for MockDeliveryTrait {
     }
 
     fn create_and_finish_carrier<T, U>(valuable: T, _old: Carrier<U>) -> Result<Carrier<T>> where T: Sized + Serialize, U: Sized + Serialize {
+        let mut cnt = TASK_DELIVERY_CREATE_AND_FINISH_COUNTER.lock().unwrap();
+        *cnt = cnt.deref() + 1;
         let x: Value = TASK_DELIVERY_VALUE.lock().unwrap().deref().clone();
         match x {
             Value::Ok => Carrier::new(valuable),
@@ -37,6 +48,8 @@ impl DeliveryTrait for MockDeliveryTrait {
     }
 
     fn create_batch_and_finish_carrier<T, U>(valuables: Vec<T>, _old: Carrier<U>) -> Result<Vec<Carrier<T>>> where T: Sized + Serialize, U: Sized + Serialize {
+        let mut cnt = TASK_DELIVERY_BATCH_AND_FINISH_COUNTER.lock().unwrap();
+        *cnt = cnt.deref() + 1;
         let x: Value = TASK_DELIVERY_VALUE.lock().unwrap().deref().clone();
         match x {
             Value::Ok => {
@@ -51,6 +64,8 @@ impl DeliveryTrait for MockDeliveryTrait {
     }
 
     fn finish_carrier(_id: &[u8; 16]) -> Result<()> {
+        let mut cnt = TASK_DELIVERY_FINISH_COUNTER.lock().unwrap();
+        *cnt = cnt.deref() + 1;
         let x: Value = TASK_DELIVERY_VALUE.lock().unwrap().deref().clone();
         match x {
             Value::Ok => Ok(()),
@@ -59,6 +74,8 @@ impl DeliveryTrait for MockDeliveryTrait {
     }
 
     fn move_to_err<T>(_err: NatureError, _carrier: Carrier<T>) where T: Sized + Serialize {
+        let mut cnt = TASK_DELIVERY_ERROR_COUNTER.lock().unwrap();
+        *cnt = cnt.deref() + 1;
         ()
     }
 }

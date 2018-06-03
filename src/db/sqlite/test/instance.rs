@@ -1,4 +1,4 @@
-use db::dao_impl::*;
+use db::trait_define::*;
 use std::collections::HashMap;
 use std::collections::HashSet;
 use super::*;

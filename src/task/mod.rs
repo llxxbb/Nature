@@ -1,6 +1,5 @@
 use data::*;
 use db::*;
-use global::*;
 pub use self::channels::*;
 pub use self::process_line::*;
 pub use self::struct_define::*;

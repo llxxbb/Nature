@@ -1,5 +1,4 @@
 pub use self::mock::*;
-use util::*;
 
 mod store;
 mod dispatch;

@@ -1,4 +1,4 @@
-use db::dao_impl::InstanceDao;
+use db::trait_define::InstanceDao;
 use std::ops::Deref;
 use uuid::UuidBytes;
 use super::*;

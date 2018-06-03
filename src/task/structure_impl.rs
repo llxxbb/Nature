@@ -1,6 +1,7 @@
 use std::collections::HashSet;
 use super::*;
 use uuid::Uuid;
+use global::*;
 
 impl ConverterInfo {
     /// **Error:**
@@ -8,7 +9,7 @@ impl ConverterInfo {
     /// * DefineNotFind
     /// * uuid parse
     pub fn new(instance: &Instance, mapping: &Mapping) -> Result<ConverterInfo> {
-        let define = ThingDefineCache::get(&mapping.to)?;
+        let define = ThingDefineCacheImpl::get(&mapping.to)?;
         let last_target = match define.is_status() {
             false => None,
             true => {

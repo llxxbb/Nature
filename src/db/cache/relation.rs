@@ -91,5 +91,3 @@ fn get_label_groups(maps: &Vec<Mapping>) -> HashMap<String, Vec<Mapping>> {
     labels
 }
 
-#[cfg(test)]
-mod test_relation;

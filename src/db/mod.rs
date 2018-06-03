@@ -1,7 +1,7 @@
 use data::*;
 use global::*;
 pub use self::cache::*;
-pub use self::dao_impl::*;
+pub use self::trait_define::*;
 pub use self::orm::*;
 pub use self::sqlite::*;
 #[cfg(test)]
@@ -10,7 +10,7 @@ use uuid::UuidBytes;
 
 mod sqlite;
 mod cache;
-mod dao_impl;
+mod trait_define;
 mod orm;
 #[cfg(test)]
 mod test;

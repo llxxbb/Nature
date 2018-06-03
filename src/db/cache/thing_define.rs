@@ -2,22 +2,24 @@ extern crate r2d2;
 
 use db::*;
 use lru_time_cache::LruCache;
+use std::sync::Arc;
 use std::sync::Mutex;
 use std::time::Duration;
 use super::*;
 
 lazy_static! {
-    static ref CACHE_THING_DEFINE: Mutex<LruCache<Thing, ThingDefine>> = Mutex::new(LruCache::<Thing, ThingDefine>::with_expiry_duration(Duration::from_secs(3600)));
+    static ref CACHE: Mutex<LruCache<Thing, ThingDefine>> = Mutex::new(LruCache::<Thing, ThingDefine>::with_expiry_duration(Duration::from_secs(3600)));
+    pub static ref CACHE_THING_DEFINE : Arc<ThingDefineCacheImpl> = Arc::new(ThingDefineCacheImpl);
 }
 
-pub struct ThingDefineCache;
+pub struct ThingDefineCacheImpl;
 
-impl ThingDefineDao for ThingDefineCache {
+impl ThingDefineCacheTrait for ThingDefineCacheImpl {
     fn get(thing: &Thing) -> Result<ThingDefine> {
         if thing.key.is_empty() {
             return Err(NatureError::VerifyError("[biz] must not be empty!".to_string()));
         }
-        let mut cache = CACHE_THING_DEFINE.lock().unwrap();
+        let mut cache = CACHE.lock().unwrap();
         {   // An explicit scope to avoid cache.insert error
             if let Some(x) = cache.get(thing) {
                 return Ok(x.clone());
@@ -31,10 +33,5 @@ impl ThingDefineDao for ThingDefineCache {
             }
         }
     }
-    fn insert(_define: &ThingDefine) -> Result<()> {
-        unimplemented!()
-    }
 }
 
-#[cfg(test)]
-mod test_thing_define;

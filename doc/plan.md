@@ -4,7 +4,6 @@
 
 * integrate test
     * simple_input
-        * rpc test
         * task test
           * dilivery store
           * instance store

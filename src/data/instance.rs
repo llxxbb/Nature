@@ -81,7 +81,7 @@ impl InstanceTrait for InstanceImpl {
     fn verify(instance: &mut Instance, root: Root) -> Result<UuidBytes> {
         Thing::key_standardize(&mut instance.data.thing.key, root)?;
         // just see whether it was configured.
-        ThingDefineCache::get(&instance.data.thing)?;
+        ThingDefineCacheImpl::get(&instance.data.thing)?;
         Self::id_generate_if_not_set(instance)
     }
 }

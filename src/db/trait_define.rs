@@ -8,6 +8,11 @@ pub trait ThingDefineDao {
     fn insert(define: &ThingDefine) -> Result<()>;
 }
 
+pub trait ThingDefineCacheTrait {
+    fn get(thing: &Thing) -> Result<ThingDefine>;
+}
+
+
 pub trait MappingDao {
     fn get_relations(from: &Thing) -> Result<Vec<Mapping>>;
 }
