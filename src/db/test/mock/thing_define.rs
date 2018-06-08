@@ -1,3 +1,4 @@
+use db::trait_define::ThingDefineCacheTrait;
 use db::trait_define::ThingDefineDao;
 use std::ops::Deref;
 use std::sync::Mutex;
@@ -31,12 +32,9 @@ impl MockTableThingDefine {
 
 pub struct ThingDefineCacheMock;
 
-impl ThingDefineDao for ThingDefineCacheMock {
+impl ThingDefineCacheTrait for ThingDefineCacheMock {
     fn get(_thing: &Thing) -> Result<ThingDefine> {
         println!("---------------- ThingDefineCache mock get ----------------------");
         CACHE_THING_DEFINE_VALUE.lock().unwrap().deref().clone()
-    }
-    fn insert(_define: &ThingDefine) -> Result<()> {
-        unimplemented!()
     }
 }

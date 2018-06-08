@@ -52,6 +52,7 @@ https://github.com/rust-lang/rust/pull/51042
 ## future
 
 * quick start
+* support local converter
 * give a demo
 * support multiple rpc types, such as web and gRpc
 * monitor point
