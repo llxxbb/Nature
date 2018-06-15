@@ -2,6 +2,9 @@
 
 ## for the nearer term
 
+
+* add operate time to instance table
+*  Mapping rename to `Relation`
 * integrate test
     * simple_input
         * task test
