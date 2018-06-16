@@ -13,7 +13,7 @@ pub trait ThingDefineCacheTrait {
 
 
 pub trait MappingDao {
-    fn get_relations(from: &Thing) -> Result<Vec<Mapping>>;
+    fn get_relations(from: &Thing) -> Result<Vec<Relation>>;
 }
 
 pub trait DeliveryDao {

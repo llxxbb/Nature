@@ -10,20 +10,20 @@ use std::time::Duration;
 use super::*;
 
 lazy_static! {
-    static ref CACHE_MAPPING: Mutex<LruCache<Thing, (Vec<Mapping>, HashMap<Thing, Range<f32>>)>> = Mutex::new(LruCache::<Thing, (Vec<Mapping>, HashMap<Thing, Range<f32>>)>::with_expiry_duration(Duration::from_secs(3600)));
+    static ref CACHE_MAPPING: Mutex<LruCache<Thing, (Vec<Relation>, HashMap<Thing, Range<f32>>)>> = Mutex::new(LruCache::<Thing, (Vec<Relation>, HashMap<Thing, Range<f32>>)>::with_expiry_duration(Duration::from_secs(3600)));
 
 }
 
-pub struct Relation;
+pub struct RelationCache;
 
-impl Relation {
-    pub fn get(from: &Thing) -> Result<Vec<Mapping>> {
+impl RelationCache {
+    pub fn get(from: &Thing) -> Result<Vec<Relation>> {
         let (relations, balances) = get_balanced(from)?;
         Ok(weight_filter(&relations, &balances))
     }
 }
 
-fn get_balanced(from: &Thing) -> Result<(Vec<Mapping>, HashMap<Thing, Range<f32>>)> {
+fn get_balanced(from: &Thing) -> Result<(Vec<Relation>, HashMap<Thing, Range<f32>>)> {
     let mut cache = CACHE_MAPPING.lock().unwrap();
     if let Some(balances) = cache.get(from) {
         return Ok(balances.clone());
@@ -36,8 +36,8 @@ fn get_balanced(from: &Thing) -> Result<(Vec<Mapping>, HashMap<Thing, Range<f32>
     Ok(rtn_clone)
 }
 
-fn weight_filter(relations: &Vec<Mapping>, balances: &HashMap<Thing, Range<f32>>) -> Vec<Mapping> {
-    let mut rtn: Vec<Mapping> = Vec::new();
+fn weight_filter(relations: &Vec<Relation>, balances: &HashMap<Thing, Range<f32>>) -> Vec<Relation> {
+    let mut rtn: Vec<Relation> = Vec::new();
     let rnd = thread_rng().gen::<f32>();
     for m in relations {
         let _ = match balances.get(&m.to) {
@@ -51,7 +51,7 @@ fn weight_filter(relations: &Vec<Mapping>, balances: &HashMap<Thing, Range<f32>>
 }
 
 /// weight group will be cached
-fn weight_calculate(labels: &HashMap<String, Vec<Mapping>>) -> HashMap<Thing, Range<f32>> {
+fn weight_calculate(labels: &HashMap<String, Vec<Relation>>) -> HashMap<Thing, Range<f32>> {
     let mut rtn: HashMap<Thing, Range<f32>> = HashMap::new();
     // calculate "to `Thing`"'s weight
     for (_, group) in labels {
@@ -77,9 +77,9 @@ fn weight_calculate(labels: &HashMap<String, Vec<Mapping>>) -> HashMap<Thing, Ra
 }
 
 /// group by labels
-fn get_label_groups(maps: &Vec<Mapping>) -> HashMap<String, Vec<Mapping>> {
+fn get_label_groups(maps: &Vec<Relation>) -> HashMap<String, Vec<Relation>> {
 // labels as key, value : Mappings have same label
-    let mut labels: HashMap<String, Vec<Mapping>> = HashMap::new();
+    let mut labels: HashMap<String, Vec<Relation>> = HashMap::new();
     for mapping in maps {
         let label = mapping.weight.label.clone();
         if label.is_empty() {

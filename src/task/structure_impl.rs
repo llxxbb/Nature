@@ -8,7 +8,7 @@ impl ConverterInfo {
     /// * Dao
     /// * DefineNotFind
     /// * uuid parse
-    pub fn new(instance: &Instance, mapping: &Mapping) -> Result<ConverterInfo> {
+    pub fn new(instance: &Instance, mapping: &Relation) -> Result<ConverterInfo> {
         let define = ThingDefineCacheImpl::get(&mapping.to)?;
         let last_target = match define.is_status() {
             false => None,

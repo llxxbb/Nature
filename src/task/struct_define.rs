@@ -5,7 +5,7 @@ use serde::Serialize;
 #[derive(Debug, Serialize, Deserialize)]
 pub struct RouteInfo {
     pub instance: Instance,
-    pub maps: Vec<Mapping>,
+    pub maps: Vec<Relation>,
 }
 
 #[derive(Debug)]
@@ -18,7 +18,7 @@ pub struct CarryError<T> where T: Sized + Serialize {
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct ConverterInfo {
     pub from: Instance,
-    pub mapping: Mapping,
+    pub mapping: Relation,
     pub last_status: Option<Instance>,
 }
 

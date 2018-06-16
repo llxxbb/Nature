@@ -2,11 +2,6 @@
 
 ## for the nearer term
 
-* add event time to instance table
-* add delivery table
-* add delivery_error table
-* add delivery_error table
-*  Mapping rename to `Relation`
 * integrate test
     * simple_input
         * task test

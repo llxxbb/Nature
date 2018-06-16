@@ -3,7 +3,7 @@ use std::collections::HashSet;
 
 /// the compose of `Mapping::from`, `Mapping::to` and `Weight::label` must be unique
 #[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq)]
-pub struct Mapping {
+pub struct Relation {
     pub from: Thing,
     pub to: Thing,
     pub who: Converter,
