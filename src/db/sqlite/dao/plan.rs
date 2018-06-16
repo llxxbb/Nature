@@ -7,7 +7,7 @@ impl StorePlanDao for StorePlanDaoService{
         unimplemented!()
     }
 
-    fn get(_from_id: &[u8; 16]) -> Result<StorePlan> {
+    fn get(_from_id: &u128) -> Result<StorePlan> {
         unimplemented!()
     }
 }

@@ -9,7 +9,7 @@ use uuid::UuidBytes;
 #[derive(Debug, Clone)]
 pub struct Carrier<T> where T: Sized + Serialize {
     pub data: T,
-    pub id: UuidBytes,
+    pub id: u128,
     pub create_time: i64,
     pub execute_time: i64,
 }

@@ -8,12 +8,13 @@ fn instance_common_test() {
     println!("----------------- instance_common_test --------------------");
     // prepare data to insert
     let instance = Instance {
-        id: UuidBytes::default(),
+        id: 0,
         data: InstanceNoID {
             thing: Thing {
                 key: "/instance/common".to_string(),
                 version: 100,
             },
+            event_time: 0,
             execute_time: 0,
             create_time: 0,
             content: String::new(),
@@ -40,12 +41,13 @@ fn get_last_status() {
     println!("----------------- get_last_status --------------------");
     // prepare data to insert
     let mut instance = Instance {
-        id: UuidBytes::default(),
+        id: 0,
         data: InstanceNoID {
             thing: Thing {
                 key: "/instance/getLast".to_string(),
                 version: 100,
             },
+            event_time: 0,
             execute_time: 0,
             create_time: 0,
             content: String::new(),

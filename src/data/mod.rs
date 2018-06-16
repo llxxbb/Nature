@@ -2,14 +2,13 @@ pub use self::carrier::*;
 pub use self::instance::*;
 pub use self::mapping::*;
 pub use self::store_plan::*;
-pub use self::thing::*;
 #[cfg(test)]
 pub use self::test::*;
-use uuid::UuidBytes;
+pub use self::thing::*;
 
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
 pub struct DelayedInstances {
-    pub carrier_id: UuidBytes,
+    pub carrier_id: u128,
     pub result: CallbackResult,
 }
 

@@ -44,12 +44,13 @@ fn new_virtual_instance(carrier: &Carrier<SerialBatchInstance>, sf: SerialFinish
     context.insert(carrier.data.context_for_finish.clone(), json);
     let time = Local::now().timestamp();
     Ok(Instance {
-        id: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        id: 0,
         data: InstanceNoID {
             thing: Thing {
                 key: SYS_KEY_SERIAL.clone(),
                 version: 1,
             },
+            event_time: time,
             execute_time: time,
             create_time: time,
             content: String::new(),
@@ -66,7 +67,7 @@ fn store_batch_items<F>(_: &F, carrier: &Carrier<SerialBatchInstance>) -> Result
         F: InstanceTrait
 {
     let mut errors: Vec<String> = Vec::new();
-    let mut succeeded_id: Vec<UuidBytes> = Vec::new();
+    let mut succeeded_id: Vec<u128> = Vec::new();
     for mut instance in carrier.data.instances.clone() {
         if let Err(err) = F::verify(&mut instance, Root::Business) {
             errors.push(format!("{:?}", err));

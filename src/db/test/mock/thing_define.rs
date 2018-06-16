@@ -1,5 +1,4 @@
 use db::trait_define::ThingDefineCacheTrait;
-use db::trait_define::ThingDefineDao;
 use std::ops::Deref;
 use std::sync::Mutex;
 use super::*;

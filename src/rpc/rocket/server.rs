@@ -2,10 +2,8 @@ extern crate rocket_contrib;
 
 use ::rocket::{ignite, Rocket};
 use self::rocket_contrib::Json;
-use super::*;
-use uuid::UuidBytes;
 use std::ops::Deref;
-
+use super::*;
 
 pub fn start_rocket_server() -> Rocket {
     ignite()
@@ -17,7 +15,7 @@ pub fn start_rocket_server() -> Rocket {
 
 /// **Note** This do not receive System `Thing`'s instances
 #[post("/input", format = "application/json", data = "<instance>")]
-fn input(instance: Json<Instance>) -> Json<Result<UuidBytes>> {
+fn input(instance: Json<Instance>) -> Json<Result<u128>> {
     let x = StoreTaskImpl::submit_single(
         TASK_DELIVERY.clone().deref(),
         DATA_INSTANCE.clone().deref(),

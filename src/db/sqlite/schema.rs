@@ -1,5 +1,28 @@
 table! {
-    instances (id) {
+    delivery (id) {
+        id -> Binary,
+        thing -> Text,
+        data_type -> Integer,
+        data -> Text,
+        create_time -> Timestamp,
+        execute_time -> Timestamp,
+        retried_times -> Integer,
+    }
+}
+
+table! {
+    delivery_error (id) {
+        id -> Binary,
+        thing -> Text,
+        data_type -> Integer,
+        data -> Text,
+        create_time -> Timestamp,
+        msg -> Text,
+    }
+}
+
+table! {
+    instances (id, thing, version, status_version) {
         id -> Binary,
         thing -> Text,
         version -> Integer,
@@ -10,6 +33,7 @@ table! {
         from_thing -> Nullable<Text>,
         from_version -> Nullable<Integer>,
         from_status_version -> Nullable<Integer>,
+        event_time -> Timestamp,
         execute_time -> Timestamp,
         create_time -> Timestamp,
     }
@@ -27,6 +51,8 @@ table! {
 }
 
 allow_tables_to_appear_in_same_query!(
+    delivery,
+    delivery_error,
     instances,
     thing_defines,
 );

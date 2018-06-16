@@ -4,9 +4,9 @@ use super::*;
 
 
 pub trait StoreTaskTrait {
-    fn submit_single<D, V, S, C>(_: &D, verify_instance: &V, store_instance: &S, thing_define: &C, instance: Instance) -> Result<UuidBytes>
+    fn submit_single<D, V, S, C>(_: &D, verify_instance: &V, store_instance: &S, thing_define: &C, instance: Instance) -> Result<u128>
         where D: DeliveryTrait, V: InstanceTrait, S: InstanceDao, C: ThingDefineCacheTrait;
-    fn store_with_root<V, S, C>(verify_instance: &V, store_instance: &S, thing_define: &C, carrier: Carrier<StoreInfo>, root: Root) -> Result<UuidBytes>
+    fn store_with_root<V, S, C>(verify_instance: &V, store_instance: &S, thing_define: &C, carrier: Carrier<StoreInfo>, root: Root) -> Result<u128>
         where V: InstanceTrait, S: InstanceDao, C: ThingDefineCacheTrait;
     fn do_store(carrier: Carrier<StoreInfo>);
 }
@@ -15,14 +15,14 @@ pub struct StoreTaskImpl;
 
 impl StoreTaskTrait for StoreTaskImpl {
     /// born an instance which is the beginning of the changes.
-    fn submit_single<D, V, S, C>(_: &D, verify_instance: &V, store_instance: &S, thing_define: &C, instance: Instance) -> Result<UuidBytes>
+    fn submit_single<D, V, S, C>(_: &D, verify_instance: &V, store_instance: &S, thing_define: &C, instance: Instance) -> Result<u128>
         where D: DeliveryTrait, V: InstanceTrait, S: InstanceDao, C: ThingDefineCacheTrait {
         let task = StoreInfo { instance, converter: None };
         let carrier = D::create_carrier(task)?;
         Self::store_with_root(verify_instance, store_instance, thing_define, carrier, Root::Business)
     }
 
-    fn store_with_root<V, S, C>(verify_instance: &V, store_instance: &S, thing_define: &C, carrier: Carrier<StoreInfo>, root: Root) -> Result<UuidBytes>
+    fn store_with_root<V, S, C>(_verify_instance: &V, _store_instance: &S, _thing_define: &C, carrier: Carrier<StoreInfo>, root: Root) -> Result<u128>
         where V: InstanceTrait, S: InstanceDao, C: ThingDefineCacheTrait {
         let mut instance = carrier.data.instance.clone();
         let uuid = V::verify(&mut instance, root)?;

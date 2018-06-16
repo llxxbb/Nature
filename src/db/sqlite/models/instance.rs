@@ -18,6 +18,7 @@ pub struct NewInstance {
     from_thing: Option<String>,
     from_version: Option<i32>,
     from_status_version: Option<i32>,
+    event_time: NaiveDateTime,
     execute_time: NaiveDateTime,
     create_time: NaiveDateTime,
 }
@@ -39,7 +40,7 @@ impl Instance {
             for i in 0..16 {
                 arr[i] = ni.id[i];
             }
-            arr
+            u128::from_bytes(arr)
         };
         let context = match ni.context {
             None => HashMap::new(),
@@ -56,6 +57,7 @@ impl Instance {
                     key: ni.thing,
                     version: ni.version,
                 },
+                event_time: ni.event_time.timestamp_millis(),
                 execute_time: ni.execute_time.timestamp_millis(),
                 create_time: ni.create_time.timestamp_millis(),
                 content: ni.content,
@@ -75,7 +77,7 @@ impl NewInstance {
             Some(ref from) => (Some(from.thing.key.clone()), Some(from.thing.version), Some(from.status_version))
         };
         Ok(NewInstance {
-            id: instance.id.to_vec(),
+            id: instance.id.to_bytes().to_vec(),
             thing: instance.thing.key.clone(),
             version: instance.thing.version,
             content: instance.content.clone(),
@@ -91,6 +93,7 @@ impl NewInstance {
             from_thing,
             from_version,
             from_status_version,
+            event_time: NaiveDateTime::from_timestamp(instance.event_time, 0),
             execute_time: NaiveDateTime::from_timestamp(instance.execute_time, 0),
             create_time: NaiveDateTime::from_timestamp(instance.create_time, 0),
         })

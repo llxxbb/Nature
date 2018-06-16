@@ -1,7 +1,7 @@
-use std::collections::HashSet;
-use super::*;
-use uuid::Uuid;
 use global::*;
+use std::collections::HashSet;
+use std::str::FromStr;
+use super::*;
 
 impl ConverterInfo {
     /// **Error:**
@@ -16,8 +16,8 @@ impl ConverterInfo {
                 match instance.context.get(&*CONTEXT_TARGET_INSTANCE_ID) {
                     // context have target id
                     Some(status_id) => {
-                        let status_id = Uuid::parse_str(status_id)?;
-                        TableInstance::get_last_status_by_id(&status_id.as_bytes())?
+                        let status_id = u128::from_str(status_id)?;
+                        TableInstance::get_last_status_by_id(&status_id)?
                     }
                     None => None,
                 }

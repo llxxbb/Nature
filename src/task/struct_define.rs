@@ -1,7 +1,6 @@
 use data::*;
 use global::*;
 use serde::Serialize;
-use uuid::UuidBytes;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct RouteInfo {
@@ -27,7 +26,7 @@ pub struct CallOutParameter {
     pub from: Instance,
     pub last_status: Option<Instance>,
     /// This is used for callback
-    pub carrier_id: UuidBytes,
+    pub carrier_id: u128,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, Default)]
@@ -44,6 +43,6 @@ pub enum ConverterReturned {
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct SerialFinished {
-    pub succeeded_id: Vec<UuidBytes>,
+    pub succeeded_id: Vec<u128>,
     pub errors: Vec<String>,
 }

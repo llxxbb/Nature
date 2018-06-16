@@ -9,7 +9,7 @@ pub trait DeliveryTrait {
     fn create_carrier<T>(valuable: T) -> Result<Carrier<T>> where T: Sized + Serialize;
     fn create_and_finish_carrier<T, U>(valuable: T, old: Carrier<U>) -> Result<Carrier<T>> where T: Sized + Serialize, U: Sized + Serialize;
     fn create_batch_and_finish_carrier<T, U>(valuables: Vec<T>, old: Carrier<U>) -> Result<Vec<Carrier<T>>> where T: Sized + Serialize, U: Sized + Serialize;
-    fn finish_carrier(id: &UuidBytes) -> Result<()>;
+    fn finish_carrier(id: &u128) -> Result<()>;
     fn move_to_err<T>(err: NatureError, carrier: Carrier<T>) where T: Sized + Serialize;
 }
 
@@ -41,7 +41,7 @@ impl DeliveryTrait for DeliveryImpl {
         where T: Sized + Serialize
     {
         let carrier = Carrier::new(valuable)?;
-        let _ = CarrierDaoService::insert(&carrier)?;
+        let _ = TableDelivery::insert(&carrier)?;
         Ok(carrier)
     }
 
@@ -70,7 +70,7 @@ impl DeliveryTrait for DeliveryImpl {
         for v in valuables {
             let _ = match Carrier::new(v) {
                 Ok(new) => {
-                    CarrierDaoService::insert(&new)?;
+                    TableDelivery::insert(&new)?;
                     rtn.push(new);
                 }
                 Err(err) => {
@@ -79,16 +79,16 @@ impl DeliveryTrait for DeliveryImpl {
                 }
             };
         }
-        CarrierDaoService::delete(&old.id)?;
+        TableDelivery::delete(&old.id)?;
         Ok(rtn)
     }
 
-    fn finish_carrier(id: &UuidBytes) -> Result<()> {
-        CarrierDaoService::delete(&id)
+    fn finish_carrier(id: &u128) -> Result<()> {
+        TableDelivery::delete(&id)
     }
 
     fn move_to_err<T>(err: NatureError, carrier: Carrier<T>) where T: Sized + Serialize {
-        let _ = CarrierDaoService::move_to_error(CarryError { err, carrier });
+        let _ = TableDelivery::move_to_error(CarryError { err, carrier });
     }
 }
 

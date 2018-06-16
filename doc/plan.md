@@ -2,8 +2,10 @@
 
 ## for the nearer term
 
-
-* add operate time to instance table
+* add event time to instance table
+* add delivery table
+* add delivery_error table
+* add delivery_error table
 *  Mapping rename to `Relation`
 * integrate test
     * simple_input
@@ -57,6 +59,7 @@ https://github.com/rust-lang/rust/pull/51042
 * quick start
 * support local converter
 * give a demo
+  * avoid conflict for N instance to 1 status instance: aggregation.
 * support multiple rpc types, such as web and gRpc
 * monitor point
 * verify input fields of thing. report error for undefined fields

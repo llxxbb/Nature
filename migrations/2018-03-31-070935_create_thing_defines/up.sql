@@ -20,7 +20,29 @@ CREATE TABLE `instances` (
 	`from_thing`	TEXT,
 	`from_version`	INTEGER,
 	`from_status_version`	INTEGER,
+	`event_time`	DATETIME NOT NULL,
 	`execute_time`	DATETIME NOT NULL,
 	`create_time`	DATETIME NOT NULL,
 	PRIMARY KEY(`id`,`thing`,`version`,`status_version`)
+);
+
+CREATE TABLE `delivery` (
+	`id`	BLOB NOT NULL,
+	`thing`	TEXT NOT NULL,
+	`data_type`	INTEGER NOT NULL,
+	`data`	TEXT NOT NULL,
+	`create_time`	DATETIME NOT NULL,
+	`execute_time`	DATETIME NOT NULL,
+	`retried_times`	INTEGER NOT NULL,
+	PRIMARY KEY(`id`)
+);
+
+CREATE TABLE `delivery_error` (
+	`id`	BLOB NOT NULL,
+	`thing`	TEXT NOT NULL,
+	`data_type`	INTEGER NOT NULL,
+	`data`	TEXT NOT NULL,
+	`create_time`	DATETIME NOT NULL,
+	`msg`	TEXT NOT NULL,
+	PRIMARY KEY(`id`)
 );

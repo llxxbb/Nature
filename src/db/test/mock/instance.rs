@@ -1,6 +1,5 @@
 use db::trait_define::InstanceDao;
 use std::ops::Deref;
-use uuid::UuidBytes;
 use super::*;
 
 lazy_static! {
@@ -15,7 +14,7 @@ impl InstanceDao for MockTableInstance {
         println!("------------ InstanceDao insert-----------------");
         TABLE_INSTANCE_INSERT_VALUE.lock().unwrap().deref().clone()
     }
-    fn get_last_status_by_id(_id: &UuidBytes) -> Result<Option<Instance>> {
+    fn get_last_status_by_id(_id: &u128) -> Result<Option<Instance>> {
         println!("------------ InstanceDao get_last_status_by_id-----------------");
         unimplemented!()
     }

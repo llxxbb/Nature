@@ -38,3 +38,8 @@ impl From<uuid::ParseError> for NatureError {
     }
 }
 
+impl From<std::num::ParseIntError> for NatureError {
+    fn from(_: std::num::ParseIntError) -> Self {
+        NatureError::UuidParseError
+    }
+}

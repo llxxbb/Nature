@@ -11,7 +11,6 @@ pub use self::store::*;
 use serde::Serialize;
 use super::channels::*;
 use super::struct_define::*;
-use uuid::UuidBytes;
 
 mod parallel;
 mod serial;

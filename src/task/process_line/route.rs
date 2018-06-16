@@ -7,7 +7,7 @@ pub fn do_route(carrier: Carrier<StoreInfo>) {
     if let Ok(relations) = Relation::get(&instance.data.thing) {
         // no relations
         if relations.len() == 0 {
-            let _ = CarrierDaoService::delete(&carrier.id);
+            let _ = TableDelivery::delete(&carrier.id);
             return;
         }
         let relations = filter_relations(instance, relations);

@@ -1,5 +1,7 @@
 # Nature
 
+Nature is a abstract from the real nature. It is a __dynamic system__ which changes things and transforms things __incessantly__ over time, but all It's history could be __traced__. 
+
 Nature is a __business process choreographer__, she decouple business data from technology such as __service__, __Interface__ etc.,
 and take care of your data in consistence state, 
 but you need to give the data to Nature first.
@@ -11,8 +13,8 @@ Nature now is in very earlier stage.
 ## Pain pot
 ![Alt text](doc/img/幻灯片4.jpg)
 Communication between services is unreliable, 
-we should do a lot of work for retrying and idempotent, 
-but this is a complex, repetitive and hard task to do.
+It would be a complex, repetitive and hard work for checking, retrying and ensuring data idempotent,
+It would spend our much time and money on it.
 
 ![Alt text](doc/img/幻灯片5.jpg)
 Service is the owner of data, and control the entry for the data. 
@@ -88,44 +90,20 @@ This feature let `Nature` run converter equally for any times, tt is __idempoten
 
 ## Significance
 ![Alt text](doc/img/幻灯片15.jpg)
+Nature __short process__ can organize all the your business into a web directly,
+will will give you a global view of you whole business, 
+whether it's the bird taking the big picture or the insight into the details,
+and you can see every data's flow in __real-time__.  
 
 ![Alt text](doc/img/幻灯片16.jpg)
+The most important point is, 
+Nature let you orchestrate the date flow over the services, 
+no technology limitation but pure business. 
+It make the `Thing` is what it should be.
+Nature will be a **Business Command Center**!
 
 ![Alt text](doc/img/幻灯片17.jpg)
 
-## Why need Nature
 
-To make data consistence is a not easy work for engineers, most of all the data transferred between services. We need check, redo and make sure the target services are idempotent, we waste much time and money on that things.
 
-Nature organize all the data into a web, you can see every data's flow in real-time. the most important point is, Nature let you orchestrate the date flow over the services, no technology but pure business. Nature will be a **Business Command Center**!
- 
-## Conception
-
-Nature is a abstract from the real nature. It is a dynamic system which changes things and transforms things incessantly over time. 
-
-### Things
-
-Things are need to be changed or transformed. this is the aim why we need to program.
-
-#### type
-
-#### instance
-
-status version
-
-### transform
-
-It controls how to change or transform the **Things**
-
-## What should it do
-
-## How to use
-
-### before to use
-
-#### ID generator
-
-**Nature** use **Thing**'s MD5 hash code as id by default. 
-
-Maybe you need a **Distribute ID Generator** like [Twitter's snowflake](https://github.com/twitter/snowflake/releases/tag/snowflake-2010) for storing large data in a distribute DB.
 

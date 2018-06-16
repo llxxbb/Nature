@@ -1,12 +1,11 @@
 use global::*;
 use task::*;
 use util::*;
-use uuid::UuidBytes;
 
 #[test]
 fn insert_env_error() {
     // verify ok
-    let _lock_instance = lock_and_set_mock_value(&DATA_INSTANCE_LOCK, &DATA_INSTANCE_RESULT, Ok(UuidBytes::default()));
+    let _lock_instance = lock_and_set_mock_value(&DATA_INSTANCE_LOCK, &DATA_INSTANCE_RESULT, Ok(0));
     // insert instance environment error
     let _lock_instance_table = lock_and_set_mock_value(&TABLE_INSTANCE_LOCK, &TABLE_INSTANCE_INSERT_VALUE, Err(NatureError::DaoEnvironmentError("instance dao mock insert error".to_string())));
     match StoreTaskImpl::store_with_root(
@@ -23,13 +22,13 @@ fn insert_env_error() {
 
 #[test]
 fn duplicated_and_finish_carrier_error() {
-    // verify ok
-    let _lock_instance = lock_and_set_mock_value(&DATA_INSTANCE_LOCK, &DATA_INSTANCE_RESULT, Ok(UuidBytes::default()));
-    // instance duplicated
+// verify ok
+    let _lock_instance = lock_and_set_mock_value(&DATA_INSTANCE_LOCK, &DATA_INSTANCE_RESULT, Ok(0));
+// instance duplicated
     let _lock_instance_table = lock_and_set_mock_value(&TABLE_INSTANCE_LOCK, &TABLE_INSTANCE_INSERT_VALUE, Err(NatureError::DaoDuplicated));
-    // this always Ok, because verify progress will check first.
+// this always Ok, because verify progress will check first.
     let _lock_define_cache = lock_and_set_mock_value(&CACHE_THING_DEFINE_LOCK, &CACHE_THING_DEFINE_VALUE, Ok(ThingDefine::default()));
-    // finish carry error
+// finish carry error
     let _lock_delivery = lock_and_set_mock_value(&TASK_DELIVERY_LOCK, &TASK_DELIVERY_VALUE, Value::Err);
     match StoreTaskImpl::store_with_root(
         &MockInstanceTrait,

@@ -10,7 +10,7 @@ pub struct ConvertTaskImpl;
 
 impl ConvertTaskTrait for ConvertTaskImpl {
     fn submit_callback(delayed: DelayedInstances) -> Result<()> {
-        let carrier = CarrierDaoService::get::<ConverterInfo>(delayed.carrier_id)?;
+        let carrier = TableDelivery::get::<ConverterInfo>(delayed.carrier_id)?;
         match delayed.result {
             CallbackResult::Err(err) => {
                 let err = NatureError::ConverterLogicalError(err);
@@ -33,7 +33,7 @@ impl ConvertTaskTrait for ConvertTaskImpl {
                 }
             }
             Ok(ConverterReturned::Delay(delay)) => {
-                let _ = CarrierDaoService::update_execute_time(carrier.id, carrier.execute_time + delay as i64);
+                let _ = TableDelivery::update_execute_time(carrier.id, carrier.execute_time + delay as i64);
                 ()
             }
             Err(err) => match err {

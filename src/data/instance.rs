@@ -1,20 +1,19 @@
 extern crate r2d2;
 
 use data::*;
+use db::*;
 use global::*;
 use std::collections::HashMap;
 use std::collections::HashSet;
 use std::ops::Deref;
-use util::*;
-use uuid::UuidBytes;
-use db::*;
 use std::sync::Arc;
+use util::*;
 
 /// A snapshot for a particular `Thing`
 #[derive(Serialize, Deserialize, Debug, Default, Clone, PartialEq)]
 pub struct Instance {
     /// A unique value used to distinguish other instance
-    pub id: UuidBytes,
+    pub id: u128,
     pub data: InstanceNoID,
 }
 
@@ -32,9 +31,11 @@ impl Deref for Instance {
 pub struct InstanceNoID {
     /// This instance's Type
     pub thing: Thing,
+    /// The time that this instance exists
+    pub event_time: i64,
     /// The time which plan to flow for this instance
     pub execute_time: i64,
-    /// When this instance created
+    /// When this instance created in db
     pub create_time: i64,
     /// What contend in this instance for the `Thing`
     pub content: String,
@@ -70,7 +71,7 @@ pub struct SerialBatchInstance {
 }
 
 pub trait InstanceTrait {
-    fn verify(instance: &mut Instance, root: Root) -> Result<UuidBytes>;
+    fn verify(instance: &mut Instance, root: Root) -> Result<u128>;
 }
 
 pub struct InstanceImpl;
@@ -78,7 +79,7 @@ pub struct InstanceImpl;
 impl InstanceTrait for InstanceImpl {
     /// check key whether defined
     /// generate id by hashing if it is not set.
-    fn verify(instance: &mut Instance, root: Root) -> Result<UuidBytes> {
+    fn verify(instance: &mut Instance, root: Root) -> Result<u128> {
         Thing::key_standardize(&mut instance.data.thing.key, root)?;
         // just see whether it was configured.
         ThingDefineCacheImpl::get(&instance.data.thing)?;
@@ -87,9 +88,8 @@ impl InstanceTrait for InstanceImpl {
 }
 
 impl InstanceImpl {
-    fn id_generate_if_not_set(instance: &mut Instance) -> Result<UuidBytes> {
-        let zero = instance.id.into_iter().all(|x| *x == 0);
-        if zero {
+    fn id_generate_if_not_set(instance: &mut Instance) -> Result<u128> {
+        if instance.id == 0 {
             instance.id = generate_id(&instance.data)?;
         }
         Ok(instance.id)

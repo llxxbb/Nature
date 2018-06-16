@@ -6,7 +6,6 @@ pub use self::orm::*;
 pub use self::sqlite::*;
 #[cfg(test)]
 pub use self::test::*;
-use uuid::UuidBytes;
 
 mod sqlite;
 mod cache;

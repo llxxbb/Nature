@@ -18,10 +18,10 @@ impl InstanceDao for TableInstance {
         }
     }
 
-    fn get_last_status_by_id(instance_id: &UuidBytes) -> Result<Option<Instance>> {
+    fn get_last_status_by_id(instance_id: &u128) -> Result<Option<Instance>> {
         use self::schema::instances::dsl::*;
         let conn: &SqliteConnection = &CONN.lock().unwrap();
-        let def = instances.filter(id.eq(instance_id.to_vec()))
+        let def = instances.filter(id.eq(instance_id.to_bytes().to_vec()))
             .order(status_version.desc())
             .limit(1)
             .load::<NewInstance>(conn)?;
@@ -35,7 +35,7 @@ impl InstanceDao for TableInstance {
     fn is_exists(ins: &Instance) -> Result<bool> {
         use self::schema::instances::dsl::*;
         let conn: &SqliteConnection = &CONN.lock().unwrap();
-        let def = instances.filter(id.eq(ins.id.to_vec()))
+        let def = instances.filter(id.eq(ins.id.to_bytes().to_vec()))
             .filter(thing.eq(ins.thing.key.clone()))
             .filter(version.eq(ins.thing.version))
             .filter(status_version.eq(ins.status_version))
@@ -55,7 +55,7 @@ impl TableInstance {
         use self::schema::instances::dsl::*;
         let conn: &SqliteConnection = &CONN.lock().unwrap();
         let rtn = diesel::delete(instances
-            .filter(id.eq(ins.id.to_vec()))
+            .filter(id.eq(ins.id.to_bytes().to_vec()))
             .filter(thing.eq(ins.thing.key.clone()))
             .filter(version.eq(ins.thing.version))
             .filter(status_version.eq(ins.status_version))

@@ -63,7 +63,7 @@ impl DeliveryTrait for MockDeliveryTrait {
         }
     }
 
-    fn finish_carrier(_id: &[u8; 16]) -> Result<()> {
+    fn finish_carrier(_id: &u128) -> Result<()> {
         let mut cnt = TASK_DELIVERY_FINISH_COUNTER.lock().unwrap();
         *cnt = cnt.deref() + 1;
         let x: Value = TASK_DELIVERY_VALUE.lock().unwrap().deref().clone();
