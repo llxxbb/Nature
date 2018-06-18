@@ -8,18 +8,28 @@ use uuid::UuidBytes;
 /// carry every kinds of **Task Info** to process which stayed at `Ready` table
 #[derive(Debug, Clone)]
 pub struct Carrier<T> where T: Sized + Serialize {
-    pub data: T,
     pub id: u128,
     pub create_time: i64,
     pub execute_time: i64,
+    pub content: CarrierContent<T>,
+}
+
+pub struct CarrierContent<T> {
+    pub data: T,
+    pub thing: String,
+    pub data_type: u8,
 }
 
 impl<T> Carrier<T> where T: Sized + Serialize {
-    pub fn new(task: T) -> Result<Carrier<T>> {
+    pub fn new(task: T, thing: String, data_type: u8) -> Result<Carrier<T>> {
         // this can avoid regenerate same content with different id
         let new_id = generate_id(&task)?;
         Ok(Carrier {
-            data: task,
+            content: CarrierContent {
+                data: task,
+                thing,
+                data_type,
+            },
             id: new_id,
             create_time: Local::now().timestamp_millis(),
             execute_time: Local::now().timestamp_millis(),

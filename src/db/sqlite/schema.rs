@@ -2,11 +2,11 @@ table! {
     delivery (id) {
         id -> Binary,
         thing -> Text,
-        data_type -> Integer,
+        data_type -> SmallInt,
         data -> Text,
         create_time -> Timestamp,
         execute_time -> Timestamp,
-        retried_times -> Integer,
+        retried_times -> SmallInt,
     }
 }
 
@@ -14,7 +14,7 @@ table! {
     delivery_error (id) {
         id -> Binary,
         thing -> Text,
-        data_type -> Integer,
+        data_type -> SmallInt,
         data -> Text,
         create_time -> Timestamp,
         msg -> Text,

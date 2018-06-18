@@ -46,3 +46,11 @@ pub struct SerialFinished {
     pub succeeded_id: Vec<u128>,
     pub errors: Vec<String>,
 }
+
+pub enum DataType {
+    Store = 1,
+    Route = 2,
+    Convert = 3,
+    ParallelBatch = 11,
+    QueueBatch = 12,
+}

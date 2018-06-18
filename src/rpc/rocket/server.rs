@@ -16,12 +16,7 @@ pub fn start_rocket_server() -> Rocket {
 /// **Note** This do not receive System `Thing`'s instances
 #[post("/input", format = "application/json", data = "<instance>")]
 fn input(instance: Json<Instance>) -> Json<Result<u128>> {
-    let x = StoreTaskImpl::submit_single(
-        TASK_DELIVERY.clone().deref(),
-        DATA_INSTANCE.clone().deref(),
-        DAO_INSTANCE.clone().deref(),
-        CACHE_THING_DEFINE.clone().deref(),
-        instance.0);
+    let x = StoreTask::submit_single(instance.0);
     Json(x)
 }
 
@@ -34,12 +29,12 @@ fn callback(delayed: Json<DelayedInstances>) -> Json<Result<()>> {
 
 #[post("/serial_batch", format = "application/json", data = "<serial_batch>")]
 fn batch_for_serial(serial_batch: Json<SerialBatchInstance>) -> Json<Result<()>> {
-    let x = submit_serial(serial_batch.0);
+    let x = Queue::<DeliveryImpl<TableDelivery>>::submit_serial(serial_batch.0);
     Json(x)
 }
 
 #[post("/parallel_batch", format = "application/json", data = "<parallel_batch>")]
 fn batch_for_parallel(parallel_batch: Json<ParallelBatchInstance>) -> Json<Result<()>> {
-    let x = submit_parallel(parallel_batch.0);
+    let x = Parallel::<DeliveryImpl<TableDelivery>>::submit_parallel(parallel_batch.0);
     Json(x)
 }

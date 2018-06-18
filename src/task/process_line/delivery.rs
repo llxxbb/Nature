@@ -1,3 +1,4 @@
+use std::marker::PhantomData;
 use std::sync::Arc;
 use std::sync::mpsc::Receiver;
 use std::sync::mpsc::Sender;
@@ -6,9 +7,9 @@ use std::thread;
 use super::*;
 
 pub trait DeliveryTrait {
-    fn create_carrier<T>(valuable: T) -> Result<Carrier<T>> where T: Sized + Serialize;
-    fn create_and_finish_carrier<T, U>(valuable: T, old: Carrier<U>) -> Result<Carrier<T>> where T: Sized + Serialize, U: Sized + Serialize;
-    fn create_batch_and_finish_carrier<T, U>(valuables: Vec<T>, old: Carrier<U>) -> Result<Vec<Carrier<T>>> where T: Sized + Serialize, U: Sized + Serialize;
+    fn create_carrier<T>(valuable: T, thing: String, data_type: u8) -> Result<Carrier<T>> where T: Sized + Serialize;
+    fn create_and_finish_carrier<T, U>(valuable: T, old: Carrier<U>, thing: String, data_type: u8) -> Result<Carrier<T>> where T: Sized + Serialize, U: Sized + Serialize;
+    fn create_batch_and_finish_carrier<T, U>(valuables: Vec<T>, old: Carrier<U>, thing: String, data_type: u8) -> Result<Vec<Carrier<T>>> where T: Sized + Serialize, U: Sized + Serialize;
     fn finish_carrier(id: &u128) -> Result<()>;
     fn move_to_err<T>(err: NatureError, carrier: Carrier<T>) where T: Sized + Serialize;
 }
@@ -34,14 +35,16 @@ pub fn start_thread<T, F>(receiver: &'static Mutex<Receiver<Carrier<T>>>, f: F)
     });
 }
 
-pub struct DeliveryImpl;
+pub struct DeliveryImpl<TD> {
+    table_delivery: PhantomData<TD>,
+}
 
-impl DeliveryTrait for DeliveryImpl {
-    fn create_carrier<T>(valuable: T) -> Result<Carrier<T>>
+impl<TD: DeliveryDao> DeliveryTrait for DeliveryImpl<TD> {
+    fn create_carrier<T>(valuable: T, thing: String, data_type: u8) -> Result<Carrier<T>>
         where T: Sized + Serialize
     {
-        let carrier = Carrier::new(valuable)?;
-        let _ = TableDelivery::insert(&carrier)?;
+        let carrier = Carrier::new(valuable, thing, data_type)?;
+        let _ = TD::insert(&carrier)?;
         Ok(carrier)
     }
 
@@ -49,13 +52,13 @@ impl DeliveryTrait for DeliveryImpl {
     /// That way we need not to communicate with DB for create new and delete old carrier.
     /// But for failure we must redo from beginning. but I think it has small chance.
     /// Another disadvantage is the failure information will be attached to the beginning.
-    fn create_and_finish_carrier<T, U>(valuable: T, old: Carrier<U>) -> Result<Carrier<T>>
+    fn create_and_finish_carrier<T, U>(valuable: T, old: Carrier<U>, thing: String, data_type: u8) -> Result<Carrier<T>>
         where T: Sized + Serialize, U: Sized + Serialize,
     {
-        let mut carrier = match Carrier::new(valuable) {
+        let mut carrier = match Carrier::new(valuable, thing, data_type) {
             Ok(new) => new,
             Err(err) => {
-                DeliveryImpl::move_to_err(err.clone(), old);
+                DeliveryImpl::<TableDelivery>::move_to_err(err.clone(), old);
                 return Err(err);
             }
         };
@@ -63,18 +66,18 @@ impl DeliveryTrait for DeliveryImpl {
         Ok(carrier)
     }
 
-    fn create_batch_and_finish_carrier<T, U>(valuables: Vec<T>, old: Carrier<U>) -> Result<Vec<Carrier<T>>>
+    fn create_batch_and_finish_carrier<T, U>(valuables: Vec<T>, old: Carrier<U>, thing: String, data_type: u8) -> Result<Vec<Carrier<T>>>
         where T: Sized + Serialize, U: Sized + Serialize,
     {
         let mut rtn: Vec<Carrier<T>> = Vec::new();
         for v in valuables {
-            let _ = match Carrier::new(v) {
+            let _ = match Carrier::new(v, thing, data_type) {
                 Ok(new) => {
                     TableDelivery::insert(&new)?;
                     rtn.push(new);
                 }
                 Err(err) => {
-                    DeliveryImpl::move_to_err(err.clone(), old);
+                    DeliveryImpl::<TableDelivery>::move_to_err(err.clone(), old);
                     return Err(err);
                 }
             };
@@ -92,6 +95,8 @@ impl DeliveryTrait for DeliveryImpl {
     }
 }
 
+pub type DeliveryService = DeliveryImpl<TableDelivery>;
+
 lazy_static! {
-    pub static ref TASK_DELIVERY : Arc<DeliveryImpl> = Arc::new(DeliveryImpl);
+    pub static ref TASK_DELIVERY : Arc<DeliveryService> = Arc::new(DeliveryImpl{table_delivery:PhantomData});
 }

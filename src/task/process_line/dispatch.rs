@@ -1,50 +1,66 @@
+use std::marker::PhantomData;
 use super::*;
 
-pub fn do_dispatch(carrier: Carrier<RouteInfo>) {
-    if carrier.data.maps.len() == 0 {
-        let _ = DeliveryImpl::finish_carrier(&carrier.id);
-        return;
-    }
+pub type DispatchService = Dispatch<DeliveryService>;
 
-    let converters = match generate_converter_info(&carrier) {
-        Ok(new) => new,
-        Err(NatureError::DaoEnvironmentError(_)) => return,
-        Err(err) => {
-            DeliveryImpl::move_to_err(err, carrier);
+pub trait DispatchTrait {
+    fn do_dispatch(carrier: Carrier<RouteInfo>);
+    fn re_dispatch(carrier: Carrier<StoreInfo>) -> Result<()>;
+}
+
+pub struct Dispatch<T> {
+    delivery_service: PhantomData<T>
+}
+
+impl<T: DeliveryTrait> DispatchTrait for Dispatch<T> {
+    fn do_dispatch(carrier: Carrier<RouteInfo>) {
+        if carrier.content.data.maps.len() == 0 {
+            let _ = T::finish_carrier(&carrier.id);
             return;
         }
-    };
 
-    let new_carriers = match DeliveryImpl::create_batch_and_finish_carrier(converters, carrier) {
-        Ok(ncs) => ncs,
-        Err(_) => return,
-    };
+        let converters = match Self::generate_converter_info(&carrier) {
+            Ok(new) => new,
+            Err(NatureError::DaoEnvironmentError(_)) => return,
+            Err(err) => {
+                T::move_to_err(err, carrier);
+                return;
+            }
+        };
 
-    for task in new_carriers {
-        send_carrier(CHANNEL_CONVERT.sender.lock().unwrap().clone(), task)
-    }
-}
+        let new_carriers = match T::create_batch_and_finish_carrier(converters, carrier) {
+            Ok(ncs) => ncs,
+            Err(_) => return,
+        };
 
-/// Get last status version and re-convert
-pub fn re_dispatch(carrier: Carrier<StoreInfo>) -> Result<()> {
-    if carrier.converter.is_none() {
-        DeliveryImpl::move_to_err(NatureError::InstanceStatusVersionConflict, carrier);
-        return Err(NatureError::InstanceStatusVersionConflict);
-    }
-    let converter = &carrier.data.converter.clone().unwrap();
-    let task = ConverterInfo::new(&converter.from, &converter.mapping)?;
-    let carrier = DeliveryImpl::create_and_finish_carrier(task, carrier)?;
-    send_carrier(CHANNEL_CONVERT.sender.lock().unwrap().clone(), carrier);
-    Ok(())
-}
-
-fn generate_converter_info(carrier: &Carrier<RouteInfo>) -> Result<Vec<ConverterInfo>> {
-    let mut new_carriers: Vec<ConverterInfo> = Vec::new();
-    for c in &carrier.data.maps {
-        match ConverterInfo::new(&carrier.instance, &c) {
-            Err(err) => return Err(err),
-            Ok(x) => new_carriers.push(x),
+        for task in new_carriers {
+            send_carrier(CHANNEL_CONVERT.sender.lock().unwrap().clone(), task)
         }
     }
-    Ok(new_carriers)
+
+    /// Get last status version and re-convert
+    fn re_dispatch(carrier: Carrier<StoreInfo>) -> Result<()> {
+        if carrier.converter.is_none() {
+            T::move_to_err(NatureError::InstanceStatusVersionConflict, carrier);
+            return Err(NatureError::InstanceStatusVersionConflict);
+        }
+        let converter = &carrier.content.data.converter.clone().unwrap();
+        let task = ConverterInfo::new(&converter.from, &converter.mapping)?;
+        let carrier = T::create_and_finish_carrier(task, carrier, converter.mapping.to.key.clone(), DataType::Convert as u8)?;
+        send_carrier(CHANNEL_CONVERT.sender.lock().unwrap().clone(), carrier);
+        Ok(())
+    }
+}
+
+impl<T: DeliveryTrait> Dispatch<T> {
+    fn generate_converter_info(carrier: &Carrier<RouteInfo>) -> Result<Vec<ConverterInfo>> {
+        let mut new_carriers: Vec<ConverterInfo> = Vec::new();
+        for c in &carrier.content.data.maps {
+            match ConverterInfo::new(&carrier.instance, &c) {
+                Err(err) => return Err(err),
+                Ok(x) => new_carriers.push(x),
+            }
+        }
+        Ok(new_carriers)
+    }
 }

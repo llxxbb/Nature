@@ -29,18 +29,18 @@ CREATE TABLE `instances` (
 CREATE TABLE `delivery` (
 	`id`	BLOB NOT NULL,
 	`thing`	TEXT NOT NULL,
-	`data_type`	INTEGER NOT NULL,
+	`data_type`	SMALLINT NOT NULL,
 	`data`	TEXT NOT NULL,
 	`create_time`	DATETIME NOT NULL,
 	`execute_time`	DATETIME NOT NULL,
-	`retried_times`	INTEGER NOT NULL,
+	`retried_times`	SMALLINT NOT NULL,
 	PRIMARY KEY(`id`)
 );
 
 CREATE TABLE `delivery_error` (
 	`id`	BLOB NOT NULL,
 	`thing`	TEXT NOT NULL,
-	`data_type`	INTEGER NOT NULL,
+	`data_type`	SMALLINT NOT NULL,
 	`data`	TEXT NOT NULL,
 	`create_time`	DATETIME NOT NULL,
 	`msg`	TEXT NOT NULL,

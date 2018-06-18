@@ -1,30 +1,36 @@
+use std::marker::PhantomData;
 use std::ops::Deref;
 use std::sync::Arc;
 use super::*;
 
 
 pub trait StoreTaskTrait {
-    fn submit_single<D, V, S, C>(_: &D, verify_instance: &V, store_instance: &S, thing_define: &C, instance: Instance) -> Result<u128>
-        where D: DeliveryTrait, V: InstanceTrait, S: InstanceDao, C: ThingDefineCacheTrait;
-    fn store_with_root<V, S, C>(verify_instance: &V, store_instance: &S, thing_define: &C, carrier: Carrier<StoreInfo>, root: Root) -> Result<u128>
-        where V: InstanceTrait, S: InstanceDao, C: ThingDefineCacheTrait;
+    fn submit_single(instance: Instance) -> Result<u128>;
+    fn store_with_root(carrier: Carrier<StoreInfo>, root: Root) -> Result<u128>;
     fn do_store(carrier: Carrier<StoreInfo>);
 }
 
-pub struct StoreTaskImpl;
+pub struct StoreTaskImpl<D, V, S, C, P> {
+    delivery_trait: PhantomData<D>,
+    instance_trait: PhantomData<V>,
+    instance_dao: PhantomData<S>,
+    thing_define_cache_trait: PhantomData<C>,
+    dispatch_service: PhantomData<P>,
+}
 
-impl StoreTaskTrait for StoreTaskImpl {
+impl<D, V, S, C, P> StoreTaskTrait for StoreTaskImpl<D, V, S, C, P>
+    where D: DeliveryTrait
+{
     /// born an instance which is the beginning of the changes.
-    fn submit_single<D, V, S, C>(_: &D, verify_instance: &V, store_instance: &S, thing_define: &C, instance: Instance) -> Result<u128>
-        where D: DeliveryTrait, V: InstanceTrait, S: InstanceDao, C: ThingDefineCacheTrait {
+    fn submit_single(instance: Instance) -> Result<u128>
+    {
         let task = StoreInfo { instance, converter: None };
-        let carrier = D::create_carrier(task)?;
-        Self::store_with_root(verify_instance, store_instance, thing_define, carrier, Root::Business)
+        let carrier = D::create_carrier(task, task.instance.data.thing.key.clone(), DataType::Store as u8)?;
+        Self::store_with_root(carrier, Root::Business)
     }
 
-    fn store_with_root<V, S, C>(_verify_instance: &V, _store_instance: &S, _thing_define: &C, carrier: Carrier<StoreInfo>, root: Root) -> Result<u128>
-        where V: InstanceTrait, S: InstanceDao, C: ThingDefineCacheTrait {
-        let mut instance = carrier.data.instance.clone();
+    fn store_with_root(carrier: Carrier<StoreInfo>, root: Root) -> Result<u128> {
+        let mut instance = carrier.content.data.instance.clone();
         let uuid = V::verify(&mut instance, root)?;
         let result = S::insert(&instance);
         match result {
@@ -33,7 +39,7 @@ impl StoreTaskTrait for StoreTaskImpl {
                 Ok(uuid)
             }
             Err(NatureError::DaoDuplicated) => {
-                handle_duplicated(carrier, instance)?;
+                Self::handle_duplicated(carrier, instance)?;
                 Ok(uuid)
             }
             Err(err) => Err(err)
@@ -41,28 +47,35 @@ impl StoreTaskTrait for StoreTaskImpl {
     }
 
     fn do_store(carrier: Carrier<StoreInfo>) {
-        if let Err(err) = StoreTaskImpl::store_with_root(DATA_INSTANCE.clone().deref(),
-                                                         DAO_INSTANCE.clone().deref(),
-                                                         CACHE_THING_DEFINE.clone().deref(),
-                                                         carrier.clone(),
-                                                         Root::Business) {
-            DeliveryImpl::move_to_err(err, carrier)
+        if let Err(err) = Self::store_with_root(carrier.clone(), Root::Business) {
+            DeliveryImpl::<TableDelivery>::move_to_err(err, carrier)
         };
     }
 }
 
-fn handle_duplicated(carrier: Carrier<StoreInfo>, instance: Instance) -> Result<()> {
-    let define = ThingDefineCacheImpl::get(&instance.data.thing)?;
-    if define.is_status() {
-        // status need to retry and correct the status version.
-        re_dispatch(carrier)
-    } else {
-        // **None Status Thing** won't try again
-        DeliveryImpl::finish_carrier(&carrier.id)?;
-        Ok(())
+impl<D, V, S, C> StoreTaskImpl<D, V, S, C,P>
+    where D: DeliveryTrait, V: InstanceTrait, S: InstanceDao, C: ThingDefineCacheTrait
+{
+    fn handle_duplicated(carrier: Carrier<StoreInfo>, instance: Instance) -> Result<()> {
+        let define = C::get(&instance.data.thing)?;
+        if define.is_status() {
+            // status need to retry and correct the status version.
+            re_dispatch(carrier)
+        } else {
+            // **None Status Thing** won't try again
+            D::finish_carrier(&carrier.id)?;
+            Ok(())
+        }
     }
 }
 
+pub type StoreTask = StoreTaskImpl<DeliveryImpl<TableDelivery>, InstanceImpl, TableInstance, ThingDefineCacheImpl>;
+
 lazy_static! {
-    pub static ref TASK_STORE : Arc<StoreTaskImpl> = Arc::new(StoreTaskImpl);
+    pub static ref TASK_STORE : Arc<StoreTask> = Arc::new(StoreTaskImpl{
+        delivery_trait: PhantomData,
+    instance_trait: PhantomData,
+    instance_dao: PhantomData,
+    thing_define_cache_trait: PhantomData,
+    });
 }

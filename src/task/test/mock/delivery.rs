@@ -26,28 +26,28 @@ pub enum Value {
 pub struct MockDeliveryTrait;
 
 impl DeliveryTrait for MockDeliveryTrait {
-    fn create_carrier<T>(valuable: T) -> Result<Carrier<T>> where T: Sized + Serialize {
+    fn create_carrier<T>(valuable: T, thing: String, data_type: u8) -> Result<Carrier<T>> where T: Sized + Serialize {
         print!("    MockDeliveryTrait : create_carrier");
         let mut cnt = TASK_DELIVERY_CREATE_COUNTER.lock().unwrap();
         *cnt = cnt.deref() + 1;
         let x: Value = TASK_DELIVERY_VALUE.lock().unwrap().deref().clone();
         match x {
-            Value::Ok => Carrier::new(valuable),
+            Value::Ok => Carrier::new(valuable, thing, data_type),
             Value::Err => Err(NatureError::SystemError("create_carrier mock error".to_string()))
         }
     }
 
-    fn create_and_finish_carrier<T, U>(valuable: T, _old: Carrier<U>) -> Result<Carrier<T>> where T: Sized + Serialize, U: Sized + Serialize {
+    fn create_and_finish_carrier<T, U>(valuable: T, _old: Carrier<U>, thing: String, data_type: u8) -> Result<Carrier<T>> where T: Sized + Serialize, U: Sized + Serialize {
         let mut cnt = TASK_DELIVERY_CREATE_AND_FINISH_COUNTER.lock().unwrap();
         *cnt = cnt.deref() + 1;
         let x: Value = TASK_DELIVERY_VALUE.lock().unwrap().deref().clone();
         match x {
-            Value::Ok => Carrier::new(valuable),
+            Value::Ok => Carrier::new(valuable, thing, data_type),
             Value::Err => Err(NatureError::SystemError("create_and_finish_carrier mock error".to_string()))
         }
     }
 
-    fn create_batch_and_finish_carrier<T, U>(valuables: Vec<T>, _old: Carrier<U>) -> Result<Vec<Carrier<T>>> where T: Sized + Serialize, U: Sized + Serialize {
+    fn create_batch_and_finish_carrier<T, U>(valuables: Vec<T>, _old: Carrier<U>, thing: String, data_type: u8) -> Result<Vec<Carrier<T>>> where T: Sized + Serialize, U: Sized + Serialize {
         let mut cnt = TASK_DELIVERY_BATCH_AND_FINISH_COUNTER.lock().unwrap();
         *cnt = cnt.deref() + 1;
         let x: Value = TASK_DELIVERY_VALUE.lock().unwrap().deref().clone();
@@ -55,7 +55,7 @@ impl DeliveryTrait for MockDeliveryTrait {
             Value::Ok => {
                 let mut rtn: Vec<Carrier<T>> = Vec::new();
                 for x in valuables {
-                    rtn.push(Carrier::new(x)?);
+                    rtn.push(Carrier::new(x, thing, data_type)?);
                 }
                 Ok(rtn)
             }

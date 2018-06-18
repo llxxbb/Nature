@@ -14,7 +14,7 @@ impl ConvertTaskTrait for ConvertTaskImpl {
         match delayed.result {
             CallbackResult::Err(err) => {
                 let err = NatureError::ConverterLogicalError(err);
-                DeliveryImpl::move_to_err(err, carrier);
+                DeliveryImpl::<TableDelivery>::move_to_err(err, carrier);
                 Ok(())
             }
             CallbackResult::Instances(ins) => handle_instances(&carrier, &ins)
@@ -28,7 +28,7 @@ impl ConvertTaskTrait for ConvertTaskImpl {
                     Ok(_) => (),
                     Err(NatureError::DaoEnvironmentError(_)) => (),
                     Err(err) => {
-                        DeliveryImpl::move_to_err(err, carrier.clone());
+                        DeliveryImpl::<TableDelivery>::move_to_err(err, carrier.clone());
                     }
                 }
             }
@@ -40,7 +40,7 @@ impl ConvertTaskTrait for ConvertTaskImpl {
                 // only **Environment Error** will be retry
                 NatureError::ConverterEnvironmentError(_) => (),
                 // other error will drop into error
-                _ => DeliveryImpl::move_to_err(err, carrier)
+                _ => DeliveryImpl::<TableDelivery>::move_to_err(err, carrier)
             }
         };
     }
@@ -49,7 +49,7 @@ impl ConvertTaskTrait for ConvertTaskImpl {
 fn handle_instances(carrier: &Carrier<ConverterInfo>, instances: &Vec<Instance>) -> Result<()> {
 // check status version to avoid loop
     let instances = verify(&carrier.mapping.to, &instances)?;
-    let plan = StorePlan::new(&carrier.data, &instances)?;
+    let plan = StorePlan::new(&carrier.content.data, &instances)?;
     to_store(carrier, plan);
     Ok(())
 }
@@ -88,10 +88,10 @@ fn to_store(carrier: &Carrier<ConverterInfo>, plan: StorePlan) {
     let store_infos: Vec<StoreInfo> = plan.plan.iter().map(|instance| {
         StoreInfo {
             instance: instance.clone(),
-            converter: Some(carrier.data.clone()),
+            converter: Some(carrier.content.data.clone()),
         }
     }).collect();
-    let new_tasks = DeliveryImpl::create_batch_and_finish_carrier(store_infos, carrier.to_owned());
+    let new_tasks = DeliveryImpl::<TableDelivery>::create_batch_and_finish_carrier(store_infos, carrier.to_owned());
     if new_tasks.is_err() {
         return;
     }

@@ -1,3 +1,5 @@
+use db::*;
+use diesel::prelude::*;
 use serde::Serialize;
 use super::*;
 use task::CarryError;
@@ -5,16 +7,16 @@ use task::CarryError;
 pub struct TableDelivery;
 
 impl DeliveryDao for TableDelivery {
-    fn insert<T: Sized + Serialize>(_carrier: &Carrier<T>) -> Result<u128> {
-//        use self::schema::thing_defines;
-//        let conn: &SqliteConnection = &CONN.lock().unwrap();
-//        let rtn = diesel::insert_into(thing_defines::table)
-//            .values(NewThingDefine::new(define))
-//            .execute(conn);
-//        match rtn {
-//            Ok(x) => Ok(x),
-//            Err(e) => Err(NatureError::from(e))
-//        }
+    fn insert<T: Sized + Serialize>(carrier: &Carrier<T>) -> Result<u128> {
+        use self::schema::delivery;
+        let conn: &SqliteConnection = &CONN.lock().unwrap();
+        let rtn = diesel::insert_into(delivery::table)
+            .values(NewThingDefine::new(carrier))
+            .execute(conn);
+        match rtn {
+            Ok(x) => Ok(x),
+            Err(e) => Err(NatureError::from(e))
+        }
         unimplemented!()
     }
 
