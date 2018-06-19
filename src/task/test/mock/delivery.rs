@@ -55,7 +55,7 @@ impl DeliveryTrait for MockDeliveryTrait {
             Value::Ok => {
                 let mut rtn: Vec<Carrier<T>> = Vec::new();
                 for x in valuables {
-                    rtn.push(Carrier::new(x, thing, data_type)?);
+                    rtn.push(Carrier::new(x, thing.clone(), data_type)?);
                 }
                 Ok(rtn)
             }

@@ -16,16 +16,16 @@ pub struct Delivery<'a> {
     pub retried_times: i16,
 }
 
-impl<'a> Delivery<'a> {
-    pub fn new<T: Serialize + Send>(carrier: &'a Carrier<T>) -> Delivery {
-        Delivery {
-            id: carrier,
-            thing: "",
-            data_type: 0,
-            data: "",
-            create_time: (),
-            execute_time: (),
-            retried_times: 0,
-        }
-    }
-}
+//impl<'a> Delivery<'a> {
+//    pub fn new<T: Serialize + Send>(carrier: &'a Carrier<T>) -> Delivery {
+//        Delivery {
+//            id: carrier,
+//            thing: "",
+//            data_type: 0,
+//            data: "",
+//            create_time: (),
+//            execute_time: (),
+//            retried_times: 0,
+//        }
+//    }
+//}

@@ -50,7 +50,8 @@ pub struct SerialFinished {
 pub enum DataType {
     Store = 1,
     Route = 2,
-    Convert = 3,
+    Dispatch = 3,
+    Convert = 4,
     ParallelBatch = 11,
     QueueBatch = 12,
 }

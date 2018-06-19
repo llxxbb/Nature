@@ -1,7 +1,7 @@
 use std::marker::PhantomData;
 use super::*;
 
-pub type DispatchService = Dispatch<DeliveryService>;
+pub type DispatchTask = Dispatch<DeliveryService>;
 
 pub trait DispatchTrait {
     fn do_dispatch(carrier: Carrier<RouteInfo>);
@@ -27,8 +27,8 @@ impl<T: DeliveryTrait> DispatchTrait for Dispatch<T> {
                 return;
             }
         };
-
-        let new_carriers = match T::create_batch_and_finish_carrier(converters, carrier) {
+        let biz = carrier.instance.thing.key.clone();
+        let new_carriers = match T::create_batch_and_finish_carrier(converters, carrier, biz, DataType::Dispatch as u8) {
             Ok(ncs) => ncs,
             Err(_) => return,
         };

@@ -2,7 +2,6 @@ extern crate rocket_contrib;
 
 use ::rocket::{ignite, Rocket};
 use self::rocket_contrib::Json;
-use std::ops::Deref;
 use super::*;
 
 pub fn start_rocket_server() -> Rocket {

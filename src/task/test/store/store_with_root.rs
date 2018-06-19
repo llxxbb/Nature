@@ -8,12 +8,7 @@ fn insert_env_error() {
     let _lock_instance = lock_and_set_mock_value(&DATA_INSTANCE_LOCK, &DATA_INSTANCE_RESULT, Ok(0));
     // insert instance environment error
     let _lock_instance_table = lock_and_set_mock_value(&TABLE_INSTANCE_LOCK, &TABLE_INSTANCE_INSERT_VALUE, Err(NatureError::DaoEnvironmentError("instance dao mock insert error".to_string())));
-    match StoreTaskImpl::store_with_root(
-        &MockInstanceTrait,
-        &MockTableInstance,
-        &MockThingDefineCache,
-        Carrier::new(StoreInfo::default()).unwrap(),
-        Root::Business) {
+    match StoreTask::store_with_root(Carrier::new(StoreInfo::default(), "test".to_string(), DataType::Store as u8).unwrap(), Root::Business) {
         Err(NatureError::DaoEnvironmentError(sss)) => assert_eq!("instance dao mock insert error", sss),
         _ => panic!("should match this arm!"),
     }
@@ -30,11 +25,8 @@ fn duplicated_and_finish_carrier_error() {
     let _lock_define_cache = lock_and_set_mock_value(&CACHE_THING_DEFINE_LOCK, &CACHE_THING_DEFINE_VALUE, Ok(ThingDefine::default()));
 // finish carry error
     let _lock_delivery = lock_and_set_mock_value(&TASK_DELIVERY_LOCK, &TASK_DELIVERY_VALUE, Value::Err);
-    match StoreTaskImpl::store_with_root(
-        &MockInstanceTrait,
-        &MockTableInstance,
-        &MockThingDefineCache,
-        Carrier::new(StoreInfo::default()).unwrap(),
+    match StoreTask::store_with_root(
+        Carrier::new(StoreInfo::default(), "test".to_string(), DataType::Store as u8).unwrap(),
         Root::Business) {
         Err(NatureError::DaoEnvironmentError(err)) => {
             assert_eq!("finish_carrier mock error".to_string(), err)

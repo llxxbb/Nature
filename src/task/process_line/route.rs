@@ -3,6 +3,7 @@ use std::collections::HashSet;
 use std::marker::PhantomData;
 use super::*;
 
+pub type RouteTask = Route<DeliveryService>;
 pub struct Route<T> {
     delivery_service: PhantomData<T>
 }
@@ -65,7 +66,8 @@ impl<T> Route<T> where T: DeliveryTrait {
 
     fn delivery_relations(carrier: Carrier<StoreInfo>, instance: &Instance, maps: Vec<Relation>) {
         let route = RouteInfo { instance: instance.clone(), maps };
-        match T::create_and_finish_carrier(route, carrier, route.instance.thing.key.clone(), DataType::Route as u8) {
+        let biz = route.instance.thing.key.clone();
+        match T::create_and_finish_carrier(route, carrier, biz, DataType::Route as u8) {
             Ok(new) => send_carrier(CHANNEL_DISPATCH.sender.lock().unwrap().clone(), new),
             Err(_) => ()
         }

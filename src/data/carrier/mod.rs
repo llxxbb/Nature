@@ -14,6 +14,7 @@ pub struct Carrier<T> where T: Sized + Serialize {
     pub content: CarrierContent<T>,
 }
 
+#[derive(Debug, Clone)]
 pub struct CarrierContent<T> {
     pub data: T,
     pub thing: String,
@@ -46,6 +47,6 @@ impl<T> Carrier<T> where T: Sized + Serialize {
 impl<T> Deref for Carrier<T> where T: Sized + Serialize {
     type Target = T;
     fn deref(&self) -> &<Self as Deref>::Target {
-        &self.data
+        &self.content.data
     }
 }

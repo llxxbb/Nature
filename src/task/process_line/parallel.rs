@@ -1,6 +1,7 @@
 use std::marker::PhantomData;
 use super::*;
 
+pub type ParallelTask = Parallel<DeliveryService>;
 pub struct Parallel<T> {
     phantom: PhantomData<T>
 }

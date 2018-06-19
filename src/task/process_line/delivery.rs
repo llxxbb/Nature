@@ -71,7 +71,7 @@ impl<TD: DeliveryDao> DeliveryTrait for DeliveryImpl<TD> {
     {
         let mut rtn: Vec<Carrier<T>> = Vec::new();
         for v in valuables {
-            let _ = match Carrier::new(v, thing, data_type) {
+            let _ = match Carrier::new(v, thing.clone(), data_type) {
                 Ok(new) => {
                     TableDelivery::insert(&new)?;
                     rtn.push(new);

@@ -6,6 +6,8 @@ use std::marker::PhantomData;
 use std::ops::Deref;
 use super::*;
 
+pub type QueueTask = Queue<DeliveryService>;
+
 pub struct Queue<T> {
     phantom: PhantomData<T>
 }
@@ -39,7 +41,8 @@ impl<T: DeliveryTrait> Queue<T> {
         };
 
         let si = StoreInfo { instance, converter: None };
-        if let Ok(route) = T::create_and_finish_carrier(si, carrier, si.instance.data.thing.key.clone(), DataType::QueueBatch as u8) {
+        let biz = si.instance.data.thing.key.clone();
+        if let Ok(route) = T::create_and_finish_carrier(si, carrier, biz, DataType::QueueBatch as u8) {
             send_carrier(CHANNEL_ROUTE.sender.lock().unwrap().clone(), route);
         }
     }

@@ -19,13 +19,14 @@ pub struct StoreTaskImpl<D, V, S, C, P> {
 }
 
 impl<D, V, S, C, P> StoreTaskTrait for StoreTaskImpl<D, V, S, C, P>
-    where D: DeliveryTrait
+    where D: DeliveryTrait, V: InstanceTrait, S: InstanceDao, C: ThingDefineCacheTrait, P: DispatchTrait
 {
     /// born an instance which is the beginning of the changes.
     fn submit_single(instance: Instance) -> Result<u128>
     {
         let task = StoreInfo { instance, converter: None };
-        let carrier = D::create_carrier(task, task.instance.data.thing.key.clone(), DataType::Store as u8)?;
+        let biz = task.instance.data.thing.key.clone();
+        let carrier = D::create_carrier(task, biz, DataType::Store as u8)?;
         Self::store_with_root(carrier, Root::Business)
     }
 
@@ -53,14 +54,14 @@ impl<D, V, S, C, P> StoreTaskTrait for StoreTaskImpl<D, V, S, C, P>
     }
 }
 
-impl<D, V, S, C> StoreTaskImpl<D, V, S, C,P>
-    where D: DeliveryTrait, V: InstanceTrait, S: InstanceDao, C: ThingDefineCacheTrait
+impl<D, V, S, C, P> StoreTaskImpl<D, V, S, C, P>
+    where D: DeliveryTrait, C: ThingDefineCacheTrait, P: DispatchTrait
 {
     fn handle_duplicated(carrier: Carrier<StoreInfo>, instance: Instance) -> Result<()> {
         let define = C::get(&instance.data.thing)?;
         if define.is_status() {
             // status need to retry and correct the status version.
-            re_dispatch(carrier)
+            P::re_dispatch(carrier)
         } else {
             // **None Status Thing** won't try again
             D::finish_carrier(&carrier.id)?;
@@ -69,7 +70,7 @@ impl<D, V, S, C> StoreTaskImpl<D, V, S, C,P>
     }
 }
 
-pub type StoreTask = StoreTaskImpl<DeliveryImpl<TableDelivery>, InstanceImpl, TableInstance, ThingDefineCacheImpl>;
+pub type StoreTask = StoreTaskImpl<DeliveryImpl<TableDelivery>, InstanceImpl, TableInstance, ThingDefineCacheImpl, DispatchTask>;
 
 lazy_static! {
     pub static ref TASK_STORE : Arc<StoreTask> = Arc::new(StoreTaskImpl{
@@ -77,5 +78,6 @@ lazy_static! {
     instance_trait: PhantomData,
     instance_dao: PhantomData,
     thing_define_cache_trait: PhantomData,
+    dispatch_service: PhantomData,
     });
 }

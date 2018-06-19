@@ -91,7 +91,12 @@ fn to_store(carrier: &Carrier<ConverterInfo>, plan: StorePlan) {
             converter: Some(carrier.content.data.clone()),
         }
     }).collect();
-    let new_tasks = DeliveryImpl::<TableDelivery>::create_batch_and_finish_carrier(store_infos, carrier.to_owned());
+    let new_tasks = DeliveryImpl::<TableDelivery>::create_batch_and_finish_carrier(
+        store_infos,
+        carrier.to_owned(),
+        carrier.mapping.to.key.clone(),
+        DataType::Convert as u8,
+    );
     if new_tasks.is_err() {
         return;
     }
