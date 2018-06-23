@@ -8,3 +8,11 @@ pub fn generate_id<T: ?Sized + Serialize>(value: &T) -> Result<u128> {
     let uuid = Uuid::new_v3(&NAMESPACE_DNS, &json);
     Ok(u128::from_bytes(*uuid.as_bytes()))
 }
+
+pub fn vec_to_u128(vec: &Vec<u8>) -> u128 {
+    let mut arr = [0u8; 16];
+    for i in 0..16 {
+        arr[i] = vec[i];
+    }
+    u128::from_bytes(arr)
+}

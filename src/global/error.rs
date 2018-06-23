@@ -43,3 +43,4 @@ impl From<std::num::ParseIntError> for NatureError {
         NatureError::UuidParseError
     }
 }
+

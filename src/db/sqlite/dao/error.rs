@@ -2,7 +2,7 @@ use diesel::result::*;
 use global::*;
 
 impl From<Error> for NatureError {
-    // TODO put aside because can't find diesel's Timeout Error
+    // put it aside because can't find diesel's Timeout Error
     fn from(err: Error) -> Self {
         match err {
             Error::DatabaseError(kind, info) => {

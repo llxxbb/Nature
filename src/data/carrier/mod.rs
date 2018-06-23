@@ -14,12 +14,13 @@ pub struct Carrier<T> where T: Sized + Serialize {
     pub content: CarrierContent<T>,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize)]
 pub struct CarrierContent<T> {
     pub data: T,
     pub thing: String,
     pub data_type: u8,
 }
+
 
 impl<T> Carrier<T> where T: Sized + Serialize {
     pub fn new(task: T, thing: String, data_type: u8) -> Result<Carrier<T>> {
@@ -39,7 +40,6 @@ impl<T> Carrier<T> where T: Sized + Serialize {
 
     /// Move Task Info from `Ready` to `Error` table
     pub fn move_to_error(_id: UuidBytes) -> Result<()> {
-        // TODO
         unimplemented!()
     }
 }

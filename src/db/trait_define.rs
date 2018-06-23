@@ -16,8 +16,8 @@ pub trait MappingDao {
     fn get_relations(from: &Thing) -> Result<Vec<Relation>>;
 }
 
-pub trait DeliveryDao {
-    fn insert<T: Sized + Serialize>(carrier: &Carrier<T>) -> Result<u128>;
+pub trait DaoDelivery {
+    fn insert<T: Sized + Serialize + Send>(carrier: &Carrier<T>) -> Result<u128>;
     fn delete(id: &u128) -> Result<()>;
     fn move_to_error<T: Sized + Serialize>(err: CarryError<T>) -> Result<()>;
     fn update_execute_time(_id: u128, new_time: i64) -> Result<()>;

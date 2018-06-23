@@ -4,6 +4,7 @@ use std::collections::HashMap;
 use std::collections::HashSet;
 use super::*;
 use super::schema::instances;
+use util::*;
 
 #[derive(Insertable, Queryable, Debug, Clone)]
 #[table_name = "instances"]
@@ -35,13 +36,7 @@ impl Instance {
                 status_version: ni.from_status_version.unwrap(),
             })
         };
-        let id = {
-            let mut arr = [0u8; 16];
-            for i in 0..16 {
-                arr[i] = ni.id[i];
-            }
-            u128::from_bytes(arr)
-        };
+        let id = vec_to_u128(&ni.id);
         let context = match ni.context {
             None => HashMap::new(),
             Some(ref s) => serde_json::from_str::<HashMap<String, String>>(s)?

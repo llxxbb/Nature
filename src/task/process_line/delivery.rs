@@ -7,9 +7,9 @@ use std::thread;
 use super::*;
 
 pub trait DeliveryTrait {
-    fn create_carrier<T>(valuable: T, thing: String, data_type: u8) -> Result<Carrier<T>> where T: Sized + Serialize;
+    fn create_carrier<T>(valuable: T, thing: String, data_type: u8) -> Result<Carrier<T>> where T: Sized + Serialize + Send;
     fn create_and_finish_carrier<T, U>(valuable: T, old: Carrier<U>, thing: String, data_type: u8) -> Result<Carrier<T>> where T: Sized + Serialize, U: Sized + Serialize;
-    fn create_batch_and_finish_carrier<T, U>(valuables: Vec<T>, old: Carrier<U>, thing: String, data_type: u8) -> Result<Vec<Carrier<T>>> where T: Sized + Serialize, U: Sized + Serialize;
+    fn create_batch_and_finish_carrier<T, U>(valuables: Vec<T>, old: Carrier<U>, thing: String, data_type: u8) -> Result<Vec<Carrier<T>>> where T: Sized + Serialize + Send, U: Sized + Serialize;
     fn finish_carrier(id: &u128) -> Result<()>;
     fn move_to_err<T>(err: NatureError, carrier: Carrier<T>) where T: Sized + Serialize;
 }
@@ -39,9 +39,9 @@ pub struct DeliveryImpl<TD> {
     table_delivery: PhantomData<TD>,
 }
 
-impl<TD: DeliveryDao> DeliveryTrait for DeliveryImpl<TD> {
+impl<TD: DaoDelivery> DeliveryTrait for DeliveryImpl<TD> {
     fn create_carrier<T>(valuable: T, thing: String, data_type: u8) -> Result<Carrier<T>>
-        where T: Sized + Serialize
+        where T: Sized + Serialize + Send
     {
         let carrier = Carrier::new(valuable, thing, data_type)?;
         let _ = TD::insert(&carrier)?;
@@ -67,7 +67,7 @@ impl<TD: DeliveryDao> DeliveryTrait for DeliveryImpl<TD> {
     }
 
     fn create_batch_and_finish_carrier<T, U>(valuables: Vec<T>, old: Carrier<U>, thing: String, data_type: u8) -> Result<Vec<Carrier<T>>>
-        where T: Sized + Serialize, U: Sized + Serialize,
+        where T: Sized + Serialize + Send, U: Sized + Serialize,
     {
         let mut rtn: Vec<Carrier<T>> = Vec::new();
         for v in valuables {

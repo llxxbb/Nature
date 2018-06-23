@@ -12,7 +12,6 @@ mod server_starter;
 #[test]
 fn submit_single() {
     println!("submit_single test---------------");
-
     // prepare input para
     let json = serde_json::to_string(&(
         Instance::default())).unwrap();

@@ -3,21 +3,23 @@ use diesel::prelude::*;
 use serde::Serialize;
 use super::*;
 use task::CarryError;
+use util::*;
 
 pub struct TableDelivery;
 
-impl DeliveryDao for TableDelivery {
-    fn insert<T: Sized + Serialize>(carrier: &Carrier<T>) -> Result<u128> {
-//        use self::schema::delivery;
-//        let conn: &SqliteConnection = &CONN.lock().unwrap();
-//        let rtn = diesel::insert_into(delivery::table)
-//            .values(NewThingDefine::new(carrier))
-//            .execute(conn);
-//        match rtn {
-//            Ok(x) => Ok(x),
-//            Err(e) => Err(NatureError::from(e))
-//        }
-        unimplemented!()
+impl DaoDelivery for TableDelivery {
+    fn insert<T: Sized + Serialize + Send>(carrier: &Carrier<T>) -> Result<u128> {
+        use self::schema::delivery;
+        let conn: &SqliteConnection = &CONN.lock().unwrap();
+        let d = Delivery::new(carrier)?;
+        let id = d.id.clone();
+        let rtn = diesel::insert_into(delivery::table)
+            .values(d)
+            .execute(conn);
+        match rtn {
+            Ok(_) => Ok(vec_to_u128(&id)),
+            Err(e) => Err(NatureError::from(e))
+        }
     }
 
     fn delete(_id: &u128) -> Result<()> {
