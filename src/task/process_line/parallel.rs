@@ -18,7 +18,7 @@ impl<T: DeliveryTrait> Parallel<T> {
         }
     }
 
-    pub fn do_parallel(carrier: Carrier<ParallelBatchInstance>) {
+    pub fn do_parallel_task(carrier: Carrier<ParallelBatchInstance>) {
         let tasks: Vec<StoreInfo> = carrier.content.data.0.iter().map(|instance| StoreInfo { instance: instance.clone(), converter: None }).collect();
         let new_carriers = T::create_batch_and_finish_carrier(tasks, carrier, "".to_string(), DataType::ParallelBatch as u8);
         if let Ok(nc) = new_carriers {

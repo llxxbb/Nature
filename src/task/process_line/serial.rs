@@ -24,7 +24,7 @@ impl<T: DeliveryTrait> Queue<T> {
         }
     }
 
-    pub fn do_serial(carrier: Carrier<SerialBatchInstance>) {
+    pub fn do_serial_task(carrier: Carrier<SerialBatchInstance>) {
         let sf = Self::store_batch_items(DATA_INSTANCE.clone().deref(), &carrier);
         if sf.is_err() {
             // retry if environment error occurs,

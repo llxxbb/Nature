@@ -1,6 +1,6 @@
 # Nature
 
-Nature is a abstract from the real nature. It is a __dynamic system__ which changes things and transforms things __incessantly__ over time, but all It's history could be __traced__. 
+Nature is a abstract from the real nature. It is a __dynamic system__ which changes `thing`s and transforms `thing`s __incessantly__ over time, but all It's history could be __traced__. 
 
 Nature is a __business process choreographer__, she decouple business data from technology such as __service__, __Interface__ etc.,
 and take care of your data in consistence state, 
@@ -10,7 +10,7 @@ Nature like a proxy between services, and make the service easy to develop and m
 
 Nature now is in very earlier stage. 
 
-## Pain pot
+## Pain point
 ![Alt text](doc/img/幻灯片4.jpg)
 Communication between services is unreliable, 
 It would be a complex, repetitive and hard work for checking, retrying and ensuring data idempotent,

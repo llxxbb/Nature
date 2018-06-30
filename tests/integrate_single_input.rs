@@ -10,8 +10,8 @@ mod server_starter;
 
 
 #[test]
-fn submit_single() {
-    println!("submit_single test---------------");
+fn must_input_key() {
+    println!("must input_key---------------");
     // prepare input para
     let json = serde_json::to_string(&(
         Instance::default())).unwrap();
@@ -26,5 +26,6 @@ fn submit_single() {
     // verify returned
     let rtn = response.body_string().unwrap();
     println!("{:?}", rtn);
-    assert_eq!(rtn, r#"{"Ok":[11,172,237,228,64,20,63,157,183,32,23,63,104,161,201,51]}"#);
+    assert_eq!(rtn, r#"{"Err":{"VerifyError":"key length can't be zero"}}"#);
 }
+

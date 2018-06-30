@@ -3,7 +3,7 @@ use super::*;
 
 pub trait ConvertTaskTrait {
     fn submit_callback(delayed: DelayedInstances) -> Result<()>;
-    fn do_convert(carrier: Carrier<ConverterInfo>);
+    fn do_convert_task(carrier: Carrier<ConverterInfo>);
 }
 
 pub struct ConvertTaskImpl;
@@ -20,7 +20,7 @@ impl ConvertTaskTrait for ConvertTaskImpl {
             CallbackResult::Instances(ins) => handle_instances(&carrier, &ins)
         }
     }
-    fn do_convert(carrier: Carrier<ConverterInfo>) {
+    fn do_convert_task(carrier: Carrier<ConverterInfo>) {
         let para = CallOutParameter::new(&carrier);
         let _ = match ConvertImpl::convert(para) {
             Ok(ConverterReturned::Instances(instances)) => {

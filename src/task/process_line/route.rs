@@ -9,7 +9,7 @@ pub struct Route<T> {
 }
 
 impl<T> Route<T> where T: DeliveryTrait {
-    pub fn do_route(carrier: Carrier<StoreInfo>) {
+    pub fn do_route_task(carrier: Carrier<StoreInfo>) {
         let instance = &carrier.content.data.instance.clone();
         if let Ok(relations) = RelationCache::get(&instance.data.thing) {
             // no relations

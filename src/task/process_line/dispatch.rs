@@ -4,7 +4,7 @@ use super::*;
 pub type DispatchTask = Dispatch<DeliveryService>;
 
 pub trait DispatchTrait {
-    fn do_dispatch(carrier: Carrier<RouteInfo>);
+    fn do_dispatch_task(carrier: Carrier<RouteInfo>);
     fn re_dispatch(carrier: Carrier<StoreInfo>) -> Result<()>;
 }
 
@@ -13,7 +13,7 @@ pub struct Dispatch<T> {
 }
 
 impl<T: DeliveryTrait> DispatchTrait for Dispatch<T> {
-    fn do_dispatch(carrier: Carrier<RouteInfo>) {
+    fn do_dispatch_task(carrier: Carrier<RouteInfo>) {
         if carrier.content.data.maps.len() == 0 {
             let _ = T::finish_carrier(&carrier.id);
             return;

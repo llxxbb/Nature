@@ -19,3 +19,6 @@ mod dispatch;
 mod convert;
 mod store;
 mod delivery;
+
+#[cfg(test)]
+mod test;
