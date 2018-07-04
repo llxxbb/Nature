@@ -3,4 +3,4 @@ pub use self::delivery::*;
 use serde::Serialize;
 use std::sync::*;
 
-mod delivery;
+pub mod delivery;

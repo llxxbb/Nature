@@ -2,8 +2,8 @@
 
 ## for the nearer term
 
-* bug: it can't insert into delivery table when instance key is empty.
-* amended task : store
+* unit test:
+  * store 
 
 * integrate test
     * simple_input

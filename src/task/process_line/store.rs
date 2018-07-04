@@ -5,7 +5,6 @@ use super::*;
 
 pub trait StoreTrait {
     fn input(instance: Instance) -> Result<u128>;
-    fn store_with_root(carrier: Carrier<StoreInfo>) -> Result<u128>;
     fn do_store_task(carrier: Carrier<StoreInfo>);
 }
 
@@ -34,6 +33,16 @@ impl<D, V, S, C, P> StoreTrait for StoreTaskImpl<D, V, S, C, P>
         Ok(uuid)
     }
 
+    fn do_store_task(carrier: Carrier<StoreInfo>) {
+        if let Err(err) = Self::store_with_root(carrier.clone()) {
+            DeliveryImpl::<TableDelivery>::move_to_err(err, carrier)
+        };
+    }
+}
+
+impl<D, V, S, C, P> StoreTaskImpl<D, V, S, C, P>
+    where D: DeliveryTrait, C: ThingDefineCacheTrait, P: DispatchTrait, S: InstanceDao
+{
     fn store_with_root(carrier: Carrier<StoreInfo>) -> Result<u128> {
         let id = carrier.instance.id;
         let result = S::insert(&carrier.instance);
@@ -50,16 +59,6 @@ impl<D, V, S, C, P> StoreTrait for StoreTaskImpl<D, V, S, C, P>
         }
     }
 
-    fn do_store_task(carrier: Carrier<StoreInfo>) {
-        if let Err(err) = Self::store_with_root(carrier.clone()) {
-            DeliveryImpl::<TableDelivery>::move_to_err(err, carrier)
-        };
-    }
-}
-
-impl<D, V, S, C, P> StoreTaskImpl<D, V, S, C, P>
-    where D: DeliveryTrait, C: ThingDefineCacheTrait, P: DispatchTrait
-{
     fn handle_duplicated(carrier: Carrier<StoreInfo>) -> Result<()> {
         let define = C::get(&carrier.instance.data.thing)?;
         if define.is_status() {

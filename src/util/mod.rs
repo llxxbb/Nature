@@ -8,7 +8,7 @@ pub use self::mock::*;
 mod logger;
 mod cfg;
 #[cfg(test)]
-mod mock;
+pub mod mock;
 
 pub mod channel;
 pub mod id_gen;
