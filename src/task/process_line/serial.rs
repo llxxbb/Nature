@@ -6,25 +6,28 @@ use std::marker::PhantomData;
 use std::ops::Deref;
 use super::*;
 
-pub type QueueTask = Queue<DeliveryService>;
+pub trait SequentialTrait {
+    fn submit_serial(batch: SerialBatchInstance) -> Result<()>;
+    fn do_serial_task(carrier: Carrier<SerialBatchInstance>);
+}
 
-pub struct Queue<T> {
+pub struct SequentialServiceImpl<T> {
     phantom: PhantomData<T>
 }
 
-impl<T: DeliveryTrait> Queue<T> {
-    pub fn submit_serial(batch: SerialBatchInstance) -> Result<()> {
+impl<T: DeliveryServiceTrait> SequentialTrait for SequentialServiceImpl<T> {
+    fn submit_serial(batch: SerialBatchInstance) -> Result<()> {
         match T::create_carrier(batch, "".to_string(), DataType::QueueBatch as u8) {
             Ok(carrier) => {
                 // to process asynchronous
-                send_carrier(&CHANNEL_SERIAL.sender, carrier);
+                T::send_carrier(&CHANNEL_SERIAL.sender, carrier);
                 Ok(())
             }
             Err(err) => Err(err),
         }
     }
 
-    pub fn do_serial_task(carrier: Carrier<SerialBatchInstance>) {
+    fn do_serial_task(carrier: Carrier<SerialBatchInstance>) {
         let sf = Self::store_batch_items(DATA_INSTANCE.clone().deref(), &carrier);
         if sf.is_err() {
             // retry if environment error occurs,
@@ -43,10 +46,12 @@ impl<T: DeliveryTrait> Queue<T> {
         let si = StoreInfo { instance, converter: None };
         let biz = si.instance.data.thing.key.clone();
         if let Ok(route) = T::create_and_finish_carrier(si, carrier, biz, DataType::QueueBatch as u8) {
-            send_carrier(&CHANNEL_ROUTE.sender, route);
+            T::send_carrier(&CHANNEL_ROUTE.sender, route);
         }
     }
+}
 
+impl<T: DeliveryServiceTrait> SequentialServiceImpl<T> {
     fn new_virtual_instance(carrier: &Carrier<SerialBatchInstance>, sf: SerialFinished) -> Result<Instance> {
         let json = serde_json::to_string(&sf)?;
         let mut context: HashMap<String, String> = HashMap::new();
@@ -72,8 +77,7 @@ impl<T: DeliveryTrait> Queue<T> {
     }
 
     fn store_batch_items<F>(_: &F, carrier: &Carrier<SerialBatchInstance>) -> Result<SerialFinished>
-        where
-            F: InstanceTrait
+        where F: InstanceServiceTrait
     {
         let mut errors: Vec<String> = Vec::new();
         let mut succeeded_id: Vec<u128> = Vec::new();
@@ -95,3 +99,5 @@ impl<T: DeliveryTrait> Queue<T> {
         Ok(SerialFinished { succeeded_id, errors })
     }
 }
+
+pub type SequentialTask = SequentialServiceImpl<DeliveryService>;

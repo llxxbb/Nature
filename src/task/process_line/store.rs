@@ -1,5 +1,4 @@
 use std::marker::PhantomData;
-use std::sync::Arc;
 use super::*;
 
 
@@ -17,7 +16,7 @@ pub struct StoreTaskImpl<D, V, S, C, P> {
 }
 
 impl<D, V, S, C, P> StoreTrait for StoreTaskImpl<D, V, S, C, P>
-    where D: DeliveryTrait, V: InstanceTrait, S: InstanceDao, C: ThingDefineCacheTrait, P: DispatchTrait
+    where D: DeliveryServiceTrait, V: InstanceServiceTrait, S: InstanceDao, C: ThingDefineCacheTrait, P: DispatchTrait
 {
     /// born an instance which is the beginning of the changes.
     fn input(mut instance: Instance) -> Result<u128>
@@ -29,26 +28,26 @@ impl<D, V, S, C, P> StoreTrait for StoreTaskImpl<D, V, S, C, P>
         let biz = task.instance.data.thing.key.clone();
         let carrier = D::create_carrier(task, biz, DataType::Store as u8)?;
         // to delivery
-        send_carrier(&CHANNEL_STORE.sender, carrier);
+        D::send_carrier(&CHANNEL_STORE.sender, carrier);
         Ok(uuid)
     }
 
     fn do_store_task(carrier: Carrier<StoreInfo>) {
         if let Err(err) = Self::store_with_root(carrier.clone()) {
-            DeliveryImpl::<TableDelivery>::move_to_err(err, carrier)
+            D::move_to_err(err, carrier)
         };
     }
 }
 
 impl<D, V, S, C, P> StoreTaskImpl<D, V, S, C, P>
-    where D: DeliveryTrait, C: ThingDefineCacheTrait, P: DispatchTrait, S: InstanceDao
+    where D: DeliveryServiceTrait, C: ThingDefineCacheTrait, P: DispatchTrait, S: InstanceDao
 {
     fn store_with_root(carrier: Carrier<StoreInfo>) -> Result<u128> {
         let id = carrier.instance.id;
         let result = S::insert(&carrier.instance);
         match result {
             Ok(_) => {
-                send_carrier(&CHANNEL_ROUTE.sender, carrier);
+                D::send_carrier(&CHANNEL_ROUTE.sender, carrier);
                 Ok(id)
             }
             Err(NatureError::DaoDuplicated) => {
@@ -72,14 +71,14 @@ impl<D, V, S, C, P> StoreTaskImpl<D, V, S, C, P>
     }
 }
 
-pub type StoreTask = StoreTaskImpl<DeliveryImpl<TableDelivery>, InstanceImpl, TableInstance, ThingDefineCacheImpl, DispatchTask>;
+pub type StoreTask = StoreTaskImpl<DeliveryService, InstanceImpl, TableInstance, ThingDefineCacheImpl, DispatchTask>;
 
-lazy_static! {
-    pub static ref TASK_STORE : Arc<StoreTask> = Arc::new(StoreTaskImpl{
-        delivery_trait: PhantomData,
-    instance_trait: PhantomData,
-    instance_dao: PhantomData,
-    thing_define_cache_trait: PhantomData,
-    dispatch_service: PhantomData,
-    });
-}
+//lazy_static! {
+//    pub static ref TASK_STORE : Arc<StoreTask> = Arc::new(StoreTaskImpl{
+//        delivery_trait: PhantomData,
+//    instance_trait: PhantomData,
+//    instance_dao: PhantomData,
+//    thing_define_cache_trait: PhantomData,
+//    dispatch_service: PhantomData,
+//    });
+//}

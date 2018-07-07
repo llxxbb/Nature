@@ -1,6 +1,5 @@
 use serde::Serialize;
 use super::*;
-use task::CarryError;
 
 pub trait ThingDefineDao {
     fn get(thing: &Thing) -> Result<ThingDefine>;
@@ -33,6 +32,6 @@ pub trait InstanceDao {
 
 pub trait StorePlanDao {
     /// replace the plan if plan exists.
-    fn save(plan: &StorePlan) -> Result<StorePlan>;
-    fn get(from_id: &u128) -> Result<StorePlan>;
+    fn save(plan: &PlanInfo) -> Result<PlanInfo>;
+    fn get(from_id: &u128) -> Result<PlanInfo>;
 }

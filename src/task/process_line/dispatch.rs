@@ -12,7 +12,7 @@ pub struct Dispatch<T> {
     delivery_service: PhantomData<T>
 }
 
-impl<T: DeliveryTrait> DispatchTrait for Dispatch<T> {
+impl<T: DeliveryServiceTrait> DispatchTrait for Dispatch<T> {
     fn do_dispatch_task(carrier: Carrier<RouteInfo>) {
         if carrier.content.data.maps.len() == 0 {
             let _ = T::finish_carrier(&carrier.id);
@@ -34,7 +34,7 @@ impl<T: DeliveryTrait> DispatchTrait for Dispatch<T> {
         };
 
         for task in new_carriers {
-            send_carrier(&CHANNEL_CONVERT.sender, task)
+            T::send_carrier(&CHANNEL_CONVERT.sender, task)
         }
     }
 
@@ -47,12 +47,12 @@ impl<T: DeliveryTrait> DispatchTrait for Dispatch<T> {
         let converter = &carrier.content.data.converter.clone().unwrap();
         let task = ConverterInfo::new(&converter.from, &converter.mapping)?;
         let carrier = T::create_and_finish_carrier(task, carrier, converter.mapping.to.key.clone(), DataType::Convert as u8)?;
-        send_carrier(&CHANNEL_CONVERT.sender, carrier);
+        T::send_carrier(&CHANNEL_CONVERT.sender, carrier);
         Ok(())
     }
 }
 
-impl<T: DeliveryTrait> Dispatch<T> {
+impl<T: DeliveryServiceTrait> Dispatch<T> {
     fn generate_converter_info(carrier: &Carrier<RouteInfo>) -> Result<Vec<ConverterInfo>> {
         let mut new_carriers: Vec<ConverterInfo> = Vec::new();
         for c in &carrier.content.data.maps {

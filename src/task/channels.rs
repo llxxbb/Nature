@@ -1,3 +1,9 @@
+extern crate multiqueue;
+
+use self::multiqueue::*;
+use serde::Serialize;
+use std::sync::Mutex;
+use std::thread;
 use super::*;
 use util::*;
 
@@ -10,3 +16,32 @@ lazy_static! {
     pub static ref CHANNEL_SERIAL : Channel<Carrier<SerialBatchInstance>> = Channel::new();
 }
 
+pub fn start_thread<T, F>(receiver: &'static Mutex<MPMCReceiver<Carrier<T>>>, f: F)
+    where
+        T: Serialize + Send,
+        F: 'static + Fn(Carrier<T>) + Send
+{
+    use std::ops::Deref;
+    thread::spawn(move || {
+        let guard = receiver.lock().unwrap();
+        let receiver = guard.deref();
+        for next in receiver {
+            f(next);
+        }
+    });
+}
+
+pub struct Channel<T> {
+    pub sender: Mutex<MPMCSender<T>>,
+    pub receiver: Mutex<MPMCReceiver<T>>,
+}
+
+impl<T> Channel<T> {
+    pub fn new() -> Channel<T> {
+        let (sx, rx) = mpmc_queue(10);
+        Channel {
+            sender: Mutex::new(sx),
+            receiver: Mutex::new(rx),
+        }
+    }
+}

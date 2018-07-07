@@ -2,7 +2,6 @@ use db::*;
 use diesel::prelude::*;
 use serde::Serialize;
 use super::*;
-use task::CarryError;
 use util::*;
 
 pub struct TableDelivery;

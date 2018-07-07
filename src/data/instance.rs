@@ -70,13 +70,13 @@ pub struct SerialBatchInstance {
     pub instances: Vec<Instance>,
 }
 
-pub trait InstanceTrait {
+pub trait InstanceServiceTrait {
     fn verify(instance: &mut Instance, root: Root) -> Result<u128>;
 }
 
 pub struct InstanceImpl;
 
-impl InstanceTrait for InstanceImpl {
+impl InstanceServiceTrait for InstanceImpl {
     /// check key whether defined
     /// generate id by hashing if it is not set.
     fn verify(instance: &mut Instance, root: Root) -> Result<u128> {

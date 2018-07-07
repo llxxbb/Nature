@@ -1,15 +1,15 @@
-use super::*;
-
+//use super::*;
+//
 //type MockStoreTask = StoreTaskImpl<DeliveryImpl<TableDelivery>, InstanceImpl, TableInstance, ThingDefineCacheImpl, DispatchTask>;
-
-#[test]
-fn must_input_key() {
-    println!("must input_key---------------");
-    let instance = Instance::default();
-    let result = StoreTask::input(instance);
-    // verify returned
-    assert!(result.is_err())
-}
+//
+//#[test]
+//fn must_input_key() {
+//    println!("must input_key---------------");
+//    let instance = Instance::default();
+//    let result = StoreTask::input(instance);
+//    // verify returned
+//    assert!(result.is_err())
+//}
 //
 //#[test]
 //fn insert_env_error() {
@@ -42,7 +42,7 @@ fn must_input_key() {
 //        _ => panic!("should not match this arm!"),
 //    }
 //}
-
+//
 //#[test]
 //fn do_store_duplicated_not_status_ok() {
 //    let _lock_instance = lock_and_set_mock_value(&INSTANCE_LOCK, &INSTANCE_RESULT, Ok(UuidBytes::default()));
@@ -56,7 +56,7 @@ fn must_input_key() {
 //        _ => panic!("should not match this arm!"),
 //    }
 //}
-
+//
 //#[test]
 //fn do_store_duplicated_status() {
 //    let _lock_instance = lock_and_set_mock_value(&INSTANCE_LOCK, &INSTANCE_RESULT, Ok(UuidBytes::default()));
@@ -69,7 +69,7 @@ fn must_input_key() {
 //        _ => panic!("should not match this arm!"),
 //    }
 //}
-
+//
 //#[test]
 //fn do_store_ok() {
 //    use std::ops::Deref;
@@ -96,31 +96,31 @@ fn must_input_key() {
 //    let x: &Vec<Box<Any + Send + Sync>> = received.deref();
 //    assert_eq!(1, x.len());
 //}
-
-#[test]
-fn delivery_error() {
-    let _lock_delivery = lock_and_set_mock_value(&TASK_DELIVERY_LOCK, &TASK_DELIVERY_VALUE, Value::Err);
-    let instance = Instance::default();
-    match StoreTask::input(instance) {
-        Err(NatureError::SystemError(sss)) => assert_eq!("create_carrier mock error", sss),
-        Err(err) => {
-            println!("{:?}", err);
-            panic!("should match this arm!");
-        }
-        Ok(x) => {
-            println!("{:?}", x);
-            panic!("should match this arm!")
-        }
-    }
-}
-
-#[test]
-fn delivery_ok_but_store_error() {
-    let _lock_delivery = lock_and_set_mock_value(&TASK_DELIVERY_LOCK, &TASK_DELIVERY_VALUE, Value::Ok);
-    let _lock_instance = lock_and_set_mock_value(&DATA_INSTANCE_LOCK, &DATA_INSTANCE_RESULT, Err(NatureError::VerifyError("instance mock verify error".to_string())));
-    let instance = Instance::default();
-    match StoreTask::input(instance) {
-        Err(NatureError::VerifyError(sss)) => assert_eq!("instance mock verify error", sss),
-        _ => panic!("should match this arm!"),
-    }
-}
+//
+//#[test]
+//fn delivery_error() {
+//    let _lock_delivery = lock_and_set_mock_value(&TASK_DELIVERY_LOCK, &TASK_DELIVERY_VALUE, Value::Err);
+//    let instance = Instance::default();
+//    match StoreTask::input(instance) {
+//        Err(NatureError::SystemError(sss)) => assert_eq!("create_carrier mock error", sss),
+//        Err(err) => {
+//            println!("{:?}", err);
+//            panic!("should match this arm!");
+//        }
+//        Ok(x) => {
+//            println!("{:?}", x);
+//            panic!("should match this arm!")
+//        }
+//    }
+//}
+//
+//#[test]
+//fn delivery_ok_but_store_error() {
+//    let _lock_delivery = lock_and_set_mock_value(&TASK_DELIVERY_LOCK, &TASK_DELIVERY_VALUE, Value::Ok);
+//    let _lock_instance = lock_and_set_mock_value(&DATA_INSTANCE_LOCK, &DATA_INSTANCE_RESULT, Err(NatureError::VerifyError("instance mock verify error".to_string())));
+//    let instance = Instance::default();
+//    match StoreTask::input(instance) {
+//        Err(NatureError::VerifyError(sss)) => assert_eq!("instance mock verify error", sss),
+//        _ => panic!("should match this arm!"),
+//    }
+//}

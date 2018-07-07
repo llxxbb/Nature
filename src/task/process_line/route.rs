@@ -4,11 +4,12 @@ use std::marker::PhantomData;
 use super::*;
 
 pub type RouteTask = Route<DeliveryService>;
+
 pub struct Route<T> {
     delivery_service: PhantomData<T>
 }
 
-impl<T> Route<T> where T: DeliveryTrait {
+impl<T> Route<T> where T: DeliveryServiceTrait {
     pub fn do_route_task(carrier: Carrier<StoreInfo>) {
         let instance = &carrier.content.data.instance.clone();
         if let Ok(relations) = RelationCache::get(&instance.data.thing) {
@@ -68,7 +69,7 @@ impl<T> Route<T> where T: DeliveryTrait {
         let route = RouteInfo { instance: instance.clone(), maps };
         let biz = route.instance.thing.key.clone();
         match T::create_and_finish_carrier(route, carrier, biz, DataType::Route as u8) {
-            Ok(new) => send_carrier(&CHANNEL_DISPATCH.sender, new),
+            Ok(new) => T::send_carrier(&CHANNEL_DISPATCH.sender, new),
             Err(_) => ()
         }
     }

@@ -1,7 +1,5 @@
-pub use self::carrier::*;
 pub use self::instance::*;
 pub use self::relation::*;
-pub use self::store_plan::*;
 #[cfg(test)]
 pub use self::test::*;
 pub use self::thing::*;
@@ -26,9 +24,7 @@ impl Default for CallbackResult {
 
 mod instance;
 mod thing;
-mod carrier;
 mod relation;
-mod store_plan;
 #[cfg(test)]
 mod test;
 

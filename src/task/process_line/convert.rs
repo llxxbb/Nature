@@ -1,4 +1,5 @@
 use rpc::*;
+use std::marker::PhantomData;
 use super::*;
 
 pub trait ConvertTaskTrait {
@@ -6,29 +7,32 @@ pub trait ConvertTaskTrait {
     fn do_convert_task(carrier: Carrier<ConverterInfo>);
 }
 
-pub struct ConvertTaskImpl;
+pub struct ConvertTaskImpl<SP, SD> {
+    plan: PhantomData<SP>,
+    delivery: PhantomData<SD>,
+}
 
-impl ConvertTaskTrait for ConvertTaskImpl {
+impl<SP, SD> ConvertTaskTrait for ConvertTaskImpl<SP, SD> where SP: PlanServiceTrait, SD: DeliveryServiceTrait {
     fn submit_callback(delayed: DelayedInstances) -> Result<()> {
         let carrier = TableDelivery::get::<ConverterInfo>(delayed.carrier_id)?;
         match delayed.result {
             CallbackResult::Err(err) => {
                 let err = NatureError::ConverterLogicalError(err);
-                DeliveryImpl::<TableDelivery>::move_to_err(err, carrier);
+                SD::move_to_err(err, carrier);
                 Ok(())
             }
-            CallbackResult::Instances(ins) => handle_instances(&carrier, &ins)
+            CallbackResult::Instances(ins) => Self::handle_instances(&carrier, &ins)
         }
     }
     fn do_convert_task(carrier: Carrier<ConverterInfo>) {
         let para = CallOutParameter::new(&carrier);
         let _ = match ConvertImpl::convert(para) {
             Ok(ConverterReturned::Instances(instances)) => {
-                match handle_instances(&carrier, &instances) {
+                match Self::handle_instances(&carrier, &instances) {
                     Ok(_) => (),
                     Err(NatureError::DaoEnvironmentError(_)) => (),
                     Err(err) => {
-                        DeliveryImpl::<TableDelivery>::move_to_err(err, carrier.clone());
+                        SD::move_to_err(err, carrier.clone());
                     }
                 }
             }
@@ -40,19 +44,42 @@ impl ConvertTaskTrait for ConvertTaskImpl {
                 // only **Environment Error** will be retry
                 NatureError::ConverterEnvironmentError(_) => (),
                 // other error will drop into error
-                _ => DeliveryImpl::<TableDelivery>::move_to_err(err, carrier)
+                _ => SD::move_to_err(err, carrier)
             }
         };
     }
 }
 
-fn handle_instances(carrier: &Carrier<ConverterInfo>, instances: &Vec<Instance>) -> Result<()> {
+impl<SP, SD> ConvertTaskImpl<SP, SD> where SP: PlanServiceTrait, SD: DeliveryServiceTrait {
+    fn handle_instances(carrier: &Carrier<ConverterInfo>, instances: &Vec<Instance>) -> Result<()> {
 // check status version to avoid loop
-    let instances = verify(&carrier.mapping.to, &instances)?;
-    let plan = StorePlan::new(&carrier.content.data, &instances)?;
-    to_store(carrier, plan);
-    Ok(())
+        let instances = verify(&carrier.mapping.to, &instances)?;
+        let plan = SP::new(&carrier.content.data, &instances)?;
+        Self::to_store(carrier, plan);
+        Ok(())
+    }
+    fn to_store(carrier: &Carrier<ConverterInfo>, plan: PlanInfo) {
+        let store_infos: Vec<StoreInfo> = plan.plan.iter().map(|instance| {
+            StoreInfo {
+                instance: instance.clone(),
+                converter: Some(carrier.content.data.clone()),
+            }
+        }).collect();
+        let new_tasks = SD::create_batch_and_finish_carrier(
+            store_infos,
+            carrier.to_owned(),
+            carrier.mapping.to.key.clone(),
+            DataType::Convert as u8,
+        );
+        if new_tasks.is_err() {
+            return;
+        }
+        for task in new_tasks.unwrap() {
+            SD::send_carrier(&CHANNEL_STORE.sender, task)
+        }
+    }
 }
+
 
 fn verify(to: &Thing, instances: &Vec<Instance>) -> Result<Vec<Instance>> {
     let mut rtn: Vec<Instance> = Vec::new();
@@ -84,27 +111,4 @@ fn verify(to: &Thing, instances: &Vec<Instance>) -> Result<Vec<Instance>> {
     Ok(rtn)
 }
 
-fn to_store(carrier: &Carrier<ConverterInfo>, plan: StorePlan) {
-    let store_infos: Vec<StoreInfo> = plan.plan.iter().map(|instance| {
-        StoreInfo {
-            instance: instance.clone(),
-            converter: Some(carrier.content.data.clone()),
-        }
-    }).collect();
-    let new_tasks = DeliveryImpl::<TableDelivery>::create_batch_and_finish_carrier(
-        store_infos,
-        carrier.to_owned(),
-        carrier.mapping.to.key.clone(),
-        DataType::Convert as u8,
-    );
-    if new_tasks.is_err() {
-        return;
-    }
-    for task in new_tasks.unwrap() {
-        send_carrier(&CHANNEL_STORE.sender, task)
-    }
-}
-
-pub trait CallOutTrait {
-    fn convert(para: CallOutParameter) -> Result<ConverterReturned>;
-}
+pub type ConvertService = ConvertTaskImpl<PlanService, DeliveryService>;
