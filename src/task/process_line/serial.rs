@@ -17,7 +17,7 @@ impl<T: DeliveryTrait> Queue<T> {
         match T::create_carrier(batch, "".to_string(), DataType::QueueBatch as u8) {
             Ok(carrier) => {
                 // to process asynchronous
-                send_carrier(CHANNEL_SERIAL.sender.lock().unwrap().clone(), carrier);
+                send_carrier(&CHANNEL_SERIAL.sender, carrier);
                 Ok(())
             }
             Err(err) => Err(err),
@@ -43,7 +43,7 @@ impl<T: DeliveryTrait> Queue<T> {
         let si = StoreInfo { instance, converter: None };
         let biz = si.instance.data.thing.key.clone();
         if let Ok(route) = T::create_and_finish_carrier(si, carrier, biz, DataType::QueueBatch as u8) {
-            send_carrier(CHANNEL_ROUTE.sender.lock().unwrap().clone(), route);
+            send_carrier(&CHANNEL_ROUTE.sender, route);
         }
     }
 

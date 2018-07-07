@@ -34,7 +34,7 @@ impl<T: DeliveryTrait> DispatchTrait for Dispatch<T> {
         };
 
         for task in new_carriers {
-            send_carrier(CHANNEL_CONVERT.sender.lock().unwrap().clone(), task)
+            send_carrier(&CHANNEL_CONVERT.sender, task)
         }
     }
 
@@ -47,7 +47,7 @@ impl<T: DeliveryTrait> DispatchTrait for Dispatch<T> {
         let converter = &carrier.content.data.converter.clone().unwrap();
         let task = ConverterInfo::new(&converter.from, &converter.mapping)?;
         let carrier = T::create_and_finish_carrier(task, carrier, converter.mapping.to.key.clone(), DataType::Convert as u8)?;
-        send_carrier(CHANNEL_CONVERT.sender.lock().unwrap().clone(), carrier);
+        send_carrier(&CHANNEL_CONVERT.sender, carrier);
         Ok(())
     }
 }

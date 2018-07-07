@@ -101,7 +101,7 @@ fn to_store(carrier: &Carrier<ConverterInfo>, plan: StorePlan) {
         return;
     }
     for task in new_tasks.unwrap() {
-        send_carrier(CHANNEL_STORE.sender.lock().unwrap().clone(), task)
+        send_carrier(&CHANNEL_STORE.sender, task)
     }
 }
 

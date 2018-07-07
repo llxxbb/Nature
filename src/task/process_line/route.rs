@@ -68,7 +68,7 @@ impl<T> Route<T> where T: DeliveryTrait {
         let route = RouteInfo { instance: instance.clone(), maps };
         let biz = route.instance.thing.key.clone();
         match T::create_and_finish_carrier(route, carrier, biz, DataType::Route as u8) {
-            Ok(new) => send_carrier(CHANNEL_DISPATCH.sender.lock().unwrap().clone(), new),
+            Ok(new) => send_carrier(&CHANNEL_DISPATCH.sender, new),
             Err(_) => ()
         }
     }

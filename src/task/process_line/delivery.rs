@@ -1,7 +1,8 @@
+extern crate multiqueue;
+
+use self::multiqueue::*;
 use std::marker::PhantomData;
 use std::sync::Arc;
-use std::sync::mpsc::Receiver;
-use std::sync::mpsc::Sender;
 use std::sync::Mutex;
 use std::thread;
 use super::*;
@@ -14,22 +15,21 @@ pub trait DeliveryTrait {
     fn move_to_err<T>(err: NatureError, carrier: Carrier<T>) where T: Sized + Serialize;
 }
 
-pub fn send_carrier<T>(sender: Sender<Carrier<T>>, carrier: Carrier<T>)
+pub fn send_carrier<T>(sender: &Mutex<MPMCSender<Carrier<T>>>, carrier: Carrier<T>)
     where T: 'static + Sized + Serialize + Sync + Send {
-    thread::spawn(move || {
-        sender.send(carrier).unwrap();
-    });
+    sender.lock().unwrap().try_send(carrier).unwrap();
 }
 
-pub fn start_thread<T, F>(receiver: &'static Mutex<Receiver<Carrier<T>>>, f: F)
+pub fn start_thread<T, F>(receiver: &'static Mutex<MPMCReceiver<Carrier<T>>>, f: F)
     where
         T: Serialize + Send,
         F: 'static + Fn(Carrier<T>) + Send
 {
+    use std::ops::Deref;
     thread::spawn(move || {
-        let receiver = receiver.lock().unwrap();
-        let mut iter = receiver.iter();
-        while let Some(next) = iter.next() {
+        let guard = receiver.lock().unwrap();
+        let receiver = guard.deref();
+        for next in receiver {
             f(next);
         }
     });

@@ -29,7 +29,7 @@ impl<D, V, S, C, P> StoreTrait for StoreTaskImpl<D, V, S, C, P>
         let biz = task.instance.data.thing.key.clone();
         let carrier = D::create_carrier(task, biz, DataType::Store as u8)?;
         // to delivery
-        send_carrier(CHANNEL_STORE.sender.lock().unwrap().clone(), carrier);
+        send_carrier(&CHANNEL_STORE.sender, carrier);
         Ok(uuid)
     }
 
@@ -48,7 +48,7 @@ impl<D, V, S, C, P> StoreTaskImpl<D, V, S, C, P>
         let result = S::insert(&carrier.instance);
         match result {
             Ok(_) => {
-                send_carrier(CHANNEL_ROUTE.sender.lock().unwrap().clone(), carrier);
+                send_carrier(&CHANNEL_ROUTE.sender, carrier);
                 Ok(id)
             }
             Err(NatureError::DaoDuplicated) => {
