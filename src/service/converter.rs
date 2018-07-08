@@ -1,8 +1,9 @@
 use super::*;
+
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct ConverterInfo {
     pub from: Instance,
-    pub mapping: Relation,
+    pub target: Target,
     pub last_status: Option<Instance>,
 }
 

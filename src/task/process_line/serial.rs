@@ -11,16 +11,19 @@ pub trait SequentialTrait {
     fn do_serial_task(carrier: Carrier<SerialBatchInstance>);
 }
 
-pub struct SequentialServiceImpl<T> {
-    phantom: PhantomData<T>
+pub struct SequentialServiceImpl<SD, SS> {
+    delivery: PhantomData<SD>,
+    store: PhantomData<SS>,
 }
 
-impl<T: DeliveryServiceTrait> SequentialTrait for SequentialServiceImpl<T> {
+impl<SD, SS> SequentialTrait for SequentialServiceImpl<SD, SS>
+    where SD: DeliveryServiceTrait, SS: StoreServiceTrait
+{
     fn submit_serial(batch: SerialBatchInstance) -> Result<()> {
-        match T::create_carrier(batch, "".to_string(), DataType::QueueBatch as u8) {
+        match SD::create_carrier(batch, "".to_string(), DataType::QueueBatch as u8) {
             Ok(carrier) => {
                 // to process asynchronous
-                T::send_carrier(&CHANNEL_SERIAL.sender, carrier);
+                SD::send_carrier(&CHANNEL_SERIAL.sender, carrier);
                 Ok(())
             }
             Err(err) => Err(err),
@@ -37,21 +40,27 @@ impl<T: DeliveryServiceTrait> SequentialTrait for SequentialServiceImpl<T> {
 
         let instance = match Self::new_virtual_instance(&carrier, sf.unwrap()) {
             Err(err) => {
-                T::move_to_err(err, carrier);
+                SD::move_to_err(err, carrier);
                 return;
             }
             Ok(ins) => ins,
         };
 
-        let si = StoreInfo { instance, converter: None };
+        let si = SS::generate_store_task(instance);
+        if si.is_err() {
+            return;
+        }
+        let si = si.unwrap();
         let biz = si.instance.data.thing.key.clone();
-        if let Ok(route) = T::create_and_finish_carrier(si, carrier, biz, DataType::QueueBatch as u8) {
-            T::send_carrier(&CHANNEL_ROUTE.sender, route);
+        if let Ok(route) = SD::create_and_finish_carrier(si, carrier, biz, DataType::QueueBatch as u8) {
+            SD::send_carrier(&CHANNEL_ROUTE.sender, route);
         }
     }
 }
 
-impl<T: DeliveryServiceTrait> SequentialServiceImpl<T> {
+impl<SD, SS> SequentialServiceImpl<SD, SS>
+    where SD: DeliveryServiceTrait, SS: StoreServiceTrait
+{
     fn new_virtual_instance(carrier: &Carrier<SerialBatchInstance>, sf: SerialFinished) -> Result<Instance> {
         let json = serde_json::to_string(&sf)?;
         let mut context: HashMap<String, String> = HashMap::new();
@@ -100,4 +109,4 @@ impl<T: DeliveryServiceTrait> SequentialServiceImpl<T> {
     }
 }
 
-pub type SequentialTask = SequentialServiceImpl<DeliveryService>;
+pub type SequentialTask = SequentialServiceImpl<DeliveryService, StoreService>;

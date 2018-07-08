@@ -26,8 +26,8 @@ impl<DAO> PlanServiceTrait for PlanServiceImpl<DAO> where DAO: StorePlanDao {
     fn new(converter_info: &ConverterInfo, instances: &Vec<Instance>) -> Result<PlanInfo> {
         let plan = PlanInfo {
             from_id: converter_info.from.id,
-            from_thing: converter_info.mapping.from.clone(),
-            to: converter_info.mapping.to.clone(),
+            from_thing: converter_info.from.thing.clone(),
+            to: converter_info.target.to.clone(),
             plan: instances.clone(),
         };
         // reload old plan if exists

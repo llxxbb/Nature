@@ -3,6 +3,7 @@ extern crate fern;
 extern crate nature;
 
 use nature::rpc::*;
+use nature::service::*;
 use nature::task::*;
 
 fn main() {
@@ -17,10 +18,9 @@ fn main() {
 }
 
 fn start_receive_threads() {
-    start_thread(&CHANNEL_ROUTE.receiver, RouteTask::do_route_task);
     start_thread(&CHANNEL_DISPATCH.receiver, DispatchTask::do_dispatch_task);
     start_thread(&CHANNEL_CONVERT.receiver, ConvertService::do_convert_task);
-    start_thread(&CHANNEL_STORE.receiver, StoreTask::do_store_task);
+    start_thread(&CHANNEL_STORE.receiver, StoreService::receive_store_task);
     start_thread(&CHANNEL_PARALLEL.receiver, ParallelTask::do_parallel_task);
     start_thread(&CHANNEL_SERIAL.receiver, SequentialTask::do_serial_task);
 }

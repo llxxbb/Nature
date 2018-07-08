@@ -7,12 +7,14 @@ pub trait ConvertTaskTrait {
     fn do_convert_task(carrier: Carrier<ConverterInfo>);
 }
 
-pub struct ConvertTaskImpl<SP, SD> {
+pub struct ConvertTaskImpl<SP, SD, SS> {
     plan: PhantomData<SP>,
     delivery: PhantomData<SD>,
+    store: PhantomData<SS>,
 }
 
-impl<SP, SD> ConvertTaskTrait for ConvertTaskImpl<SP, SD> where SP: PlanServiceTrait, SD: DeliveryServiceTrait {
+impl<SP, SD, SS> ConvertTaskTrait for ConvertTaskImpl<SP, SD, SS>
+    where SP: PlanServiceTrait, SD: DeliveryServiceTrait, SS: StoreServiceTrait {
     fn submit_callback(delayed: DelayedInstances) -> Result<()> {
         let carrier = TableDelivery::get::<ConverterInfo>(delayed.carrier_id)?;
         match delayed.result {
@@ -50,25 +52,28 @@ impl<SP, SD> ConvertTaskTrait for ConvertTaskImpl<SP, SD> where SP: PlanServiceT
     }
 }
 
-impl<SP, SD> ConvertTaskImpl<SP, SD> where SP: PlanServiceTrait, SD: DeliveryServiceTrait {
+impl<SP, SD, SS> ConvertTaskImpl<SP, SD, SS>
+    where SP: PlanServiceTrait, SD: DeliveryServiceTrait, SS: StoreServiceTrait {
     fn handle_instances(carrier: &Carrier<ConverterInfo>, instances: &Vec<Instance>) -> Result<()> {
 // check status version to avoid loop
-        let instances = verify(&carrier.mapping.to, &instances)?;
+        let instances = verify(&carrier.target.to, &instances)?;
         let plan = SP::new(&carrier.content.data, &instances)?;
-        Self::to_store(carrier, plan);
+        Self::do_store(carrier, plan);
         Ok(())
     }
-    fn to_store(carrier: &Carrier<ConverterInfo>, plan: PlanInfo) {
-        let store_infos: Vec<StoreInfo> = plan.plan.iter().map(|instance| {
-            StoreInfo {
-                instance: instance.clone(),
-                converter: Some(carrier.content.data.clone()),
+    fn do_store(carrier: &Carrier<ConverterInfo>, plan: PlanInfo) {
+        let mut store_infos: Vec<StoreTaskInfo> = Vec::new();
+        for instance in plan.plan.iter() {
+            match SS::generate_store_task(instance.clone()) {
+                Ok(task) => store_infos.push(task),
+                // break process will environment error occurs.
+                _ => return
             }
-        }).collect();
+        }
         let new_tasks = SD::create_batch_and_finish_carrier(
             store_infos,
             carrier.to_owned(),
-            carrier.mapping.to.key.clone(),
+            carrier.target.to.key.clone(),
             DataType::Convert as u8,
         );
         if new_tasks.is_err() {
@@ -111,4 +116,4 @@ fn verify(to: &Thing, instances: &Vec<Instance>) -> Result<Vec<Instance>> {
     Ok(rtn)
 }
 
-pub type ConvertService = ConvertTaskImpl<PlanService, DeliveryService>;
+pub type ConvertService = ConvertTaskImpl<PlanService, DeliveryService, StoreService>;

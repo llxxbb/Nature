@@ -15,7 +15,7 @@ pub fn start_rocket_server() -> Rocket {
 /// **Note** This do not receive System `Thing`'s instances
 #[post("/input", format = "application/json", data = "<instance>")]
 fn input(instance: Json<Instance>) -> Json<Result<u128>> {
-    let x = StoreTask::input(instance.0);
+    let x = StoreService::input(instance.0);
     Json(x)
 }
 

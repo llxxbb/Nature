@@ -6,7 +6,6 @@ use serde::Serialize;
 use std::marker::PhantomData;
 use std::ops::Deref;
 use std::sync::Mutex;
-use std::thread;
 use super::*;
 use util::id_gen::generate_id;
 
@@ -135,6 +134,15 @@ impl<TD: DaoDelivery> DeliveryServiceTrait for DeliveryServiceImpl<TD> {
     }
 }
 
+
+pub enum DataType {
+    Store = 1,
+    Route = 2,
+    Dispatch = 3,
+    Convert = 4,
+    ParallelBatch = 11,
+    QueueBatch = 12,
+}
 
 pub type DeliveryService = DeliveryServiceImpl<TableDelivery>;
 

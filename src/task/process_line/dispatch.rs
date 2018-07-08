@@ -4,8 +4,8 @@ use super::*;
 pub type DispatchTask = Dispatch<DeliveryService>;
 
 pub trait DispatchTrait {
-    fn do_dispatch_task(carrier: Carrier<RouteInfo>);
-    fn re_dispatch(carrier: Carrier<StoreInfo>) -> Result<()>;
+    fn do_dispatch_task(carrier: Carrier<StoreTaskInfo>);
+    fn re_dispatch(carrier: Carrier<StoreTaskInfo>) -> Result<()>;
 }
 
 pub struct Dispatch<T> {
@@ -13,8 +13,8 @@ pub struct Dispatch<T> {
 }
 
 impl<T: DeliveryServiceTrait> DispatchTrait for Dispatch<T> {
-    fn do_dispatch_task(carrier: Carrier<RouteInfo>) {
-        if carrier.content.data.maps.len() == 0 {
+    fn do_dispatch_task(carrier: Carrier<StoreTaskInfo>) {
+        if carrier.content.data.target.is_none() {
             let _ = T::finish_carrier(&carrier.id);
             return;
         }
@@ -39,23 +39,25 @@ impl<T: DeliveryServiceTrait> DispatchTrait for Dispatch<T> {
     }
 
     /// Get last status version and re-convert
-    fn re_dispatch(carrier: Carrier<StoreInfo>) -> Result<()> {
-        if carrier.converter.is_none() {
+    fn re_dispatch(carrier: Carrier<StoreTaskInfo>) -> Result<()> {
+        if carrier.upstream.is_none() {
             T::move_to_err(NatureError::InstanceStatusVersionConflict, carrier);
             return Err(NatureError::InstanceStatusVersionConflict);
         }
-        let converter = &carrier.content.data.converter.clone().unwrap();
-        let task = ConverterInfo::new(&converter.from, &converter.mapping)?;
-        let carrier = T::create_and_finish_carrier(task, carrier, converter.mapping.to.key.clone(), DataType::Convert as u8)?;
+        let converter = &carrier.content.data.upstream.clone().unwrap();
+        let task = ConverterInfo::new(&converter.from, &converter.target)?;
+        let carrier = T::create_and_finish_carrier(task, carrier, converter.target.to.key.clone(), DataType::Convert as u8)?;
         T::send_carrier(&CHANNEL_CONVERT.sender, carrier);
         Ok(())
     }
 }
 
 impl<T: DeliveryServiceTrait> Dispatch<T> {
-    fn generate_converter_info(carrier: &Carrier<RouteInfo>) -> Result<Vec<ConverterInfo>> {
+    fn generate_converter_info(carrier: &Carrier<StoreTaskInfo>) -> Result<Vec<ConverterInfo>> {
         let mut new_carriers: Vec<ConverterInfo> = Vec::new();
-        for c in &carrier.content.data.maps {
+        let target = carrier.target.clone();
+        let tar = target.unwrap();
+        for c in tar {
             match ConverterInfo::new(&carrier.instance, &c) {
                 Err(err) => return Err(err),
                 Ok(x) => new_carriers.push(x),

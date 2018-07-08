@@ -8,7 +8,7 @@ impl ConverterInfo {
     /// * Dao
     /// * DefineNotFind
     /// * uuid parse
-    pub fn new(instance: &Instance, mapping: &Relation) -> Result<ConverterInfo> {
+    pub fn new(instance: &Instance, mapping: &Target) -> Result<ConverterInfo> {
         let define = ThingDefineCacheImpl::get(&mapping.to)?;
         let last_target = match define.is_status() {
             false => None,
@@ -24,17 +24,17 @@ impl ConverterInfo {
             }
         };
         if let Some(ref last) = last_target {
-            Self::check_last(&last.status, &mapping.demand)?;
+            Self::check_last(&last.status, &mapping.last_status_demand)?;
         };
         let rtn = ConverterInfo {
             from: instance.clone(),
-            mapping: mapping.clone(),
+            target: mapping.clone(),
             last_status: last_target,
         };
         Ok(rtn)
     }
 
-    fn check_last(last: &HashSet<String>, demand: &Demand) -> Result<()> {
+    fn check_last(last: &HashSet<String>, demand: &LastStatusDemand) -> Result<()> {
         for s in &demand.target_status_include {
             if !last.contains(s) {
                 return Err(NatureError::TargetInstanceNotIncludeStatus(s.clone()));

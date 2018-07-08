@@ -31,5 +31,5 @@ pub mod rpc;
 pub mod task;
 pub mod data;
 pub mod db;
-mod service;
+pub mod service;
 

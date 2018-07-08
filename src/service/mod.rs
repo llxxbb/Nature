@@ -2,12 +2,15 @@ use data::*;
 use db::*;
 use global::*;
 pub use self::converter::{CallOutParameter, ConverterInfo, ConverterReturned};
-pub use self::delivery::{Carrier, CarryError, DeliveryService, DeliveryServiceTrait, SVC_DELIVERY};
-pub use self::plan::{PlanInfo, PlanServiceTrait,PlanService, SVC_PLAN};
-pub use self::store::StoreInfo;
+pub use self::delivery::{Carrier, CarryError, DataType, DeliveryService, DeliveryServiceTrait, SVC_DELIVERY};
+pub use self::plan::{PlanInfo, PlanService, PlanServiceTrait, SVC_PLAN};
+pub use self::route::{Demand, LastStatusDemand, Relation, RouteInfo, RouteService, RouteServiceTrait, Target};
+pub use self::store::{StoreService, StoreServiceTrait, StoreTaskInfo};
 use std::sync::Arc;
+use task::*;
 
 mod delivery;
 mod plan;
 mod converter;
 mod store;
+mod route;
