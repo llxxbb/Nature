@@ -2,15 +2,9 @@
 
 ## for the nearer term
 
-* move store from task to service directory
-* move route from task to service directory
-
-* implement route service
 * delete CHANNEL_ROUTE
-* implement store service
-    includes route information.
-    send to dispatch
     
+
 * move convert from task to service directory
 
 * unit test:

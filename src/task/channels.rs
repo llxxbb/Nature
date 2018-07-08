@@ -7,7 +7,6 @@ use std::thread;
 use super::*;
 
 lazy_static! {
-    pub static ref CHANNEL_ROUTE : Channel<Carrier<StoreTaskInfo>> = Channel::new();
     pub static ref CHANNEL_DISPATCH : Channel<Carrier<StoreTaskInfo>> = Channel::new();
     pub static ref CHANNEL_CONVERT : Channel<Carrier<ConverterInfo>> = Channel::new();
     pub static ref CHANNEL_STORE : Channel<Carrier<StoreTaskInfo>> = Channel::new();

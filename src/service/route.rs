@@ -9,7 +9,6 @@ pub trait RouteServiceTrait {
     fn get_route(instance: &Instance) -> Result<Option<Vec<Target>>>;
 }
 
-
 pub struct RouteServiceImpl<T> {
     delivery_service: PhantomData<T>
 }

@@ -53,7 +53,7 @@ impl<SD, SS> SequentialTrait for SequentialServiceImpl<SD, SS>
         let si = si.unwrap();
         let biz = si.instance.data.thing.key.clone();
         if let Ok(route) = SD::create_and_finish_carrier(si, carrier, biz, DataType::QueueBatch as u8) {
-            SD::send_carrier(&CHANNEL_ROUTE.sender, route);
+            SD::send_carrier(&CHANNEL_DISPATCH.sender, route);
         }
     }
 }

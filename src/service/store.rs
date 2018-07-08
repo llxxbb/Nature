@@ -88,16 +88,6 @@ impl<D, V, S, C, P, R> StoreServiceImpl<D, V, S, C, P, R>
         }
     }
 
-//    fn delivery_relations(carrier: Carrier<StoreTaskInfo>, instance: &Instance, maps: Vec<Relation>) {
-//        let route = RouteInfo { instance: instance.clone(), maps };
-//        let biz = route.instance.thing.key.clone();
-//        match T::create_and_finish_carrier(route, carrier, biz, DataType::Route as u8) {
-//            Ok(new) => T::send_carrier(&CHANNEL_DISPATCH.sender, new),
-//            Err(_) => ()
-//        }
-//    }
-
-
     fn handle_duplicated(carrier: Carrier<StoreTaskInfo>) -> Result<()> {
         let define = C::get(&carrier.instance.data.thing)?;
         if define.is_status() {
@@ -110,6 +100,5 @@ impl<D, V, S, C, P, R> StoreServiceImpl<D, V, S, C, P, R>
         }
     }
 }
-
 
 pub type StoreService = StoreServiceImpl<DeliveryService, InstanceImpl, TableInstance, ThingDefineCacheImpl, DispatchTask, RouteService>;
