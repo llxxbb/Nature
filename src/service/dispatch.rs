@@ -1,18 +1,18 @@
 use std::marker::PhantomData;
 use super::*;
 
-pub type DispatchTask = Dispatch<DeliveryService>;
+pub type DispatchService = DispatchServiceImpl<DeliveryService>;
 
-pub trait DispatchTrait {
+pub trait DispatchServiceTrait {
     fn do_dispatch_task(carrier: Carrier<StoreTaskInfo>);
     fn re_dispatch(carrier: Carrier<StoreTaskInfo>) -> Result<()>;
 }
 
-pub struct Dispatch<T> {
+pub struct DispatchServiceImpl<T> {
     delivery_service: PhantomData<T>
 }
 
-impl<T: DeliveryServiceTrait> DispatchTrait for Dispatch<T> {
+impl<T: DeliveryServiceTrait> DispatchServiceTrait for DispatchServiceImpl<T> {
     fn do_dispatch_task(carrier: Carrier<StoreTaskInfo>) {
         if carrier.content.data.target.is_none() {
             let _ = T::finish_carrier(&carrier.id);
@@ -52,7 +52,7 @@ impl<T: DeliveryServiceTrait> DispatchTrait for Dispatch<T> {
     }
 }
 
-impl<T: DeliveryServiceTrait> Dispatch<T> {
+impl<T: DeliveryServiceTrait> DispatchServiceImpl<T> {
     fn generate_converter_info(carrier: &Carrier<StoreTaskInfo>) -> Result<Vec<ConverterInfo>> {
         let mut new_carriers: Vec<ConverterInfo> = Vec::new();
         let target = carrier.target.clone();

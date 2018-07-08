@@ -2,9 +2,6 @@
 
 ## for the nearer term
 
-* delete CHANNEL_ROUTE
-    
-
 * move convert from task to service directory
 
 * unit test:

@@ -31,7 +31,7 @@ impl<D, V, S, C, P, R> StoreServiceTrait for StoreServiceImpl<D, V, S, C, P, R>
           V: InstanceServiceTrait,
           S: InstanceDao,
           C: ThingDefineCacheTrait,
-          P: DispatchTrait,
+          P: DispatchServiceTrait,
           R: RouteServiceTrait
 {
     /// born an instance which is the beginning of the changes.
@@ -69,7 +69,7 @@ impl<D, V, S, C, P, R> StoreServiceTrait for StoreServiceImpl<D, V, S, C, P, R>
 }
 
 impl<D, V, S, C, P, R> StoreServiceImpl<D, V, S, C, P, R>
-    where D: DeliveryServiceTrait, C: ThingDefineCacheTrait, P: DispatchTrait, S: InstanceDao
+    where D: DeliveryServiceTrait, C: ThingDefineCacheTrait, P: DispatchServiceTrait, S: InstanceDao
 {
     /// save to db and handle duplicated data
     fn save(carrier: Carrier<StoreTaskInfo>) -> Result<u128> {
@@ -101,4 +101,4 @@ impl<D, V, S, C, P, R> StoreServiceImpl<D, V, S, C, P, R>
     }
 }
 
-pub type StoreService = StoreServiceImpl<DeliveryService, InstanceImpl, TableInstance, ThingDefineCacheImpl, DispatchTask, RouteService>;
+pub type StoreService = StoreServiceImpl<DeliveryService, InstanceImpl, TableInstance, ThingDefineCacheImpl, DispatchService, RouteService>;

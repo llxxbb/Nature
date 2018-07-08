@@ -1,6 +1,7 @@
 ///! World Connection Service provider
 extern crate uuid;
 
+pub use self::channels::*;
 pub use self::error::*;
 use std;
 
@@ -16,5 +17,6 @@ lazy_static! {
 }
 
 
-pub mod error;
+mod error;
+mod channels;
 
