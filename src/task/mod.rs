@@ -1,6 +1,6 @@
 use data::*;
 use db::*;
-pub use self::process_line::{ConvertService, ConvertTaskImpl, ConvertTaskTrait, SequentialTask};
+pub use self::process_line::{SequentialTask};
 pub use self::process_line::{ParallelServiceImpl, ParallelServiceTrait, ParallelTask, SequentialServiceImpl, SequentialTrait};
 pub use self::struct_define::*;
 #[cfg(test)]

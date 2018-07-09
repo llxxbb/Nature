@@ -6,7 +6,6 @@ use serde::Serialize;
 use service::*;
 use std::sync::Mutex;
 use std::thread;
-use super::*;
 
 lazy_static! {
     pub static ref CHANNEL_DISPATCH : Channel<Carrier<StoreTaskInfo>> = Channel::new();

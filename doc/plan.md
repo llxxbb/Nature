@@ -2,8 +2,6 @@
 
 ## for the nearer term
 
-* move convert from task to service directory
-
 * unit test:
   * store 
 * integrate test
