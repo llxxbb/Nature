@@ -5,7 +5,6 @@ extern crate nature;
 use nature::global::*;
 use nature::rpc::*;
 use nature::service::*;
-use nature::task::*;
 
 fn main() {
     nature::util::setup_logger().unwrap();

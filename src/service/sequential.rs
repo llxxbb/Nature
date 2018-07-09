@@ -6,6 +6,12 @@ use std::marker::PhantomData;
 use std::ops::Deref;
 use super::*;
 
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct SerialFinished {
+    pub succeeded_id: Vec<u128>,
+    pub errors: Vec<String>,
+}
+
 pub trait SequentialTrait {
     fn submit_serial(batch: SerialBatchInstance) -> Result<()>;
     fn do_serial_task(carrier: Carrier<SerialBatchInstance>);
