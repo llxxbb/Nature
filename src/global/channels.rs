@@ -3,7 +3,7 @@ extern crate multiqueue;
 use data::*;
 use self::multiqueue::*;
 use serde::Serialize;
-use service::*;
+use fg_service::*;
 use std::sync::Mutex;
 use std::thread;
 

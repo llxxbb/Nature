@@ -1,6 +1,6 @@
 use chrono::prelude::*;
+use db::trait_define::ThingDefineDaoTrait;
 use super::*;
-
 
 
 #[test]
@@ -20,15 +20,18 @@ fn define_test() {
         version: 100,
     };
     // delete if it exists 
-    if let Ok(Some(_)) = TableThingDefine::get(&thing) {
-        let _ = TableThingDefine::delete(&thing);
+    if let Ok(Some(_)) = ThingDefineDaoImpl::get(&thing) {
+        let _ = ThingDefineDaoImpl::delete(&thing);
     }
     // insert
-    let rtn = TableThingDefine::insert(&define);
-    println!("insert result : {:?}", rtn);
+    let rtn = ThingDefineDaoImpl::insert(&define);
+    assert_eq!(rtn.unwrap(), 1);
+    // repeat insert
+    let rtn = ThingDefineDaoImpl::insert(&define);
+    assert_eq!(rtn.err().unwrap(), NatureError::DaoDuplicated);
     // find inserted
-    let row = TableThingDefine::get(&thing).unwrap().unwrap();
+    let row = ThingDefineDaoImpl::get(&thing).unwrap().unwrap();
     assert_eq!(row, define);
     // delete it
-    TableThingDefine::delete(&thing).unwrap();
+    ThingDefineDaoImpl::delete(&thing).unwrap();
 }

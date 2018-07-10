@@ -1,10 +1,10 @@
 use diesel::prelude::*;
 use super::*;
 
-pub struct TableThingDefine;
+pub struct ThingDefineDaoImpl;
 
-impl TableThingDefine {
-    pub fn get(thing: &Thing) -> Result<Option<ThingDefine>> {
+impl ThingDefineDaoTrait for ThingDefineDaoImpl {
+    fn get(thing: &Thing) -> Result<Option<ThingDefine>> {
         use self::schema::thing_defines::dsl::*;
         let conn: &SqliteConnection = &CONN.lock().unwrap();
         let def = thing_defines.filter(key.eq(&thing.key))
@@ -17,7 +17,7 @@ impl TableThingDefine {
         }
     }
 
-    pub fn insert(define: &ThingDefine) -> Result<usize> {
+    fn insert(define: &ThingDefine) -> Result<usize> {
         use self::schema::thing_defines;
         let conn: &SqliteConnection = &CONN.lock().unwrap();
         let rtn = diesel::insert_into(thing_defines::table)
@@ -29,7 +29,7 @@ impl TableThingDefine {
         }
     }
 
-    pub fn delete(thing: &Thing) -> Result<usize> {
+    fn delete(thing: &Thing) -> Result<usize> {
         use self::schema::thing_defines::dsl::*;
         let conn: &SqliteConnection = &CONN.lock().unwrap();
         let rtn = diesel::delete(thing_defines.filter(key.eq(&thing.key)).filter(version.eq(thing.version)))

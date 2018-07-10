@@ -25,7 +25,7 @@ impl ThingDefineCacheTrait for ThingDefineCacheImpl {
                 return Ok(x.clone());
             };
         };
-        match TableThingDefine::get(&thing)? {
+        match ThingDefineDaoImpl::get(&thing)? {
             None => return Err(NatureError::ThingNotDefined(format!("{} not defined", thing.key))),
             Some(def) => {
                 cache.insert(thing.clone(), def.clone());

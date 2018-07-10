@@ -2,8 +2,10 @@
 
 ## for the nearer term
 
-* unit test:
-  * store 
+* integrate test
+  simple_input
+    add a defined thing to db and test
+
 * integrate test
     * simple_input
         * task test
@@ -13,6 +15,8 @@
     callback
     batch_serial
     batch_parallel
+* unit test:
+  * store 
 * test task
   * process line
     * dispatch

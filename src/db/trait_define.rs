@@ -1,9 +1,10 @@
 use serde::Serialize;
 use super::*;
 
-pub trait ThingDefineDao {
-    fn get(thing: &Thing) -> Result<ThingDefine>;
-    fn insert(define: &ThingDefine) -> Result<()>;
+pub trait ThingDefineDaoTrait{
+    fn get(thing: &Thing) -> Result<Option<ThingDefine>>;
+    fn insert(define: &ThingDefine) -> Result<usize>;
+    fn delete(thing: &Thing) -> Result<usize>;
 }
 
 pub trait ThingDefineCacheTrait {

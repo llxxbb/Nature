@@ -6,7 +6,7 @@ pub use self::sqlite::*;
 #[cfg(test)]
 pub use self::test::*;
 pub use self::trait_define::*;
-use service::*;
+use fg_service::*;
 
 mod sqlite;
 mod cache;
