@@ -4,7 +4,7 @@ use super::*;
 fn standardize_empty() {
     println!("----------------- standardize_empty --------------------");
     let mut key = String::new();
-    let rtn = Thing::key_standardize(&mut key, Root::Business);
+    let rtn = Thing::key_standardize(&mut key);
     if let Err(NatureError::VerifyError(x)) = rtn {
         assert_eq!(x, "key length can't be zero");
     } else {
@@ -12,7 +12,7 @@ fn standardize_empty() {
     }
 
     let mut key = "/".to_string();
-    let rtn = Thing::key_standardize(&mut key, Root::Business);
+    let rtn = Thing::key_standardize(&mut key);
     if let Err(NatureError::VerifyError(x)) = rtn {
         assert_eq!(x, "key length can't be zero");
     } else {
@@ -25,7 +25,7 @@ fn standardize_empty() {
 fn standardize_no_separator_at_beginning() {
     println!("----------------- standardize_no_separator_at_beginning --------------------");
     let mut key = "a/b/c/".to_string();
-    let _rtn = Thing::key_standardize(&mut key, Root::Business);
+    let _rtn = Thing::key_standardize(&mut key);
     assert_eq!(key, "/B/a/b/c");
 }
 
@@ -33,6 +33,6 @@ fn standardize_no_separator_at_beginning() {
 fn standardize_system_key() {
     println!("----------------- standardize_system_key --------------------");
     let mut key = "/a/b/c".to_string();
-    let _rtn = Thing::key_standardize(&mut key, Root::System);
+    let _rtn = Thing::key_standardize(&mut key);
     assert_eq!(key, "/S/a/b/c");
 }

@@ -11,15 +11,15 @@ pub static SYS_ROOT: &'static str = "/S";
 /// the root for business `Thing`
 pub static BIZ_ROOT: &'static str = "/B";
 
-/// Every `Thing` must have a root
-#[derive(Debug)]
-pub enum Root {
+/// Every `Thing` must have a type
+#[derive(Serialize, Deserialize, PartialEq, Eq, Hash, Debug, Clone, Ord, PartialOrd)]
+pub enum ThingType {
     Business,
     System,
 }
 
 /// `Thing`'s basic information
-#[derive(Serialize, Deserialize, PartialEq, Eq, Hash, Debug, Default, Clone, Ord, PartialOrd)]
+#[derive(Serialize, Deserialize, PartialEq, Eq, Hash, Debug, Clone, Ord, PartialOrd)]
 pub struct Thing {
     /// # Identify a `Thing`.
     ///
@@ -34,11 +34,24 @@ pub struct Thing {
 
     /// A `Thing` can be changed in future, the `version` will support this without effect the old ones
     pub version: i32,
+
+    /// A `Thing`'s type
+    pub thing_type: ThingType,
+}
+
+impl Default for Thing {
+    fn default() -> Self {
+        Thing {
+            key: String::default(),
+            version: 0,
+            thing_type: ThingType::Business,
+        }
+    }
 }
 
 impl Thing {
     /// prefix "/B(usiness)" to the head of the string,.to avoid outer use"/S(ystem)" prefix.
-    pub fn key_standardize(biz: &mut String, root: Root) -> Result<()> {
+    pub fn key_standardize(biz: &mut String) -> Result<()> {
         if biz.ends_with(PATH_SEPARATOR) {
             let last = biz.len() - 1;
             biz.remove(last);
@@ -48,10 +61,6 @@ impl Thing {
         }
         if !biz.starts_with(PATH_SEPARATOR) {
             biz.insert(0, PATH_SEPARATOR);
-        }
-        match root {
-            Root::Business => biz.insert_str(0, BIZ_ROOT),
-            Root::System => biz.insert_str(0, SYS_ROOT),
         }
         Ok(())
     }

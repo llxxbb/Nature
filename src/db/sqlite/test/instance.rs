@@ -13,6 +13,7 @@ fn instance_common_test() {
             thing: Thing {
                 key: "/instance/common".to_string(),
                 version: 100,
+                thing_type: ThingType::Business,
             },
             event_time: 0,
             execute_time: 0,
@@ -46,6 +47,7 @@ fn get_last_status() {
             thing: Thing {
                 key: "/instance/getLast".to_string(),
                 version: 100,
+                thing_type: ThingType::Business,
             },
             event_time: 0,
             execute_time: 0,

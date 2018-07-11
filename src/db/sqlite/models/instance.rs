@@ -32,6 +32,7 @@ impl Instance {
                 thing: Thing {
                     key: k,
                     version: ni.from_version.unwrap(),
+                    thing_type: ThingType::Business,
                 },
                 status_version: ni.from_status_version.unwrap(),
             })
@@ -51,6 +52,7 @@ impl Instance {
                 thing: Thing {
                     key: ni.thing,
                     version: ni.version,
+                    thing_type: ThingType::Business,
                 },
                 event_time: ni.event_time.timestamp_millis(),
                 execute_time: ni.execute_time.timestamp_millis(),

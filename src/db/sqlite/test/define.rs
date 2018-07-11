@@ -18,6 +18,7 @@ fn define_test() {
     let thing = Thing {
         key: "/test".to_string(),
         version: 100,
+        thing_type: ThingType::Business,
     };
     // delete if it exists 
     if let Ok(Some(_)) = ThingDefineDaoImpl::get(&thing) {

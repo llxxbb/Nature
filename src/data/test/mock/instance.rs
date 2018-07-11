@@ -1,6 +1,5 @@
 use data::instance::Instance;
 use data::InstanceServiceTrait;
-use data::thing::Root;
 use std::ops::Deref;
 use super::*;
 
@@ -12,7 +11,7 @@ lazy_static! {
 pub struct MockInstanceTrait;
 
 impl InstanceServiceTrait for MockInstanceTrait {
-    fn verify(_instance: &mut Instance, _root: Root) -> Result<u128> {
+    fn verify(_instance: &mut Instance) -> Result<u128> {
         DATA_INSTANCE_RESULT.lock().unwrap().deref().clone()
     }
 }

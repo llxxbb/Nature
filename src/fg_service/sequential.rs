@@ -78,6 +78,7 @@ impl<SD, SS> SequentialServiceImpl<SD, SS>
                 thing: Thing {
                     key: SYS_KEY_SERIAL.clone(),
                     version: 1,
+                    thing_type: ThingType::System,
                 },
                 event_time: time,
                 execute_time: time,
@@ -97,7 +98,8 @@ impl<SD, SS> SequentialServiceImpl<SD, SS>
         let mut errors: Vec<String> = Vec::new();
         let mut succeeded_id: Vec<u128> = Vec::new();
         for mut instance in carrier.content.data.instances.clone() {
-            if let Err(err) = F::verify(&mut instance, Root::Business) {
+            instance.data.thing.thing_type = ThingType::Business;
+            if let Err(err) = F::verify(&mut instance) {
                 errors.push(format!("{:?}", err));
                 continue;
             }

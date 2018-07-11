@@ -71,7 +71,7 @@ pub struct SerialBatchInstance {
 }
 
 pub trait InstanceServiceTrait {
-    fn verify(instance: &mut Instance, root: Root) -> Result<u128>;
+    fn verify(instance: &mut Instance) -> Result<u128>;
 }
 
 pub struct InstanceImpl;
@@ -79,8 +79,8 @@ pub struct InstanceImpl;
 impl InstanceServiceTrait for InstanceImpl {
     /// check key whether defined
     /// generate id by hashing if it is not set.
-    fn verify(instance: &mut Instance, root: Root) -> Result<u128> {
-        Thing::key_standardize(&mut instance.data.thing.key, root)?;
+    fn verify(instance: &mut Instance) -> Result<u128> {
+        Thing::key_standardize(&mut instance.data.thing.key)?;
         // just see whether it was configured.
         ThingDefineCacheImpl::get(&instance.data.thing)?;
         Self::id_generate_if_not_set(instance)
