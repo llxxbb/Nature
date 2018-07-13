@@ -1,13 +1,15 @@
 extern crate chrono;
 extern crate fern;
+#[macro_use]
+extern crate log;
 extern crate nature;
 
+use nature::fg_service::*;
 use nature::global::*;
 use nature::rpc::*;
-use nature::fg_service::*;
 
 fn main() {
-    nature::util::setup_logger().unwrap();
+    let _ = nature::util::setup_logger();
 
     // read config
 //    let config = world_connection::util::get_settings();
@@ -18,6 +20,7 @@ fn main() {
 }
 
 fn start_receive_threads() {
+    info!("to start receive threads");
     start_thread(&CHANNEL_DISPATCH.receiver, DispatchService::do_dispatch_task);
     start_thread(&CHANNEL_CONVERT.receiver, ConvertService::do_convert_task);
     start_thread(&CHANNEL_STORE.receiver, StoreService::receive_store_task);

@@ -37,6 +37,7 @@ impl<D, V, S, C, P, R> StoreServiceTrait for StoreServiceImpl<D, V, S, C, P, R>
     /// born an instance which is the beginning of the changes.
     fn input(mut instance: Instance) -> Result<u128>
     {
+        debug!("get instance: {:?}", instance);
         instance.data.thing.thing_type = ThingType::Business;
         let uuid = V::verify(&mut instance)?;
         let task = Self::generate_store_task(instance)?;

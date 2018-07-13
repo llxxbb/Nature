@@ -23,7 +23,7 @@ fn key_defined() {
         fields: None,
         create_time: Local::now().naive_local(),
     };
-    let result = ThingDefineDaoImpl::insert(&define);
+    let _ = ThingDefineDaoImpl::insert(&define);
     // prepare input para
     let mut instance = Instance::default();
     instance.data.thing.key = key;

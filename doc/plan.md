@@ -2,6 +2,7 @@
 
 ## for the nearer term
 
+* add 
 * integrate test
   simple_input
     add a defined thing to db and test
