@@ -1,11 +1,9 @@
 # plan
 
-
-
 ## for the nearer term
 
 * implement one_step_flow dao
-
+* add trait to relation cache
 * integrate test
   simple_input
     add a defined thing to db and test

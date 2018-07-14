@@ -1,14 +1,14 @@
 use data::*;
 use db::*;
 use global::*;
-pub use self::convert::{CallOutParameter, ConverterInfo, ConverterReturned, ConvertService, ConvertTaskTrait};
-pub use self::delivery::{Carrier, CarryError, DataType, DeliveryService, DeliveryServiceTrait, SVC_DELIVERY};
-pub use self::dispatch::{DispatchService, DispatchServiceTrait};
-pub use self::parallel::{ParallelServiceTrait, ParallelTask};
-pub use self::plan::{PlanInfo, PlanService, PlanServiceTrait, SVC_PLAN};
-pub use self::route::{Demand, LastStatusDemand, Relation, RouteInfo, RouteService, RouteServiceTrait, Target};
-pub use self::sequential::{SequentialTask, SequentialTrait};
-pub use self::store::{StoreService, StoreServiceTrait, StoreTaskInfo};
+pub use self::convert::{CallOutParameter, ConverterInfo, ConverterReturned, ConvertServiceImpl, ConvertServiceTrait};
+pub use self::delivery::{Carrier, CarryError, DataType, DeliveryServiceImpl, DeliveryServiceTrait, SVC_DELIVERY};
+pub use self::dispatch::{DispatchServiceImpl, DispatchServiceTrait};
+pub use self::parallel::{ParallelServiceImpl, ParallelServiceTrait};
+pub use self::plan::{PlanInfo, PlanServiceImpl, PlanServiceTrait, SVC_PLAN};
+pub use self::route::{Demand, LastStatusDemand, Relation, RouteInfo, RouteServiceImpl, RouteServiceTrait, Target};
+pub use self::sequential::{SequentialServiceImpl, SequentialTrait};
+pub use self::store::{StoreServiceImpl, StoreServiceTrait, StoreTaskInfo};
 use std::sync::Arc;
 
 mod delivery;

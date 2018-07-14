@@ -43,4 +43,3 @@ impl<SD, SS> ParallelServiceTrait for ParallelServiceImpl<SD, SS>
     }
 }
 
-pub type ParallelTask = ParallelServiceImpl<DeliveryService, StoreService>;

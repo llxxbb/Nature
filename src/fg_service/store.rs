@@ -103,5 +103,3 @@ impl<D, V, S, C, P, R> StoreServiceImpl<D, V, S, C, P, R>
         }
     }
 }
-
-pub type StoreService = StoreServiceImpl<DeliveryService, InstanceImpl, InstanceDaoImpl, ThingDefineCacheImpl, DispatchService, RouteService>;

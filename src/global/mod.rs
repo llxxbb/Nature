@@ -3,6 +3,7 @@ extern crate uuid;
 
 pub use self::channels::*;
 pub use self::error::*;
+pub use self::service_type_define::*;
 use std;
 
 pub type Result<T> = std::result::Result<T, NatureError>;
@@ -16,7 +17,8 @@ lazy_static! {
     pub static ref CONTEXT_TARGET_INSTANCE_ID : String = "sys.target_instance_id".to_string();
 }
 
-
 mod error;
 mod channels;
+
+mod service_type_define;
 

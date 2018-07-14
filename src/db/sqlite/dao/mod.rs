@@ -1,4 +1,4 @@
-pub use self::carrier::*;
+pub use self::delivery::*;
 pub use self::error::*;
 pub use self::instance::*;
 pub use self::one_step_flow::*;
@@ -9,6 +9,6 @@ use super::*;
 mod thing_define;
 mod instance;
 mod error;
-mod carrier;
+mod delivery;
 mod one_step_flow;
 mod plan;

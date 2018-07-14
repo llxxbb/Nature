@@ -23,18 +23,18 @@ pub enum ConverterReturned {
     Instances(Vec<Instance>),
 }
 
-pub trait ConvertTaskTrait {
+pub trait ConvertServiceTrait {
     fn submit_callback(delayed: DelayedInstances) -> Result<()>;
     fn do_convert_task(carrier: Carrier<ConverterInfo>);
 }
 
-pub struct ConvertTaskImpl<SP, SD, SS> {
+pub struct ConvertServiceImpl<SP, SD, SS> {
     plan: PhantomData<SP>,
     delivery: PhantomData<SD>,
     store: PhantomData<SS>,
 }
 
-impl<SP, SD, SS> ConvertTaskTrait for ConvertTaskImpl<SP, SD, SS>
+impl<SP, SD, SS> ConvertServiceTrait for ConvertServiceImpl<SP, SD, SS>
     where SP: PlanServiceTrait, SD: DeliveryServiceTrait, SS: StoreServiceTrait {
     fn submit_callback(delayed: DelayedInstances) -> Result<()> {
         let carrier = DeliveryDaoImpl::get::<ConverterInfo>(delayed.carrier_id)?;
@@ -73,7 +73,7 @@ impl<SP, SD, SS> ConvertTaskTrait for ConvertTaskImpl<SP, SD, SS>
     }
 }
 
-impl<SP, SD, SS> ConvertTaskImpl<SP, SD, SS>
+impl<SP, SD, SS> ConvertServiceImpl<SP, SD, SS>
     where SP: PlanServiceTrait, SD: DeliveryServiceTrait, SS: StoreServiceTrait {
     fn handle_instances(carrier: &Carrier<ConverterInfo>, instances: &Vec<Instance>) -> Result<()> {
 // check status version to avoid loop
@@ -136,8 +136,6 @@ fn verify(to: &Thing, instances: &Vec<Instance>) -> Result<Vec<Instance>> {
 
     Ok(rtn)
 }
-
-pub type ConvertService = ConvertTaskImpl<PlanService, DeliveryService, StoreService>;
 
 impl ConverterInfo {
     /// **Error:**

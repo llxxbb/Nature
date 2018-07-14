@@ -3,8 +3,6 @@ use std::collections::HashSet;
 use std::marker::PhantomData;
 use super::*;
 
-pub type RouteService = RouteServiceImpl<DeliveryService>;
-
 pub trait RouteServiceTrait {
     fn get_route(instance: &Instance) -> Result<Option<Vec<Target>>>;
 }

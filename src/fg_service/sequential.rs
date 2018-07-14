@@ -116,5 +116,3 @@ impl<SD, SS> SequentialServiceImpl<SD, SS>
         Ok(SerialFinished { succeeded_id, errors })
     }
 }
-
-pub type SequentialTask = SequentialServiceImpl<DeliveryService, StoreService>;

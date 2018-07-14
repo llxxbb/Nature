@@ -146,7 +146,6 @@ pub enum DataType {
     QueueBatch = 12,
 }
 
-pub type DeliveryService = DeliveryServiceImpl<DeliveryDaoImpl>;
 
 lazy_static! {
     pub static ref SVC_DELIVERY : Arc<DeliveryService> = Arc::new(DeliveryServiceImpl{table_delivery:PhantomData});

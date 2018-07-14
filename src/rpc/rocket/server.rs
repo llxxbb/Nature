@@ -28,12 +28,12 @@ fn callback(delayed: Json<DelayedInstances>) -> Json<Result<()>> {
 
 #[post("/serial_batch", format = "application/json", data = "<serial_batch>")]
 fn batch_for_serial(serial_batch: Json<SerialBatchInstance>) -> Json<Result<()>> {
-    let x = SequentialTask::submit_serial(serial_batch.0);
+    let x = SequentialService::submit_serial(serial_batch.0);
     Json(x)
 }
 
 #[post("/parallel_batch", format = "application/json", data = "<parallel_batch>")]
 fn batch_for_parallel(parallel_batch: Json<ParallelBatchInstance>) -> Json<Result<()>> {
-    let x = ParallelTask::submit_parallel(parallel_batch.0);
+    let x = ParallelService::submit_parallel(parallel_batch.0);
     Json(x)
 }

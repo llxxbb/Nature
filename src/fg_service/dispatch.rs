@@ -1,8 +1,6 @@
 use std::marker::PhantomData;
 use super::*;
 
-pub type DispatchService = DispatchServiceImpl<DeliveryService>;
-
 pub trait DispatchServiceTrait {
     fn do_dispatch_task(carrier: Carrier<StoreTaskInfo>);
     fn re_dispatch(carrier: Carrier<StoreTaskInfo>) -> Result<()>;
