@@ -103,7 +103,7 @@ impl<SD, SS> SequentialServiceImpl<SD, SS>
                 errors.push(format!("{:?}", err));
                 continue;
             }
-            match TableInstance::insert(&instance) {
+            match InstanceDaoImpl::insert(&instance) {
                 Ok(_) => succeeded_id.push(instance.id),
                 Err(NatureError::DaoEnvironmentError(err)) => return Err(NatureError::DaoEnvironmentError(err)),
                 Err(NatureError::DaoDuplicated) => succeeded_id.push(instance.id),

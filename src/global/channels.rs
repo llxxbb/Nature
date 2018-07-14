@@ -6,6 +6,7 @@ use serde::Serialize;
 use fg_service::*;
 use std::sync::Mutex;
 use std::thread;
+use std::fmt::Debug;
 
 lazy_static! {
     pub static ref CHANNEL_DISPATCH : Channel<Carrier<StoreTaskInfo>> = Channel::new();
@@ -17,7 +18,7 @@ lazy_static! {
 
 pub fn start_thread<T, F>(receiver: &'static Mutex<MPMCReceiver<Carrier<T>>>, f: F)
     where
-        T: Serialize + Send,
+        T: Serialize + Send + Debug,
         F: 'static + Fn(Carrier<T>) + Send
 {
     use std::ops::Deref;

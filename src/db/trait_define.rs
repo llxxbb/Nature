@@ -1,5 +1,6 @@
 use serde::Serialize;
 use super::*;
+use std::fmt::Debug;
 
 pub trait ThingDefineDaoTrait{
     fn get(thing: &Thing) -> Result<Option<ThingDefine>>;
@@ -12,26 +13,26 @@ pub trait ThingDefineCacheTrait {
 }
 
 
-pub trait MappingDao {
+pub trait OneStepFlowDaoTrait {
     fn get_relations(from: &Thing) -> Result<Vec<Relation>>;
 }
 
-pub trait DaoDelivery {
-    fn insert<T: Sized + Serialize + Send>(carrier: &Carrier<T>) -> Result<u128>;
+pub trait DeliveryDaoTrait {
+    fn insert<T: Sized + Serialize + Send + Debug>(carrier: &Carrier<T>) -> Result<u128>;
     fn delete(id: &u128) -> Result<()>;
-    fn move_to_error<T: Sized + Serialize>(err: CarryError<T>) -> Result<()>;
+    fn move_to_error<T: Sized + Serialize + Debug>(err: CarryError<T>) -> Result<()>;
     fn update_execute_time(_id: u128, new_time: i64) -> Result<()>;
-    fn get<T: Sized + Serialize>(_id: u128) -> Result<Carrier<T>>;
+    fn get<T: Sized + Serialize + Debug>(_id: u128) -> Result<Carrier<T>>;
 }
 
-pub trait InstanceDao {
+pub trait InstanceDaoTrait {
     fn insert(instance: &Instance) -> Result<usize>;
     fn get_last_status_by_id(id: &u128) -> Result<Option<Instance>>;
     /// check whether source stored earlier
     fn is_exists(instance: &Instance) -> Result<bool>;
 }
 
-pub trait StorePlanDao {
+pub trait StorePlanDaoTrait {
     /// replace the plan if plan exists.
     fn save(plan: &PlanInfo) -> Result<PlanInfo>;
     fn get(from_id: &u128) -> Result<PlanInfo>;

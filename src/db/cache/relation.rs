@@ -18,6 +18,7 @@ pub struct RelationCache;
 
 impl RelationCache {
     pub fn get(from: &Thing) -> Result<Vec<Relation>> {
+        debug!("get relation for thing : {:?}", from);
         let (relations, balances) = get_balanced(from)?;
         Ok(weight_filter(&relations, &balances))
     }
@@ -26,9 +27,11 @@ impl RelationCache {
 fn get_balanced(from: &Thing) -> Result<(Vec<Relation>, HashMap<Thing, Range<f32>>)> {
     let mut cache = CACHE_MAPPING.lock().unwrap();
     if let Some(balances) = cache.get(from) {
+        debug!("get balances from cache for thing : {:?}", from);
         return Ok(balances.clone());
     }
-    let relations = MappingDaoService::get_relations(from)?;
+    debug!("get balances from db for thing : {:?}", from);
+    let relations = OneStepFlowDaoImpl::get_relations(from)?;
     let label_groups = get_label_groups(&relations);
     let rtn = (relations, weight_calculate(&label_groups));
     let rtn_clone = rtn.clone();

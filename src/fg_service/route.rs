@@ -30,6 +30,7 @@ impl<T> RouteServiceTrait for RouteServiceImpl<T> where T: DeliveryServiceTrait 
 
 impl<T> RouteServiceImpl<T> where T: DeliveryServiceTrait {
     fn filter_relations(instance: &Instance, maps: Vec<Relation>) -> Option<Vec<Target>> {
+        debug!("filter relations for instance: {:?}", instance);
         let mut rtn: Vec<Target> = Vec::new();
         for m in maps {
             if !Self::context_check(&instance.data.context, &m) {

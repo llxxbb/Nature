@@ -37,7 +37,7 @@ pub struct ConvertTaskImpl<SP, SD, SS> {
 impl<SP, SD, SS> ConvertTaskTrait for ConvertTaskImpl<SP, SD, SS>
     where SP: PlanServiceTrait, SD: DeliveryServiceTrait, SS: StoreServiceTrait {
     fn submit_callback(delayed: DelayedInstances) -> Result<()> {
-        let carrier = TableDelivery::get::<ConverterInfo>(delayed.carrier_id)?;
+        let carrier = DeliveryDaoImpl::get::<ConverterInfo>(delayed.carrier_id)?;
         match delayed.result {
             CallbackResult::Err(err) => {
                 let err = NatureError::ConverterLogicalError(err);
@@ -60,7 +60,7 @@ impl<SP, SD, SS> ConvertTaskTrait for ConvertTaskImpl<SP, SD, SS>
                 }
             }
             Ok(ConverterReturned::Delay(delay)) => {
-                let _ = TableDelivery::update_execute_time(carrier.id, carrier.execute_time + delay as i64);
+                let _ = DeliveryDaoImpl::update_execute_time(carrier.id, carrier.execute_time + delay as i64);
                 ()
             }
             Err(err) => match err {
@@ -153,7 +153,7 @@ impl ConverterInfo {
                     // context have target id
                     Some(status_id) => {
                         let status_id = u128::from_str(status_id)?;
-                        TableInstance::get_last_status_by_id(&status_id)?
+                        InstanceDaoImpl::get_last_status_by_id(&status_id)?
                     }
                     None => None,
                 }

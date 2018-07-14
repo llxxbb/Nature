@@ -29,7 +29,7 @@ pub struct StoreServiceImpl<D, V, S, C, P, R> {
 impl<D, V, S, C, P, R> StoreServiceTrait for StoreServiceImpl<D, V, S, C, P, R>
     where D: DeliveryServiceTrait,
           V: InstanceServiceTrait,
-          S: InstanceDao,
+          S: InstanceDaoTrait,
           C: ThingDefineCacheTrait,
           P: DispatchServiceTrait,
           R: RouteServiceTrait
@@ -63,6 +63,7 @@ impl<D, V, S, C, P, R> StoreServiceTrait for StoreServiceImpl<D, V, S, C, P, R>
     /// generate `StoreTaskInfo` include route information.
     /// `Err` on environment error
     fn generate_store_task(instance: Instance) -> Result<StoreTaskInfo> {
+        debug!("generate store task for : {:?}", instance);
         let target = R::get_route(&instance)?;
         // save to delivery to make it can redo
         let task = StoreTaskInfo { instance, upstream: None, target };
@@ -71,7 +72,7 @@ impl<D, V, S, C, P, R> StoreServiceTrait for StoreServiceImpl<D, V, S, C, P, R>
 }
 
 impl<D, V, S, C, P, R> StoreServiceImpl<D, V, S, C, P, R>
-    where D: DeliveryServiceTrait, C: ThingDefineCacheTrait, P: DispatchServiceTrait, S: InstanceDao
+    where D: DeliveryServiceTrait, C: ThingDefineCacheTrait, P: DispatchServiceTrait, S: InstanceDaoTrait
 {
     /// save to db and handle duplicated data
     fn save(carrier: Carrier<StoreTaskInfo>) -> Result<u128> {
@@ -103,4 +104,4 @@ impl<D, V, S, C, P, R> StoreServiceImpl<D, V, S, C, P, R>
     }
 }
 
-pub type StoreService = StoreServiceImpl<DeliveryService, InstanceImpl, TableInstance, ThingDefineCacheImpl, DispatchService, RouteService>;
+pub type StoreService = StoreServiceImpl<DeliveryService, InstanceImpl, InstanceDaoImpl, ThingDefineCacheImpl, DispatchService, RouteService>;

@@ -1,8 +1,8 @@
 use super::*;
 
-pub struct StorePlanDaoService;
+pub struct StorePlanDaoImpl;
 
-impl StorePlanDao for StorePlanDaoService {
+impl StorePlanDaoTrait for StorePlanDaoImpl {
     fn save(_plan: &PlanInfo) -> Result<PlanInfo> {
         unimplemented!()
     }

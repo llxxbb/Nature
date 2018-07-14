@@ -22,7 +22,7 @@ pub struct PlanServiceImpl<DAO> {
     dao: PhantomData<DAO>
 }
 
-impl<DAO> PlanServiceTrait for PlanServiceImpl<DAO> where DAO: StorePlanDao {
+impl<DAO> PlanServiceTrait for PlanServiceImpl<DAO> where DAO: StorePlanDaoTrait {
     fn new(converter_info: &ConverterInfo, instances: &Vec<Instance>) -> Result<PlanInfo> {
         let plan = PlanInfo {
             from_id: converter_info.from.id,
@@ -39,7 +39,7 @@ impl<DAO> PlanServiceTrait for PlanServiceImpl<DAO> where DAO: StorePlanDao {
     }
 }
 
-pub type PlanService = PlanServiceImpl<StorePlanDaoService>;
+pub type PlanService = PlanServiceImpl<StorePlanDaoImpl>;
 
 lazy_static! {
     pub static ref SVC_PLAN : Arc<PlanService> = Arc::new(PlanServiceImpl{dao: PhantomData});

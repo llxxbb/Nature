@@ -16,6 +16,7 @@ pub struct ThingDefineCacheImpl;
 
 impl ThingDefineCacheTrait for ThingDefineCacheImpl {
     fn get(thing: &Thing) -> Result<ThingDefine> {
+        debug!("get `ThingDefine` from cache for thing : {:?}", thing);
         if thing.key.is_empty() {
             return Err(NatureError::VerifyError("[biz] must not be empty!".to_string()));
         }

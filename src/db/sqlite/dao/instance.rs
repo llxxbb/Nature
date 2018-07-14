@@ -1,10 +1,9 @@
 use diesel::prelude::*;
-use std::sync::Arc;
 use super::*;
 
-pub struct TableInstance;
+pub struct InstanceDaoImpl;
 
-impl InstanceDao for TableInstance {
+impl InstanceDaoTrait for InstanceDaoImpl {
     fn insert(instance: &Instance) -> Result<usize> {
         use self::schema::instances;
         let new = NewInstance::new(instance)?;
@@ -50,7 +49,7 @@ impl InstanceDao for TableInstance {
     }
 }
 
-impl TableInstance {
+impl InstanceDaoImpl {
     pub fn delete(ins: &Instance) -> Result<usize> {
         use self::schema::instances::dsl::*;
         let conn: &SqliteConnection = &CONN.lock().unwrap();
@@ -65,8 +64,4 @@ impl TableInstance {
             Err(err) => Err(NatureError::from(err))
         }
     }
-}
-
-lazy_static! {
-    pub static ref DAO_INSTANCE : Arc<TableInstance> = Arc::new(TableInstance);
 }

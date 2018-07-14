@@ -1,3 +1,5 @@
+//! Define the data used all over the project, not only by `fg-service`
+
 pub use self::instance::*;
 pub use self::relation::*;
 #[cfg(test)]

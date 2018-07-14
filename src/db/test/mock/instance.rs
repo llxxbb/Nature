@@ -1,4 +1,4 @@
-use db::trait_define::InstanceDao;
+use db::trait_define::InstanceDaoTrait;
 use std::ops::Deref;
 use super::*;
 
@@ -9,7 +9,7 @@ lazy_static! {
 
 pub struct MockTableInstance;
 
-impl InstanceDao for MockTableInstance {
+impl InstanceDaoTrait for MockTableInstance {
     fn insert(_instance: &Instance) -> Result<usize> {
         println!("------------ InstanceDao insert-----------------");
         TABLE_INSTANCE_INSERT_VALUE.lock().unwrap().deref().clone()

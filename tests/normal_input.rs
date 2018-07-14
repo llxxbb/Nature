@@ -2,17 +2,20 @@ extern crate chrono;
 extern crate nature;
 extern crate rocket;
 extern crate serde_json;
+extern crate log;
 
 use chrono::prelude::*;
 use self::nature::data::{Instance, ThingDefine};
 use self::nature::db::*;
 use self::rocket::http::ContentType;
 use server_starter::*;
+use nature::util::setup_logger;
 
 mod server_starter;
 
 #[test]
 fn key_defined() {
+    let _ = setup_logger();
     // insert defined
     let key = "/key/defined".to_string();
     let define = ThingDefine {

@@ -4,6 +4,7 @@ use serde::Serialize;
 use super::*;
 use super::schema::delivery;
 use uuid::*;
+use std::fmt::Debug;
 
 #[derive(Debug)]
 #[derive(Insertable)]
@@ -19,7 +20,7 @@ pub struct Delivery {
 }
 
 impl Delivery {
-    pub fn new<T: Serialize + Send>(carrier: &Carrier<T>) -> Result<Delivery> {
+    pub fn new<T: Serialize + Send + Debug>(carrier: &Carrier<T>) -> Result<Delivery> {
         let json = serde_json::to_string(&carrier.content)?;
         Ok(Delivery {
             id: {

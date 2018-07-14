@@ -1,13 +1,15 @@
 use db::*;
 use diesel::prelude::*;
 use serde::Serialize;
+use std::fmt::Debug;
 use super::*;
 use util::*;
 
-pub struct TableDelivery;
+pub struct DeliveryDaoImpl;
 
-impl DaoDelivery for TableDelivery {
-    fn insert<T: Sized + Serialize + Send>(carrier: &Carrier<T>) -> Result<u128> {
+impl DeliveryDaoTrait for DeliveryDaoImpl {
+    fn insert<T: Sized + Serialize + Send + Debug>(carrier: &Carrier<T>) -> Result<u128> {
+        debug!("insert carrier to db : {:?}", carrier);
         use self::schema::delivery;
         let conn: &SqliteConnection = &CONN.lock().unwrap();
         let d = Delivery::new(carrier)?;
@@ -25,7 +27,7 @@ impl DaoDelivery for TableDelivery {
         unimplemented!()
     }
 
-    fn move_to_error<T: Sized + Serialize>(_err: CarryError<T>) -> Result<()> {
+    fn move_to_error<T: Sized + Serialize + Debug>(_err: CarryError<T>) -> Result<()> {
         unimplemented!()
     }
 
@@ -33,7 +35,7 @@ impl DaoDelivery for TableDelivery {
         unimplemented!()
     }
 
-    fn get<T: Sized + Serialize>(_id: u128) -> Result<Carrier<T>> {
+    fn get<T: Sized + Serialize + Debug>(_id: u128) -> Result<Carrier<T>> {
         unimplemented!()
     }
 }
