@@ -7,13 +7,15 @@ pub trait RouteServiceTrait {
     fn get_route(instance: &Instance) -> Result<Option<Vec<Target>>>;
 }
 
-pub struct RouteServiceImpl<T> {
-    delivery_service: PhantomData<T>
+pub struct RouteServiceImpl<D, O> {
+    delivery_service: PhantomData<D>,
+    one_step_flow_cache: PhantomData<O>,
 }
 
-impl<T> RouteServiceTrait for RouteServiceImpl<T> where T: DeliveryServiceTrait {
+impl<D, O> RouteServiceTrait for RouteServiceImpl<D, O>
+    where D: DeliveryServiceTrait, O: OneStepFlowCacheTrait {
     fn get_route(instance: &Instance) -> Result<Option<Vec<Target>>> {
-        if let Ok(relations) = RelationCache::get(&instance.thing) {
+        if let Ok(relations) = O::get(&instance.thing) {
             // no relations
             if relations.len() == 0 {
                 return Ok(None);
@@ -26,7 +28,7 @@ impl<T> RouteServiceTrait for RouteServiceImpl<T> where T: DeliveryServiceTrait 
     }
 }
 
-impl<T> RouteServiceImpl<T> where T: DeliveryServiceTrait {
+impl<D, O> RouteServiceImpl<D, O> {
     fn filter_relations(instance: &Instance, maps: Vec<Relation>) -> Option<Vec<Target>> {
         debug!("filter relations for instance: {:?}", instance);
         let mut rtn: Vec<Target> = Vec::new();

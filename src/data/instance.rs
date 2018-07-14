@@ -6,7 +6,6 @@ use global::*;
 use std::collections::HashMap;
 use std::collections::HashSet;
 use std::ops::Deref;
-use std::sync::Arc;
 use util::*;
 
 /// A snapshot for a particular `Thing`
@@ -74,9 +73,9 @@ pub trait InstanceServiceTrait {
     fn verify(instance: &mut Instance) -> Result<u128>;
 }
 
-pub struct InstanceImpl;
+pub struct InstanceServiceImpl;
 
-impl InstanceServiceTrait for InstanceImpl {
+impl InstanceServiceTrait for InstanceServiceImpl {
     /// check key whether defined
     /// generate id by hashing if it is not set.
     fn verify(instance: &mut Instance) -> Result<u128> {
@@ -88,7 +87,7 @@ impl InstanceServiceTrait for InstanceImpl {
     }
 }
 
-impl InstanceImpl {
+impl InstanceServiceImpl {
     fn id_generate_if_not_set(instance: &mut Instance) -> Result<u128> {
         if instance.id == 0 {
             debug!("generate id for instance : {:?}", instance);
@@ -96,9 +95,5 @@ impl InstanceImpl {
         }
         Ok(instance.id)
     }
-}
-
-lazy_static! {
-    pub static ref DATA_INSTANCE: Arc<InstanceImpl> = Arc::new(InstanceImpl);
 }
 

@@ -145,8 +145,3 @@ pub enum DataType {
     ParallelBatch = 11,
     QueueBatch = 12,
 }
-
-
-lazy_static! {
-    pub static ref SVC_DELIVERY : Arc<DeliveryService> = Arc::new(DeliveryServiceImpl{table_delivery:PhantomData});
-}

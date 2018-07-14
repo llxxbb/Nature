@@ -2,14 +2,12 @@ extern crate r2d2;
 
 use db::*;
 use lru_time_cache::LruCache;
-use std::sync::Arc;
 use std::sync::Mutex;
 use std::time::Duration;
 use super::*;
 
 lazy_static! {
     static ref CACHE: Mutex<LruCache<Thing, ThingDefine>> = Mutex::new(LruCache::<Thing, ThingDefine>::with_expiry_duration(Duration::from_secs(3600)));
-    pub static ref CACHE_THING_DEFINE : Arc<ThingDefineCacheImpl> = Arc::new(ThingDefineCacheImpl);
 }
 
 pub struct ThingDefineCacheImpl;

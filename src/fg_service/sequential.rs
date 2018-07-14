@@ -3,7 +3,6 @@ use serde_json;
 use std::collections::HashMap;
 use std::collections::HashSet;
 use std::marker::PhantomData;
-use std::ops::Deref;
 use super::*;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -17,13 +16,14 @@ pub trait SequentialTrait {
     fn do_serial_task(carrier: Carrier<SerialBatchInstance>);
 }
 
-pub struct SequentialServiceImpl<SD, SS> {
+pub struct SequentialServiceImpl<SD, SS, SI> {
     delivery: PhantomData<SD>,
     store: PhantomData<SS>,
+    svc_instance: PhantomData<SI>,
 }
 
-impl<SD, SS> SequentialTrait for SequentialServiceImpl<SD, SS>
-    where SD: DeliveryServiceTrait, SS: StoreServiceTrait
+impl<SD, SS, SI> SequentialTrait for SequentialServiceImpl<SD, SS, SI>
+    where SD: DeliveryServiceTrait, SS: StoreServiceTrait, SI: InstanceServiceTrait
 {
     fn submit_serial(batch: SerialBatchInstance) -> Result<()> {
         match SD::create_carrier(batch, "".to_string(), DataType::QueueBatch as u8) {
@@ -37,7 +37,7 @@ impl<SD, SS> SequentialTrait for SequentialServiceImpl<SD, SS>
     }
 
     fn do_serial_task(carrier: Carrier<SerialBatchInstance>) {
-        let sf = Self::store_batch_items(DATA_INSTANCE.clone().deref(), &carrier);
+        let sf = Self::store_batch_items(&carrier);
         if sf.is_err() {
             // retry if environment error occurs,
             // item error will not break the process and insert into error list of `SerialFinished`
@@ -64,8 +64,8 @@ impl<SD, SS> SequentialTrait for SequentialServiceImpl<SD, SS>
     }
 }
 
-impl<SD, SS> SequentialServiceImpl<SD, SS>
-    where SD: DeliveryServiceTrait, SS: StoreServiceTrait
+impl<SD, SS, SI> SequentialServiceImpl<SD, SS, SI>
+    where SD: DeliveryServiceTrait, SS: StoreServiceTrait, SI: InstanceServiceTrait
 {
     fn new_virtual_instance(carrier: &Carrier<SerialBatchInstance>, sf: SerialFinished) -> Result<Instance> {
         let json = serde_json::to_string(&sf)?;
@@ -92,14 +92,13 @@ impl<SD, SS> SequentialServiceImpl<SD, SS>
         })
     }
 
-    fn store_batch_items<F>(_: &F, carrier: &Carrier<SerialBatchInstance>) -> Result<SerialFinished>
-        where F: InstanceServiceTrait
+    fn store_batch_items(carrier: &Carrier<SerialBatchInstance>) -> Result<SerialFinished>
     {
         let mut errors: Vec<String> = Vec::new();
         let mut succeeded_id: Vec<u128> = Vec::new();
         for mut instance in carrier.content.data.instances.clone() {
             instance.data.thing.thing_type = ThingType::Business;
-            if let Err(err) = F::verify(&mut instance) {
+            if let Err(err) = SI::verify(&mut instance) {
                 errors.push(format!("{:?}", err));
                 continue;
             }

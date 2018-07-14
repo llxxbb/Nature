@@ -39,6 +39,3 @@ impl<DAO> PlanServiceTrait for PlanServiceImpl<DAO> where DAO: StorePlanDaoTrait
     }
 }
 
-lazy_static! {
-    pub static ref SVC_PLAN : Arc<PlanService> = Arc::new(PlanServiceImpl{dao: PhantomData});
-}
