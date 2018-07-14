@@ -103,5 +103,7 @@ When instance changed, Nature don't update it but version it, so you can have a 
 
 你缺少的元数据管理
 
-
+一阴一阳谓之道
+  thing 为因
+  flow 为阳
 

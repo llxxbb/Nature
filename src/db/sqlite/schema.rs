@@ -40,6 +40,20 @@ table! {
 }
 
 table! {
+    one_step_flow (from_thing, from_version, to_thing, to_version) {
+        from_thing -> Text,
+        from_version -> Integer,
+        to_thing -> Text,
+        to_version -> Integer,
+        exe_protocol -> Text,
+        exe_url -> Text,
+        selector -> Nullable<Text>,
+        group -> Nullable<Text>,
+        weight -> Nullable<Integer>,
+    }
+}
+
+table! {
     thing_defines (key, version) {
         key -> Text,
         description -> Nullable<Text>,
@@ -54,5 +68,6 @@ allow_tables_to_appear_in_same_query!(
     delivery,
     delivery_error,
     instances,
+    one_step_flow,
     thing_defines,
 );

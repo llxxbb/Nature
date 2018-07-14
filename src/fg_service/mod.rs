@@ -6,7 +6,7 @@ pub use self::delivery::{Carrier, CarryError, DataType, DeliveryServiceImpl, Del
 pub use self::dispatch::{DispatchServiceImpl, DispatchServiceTrait};
 pub use self::parallel::{ParallelServiceImpl, ParallelServiceTrait};
 pub use self::plan::{PlanInfo, PlanServiceImpl, PlanServiceTrait};
-pub use self::route::{Demand, LastStatusDemand, Relation, RouteInfo, RouteServiceImpl, RouteServiceTrait, Target};
+pub use self::route::{RouteServiceImpl, RouteServiceTrait};
 pub use self::sequential::{SequentialServiceImpl, SequentialTrait};
 pub use self::store::{StoreServiceImpl, StoreServiceTrait, StoreTaskInfo};
 

@@ -14,7 +14,7 @@ pub trait ThingDefineCacheTrait {
 
 
 pub trait OneStepFlowDaoTrait {
-    fn get_relations(from: &Thing) -> Result<Vec<Relation>>;
+    fn get_relations(from: &Thing) -> Result<Option<Vec<OneStepFlow>>>;
 }
 
 pub trait DeliveryDaoTrait {

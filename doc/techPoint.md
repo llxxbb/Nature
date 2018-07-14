@@ -1,7 +1,14 @@
 # Technology Point
 
-## Environment setting.
+## Install a certain version of toolchain
 
+example: rustup toolchain install nightly-2018-05-22
+
+## switchr toolchain
+
+restup default nightly-yyyy-mm-dd
+
+## Environment setting.
 
 ## project edit under windows
 

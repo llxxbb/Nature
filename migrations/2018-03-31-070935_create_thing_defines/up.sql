@@ -9,6 +9,19 @@ CREATE TABLE `thing_defines` (
 	PRIMARY KEY(`key`,`version`)
 );
 
+CREATE TABLE `one_step_flow` (
+	`from_thing`	TEXT NOT NULL,
+	`from_version`	INTEGER NOT NULL,
+	`to_thing`	TEXT NOT NULL,
+	`to_version`	INTEGER NOT NULL,
+	`exe_protocol`	TEXT NOT NULL,
+	`exe_url`	TEXT NOT NULL,
+	`selector`	TEXT,
+	`group`	TEXT,
+	`weight`	INTEGER,
+	PRIMARY KEY(`from_thing`,`from_version`,`to_thing`,`to_version`)
+);
+
 CREATE TABLE `instances` (
 	`id`	BLOB NOT NULL,
 	`thing`	TEXT NOT NULL,

@@ -1,7 +1,7 @@
 //! Define the data used all over the project, not only by `fg-service`
 
 pub use self::instance::*;
-pub use self::relation::*;
+pub use self::one_step_flow::*;
 #[cfg(test)]
 pub use self::test::*;
 pub use self::thing::*;
@@ -26,7 +26,7 @@ impl Default for CallbackResult {
 
 mod instance;
 mod thing;
-mod relation;
+mod one_step_flow;
 #[cfg(test)]
 mod test;
 
