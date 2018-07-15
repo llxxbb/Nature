@@ -3,8 +3,9 @@ use data::thing::Thing;
 use std::collections::HashSet;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq)]
-pub struct Converter {
+pub struct Executor {
     pub protocol: String,
+    /// url do not contain's protocol define
     pub url: String,
 }
 
@@ -25,14 +26,14 @@ pub struct LastStatusDemand {
 #[derive(Debug, Serialize, Deserialize, Clone, Default)]
 pub struct Target {
     pub to: Thing,
-    pub executor: Converter,
-    pub last_status_demand: LastStatusDemand,
-    pub weight: Weight,
+    pub executor: Executor,
+    pub last_status_demand: Option<LastStatusDemand>,
+    pub weight: Option<Weight>,
 }
 
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq)]
-pub struct Demand {
+pub struct Selector {
     pub source_status_include: HashSet<String>,
     pub source_status_exclude: HashSet<String>,
     pub target_status_include: HashSet<String>,
@@ -47,9 +48,9 @@ pub struct Demand {
 pub struct OneStepFlow {
     pub from: Thing,
     pub to: Thing,
-    pub who: Converter,
-    pub demand: Demand,
-    pub weight: Weight,
+    pub executor: Executor,
+    pub selector: Option<Selector>,
+    pub weight: Option<Weight>,
 }
 
 /// used to gray deploy
@@ -58,7 +59,7 @@ pub struct Weight {
     /// Used to distinguish converters which are same `OneStepFlow::from` and `OneStepFlow::to`
     pub label: String,
     /// indicate the proportion of the whole stream, the whole will the sum of the participate `Weight::proportion`
-    pub proportion: u8,
+    pub proportion: i32,
 }
 
 

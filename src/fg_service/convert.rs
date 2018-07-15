@@ -158,7 +158,9 @@ impl ConverterInfo {
             }
         };
         if let Some(ref last) = last_target {
-            Self::check_last(&last.status, &mapping.last_status_demand)?;
+            if let Some(demand) = &mapping.last_status_demand {
+                Self::check_last(&last.status, demand)?;
+            }
         };
         let rtn = ConverterInfo {
             from: instance.clone(),

@@ -1,10 +1,10 @@
 use chrono::prelude::*;
 use global::*;
 use serde::Serialize;
-use super::*;
 use super::schema::delivery;
 use uuid::*;
 use std::fmt::Debug;
+use fg_service::Carrier;
 
 #[derive(Debug)]
 #[derive(Insertable)]

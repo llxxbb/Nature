@@ -10,37 +10,46 @@ use std::time::Duration;
 use super::*;
 
 lazy_static! {
-    static ref CACHE_MAPPING: Mutex<LruCache<Thing, (Vec<OneStepFlow>, HashMap<Thing, Range<f32>>)>> = Mutex::new(LruCache::<Thing, (Vec<OneStepFlow>, HashMap<Thing, Range<f32>>)>::with_expiry_duration(Duration::from_secs(3600)));
+    static ref CACHE_MAPPING: Mutex<LruCache<Thing, (Option<Vec<OneStepFlow>>, Option<HashMap<Thing, Range<f32>>>)>> = Mutex::new(LruCache::<Thing, (Option<Vec<OneStepFlow>>, Option<HashMap<Thing, Range<f32>>>)>::with_expiry_duration(Duration::from_secs(3600)));
 }
 
 pub trait OneStepFlowCacheTrait {
-    fn get(from: &Thing) -> Result<Vec<OneStepFlow>>;
+    fn get(from: &Thing) -> Result<Option<Vec<OneStepFlow>>>;
 }
 
 pub struct OneStepFlowCacheImpl;
 
 impl OneStepFlowCacheTrait for OneStepFlowCacheImpl {
-    fn get(from: &Thing) -> Result<Vec<OneStepFlow>> {
+    fn get(from: &Thing) -> Result<Option<Vec<OneStepFlow>>> {
         debug!("get relation for thing : {:?}", from);
         let (relations, balances) = Self::get_balanced(from)?;
-        Ok(Self::weight_filter(&relations, &balances))
+        if relations.is_none() {
+            Ok(None)
+        } else {
+            Ok(Some(Self::weight_filter(&relations.unwrap(), &balances.unwrap())))
+        }
     }
 }
 
 impl OneStepFlowCacheImpl {
-    fn get_balanced(from: &Thing) -> Result<(Vec<OneStepFlow>, HashMap<Thing, Range<f32>>)> {
+    fn get_balanced(from: &Thing) -> Result<(Option<Vec<OneStepFlow>>, Option<HashMap<Thing, Range<f32>>>)> {
         let mut cache = CACHE_MAPPING.lock().unwrap();
         if let Some(balances) = cache.get(from) {
             debug!("get balances from cache for thing : {:?}", from);
             return Ok(balances.clone());
         }
         debug!("get balances from db for thing : {:?}", from);
-        let relations = OneStepFlowDaoImpl::get_relations(from)?;
-        let label_groups = Self::get_label_groups(&relations);
-        let rtn = (relations, Self::weight_calculate(&label_groups));
-        let rtn_clone = rtn.clone();
+        let rtn = match OneStepFlowDaoImpl::get_relations(from) {
+            Ok(None) => (None, None),
+            Ok(Some(relations)) => {
+                let label_groups = Self::get_label_groups(&relations);
+                (Some(relations), Some(Self::weight_calculate(&label_groups)))
+            }
+            Err(err) => return Err(err)
+        };
+        let cpy = rtn.clone();
         cache.insert(from.clone(), rtn);
-        Ok(rtn_clone)
+        Ok(cpy)
     }
 
     fn weight_filter(relations: &Vec<OneStepFlow>, balances: &HashMap<Thing, Range<f32>>) -> Vec<OneStepFlow> {
@@ -62,14 +71,24 @@ impl OneStepFlowCacheImpl {
         let mut rtn: HashMap<Thing, Range<f32>> = HashMap::new();
         // calculate "to `Thing`"'s weight
         for (_, group) in labels {
-            let sum = group.iter().fold(0u16, |sum, mapping| sum + mapping.weight.proportion as u16);
+            let sum = group.iter().fold(0i32, |sum, mapping| {
+                let proportion = match &mapping.weight {
+                    None => 1,
+                    Some(w) => w.proportion,
+                };
+                sum + proportion
+            });
             if sum <= 0 {
                 continue;
             }
             let mut begin = 0.0;
             let last = group.last().unwrap();
             for m in group {
-                let w = m.weight.proportion as f32 / sum as f32;
+                let proportion = match &m.weight {
+                    None => 1,
+                    Some(w) => w.proportion,
+                };
+                let w = proportion as f32 / sum as f32;
                 let end = begin + w;
                 if ptr::eq(m, last) {
                     // last must great 1
@@ -88,11 +107,15 @@ impl OneStepFlowCacheImpl {
 // labels as key, value : Mappings have same label
         let mut labels: HashMap<String, Vec<OneStepFlow>> = HashMap::new();
         for mapping in maps {
-            let label = &mapping.weight.label;
+            if mapping.weight.is_none() {
+                continue;
+            }
+            let w = mapping.weight.clone();
+            let label = w.unwrap().label;
             if label.is_empty() {
                 continue;
             }
-            let mappings = labels.entry(label.clone()).or_insert(Vec::new());
+            let mappings = labels.entry(label).or_insert(Vec::new());
             mappings.push(mapping.clone());
         }
         labels

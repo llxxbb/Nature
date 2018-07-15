@@ -4,6 +4,8 @@
 
 example: rustup toolchain install nightly-2018-05-22
 
+last: 1.29.0-nightly (e06c87544 2018-07-06)
+
 ## switchr toolchain
 
 restup default nightly-yyyy-mm-dd

@@ -6,7 +6,7 @@ pub use self::orm::*;
 pub use self::sqlite::*;
 pub use self::trait_define::*;
 
-mod sqlite;
+pub mod sqlite;
 mod cache;
 mod trait_define;
 mod orm;

@@ -15,7 +15,7 @@ pub struct RouteServiceImpl<D, O> {
 impl<D, O> RouteServiceTrait for RouteServiceImpl<D, O>
     where D: DeliveryServiceTrait, O: OneStepFlowCacheTrait {
     fn get_route(instance: &Instance) -> Result<Option<Vec<Target>>> {
-        if let Ok(relations) = O::get(&instance.thing) {
+        if let Ok(Some(relations)) = O::get(&instance.thing) {
             // no relations
             if relations.len() == 0 {
                 return Ok(None);
@@ -33,18 +33,29 @@ impl<D, O> RouteServiceImpl<D, O> {
         debug!("filter relations for instance: {:?}", instance);
         let mut rtn: Vec<Target> = Vec::new();
         for m in maps {
-            if !Self::context_check(&instance.data.context, &m) {
-                continue;
-            }
-            if !Self::status_check(&instance.data.status, &m) {
-                continue;
+            if !m.selector.is_none() {
+                let selector = &m.selector.clone().unwrap();
+                if !Self::context_check(&instance.data.context, selector) {
+                    continue;
+                }
+                if !Self::status_check(&instance.data.status, selector) {
+                    continue;
+                }
             }
             let t = Target {
                 to: m.to.clone(),
-                executor: m.who,
-                last_status_demand: LastStatusDemand {
-                    target_status_include: m.demand.target_status_include,
-                    target_status_exclude: m.demand.target_status_exclude,
+                executor: m.executor,
+                last_status_demand: {
+                    match m.selector {
+                        None => None,
+                        Some(demand) => {
+                            let ld = LastStatusDemand {
+                                target_status_include: demand.target_status_include,
+                                target_status_exclude: demand.target_status_exclude,
+                            };
+                            Some(ld)
+                        }
+                    }
                 },
                 weight: m.weight,
             };
@@ -58,13 +69,13 @@ impl<D, O> RouteServiceImpl<D, O> {
         }
     }
 
-    fn context_check(contexts: &HashMap<String, String>, mapping: &OneStepFlow) -> bool {
-        for exclude in &mapping.demand.context_exclude {
+    fn context_check(contexts: &HashMap<String, String>, selector: &Selector) -> bool {
+        for exclude in &selector.context_exclude {
             if contexts.contains_key(exclude) {
                 return false;
             }
         }
-        for include in &mapping.demand.context_include {
+        for include in &selector.context_include {
             if !contexts.contains_key(include) {
                 return false;
             }
@@ -72,13 +83,13 @@ impl<D, O> RouteServiceImpl<D, O> {
         true
     }
 
-    fn status_check(status: &HashSet<String>, mapping: &OneStepFlow) -> bool {
-        for exclude in &mapping.demand.source_status_exclude {
+    fn status_check(status: &HashSet<String>, selector: &Selector) -> bool {
+        for exclude in &selector.source_status_exclude {
             if status.contains(exclude) {
                 return false;
             }
         }
-        for include in &mapping.demand.source_status_include {
+        for include in &selector.source_status_include {
             if !status.contains(include) {
                 return false;
             }

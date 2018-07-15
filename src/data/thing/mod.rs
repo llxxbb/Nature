@@ -1,7 +1,6 @@
 use chrono::prelude::*;
 use global::*;
 
-
 /// separator for `Thing`'s key
 pub static PATH_SEPARATOR: char = '/';
 
@@ -66,8 +65,11 @@ impl Thing {
     }
 }
 
+//trace_macros!(true);
+
 /// `Thing`'s extended information
 /// `DateTime` is not implement `Default` trait
+#[allow(proc_macro_derive_resolution_fallback)]
 #[derive(Serialize, Deserialize, Debug, Queryable, Clone, PartialOrd, PartialEq)]
 pub struct ThingDefine {
     pub key: String,
@@ -85,6 +87,8 @@ pub struct ThingDefine {
 
     pub create_time: NaiveDateTime,
 }
+
+//trace_macros!(false);
 
 impl Default for ThingDefine {
     fn default() -> Self {

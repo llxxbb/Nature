@@ -1,7 +1,6 @@
 pub use self::conn::*;
-pub use self::models::*;
 pub use self::dao::*;
-
+pub use self::models::*;
 use super::*;
 
 pub mod schema;
