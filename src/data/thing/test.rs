@@ -26,13 +26,5 @@ fn standardize_no_separator_at_beginning() {
     println!("----------------- standardize_no_separator_at_beginning --------------------");
     let mut key = "a/b/c/".to_string();
     let _rtn = Thing::key_standardize(&mut key);
-    assert_eq!(key, "/B/a/b/c");
-}
-
-#[test]
-fn standardize_system_key() {
-    println!("----------------- standardize_system_key --------------------");
-    let mut key = "/a/b/c".to_string();
-    let _rtn = Thing::key_standardize(&mut key);
-    assert_eq!(key, "/S/a/b/c");
+    assert_eq!(key, "/a/b/c");
 }

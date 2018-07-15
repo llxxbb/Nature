@@ -48,6 +48,6 @@ fn key_undefined() {
     // verify returned
     let rtn = response.body_string().unwrap();
     println!("{:?}", rtn);
-    assert_eq!(rtn, r#"{"Err":{"ThingNotDefined":"/B/key/undefined not defined"}}"#);
+    assert_eq!(rtn, r#"{"Err":{"ThingNotDefined":"/key/undefined not defined"}}"#);
 }
 

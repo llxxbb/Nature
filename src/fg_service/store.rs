@@ -12,7 +12,7 @@ pub struct StoreTaskInfo {
 pub trait StoreServiceTrait {
     /// verify input data first then `do_store`
     fn input(instance: Instance) -> Result<u128>;
-    fn receive_store_task(carrier: Carrier<StoreTaskInfo>);
+    fn do_store_task(carrier: Carrier<StoreTaskInfo>);
     fn send_store_task(task: StoreTaskInfo) -> Result<()>;
     fn generate_store_task(instance: Instance) -> Result<StoreTaskInfo>;
 }
@@ -45,7 +45,7 @@ impl<D, V, S, C, P, R> StoreServiceTrait for StoreServiceImpl<D, V, S, C, P, R>
         Ok(uuid)
     }
 
-    fn receive_store_task(carrier: Carrier<StoreTaskInfo>) {
+    fn do_store_task(carrier: Carrier<StoreTaskInfo>) {
         if let Err(err) = Self::save(carrier.clone()) {
             D::move_to_err(err, carrier)
         };
@@ -55,7 +55,7 @@ impl<D, V, S, C, P, R> StoreServiceTrait for StoreServiceImpl<D, V, S, C, P, R>
         // get route info
         let biz = task.instance.data.thing.key.clone();
         let carrier = D::create_carrier(task, biz, DataType::Store as u8)?;
-        // to delivery
+        // send to this service again to unify the store process.
         D::send_carrier(&CHANNEL_STORE.sender, carrier);
         Ok(())
     }
@@ -76,6 +76,7 @@ impl<D, V, S, C, P, R> StoreServiceImpl<D, V, S, C, P, R>
 {
     /// save to db and handle duplicated data
     fn save(carrier: Carrier<StoreTaskInfo>) -> Result<u128> {
+        debug!("save instance : {:?}", carrier.instance);
         let id = carrier.instance.id;
         let result = S::insert(&carrier.instance);
         match result {

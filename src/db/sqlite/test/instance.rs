@@ -4,8 +4,7 @@ use std::collections::HashSet;
 use super::*;
 
 #[test]
-fn instance_common_test() {
-    println!("----------------- instance_common_test --------------------");
+fn instance_insert_exists_delete_test() {
     // prepare data to insert
     let instance = Instance {
         id: 0,
@@ -39,7 +38,6 @@ fn instance_common_test() {
 
 #[test]
 fn get_last_status() {
-    println!("----------------- get_last_status --------------------");
     // prepare data to insert
     let mut instance = Instance {
         id: 0,

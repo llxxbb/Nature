@@ -5,7 +5,6 @@ use super::*;
 
 #[test]
 fn define_test() {
-    println!("----------------- define_test --------------------");
     // prepare data to insert
     let define = ThingDefine {
         key: "/test".to_string(),

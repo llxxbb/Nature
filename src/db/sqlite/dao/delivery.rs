@@ -1,5 +1,6 @@
 use db::*;
 use diesel::prelude::*;
+use diesel::result::*;
 use serde::Serialize;
 use std::fmt::Debug;
 use super::*;
@@ -19,6 +20,16 @@ impl DeliveryDaoTrait for DeliveryDaoImpl {
             .execute(conn);
         match rtn {
             Ok(_) => Ok(vec_to_u128(&id)),
+            Err(Error::DatabaseError(kind, info)) => {
+                match kind {
+                    DatabaseErrorKind::UniqueViolation => {
+                        debug!("already insert carrier for : {:?}", id);
+                        Ok(vec_to_u128(&id))
+                    }
+                    DatabaseErrorKind::__Unknown => Err(NatureError::DaoEnvironmentError(format!("{:?}", info))),
+                    _ => Err(NatureError::DaoLogicalError(format!("{:?}", info))),
+                }
+            }
             Err(e) => Err(NatureError::from(e))
         }
     }

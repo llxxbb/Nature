@@ -23,7 +23,7 @@ fn start_receive_threads() {
     info!("to start receive threads");
     start_thread(&CHANNEL_DISPATCH.receiver, DispatchService::do_dispatch_task);
     start_thread(&CHANNEL_CONVERT.receiver, ConvertService::do_convert_task);
-    start_thread(&CHANNEL_STORE.receiver, StoreService::receive_store_task);
+    start_thread(&CHANNEL_STORE.receiver, StoreService::do_store_task);
     start_thread(&CHANNEL_PARALLEL.receiver, ParallelService::do_parallel_task);
     start_thread(&CHANNEL_SERIAL.receiver, SequentialService::do_serial_task);
 }

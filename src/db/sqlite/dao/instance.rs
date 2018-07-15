@@ -51,17 +51,16 @@ impl InstanceDaoTrait for InstanceDaoImpl {
 
 impl InstanceDaoImpl {
     pub fn delete(ins: &Instance) -> Result<usize> {
+        debug!("delete instance : {:?}", ins);
         use self::schema::instances::dsl::*;
         let conn: &SqliteConnection = &CONN.lock().unwrap();
-        let rtn = diesel::delete(instances
+        let rows = instances
             .filter(id.eq(ins.id.to_bytes().to_vec()))
             .filter(thing.eq(ins.thing.key.clone()))
             .filter(version.eq(ins.thing.version))
-            .filter(status_version.eq(ins.status_version))
-        ).execute(conn);
-        match rtn {
-            Ok(x) => Ok(x),
-            Err(err) => Err(NatureError::from(err))
-        }
+            .filter(status_version.eq(ins.status_version));
+//        debug!("rows filter : {:?}", rows);
+        let rtn = diesel::delete(rows).execute(conn)?;
+        Ok(rtn)
     }
 }
