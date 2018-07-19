@@ -69,7 +69,6 @@ impl Thing {
 
 /// `Thing`'s extended information
 /// `DateTime` is not implement `Default` trait
-#[allow(proc_macro_derive_resolution_fallback)]
 #[derive(Serialize, Deserialize, Debug, Queryable, Clone, PartialOrd, PartialEq)]
 pub struct ThingDefine {
     pub key: String,

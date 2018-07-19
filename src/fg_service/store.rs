@@ -46,6 +46,7 @@ impl<D, V, S, C, P, R> StoreServiceTrait for StoreServiceImpl<D, V, S, C, P, R>
     }
 
     fn do_store_task(carrier: Carrier<StoreTaskInfo>) {
+        debug!("------------------do_store_task------------------------");
         if let Err(err) = Self::save(carrier.clone()) {
             D::move_to_err(err, carrier)
         };

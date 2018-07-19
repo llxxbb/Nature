@@ -1,7 +1,4 @@
-extern crate multiqueue;
-
 use chrono::prelude::*;
-use self::multiqueue::*;
 use serde::Serialize;
 use std::fmt::Debug;
 use std::marker::PhantomData;
@@ -9,6 +6,7 @@ use std::ops::Deref;
 use std::sync::Mutex;
 use super::*;
 use util::id_gen::generate_id;
+use std::sync::mpsc::Sender;
 
 
 /// carry every kinds of **Task Info** to process which stayed at `Ready` table
@@ -51,7 +49,7 @@ pub trait DeliveryServiceTrait {
     fn finish_carrier(id: &u128) -> Result<()>;
     fn move_to_err<T>(err: NatureError, carrier: Carrier<T>) where T: Sized + Serialize + Debug;
     fn new_carrier<T>(task: T, thing: String, data_type: u8) -> Result<Carrier<T>> where T: Sized + Serialize + Debug;
-    fn send_carrier<T>(sender: &Mutex<MPMCSender<Carrier<T>>>, carrier: Carrier<T>)
+    fn send_carrier<T>(sender: &Mutex<Sender<Carrier<T>>>, carrier: Carrier<T>)
         where T: 'static + Sized + Serialize + Sync + Send + Debug;
 }
 
@@ -129,19 +127,18 @@ impl<TD: DeliveryDaoTrait> DeliveryServiceTrait for DeliveryServiceImpl<TD> {
             execute_time: Local::now().timestamp_millis(),
         })
     }
-    fn send_carrier<T>(sender: &Mutex<MPMCSender<Carrier<T>>>, carrier: Carrier<T>)
+    fn send_carrier<T>(sender: &Mutex<Sender<Carrier<T>>>, carrier: Carrier<T>)
         where T: 'static + Sized + Serialize + Sync + Send + Debug {
         debug!("send carrier : {:?}", carrier);
-        sender.lock().unwrap().try_send(carrier).unwrap();
+        let send_status = sender.lock().unwrap().send(carrier);
     }
 }
 
 
 pub enum DataType {
     Store = 1,
-    Route = 2,
-    Dispatch = 3,
-    Convert = 4,
+    Dispatch = 2,
+    Convert = 3,
     ParallelBatch = 11,
     QueueBatch = 12,
 }

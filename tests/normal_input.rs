@@ -5,17 +5,20 @@ extern crate rocket;
 extern crate serde_json;
 
 use chrono::prelude::*;
-use nature::util::setup_logger;
 use self::nature::data::{Instance, ThingDefine};
 use self::nature::db::*;
 use self::rocket::http::ContentType;
 use server_starter::*;
+use nature::global::sys_init;
+use std::thread;
+use std::time;
 
 mod server_starter;
 
 #[test]
 fn key_defined() {
-    let _ = setup_logger();
+    let threads = sys_init();
+    println!("created threads: {:?}", threads);
     println!("------------------ insert thing define -----------------");
     let key = "/key/defined".to_string();
     let define = ThingDefine {
@@ -47,6 +50,7 @@ fn key_defined() {
         .header(ContentType::JSON)
         .dispatch();
 
+    thread::sleep(time::Duration::from_millis(5000));
     println!("------------------ verify -----------------");
 
     // TODO saved to db
