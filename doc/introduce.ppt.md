@@ -107,3 +107,14 @@ When instance changed, Nature don't update it but version it, so you can have a 
   thing 为因
   flow 为阳
 
+requirement vs control or how to balance between them.
+    requirement is the primary target of a system to implement, then the control are following.
+    `Nature` make it complete separated and easy to operate every side.
+    `converter` and `Thing` definition are the controls to manage the system
+    `select` in a converter definition is a requirement and don't care how to control the downstream.
+     
+  
+非常广泛的应用情景：
+    统计分析：如统计班级的内学员的平均分
+    工作流：如上线审批流程
+    服务编排：

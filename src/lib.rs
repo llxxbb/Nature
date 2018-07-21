@@ -1,4 +1,4 @@
-#![feature(plugin, proc_macro, proc_macro_gen)]
+#![feature(plugin, proc_macro_gen)]
 #![plugin(rocket_codegen)]
 #![feature(range_contains)]
 #![feature(extern_prelude)]

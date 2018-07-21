@@ -130,7 +130,7 @@ impl<TD: DeliveryDaoTrait> DeliveryServiceTrait for DeliveryServiceImpl<TD> {
     fn send_carrier<T>(sender: &Mutex<Sender<Carrier<T>>>, carrier: Carrier<T>)
         where T: 'static + Sized + Serialize + Sync + Send + Debug {
         debug!("send carrier : {:?}", carrier);
-        let send_status = sender.lock().unwrap().send(carrier);
+        let _send_status = sender.lock().unwrap().send(carrier);
     }
 }
 
