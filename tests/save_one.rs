@@ -5,18 +5,18 @@ extern crate rocket;
 extern crate serde_json;
 
 use chrono::prelude::*;
+use nature::global::sys_init;
 use self::nature::data::{Instance, ThingDefine};
 use self::nature::db::*;
 use self::rocket::http::ContentType;
 use server_starter::*;
-use nature::global::sys_init;
 use std::thread;
 use std::time;
 
 mod server_starter;
 
 #[test]
-fn key_defined() {
+fn save_one() {
     let threads = sys_init();
     println!("created threads: {:?}", threads);
     println!("------------------ insert thing define -----------------");
@@ -50,11 +50,10 @@ fn key_defined() {
         .header(ContentType::JSON)
         .dispatch();
 
-    thread::sleep(time::Duration::from_millis(5000));
+    thread::sleep(time::Duration::from_millis(500));
     println!("------------------ verify -----------------");
 
     // TODO saved to db
-    // TODO delivery removed
     let rtn = response.body_string().unwrap();
     println!("{:?}", rtn);
     assert_eq!(rtn, r#"{"Ok":290732852190148059426348090381887592931}"#);

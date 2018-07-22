@@ -79,11 +79,12 @@ impl InstanceServiceTrait for InstanceServiceImpl {
     /// check key whether defined
     /// generate id by hashing if it is not set.
     fn verify(instance: &mut Instance) -> Result<u128> {
-        debug!("verify instance : {:?}", instance);
         Thing::key_standardize(&mut instance.data.thing.key)?;
         // just see whether it was configured.
         ThingDefineCacheImpl::get(&instance.data.thing)?;
-        Self::id_generate_if_not_set(instance)
+        let id = Self::id_generate_if_not_set(instance);
+        debug!("verified for instance id : {:?}", id);
+        id
     }
 }
 

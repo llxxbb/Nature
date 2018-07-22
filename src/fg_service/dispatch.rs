@@ -12,9 +12,9 @@ pub struct DispatchServiceImpl<T> {
 
 impl<T: DeliveryServiceTrait> DispatchServiceTrait for DispatchServiceImpl<T> {
     fn do_dispatch_task(carrier: Carrier<StoreTaskInfo>) {
-        debug!("received carrier info : {:?}", carrier);
+        debug!("------------------do_dispatch_task------------------------");
         if carrier.content.data.target.is_none() {
-            let _ = T::finish_carrier(&carrier.id);
+            let _ = T::finish_carrier(carrier.id);
             return;
         }
 

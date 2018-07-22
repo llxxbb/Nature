@@ -3,10 +3,10 @@ use serde::Serialize;
 use std::fmt::Debug;
 use std::marker::PhantomData;
 use std::ops::Deref;
+use std::sync::mpsc::Sender;
 use std::sync::Mutex;
 use super::*;
-use util::id_gen::generate_id;
-use std::sync::mpsc::Sender;
+use util::id_tool::generate_id;
 
 
 /// carry every kinds of **Task Info** to process which stayed at `Ready` table
@@ -46,7 +46,7 @@ pub trait DeliveryServiceTrait {
     fn create_carrier<T>(valuable: T, thing: String, data_type: u8) -> Result<Carrier<T>> where T: Sized + Serialize + Send + Debug;
     fn create_and_finish_carrier<T, U>(valuable: T, old: Carrier<U>, thing: String, data_type: u8) -> Result<Carrier<T>> where T: Sized + Serialize + Debug, U: Sized + Serialize + Debug;
     fn create_batch_and_finish_carrier<T, U>(valuables: Vec<T>, old: Carrier<U>, thing: String, data_type: u8) -> Result<Vec<Carrier<T>>> where T: Sized + Serialize + Send + Debug, U: Sized + Serialize + Debug;
-    fn finish_carrier(id: &u128) -> Result<()>;
+    fn finish_carrier(id: u128) -> Result<()>;
     fn move_to_err<T>(err: NatureError, carrier: Carrier<T>) where T: Sized + Serialize + Debug;
     fn new_carrier<T>(task: T, thing: String, data_type: u8) -> Result<Carrier<T>> where T: Sized + Serialize + Debug;
     fn send_carrier<T>(sender: &Mutex<Sender<Carrier<T>>>, carrier: Carrier<T>)
@@ -101,12 +101,13 @@ impl<TD: DeliveryDaoTrait> DeliveryServiceTrait for DeliveryServiceImpl<TD> {
                 }
             };
         }
-        TD::delete(&old.id)?;
+        TD::delete(old.id)?;
         Ok(rtn)
     }
 
-    fn finish_carrier(id: &u128) -> Result<()> {
-        TD::delete(&id)
+    fn finish_carrier(id: u128) -> Result<()> {
+        debug!("finished carrier for id: {:?}", id);
+        TD::delete(id)
     }
 
     fn move_to_err<T>(err: NatureError, carrier: Carrier<T>) where T: Sized + Serialize + Debug {
@@ -129,7 +130,7 @@ impl<TD: DeliveryDaoTrait> DeliveryServiceTrait for DeliveryServiceImpl<TD> {
     }
     fn send_carrier<T>(sender: &Mutex<Sender<Carrier<T>>>, carrier: Carrier<T>)
         where T: 'static + Sized + Serialize + Sync + Send + Debug {
-        debug!("send carrier : {:?}", carrier);
+        debug!("send carrier for id: {:?}", carrier.id);
         let _send_status = sender.lock().unwrap().send(carrier);
     }
 }

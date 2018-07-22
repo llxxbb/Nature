@@ -1,8 +1,8 @@
 use serde::Serialize;
-use super::*;
 use std::fmt::Debug;
+use super::*;
 
-pub trait ThingDefineDaoTrait{
+pub trait ThingDefineDaoTrait {
     fn get(thing: &Thing) -> Result<Option<ThingDefine>>;
     fn insert(define: &ThingDefine) -> Result<usize>;
     fn delete(thing: &Thing) -> Result<usize>;
@@ -19,7 +19,7 @@ pub trait OneStepFlowDaoTrait {
 
 pub trait DeliveryDaoTrait {
     fn insert<T: Sized + Serialize + Send + Debug>(carrier: &Carrier<T>) -> Result<u128>;
-    fn delete(id: &u128) -> Result<()>;
+    fn delete(id: u128) -> Result<()>;
     fn move_to_error<T: Sized + Serialize + Debug>(err: CarryError<T>) -> Result<()>;
     fn update_execute_time(_id: u128, new_time: i64) -> Result<()>;
     fn get<T: Sized + Serialize + Debug>(_id: u128) -> Result<Carrier<T>>;

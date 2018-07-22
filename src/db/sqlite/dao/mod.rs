@@ -1,3 +1,5 @@
+use diesel::prelude::*;
+
 pub use self::delivery::*;
 pub use self::error::*;
 pub use self::instance::*;
