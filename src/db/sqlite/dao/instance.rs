@@ -1,5 +1,6 @@
 use diesel::prelude::*;
 use super::*;
+use util::id_tool::u128_to_vec_u8;
 
 pub struct InstanceDaoImpl;
 
@@ -17,19 +18,6 @@ impl InstanceDaoTrait for InstanceDaoImpl {
         }
     }
 
-    fn get_last_status_by_id(instance_id: &u128) -> Result<Option<Instance>> {
-        use self::schema::instances::dsl::*;
-        let conn: &SqliteConnection = &CONN.lock().unwrap();
-        let def = instances.filter(id.eq(instance_id.to_bytes().to_vec()))
-            .order(status_version.desc())
-            .limit(1)
-            .load::<NewInstance>(conn)?;
-        match def.len() {
-            0 => Ok(None),
-            1 => Ok(Some(Instance::from(def[0].clone())?)),
-            _ => Err(NatureError::SystemError("should less than 2 record return".to_string())),
-        }
-    }
     /// check whether source stored earlier
     fn is_exists(ins: &Instance) -> Result<bool> {
         use self::schema::instances::dsl::*;
@@ -44,6 +32,19 @@ impl InstanceDaoTrait for InstanceDaoImpl {
         match def.len() {
             0 => Ok(false),
             1 => Ok(true),
+            _ => Err(NatureError::SystemError("should less than 2 record return".to_string())),
+        }
+    }
+    fn get_by_id(instance_id: u128) -> Result<Option<Instance>> {
+        use self::schema::instances::dsl::*;
+        let conn: &SqliteConnection = &CONN.lock().unwrap();
+        let def = instances.filter(id.eq(u128_to_vec_u8(instance_id)))
+            .order(status_version.desc())
+            .limit(1)
+            .load::<NewInstance>(conn)?;
+        match def.len() {
+            0 => Ok(None),
+            1 => Ok(Some(Instance::from(def[0].clone())?)),
             _ => Err(NatureError::SystemError("should less than 2 record return".to_string())),
         }
     }

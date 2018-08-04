@@ -30,3 +30,13 @@ impl OneStepFlowDaoTrait for OneStepFlowDaoImpl {
         }
     }
 }
+
+impl OneStepFlowDaoImpl {
+    pub fn insert(one: OneStepFlowRow) {
+        use self::schema::one_step_flow;
+        let conn: &SqliteConnection = &CONN.lock().unwrap();
+        diesel::insert_into(one_step_flow::table)
+            .values(one)
+            .execute(conn);
+    }
+}

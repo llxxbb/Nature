@@ -27,9 +27,9 @@ pub trait DeliveryDaoTrait {
 
 pub trait InstanceDaoTrait {
     fn insert(instance: &Instance) -> Result<usize>;
-    fn get_last_status_by_id(id: &u128) -> Result<Option<Instance>>;
     /// check whether source stored earlier
     fn is_exists(instance: &Instance) -> Result<bool>;
+    fn get_by_id(id: u128) -> Result<Option<Instance>>;
 }
 
 pub trait StorePlanDaoTrait {

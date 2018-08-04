@@ -24,7 +24,7 @@ pub struct LastStatusDemand {
 
 /// the compose of `Mapping::from`, `Mapping::to` and `Weight::label` must be unique
 #[derive(Debug, Serialize, Deserialize, Clone, Default)]
-pub struct Target {
+pub struct Mission {
     pub to: Thing,
     pub executor: Executor,
     pub last_status_demand: Option<LastStatusDemand>,

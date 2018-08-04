@@ -4,9 +4,9 @@ extern crate serde_json;
 
 use self::nature::data::Instance;
 use self::rocket::http::ContentType;
-use server_starter::*;
+use common::*;
 
-mod server_starter;
+mod common;
 
 
 #[test]
@@ -17,7 +17,7 @@ fn must_input_key() {
         Instance::default())).unwrap();
 
     // call service
-    let client = get_client();
+    let client = get_test_client();
     let mut response = client.post("/input")
         .body(json)
         .header(ContentType::JSON)
@@ -39,7 +39,7 @@ fn key_undefined() {
         instance)).unwrap();
 
     // call service
-    let client = get_client();
+    let client = get_test_client();
     let mut response = client.post("/input")
         .body(json)
         .header(ContentType::JSON)

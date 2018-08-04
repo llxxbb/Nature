@@ -2,18 +2,14 @@
 
 ## for the nearer term
 
-* add verify to integrate test for save_one
-* duplicated carrier process
 * integrate test
-  simple_input
-    add a defined thing to db and test
+  add verify to integrate test for save_one
 
 * integrate test
-    * simple_input
-        * task test
-          * dilivery store
-          * instance store
-          * dispatch
+    multi downstream
+
+* integrate test
+    multi downstream
     callback
     batch_serial
     batch_parallel

@@ -13,7 +13,7 @@ pub struct DispatchServiceImpl<T> {
 impl<T: DeliveryServiceTrait> DispatchServiceTrait for DispatchServiceImpl<T> {
     fn do_dispatch_task(carrier: Carrier<StoreTaskInfo>) {
         debug!("------------------do_dispatch_task------------------------");
-        if carrier.content.data.target.is_none() {
+        if carrier.content.data.mission.is_none() {
             let _ = T::finish_carrier(carrier.id);
             return;
         }
@@ -54,7 +54,7 @@ impl<T: DeliveryServiceTrait> DispatchServiceTrait for DispatchServiceImpl<T> {
 impl<T: DeliveryServiceTrait> DispatchServiceImpl<T> {
     fn generate_converter_info(carrier: &Carrier<StoreTaskInfo>) -> Result<Vec<ConverterInfo>> {
         let mut new_carriers: Vec<ConverterInfo> = Vec::new();
-        let target = carrier.target.clone();
+        let target = carrier.mission.clone();
         let tar = target.unwrap();
         for c in tar {
             match ConverterInfo::new(&carrier.instance, &c) {

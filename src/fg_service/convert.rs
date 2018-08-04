@@ -7,7 +7,7 @@ use super::*;
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct ConverterInfo {
     pub from: Instance,
-    pub target: Target,
+    pub target: Mission,
     pub last_status: Option<Instance>,
 }
 
@@ -142,7 +142,7 @@ impl ConverterInfo {
     /// * Dao
     /// * DefineNotFind
     /// * uuid parse
-    pub fn new(instance: &Instance, mapping: &Target) -> Result<ConverterInfo> {
+    pub fn new(instance: &Instance, mapping: &Mission) -> Result<ConverterInfo> {
         let define = ThingDefineCacheImpl::get(&mapping.to)?;
         let last_target = match define.is_status() {
             false => None,
@@ -151,7 +151,7 @@ impl ConverterInfo {
                     // context have target id
                     Some(status_id) => {
                         let status_id = u128::from_str(status_id)?;
-                        InstanceDaoImpl::get_last_status_by_id(&status_id)?
+                        InstanceDaoImpl::get_by_id(status_id)?
                     }
                     None => None,
                 }

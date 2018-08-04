@@ -72,7 +72,7 @@ fn get_last_status() {
     instance.data.status_version = 111;
     assert_eq!(Ok(1), InstanceDaoImpl::insert(&instance));
     // get last
-    if let Ok(Some(x)) = InstanceDaoImpl::get_last_status_by_id(&instance.id) {
+    if let Ok(Some(x)) = InstanceDaoImpl::get_by_id(instance.id) {
         assert_eq!(123, x.status_version);
     } else {
         panic!("shouldn't get error");

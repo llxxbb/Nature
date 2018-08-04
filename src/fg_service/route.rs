@@ -4,7 +4,7 @@ use std::marker::PhantomData;
 use super::*;
 
 pub trait RouteServiceTrait {
-    fn get_route(instance: &Instance) -> Result<Option<Vec<Target>>>;
+    fn get_route(instance: &Instance) -> Result<Option<Vec<Mission>>>;
 }
 
 pub struct RouteServiceImpl<D, O> {
@@ -14,7 +14,7 @@ pub struct RouteServiceImpl<D, O> {
 
 impl<D, O> RouteServiceTrait for RouteServiceImpl<D, O>
     where D: DeliveryServiceTrait, O: OneStepFlowCacheTrait {
-    fn get_route(instance: &Instance) -> Result<Option<Vec<Target>>> {
+    fn get_route(instance: &Instance) -> Result<Option<Vec<Mission>>> {
         if let Ok(Some(relations)) = O::get(&instance.thing) {
             // no relations
             if relations.len() == 0 {
@@ -29,9 +29,9 @@ impl<D, O> RouteServiceTrait for RouteServiceImpl<D, O>
 }
 
 impl<D, O> RouteServiceImpl<D, O> {
-    fn filter_relations(instance: &Instance, maps: Vec<OneStepFlow>) -> Option<Vec<Target>> {
+    fn filter_relations(instance: &Instance, maps: Vec<OneStepFlow>) -> Option<Vec<Mission>> {
         debug!("filter relations for instance: {:?}", instance);
-        let mut rtn: Vec<Target> = Vec::new();
+        let mut rtn: Vec<Mission> = Vec::new();
         for m in maps {
             if !m.selector.is_none() {
                 let selector = &m.selector.clone().unwrap();
@@ -42,7 +42,7 @@ impl<D, O> RouteServiceImpl<D, O> {
                     continue;
                 }
             }
-            let t = Target {
+            let t = Mission {
                 to: m.to.clone(),
                 executor: m.executor,
                 last_status_demand: {

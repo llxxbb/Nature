@@ -6,7 +6,7 @@ pub struct StoreTaskInfo {
     pub instance: Instance,
     /// save outside has non converter info.
     pub upstream: Option<ConverterInfo>,
-    pub target: Option<Vec<Target>>,
+    pub mission: Option<Vec<Mission>>,
 }
 
 pub trait StoreServiceTrait {
@@ -52,7 +52,7 @@ impl<D, V, S, C, P, R> StoreServiceTrait for StoreServiceImpl<D, V, S, C, P, R>
         let target = R::get_route(&instance)?;
         debug!("routes info for instance : {:?}", target);
         // save to delivery to make it can redo
-        let task = StoreTaskInfo { instance, upstream: None, target };
+        let task = StoreTaskInfo { instance, upstream: None, mission: target };
         Ok(task)
     }
 
