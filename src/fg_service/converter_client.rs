@@ -1,5 +1,6 @@
 use super::*;
-use rpc::CallOutTrait;
+use fg_service::CallOutTrait;
+
 
 pub struct ConvertImpl;
 

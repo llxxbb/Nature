@@ -1,5 +1,6 @@
 use diesel::result::*;
 use global::*;
+use nature_common::*;
 
 impl From<Error> for NatureError {
     // put it aside because can't find diesel's Timeout Error

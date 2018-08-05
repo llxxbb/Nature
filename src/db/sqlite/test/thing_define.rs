@@ -1,5 +1,6 @@
 use chrono::prelude::*;
 use db::trait_define::ThingDefineDaoTrait;
+use nature_common::*;
 use super::*;
 
 

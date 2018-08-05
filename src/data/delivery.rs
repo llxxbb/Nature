@@ -1,4 +1,4 @@
-use global::NatureError;
+use nature_common::NatureError;
 use serde::Serialize;
 use std::fmt::Debug;
 use std::ops::Deref;

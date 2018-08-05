@@ -1,7 +1,7 @@
 use data::*;
 use db::*;
 use global::*;
-pub use self::convert::{CallOutParameter, ConvertServiceImpl, ConvertServiceTrait};
+pub use self::convert::{CallOutTrait, ConvertServiceImpl, ConvertServiceTrait};
 pub use self::delivery::{DeliveryServiceImpl, DeliveryServiceTrait};
 pub use self::dispatch::{DispatchServiceImpl, DispatchServiceTrait};
 pub use self::parallel::{ParallelServiceImpl, ParallelServiceTrait};
@@ -18,6 +18,8 @@ mod route;
 mod dispatch;
 mod sequential;
 mod parallel;
+mod instance;
+mod converter_client;
 
 #[cfg(test)]
 mod test;

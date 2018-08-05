@@ -2,7 +2,6 @@
 
 pub use self::converter::*;
 pub use self::delivery::*;
-pub use self::instance::*;
 #[cfg(test)]
 pub use self::test::*;
 pub use self::thing::*;
@@ -25,7 +24,6 @@ impl Default for CallbackResult {
     }
 }
 
-mod instance;
 mod thing;
 mod converter;
 mod delivery;

@@ -1,5 +1,5 @@
-use data::*;
 use global::*;
+use nature_common::*;
 use serde_json;
 use super::schema::one_step_flow;
 

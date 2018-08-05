@@ -8,7 +8,6 @@ use std;
 use std::thread::JoinHandle;
 use util::setup_logger;
 
-pub type Result<T> = std::result::Result<T, NatureError>;
 
 // for product and mock
 lazy_static! {

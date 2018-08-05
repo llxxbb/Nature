@@ -4,13 +4,9 @@ use std::marker::PhantomData;
 use std::str::FromStr;
 use super::*;
 
-pub struct CallOutParameter {
-    pub from: Instance,
-    pub last_status: Option<Instance>,
-    /// This is used for callback
-    pub carrier_id: u128,
+pub trait CallOutTrait {
+    fn convert(para: &Carrier<ConverterInfo>) -> Result<ConverterReturned>;
 }
-
 
 pub trait ConvertServiceTrait {
     fn submit_callback(delayed: DelayedInstances) -> Result<()>;

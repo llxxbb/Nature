@@ -1,4 +1,5 @@
 use db::trait_define::*;
+use nature_common::*;
 use std::collections::HashMap;
 use std::collections::HashSet;
 use super::*;

@@ -1,5 +1,5 @@
-use data::instance::Instance;
-use data::thing::Thing;
+use nature_common::Thing;
+use nature_common::Instance;
 use std::collections::HashSet;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq)]
@@ -29,10 +29,6 @@ pub struct ConverterInfo {
     pub last_status: Option<Instance>,
 }
 
-pub enum ConverterReturned {
-    Delay(u32),
-    Instances(Vec<Instance>),
-}
 /// the compose of `Mapping::from`, `Mapping::to` and `Weight::label` must be unique
 #[derive(Debug, Serialize, Deserialize, Clone, Default)]
 pub struct Mission {
