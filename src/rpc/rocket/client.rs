@@ -1,14 +1,12 @@
 use super::*;
-
-
-pub trait CallOutTrait {
-    fn convert(para: CallOutParameter) -> Result<ConverterReturned>;
-}
+use rpc::CallOutTrait;
 
 pub struct ConvertImpl;
 
 impl CallOutTrait for ConvertImpl {
-    fn convert(_para: CallOutParameter) -> Result<ConverterReturned> {
+    fn convert(carrier: &Carrier<ConverterInfo>) -> Result<ConverterReturned> {
+        let _para = CallOutParameter::new(carrier);
+
         unimplemented!()
     }
 }

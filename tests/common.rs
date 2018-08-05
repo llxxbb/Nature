@@ -6,18 +6,20 @@ use nature::db::*;
 use nature::rpc::start_rocket_server;
 use rocket::local::Client;
 
-
+#[allow(dead_code)]
 pub fn get_test_client() -> Client {
     let rocket = start_rocket_server();
     Client::new(rocket).expect("valid rocket instance")
 }
 
+#[allow(dead_code)]
 pub fn new_thing_define(key: &str) {
     let mut define = ThingDefine::default();
     define.key = key.to_string();
     let _ = ThingDefineDaoImpl::insert(&define);
 }
 
+#[allow(dead_code)]
 pub fn new_one_step_flow(from: &str, to: &str, url: &str) {
     let row = OneStepFlowRow {
         from_thing: from.to_string(),

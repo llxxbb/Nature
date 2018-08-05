@@ -20,7 +20,7 @@ impl DeliveryDaoTrait for DeliveryDaoImpl {
             Ok(_) => {
                 debug!("insert carrier to db for id: {:?} successful", carrier.id);
                 Ok(vec_to_u128(&id))
-            },
+            }
             Err(Error::DatabaseError(kind, info)) => {
                 match kind {
                     DatabaseErrorKind::UniqueViolation => {
@@ -47,7 +47,7 @@ impl DeliveryDaoTrait for DeliveryDaoImpl {
             Ok(_) => {
                 debug!("delete carrier for id: {:?} successful", carrier_id);
                 Ok(())
-            },
+            }
             Err(err) => {
                 debug!("delete carrier for id: {:?} occurred error", carrier_id);
                 Err(NatureError::from(err))

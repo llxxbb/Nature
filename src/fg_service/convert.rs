@@ -4,13 +4,6 @@ use std::marker::PhantomData;
 use std::str::FromStr;
 use super::*;
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct ConverterInfo {
-    pub from: Instance,
-    pub target: Mission,
-    pub last_status: Option<Instance>,
-}
-
 pub struct CallOutParameter {
     pub from: Instance,
     pub last_status: Option<Instance>,
@@ -18,10 +11,6 @@ pub struct CallOutParameter {
     pub carrier_id: u128,
 }
 
-pub enum ConverterReturned {
-    Delay(u32),
-    Instances(Vec<Instance>),
-}
 
 pub trait ConvertServiceTrait {
     fn submit_callback(delayed: DelayedInstances) -> Result<()>;
@@ -48,8 +37,7 @@ impl<SP, SD, SS> ConvertServiceTrait for ConvertServiceImpl<SP, SD, SS>
         }
     }
     fn do_convert_task(carrier: Carrier<ConverterInfo>) {
-        let para = CallOutParameter::new(&carrier);
-        let _ = match ConvertImpl::convert(para) {
+        let _ = match ConvertImpl::convert(&carrier) {
             Ok(ConverterReturned::Instances(instances)) => {
                 match Self::handle_instances(&carrier, &instances) {
                     Ok(_) => (),

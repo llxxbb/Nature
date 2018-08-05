@@ -32,11 +32,15 @@ impl OneStepFlowDaoTrait for OneStepFlowDaoImpl {
 }
 
 impl OneStepFlowDaoImpl {
-    pub fn insert(one: OneStepFlowRow) {
+    pub fn insert(one: OneStepFlowRow) -> Result<usize> {
         use self::schema::one_step_flow;
         let conn: &SqliteConnection = &CONN.lock().unwrap();
-        diesel::insert_into(one_step_flow::table)
+        let rtn = diesel::insert_into(one_step_flow::table)
             .values(one)
             .execute(conn);
+        match rtn {
+            Ok(x) => Ok(x),
+            Err(e) => Err(NatureError::from(e))
+        }
     }
 }

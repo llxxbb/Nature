@@ -15,7 +15,7 @@ use std::time;
 mod common;
 
 #[test]
-fn save_one() {
+fn web_post_and_save_one() {
     let threads = sys_init();
     println!("created threads: {:?}", threads);
     println!("------------------ insert thing define -----------------");

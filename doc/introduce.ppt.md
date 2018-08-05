@@ -118,3 +118,5 @@ requirement vs control or how to balance between them.
     统计分析：如统计班级的内学员的平均分
     工作流：如上线审批流程
     服务编排：
+    
+单体应用（monolithic application）    

@@ -1,10 +1,10 @@
 use chrono::prelude::*;
-use fg_service::Carrier;
 use global::*;
 use serde::Serialize;
 use std::fmt::Debug;
 use super::schema::delivery;
 use util::u128_to_vec_u8;
+use data::Carrier;
 
 #[derive(Debug)]
 #[derive(Insertable)]

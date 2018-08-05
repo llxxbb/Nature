@@ -2,44 +2,10 @@ use chrono::prelude::*;
 use serde::Serialize;
 use std::fmt::Debug;
 use std::marker::PhantomData;
-use std::ops::Deref;
 use std::sync::mpsc::Sender;
 use std::sync::Mutex;
 use super::*;
 use util::id_tool::generate_id;
-
-
-/// carry every kinds of **Task Info** to process which stayed at `Ready` table
-#[derive(Debug, Clone)]
-pub struct Carrier<T> where T: Sized + Serialize + Debug {
-    pub id: u128,
-    pub create_time: i64,
-    pub execute_time: i64,
-    pub content: CarrierContent<T>,
-}
-
-#[derive(Debug, Clone, Serialize)]
-pub struct CarrierContent<T> {
-    pub data: T,
-    pub thing: String,
-    pub data_type: u8,
-}
-
-#[derive(Debug)]
-pub struct CarryError<T> where T: Sized + Serialize + Debug {
-    pub err: NatureError,
-    pub carrier: Carrier<T>,
-}
-
-
-impl<T> Carrier<T> where T: Sized + Serialize + Debug {}
-
-impl<T> Deref for Carrier<T> where T: Sized + Serialize + Debug {
-    type Target = T;
-    fn deref(&self) -> &<Self as Deref>::Target {
-        &self.content.data
-    }
-}
 
 
 pub trait DeliveryServiceTrait {
@@ -133,13 +99,4 @@ impl<TD: DeliveryDaoTrait> DeliveryServiceTrait for DeliveryServiceImpl<TD> {
         debug!("send carrier for id: {:?}", carrier.id);
         let _send_status = sender.lock().unwrap().send(carrier);
     }
-}
-
-
-pub enum DataType {
-    Store = 1,
-    Dispatch = 2,
-    Convert = 3,
-    ParallelBatch = 11,
-    QueueBatch = 12,
 }

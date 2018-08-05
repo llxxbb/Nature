@@ -22,6 +22,17 @@ pub struct LastStatusDemand {
     pub target_status_exclude: HashSet<String>,
 }
 
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct ConverterInfo {
+    pub from: Instance,
+    pub target: Mission,
+    pub last_status: Option<Instance>,
+}
+
+pub enum ConverterReturned {
+    Delay(u32),
+    Instances(Vec<Instance>),
+}
 /// the compose of `Mapping::from`, `Mapping::to` and `Weight::label` must be unique
 #[derive(Debug, Serialize, Deserialize, Clone, Default)]
 pub struct Mission {
