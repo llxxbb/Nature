@@ -5,6 +5,7 @@ use std::sync::mpsc::*;
 use std::sync::Mutex;
 use std::thread;
 use std::thread::JoinHandle;
+use nature_common::*;
 
 lazy_static! {
     pub static ref CHANNEL_DISPATCH : Channel<Carrier<StoreTaskInfo>> = Channel::new();

@@ -1,7 +1,7 @@
-use global::*;
 use nature_common::*;
 use serde_json;
-use super::schema::one_step_flow;
+use data::*;
+use super::super::schema::one_step_flow;
 
 #[derive(Debug)]
 #[derive(Insertable, Queryable)]

@@ -4,7 +4,6 @@ extern crate uuid;
 pub use self::channels::*;
 pub use self::error::*;
 pub use self::service_type_define::*;
-use std;
 use std::thread::JoinHandle;
 use util::setup_logger;
 

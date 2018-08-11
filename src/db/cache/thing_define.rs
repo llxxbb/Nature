@@ -16,7 +16,7 @@ impl ThingDefineCacheTrait for ThingDefineCacheImpl {
     fn get(thing: &Thing) -> Result<ThingDefine> {
         debug!("get `ThingDefine` from cache for thing : {:?}", thing);
         if thing.key.is_empty() {
-            return Err(NatureError::VerifyError("[biz] must not be empty!".to_string()));
+            return Err(Box::new(NatureError::VerifyError("[biz] must not be empty!".to_string())));
         }
         let mut cache = CACHE.lock().unwrap();
         {   // An explicit scope to avoid cache.insert error
@@ -25,7 +25,7 @@ impl ThingDefineCacheTrait for ThingDefineCacheImpl {
             };
         };
         match ThingDefineDaoImpl::get(&thing)? {
-            None => return Err(NatureError::ThingNotDefined(format!("{} not defined", thing.key))),
+            None => return Err(Box::new(NatureError::ThingNotDefined(format!("{} not defined", thing.key)))),
             Some(def) => {
                 cache.insert(thing.clone(), def.clone());
                 Ok(def)

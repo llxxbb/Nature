@@ -1,7 +1,7 @@
-use global::*;
 use serde::Serialize;
 use serde_json;
 use uuid::*;
+use nature_common::*;
 
 #[inline]
 pub fn generate_id<T: ?Sized + Serialize>(value: &T) -> Result<u128> {

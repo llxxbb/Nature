@@ -5,6 +5,7 @@ pub use self::delivery::*;
 #[cfg(test)]
 pub use self::test::*;
 pub use self::thing::*;
+use nature_common::*;
 
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
 pub struct DelayedInstances {

@@ -5,6 +5,7 @@
 #![feature(trace_macros)]
 #![feature(int_to_from_bytes)]  // this used to convert uuid to u128
 #![feature(try_from)] // vec to array
+#![feature(box_patterns)]
 
 extern crate chrono;
 #[macro_use]

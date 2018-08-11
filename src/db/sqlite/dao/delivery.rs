@@ -1,8 +1,9 @@
+use super::*;
 use db::*;
 use diesel::result::*;
 use serde::Serialize;
 use std::fmt::Debug;
-use super::*;
+use std::ops::Deref;
 use util::*;
 
 pub struct DeliveryDaoImpl;
@@ -13,27 +14,28 @@ impl DeliveryDaoTrait for DeliveryDaoImpl {
         let conn: &SqliteConnection = &CONN.lock().unwrap();
         let d = Delivery::new(carrier)?;
         let id = d.id.clone();
-        let rtn = diesel::insert_into(delivery::table)
-            .values(d)
-            .execute(conn);
+        let rtn = diesel::insert_into(delivery::table).values(d).execute(conn);
         match rtn {
             Ok(_) => {
                 debug!("insert carrier to db for id: {:?} successful", carrier.id);
                 Ok(vec_to_u128(&id))
             }
-            Err(Error::DatabaseError(kind, info)) => {
-                match kind {
-                    DatabaseErrorKind::UniqueViolation => {
-                        debug!("already insert carrier for : {:?}", id);
-                        Ok(vec_to_u128(&id))
-                    }
-                    DatabaseErrorKind::__Unknown => Err(NatureError::DaoEnvironmentError(format!("{:?}", info))),
-                    _ => Err(NatureError::DaoLogicalError(format!("{:?}", info))),
+            Err(Error::DatabaseError(kind, info)) => match kind {
+                DatabaseErrorKind::UniqueViolation => {
+                    debug!("already insert carrier for : {:?}", id);
+                    Ok(vec_to_u128(&id))
                 }
-            }
+                DatabaseErrorKind::__Unknown => {
+                    Err(Box::new(NatureError::DaoEnvironmentError(format!("{:?}", info))))
+                }
+                _ => Err(Box::new(NatureError::DaoLogicalError(format!("{:?}", info)))),
+            },
             Err(e) => {
-                debug!("insert carrier to db for id: {:?} occurred error", carrier.id);
-                Err(NatureError::from(e))
+                debug!(
+                    "insert carrier to db for id: {:?} occurred error",
+                    carrier.id
+                );
+                Err(e)
             }
         }
     }
@@ -41,8 +43,7 @@ impl DeliveryDaoTrait for DeliveryDaoImpl {
     fn delete(carrier_id: u128) -> Result<()> {
         use self::schema::delivery::dsl::*;
         let conn: &SqliteConnection = &CONN.lock().unwrap();
-        let rtn = diesel::delete(delivery.filter(id.eq(u128_to_vec_u8(carrier_id))))
-            .execute(conn);
+        let rtn = diesel::delete(delivery.filter(id.eq(u128_to_vec_u8(carrier_id)))).execute(conn);
         match rtn {
             Ok(_) => {
                 debug!("delete carrier for id: {:?} successful", carrier_id);
@@ -50,7 +51,7 @@ impl DeliveryDaoTrait for DeliveryDaoImpl {
             }
             Err(err) => {
                 debug!("delete carrier for id: {:?} occurred error", carrier_id);
-                Err(NatureError::from(err))
+                Err(DBNatureError::from(err).deref())
             }
         }
     }

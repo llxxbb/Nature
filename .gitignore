@@ -1,0 +1,9 @@
+Cargo.lock
+Nature.iml
+output.log
+.cargo/
+.idea/
+.vscode/
+rls/
+target/
+nature.sqlite

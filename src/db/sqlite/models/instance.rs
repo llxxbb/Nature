@@ -2,9 +2,9 @@ use chrono::prelude::*;
 use serde_json;
 use std::collections::HashMap;
 use std::collections::HashSet;
-use super::*;
-use super::schema::instances;
+use super::super::schema::instances;
 use util::*;
+use nature_common::*;
 
 #[derive(Insertable, Queryable, Debug, Clone)]
 #[table_name = "instances"]
@@ -24,8 +24,8 @@ pub struct NewInstance {
     create_time: NaiveDateTime,
 }
 
-impl Instance {
-    pub fn from(ni: NewInstance) -> Result<Self> {
+impl NewInstance {
+    pub fn to(ni: NewInstance) -> Result<Instance> {
         let from = match ni.from_thing {
             None => None,
             Some(k) => Some(FromInstance {

@@ -1,5 +1,5 @@
-use std::marker::PhantomData;
 use super::*;
+use std::marker::PhantomData;
 
 #[derive(Debug, Serialize, Deserialize, Clone, Default)]
 pub struct StoreTaskInfo {
@@ -27,16 +27,16 @@ pub struct StoreServiceImpl<D, V, S, C, P, R> {
 }
 
 impl<D, V, S, C, P, R> StoreServiceTrait for StoreServiceImpl<D, V, S, C, P, R>
-    where D: DeliveryServiceTrait,
-          V: InstanceServiceTrait,
-          S: InstanceDaoTrait,
-          C: ThingDefineCacheTrait,
-          P: DispatchServiceTrait,
-          R: RouteServiceTrait
+where
+    D: DeliveryServiceTrait,
+    V: InstanceServiceTrait,
+    S: InstanceDaoTrait,
+    C: ThingDefineCacheTrait,
+    P: DispatchServiceTrait,
+    R: RouteServiceTrait,
 {
     /// born an instance which is the beginning of the changes.
-    fn input(mut instance: Instance) -> Result<u128>
-    {
+    fn input(mut instance: Instance) -> Result<u128> {
         debug!("get instance: {:?}", instance);
         instance.data.thing.thing_type = ThingType::Business;
         let uuid = V::verify(&mut instance)?;
@@ -52,21 +52,28 @@ impl<D, V, S, C, P, R> StoreServiceTrait for StoreServiceImpl<D, V, S, C, P, R>
         let target = R::get_route(&instance)?;
         debug!("routes info for instance : {:?}", target);
         // save to delivery to make it can redo
-        let task = StoreTaskInfo { instance, upstream: None, mission: target };
+        let task = StoreTaskInfo {
+            instance,
+            upstream: None,
+            mission: target,
+        };
         Ok(task)
     }
 
     fn do_store_task(carrier: Carrier<StoreTaskInfo>) {
         debug!("------------------do_store_task------------------------");
         if let Err(err) = Self::save(carrier.clone()) {
-            D::move_to_err(err, carrier)
+            D::move_to_err(err.downcast::<NatureError>().unwrap(), carrier)
         };
     }
 
     fn send_store_task(task: StoreTaskInfo) -> Result<()> {
         // get route info
         let biz = task.instance.data.thing.key.clone();
-        debug!("create carrier for store task, the instance id is : {:?}", task.instance.id);
+        debug!(
+            "create carrier for store task, the instance id is : {:?}",
+            task.instance.id
+        );
         let carrier = D::create_carrier(task, biz, DataType::Store as u8)?;
         // send to this service again to unify the store process.
         D::send_carrier(&CHANNEL_STORE.sender, carrier);
@@ -75,7 +82,11 @@ impl<D, V, S, C, P, R> StoreServiceTrait for StoreServiceImpl<D, V, S, C, P, R>
 }
 
 impl<D, V, S, C, P, R> StoreServiceImpl<D, V, S, C, P, R>
-    where D: DeliveryServiceTrait, C: ThingDefineCacheTrait, P: DispatchServiceTrait, S: InstanceDaoTrait
+where
+    D: DeliveryServiceTrait,
+    C: ThingDefineCacheTrait,
+    P: DispatchServiceTrait,
+    S: InstanceDaoTrait,
 {
     /// save to db and handle duplicated data
     fn save(carrier: Carrier<StoreTaskInfo>) -> Result<u128> {
@@ -87,11 +98,19 @@ impl<D, V, S, C, P, R> StoreServiceImpl<D, V, S, C, P, R>
                 D::send_carrier(&CHANNEL_DISPATCH.sender, carrier);
                 Ok(id)
             }
-            Err(NatureError::DaoDuplicated) => {
-                Self::handle_duplicated(carrier)?;
-                Ok(id)
+            Err(err) => {
+                if err.is::<NatureError>() {
+                    match err.downcast_ref().unwrap() {
+                        NatureError::DaoDuplicated => {
+                            Self::handle_duplicated(carrier)?;
+                            Ok(id)
+                        }
+                        _ => Err(err)
+                    }
+                } else {
+                    Err(err)
+                }
             }
-            Err(err) => Err(err)
         }
     }
 

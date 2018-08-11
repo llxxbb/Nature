@@ -1,4 +1,3 @@
-use rpc::*;
 use std::collections::HashSet;
 use std::marker::PhantomData;
 use std::str::FromStr;

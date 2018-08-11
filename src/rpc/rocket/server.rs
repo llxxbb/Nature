@@ -2,7 +2,10 @@ extern crate rocket_contrib;
 
 use ::rocket::{ignite, Rocket};
 use self::rocket_contrib::Json;
-use super::*;
+use nature_common::*;
+use global::*;
+use fg_service::*;
+use data::*;
 
 pub fn start_rocket_server() -> Rocket {
     ignite()

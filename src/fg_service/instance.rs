@@ -1,4 +1,5 @@
 use super::*;
+use util::*;
 
 pub trait InstanceServiceTrait {
     fn verify(instance: &mut Instance) -> Result<u128>;

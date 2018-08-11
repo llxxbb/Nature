@@ -13,7 +13,7 @@ impl ThingDefineDaoTrait for ThingDefineDaoImpl {
         match def.len() {
             0 => Ok(None),
             1 => Ok(Some(def[0].clone())),
-            _ => Err(NatureError::SystemError("should less than 2 record return".to_string())),
+            _ => Err(Box::new(NatureError::SystemError("should less than 2 record return".to_string()))),
         }
     }
 
