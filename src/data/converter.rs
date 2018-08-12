@@ -1,10 +1,41 @@
-use nature_common::Thing;
-use nature_common::Instance;
+use global::*;
+use nature_common::*;
 use std::collections::HashSet;
+use std::str::FromStr;
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+pub enum Protocol {
+    LocalRust,
+    Http,
+    Https,
+}
+
+impl FromStr for Protocol {
+    type Err = NatureErrorWrapper;
+
+    fn from_str(s: &str) -> Result<Self> {
+        let cmp = &*s.to_uppercase();
+        match cmp {
+            "LOCALRUST" => Ok(Protocol::LocalRust),
+            "HTTP" => Ok(Protocol::Http),
+            "HTTPS" => Ok(Protocol::Https),
+            _ => {
+                let msg = format!("unknown protocol : {}", s);
+                Err(NatureErrorWrapper::from(NatureError::VerifyError(msg)))
+            }
+        }
+    }
+}
+
+impl Default for Protocol {
+    fn default() -> Self {
+        Protocol::LocalRust
+    }
+}
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq)]
 pub struct Executor {
-    pub protocol: String,
+    pub protocol: Protocol,
     /// url do not contain's protocol define
     pub url: String,
 }

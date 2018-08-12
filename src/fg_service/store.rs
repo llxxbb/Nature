@@ -37,7 +37,6 @@ impl<D, V, S, C, P, R> StoreServiceTrait for StoreServiceImpl<D, V, S, C, P, R>
 {
     /// born an instance which is the beginning of the changes.
     fn input(mut instance: Instance) -> Result<u128> {
-        debug!("get instance: {:?}", instance);
         instance.data.thing.thing_type = ThingType::Business;
         let uuid = V::verify(&mut instance)?;
         let task = Self::generate_store_task(instance)?;
@@ -100,23 +99,11 @@ impl<D, V, S, C, P, R> StoreServiceImpl<D, V, S, C, P, R>
             }
             Err(err) => match err.err {
                 NatureError::DaoDuplicated => {
-                    Self::handle_duplicated(carrier)?;
+                    // delivery will be retry by back-end.service
                     Ok(id)
                 }
                 _ => Err(err)
             }
-        }
-    }
-
-    fn handle_duplicated(carrier: Carrier<StoreTaskInfo>) -> Result<()> {
-        let define = C::get(&carrier.instance.data.thing)?;
-        if define.is_status() {
-            // status need to retry and correct the status version.
-            P::re_dispatch(carrier)
-        } else {
-            // **None Status Thing** won't try again
-            D::finish_carrier(carrier.id)?;
-            Ok(())
         }
     }
 }

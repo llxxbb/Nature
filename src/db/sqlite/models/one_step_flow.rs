@@ -2,6 +2,7 @@ use data::*;
 use global::*;
 use nature_common::*;
 use serde_json;
+use std::str::FromStr;
 use super::super::schema::one_step_flow;
 
 #[derive(Debug)]
@@ -59,7 +60,7 @@ impl OneStepFlow {
                 thing_type: ThingType::Business,
             },
             executor: Executor {
-                protocol: val.exe_protocol,
+                protocol: Protocol::from_str(&val.exe_protocol)?,
                 url: val.exe_url,
             },
             selector,

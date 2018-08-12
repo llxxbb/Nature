@@ -34,7 +34,6 @@ pub fn start_thread<T, F>(receiver: &'static Mutex<Receiver<T>>, f: F) -> JoinHa
 {
     use std::ops::Deref;
     thread::spawn(move || {
-        debug!("---------------create thread -----------------");
         let guard = receiver.lock().unwrap();
         let receiver = guard.deref();
         for next in receiver {

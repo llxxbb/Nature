@@ -50,14 +50,14 @@ impl InstanceDaoTrait for InstanceDaoImpl {
         match def.len() {
             0 => Ok(None),
             1 => Ok(Some(def[0].to()?)),
-            _ => Err(NatureErrorWrapper::from(NatureError::SystemError("should less than 2 record return".to_string(),))),
+            _ => Err(NatureErrorWrapper::from(NatureError::SystemError("should less than 2 record return".to_string()))),
         }
     }
 }
 
 impl InstanceDaoImpl {
     pub fn delete(ins: &Instance) -> Result<usize> {
-        debug!("delete instance : {:?}", ins);
+        debug!("delete instance, id is : {:?}", ins.id);
         use self::schema::instances::dsl::*;
         let conn: &SqliteConnection = &CONN.lock().unwrap();
         let rows = instances

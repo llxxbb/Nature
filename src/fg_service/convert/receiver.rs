@@ -1,11 +1,9 @@
+use fg_service::convert::caller::ConvertImpl;
 use std::collections::HashSet;
 use std::marker::PhantomData;
 use std::str::FromStr;
 use super::*;
 
-pub trait CallOutTrait {
-    fn convert(para: &Carrier<ConverterInfo>) -> Result<ConverterReturned>;
-}
 
 pub trait ConvertServiceTrait {
     fn submit_callback(delayed: DelayedInstances) -> Result<()>;
@@ -171,7 +169,7 @@ impl ConverterInfo {
         Ok(())
     }
 
-    pub fn to_out_parameter(internal: &Carrier<ConverterInfo>) -> CallOutParameter {
+    pub fn gen_out_parameter(internal: &Carrier<ConverterInfo>) -> CallOutParameter {
         CallOutParameter {
             from: internal.from.clone(),
             last_status: internal.last_status.clone(),
