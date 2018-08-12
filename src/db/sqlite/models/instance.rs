@@ -1,10 +1,11 @@
 use chrono::prelude::*;
+use global::*;
+use nature_common::*;
 use serde_json;
 use std::collections::HashMap;
 use std::collections::HashSet;
 use super::super::schema::instances;
 use util::*;
-use nature_common::*;
 
 #[derive(Insertable, Queryable, Debug, Clone)]
 #[table_name = "instances"]
@@ -25,24 +26,24 @@ pub struct NewInstance {
 }
 
 impl NewInstance {
-    pub fn to(ni: NewInstance) -> Result<Instance> {
-        let from = match ni.from_thing {
+    pub fn to(&self) -> Result<Instance> {
+        let from = match &self.from_thing {
             None => None,
             Some(k) => Some(FromInstance {
                 thing: Thing {
-                    key: k,
-                    version: ni.from_version.unwrap(),
+                    key: k.to_string(),
+                    version: self.from_version.unwrap(),
                     thing_type: ThingType::Business,
                 },
-                status_version: ni.from_status_version.unwrap(),
+                status_version: self.from_status_version.unwrap(),
             })
         };
-        let id = vec_to_u128(&ni.id);
-        let context = match ni.context {
+        let id = vec_to_u128(&self.id);
+        let context = match self.context {
             None => HashMap::new(),
             Some(ref s) => serde_json::from_str::<HashMap<String, String>>(s)?
         };
-        let status = match ni.status {
+        let status = match self.status {
             None => HashSet::new(),
             Some(ref s) => serde_json::from_str::<HashSet<String>>(s)?
         };
@@ -50,17 +51,17 @@ impl NewInstance {
             id,
             data: InstanceNoID {
                 thing: Thing {
-                    key: ni.thing,
-                    version: ni.version,
+                    key: self.thing.clone(),
+                    version: self.version,
                     thing_type: ThingType::Business,
                 },
-                event_time: ni.event_time.timestamp_millis(),
-                execute_time: ni.execute_time.timestamp_millis(),
-                create_time: ni.create_time.timestamp_millis(),
-                content: ni.content,
+                event_time: self.event_time.timestamp_millis(),
+                execute_time: self.execute_time.timestamp_millis(),
+                create_time: self.create_time.timestamp_millis(),
+                content: self.content.clone(),
                 context,
                 status,
-                status_version: ni.status_version,
+                status_version: self.status_version,
                 from,
             },
         })

@@ -1,3 +1,4 @@
+use db::trait_define::OneStepFlowDaoTrait;
 use diesel::prelude::*;
 use super::*;
 
@@ -26,7 +27,7 @@ impl OneStepFlowDaoTrait for OneStepFlowDaoImpl {
                     return Ok(None);
                 }
             }
-            _ => Err(NatureError::SystemError("unknown error occurred".to_string())),
+            _ => Err(NatureErrorWrapper::from(NatureError::SystemError("unknown error occurred".to_string()))),
         }
     }
 }
@@ -40,7 +41,7 @@ impl OneStepFlowDaoImpl {
             .execute(conn);
         match rtn {
             Ok(x) => Ok(x),
-            Err(e) => Err(NatureError::from(e))
+            Err(e) => Err(NatureErrorWrapper::from(e))
         }
     }
 }

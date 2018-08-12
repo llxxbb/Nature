@@ -1,13 +1,17 @@
 extern crate rand;
 
+use data::*;
+use db::trait_define::OneStepFlowDaoTrait;
+use global::Result;
 use lru_time_cache::LruCache;
+use nature_common::*;
 use self::rand::{Rng, thread_rng};
 use std::collections::HashMap;
+use std::marker::PhantomData;
 use std::ops::Range;
 use std::ptr;
 use std::sync::Mutex;
 use std::time::Duration;
-use super::*;
 
 lazy_static! {
     static ref CACHE_MAPPING: Mutex<LruCache<Thing, (Option<Vec<OneStepFlow>>, Option<HashMap<Thing, Range<f32>>>)>> = Mutex::new(LruCache::<Thing, (Option<Vec<OneStepFlow>>, Option<HashMap<Thing, Range<f32>>>)>::with_expiry_duration(Duration::from_secs(3600)));
@@ -17,9 +21,11 @@ pub trait OneStepFlowCacheTrait {
     fn get(from: &Thing) -> Result<Option<Vec<OneStepFlow>>>;
 }
 
-pub struct OneStepFlowCacheImpl;
+pub struct OneStepFlowCacheImpl<T> {
+    dao: PhantomData<T>
+}
 
-impl OneStepFlowCacheTrait for OneStepFlowCacheImpl {
+impl<T> OneStepFlowCacheTrait for OneStepFlowCacheImpl<T> where T: OneStepFlowDaoTrait {
     fn get(from: &Thing) -> Result<Option<Vec<OneStepFlow>>> {
         debug!("get relation for thing : {:?}", from);
         let (relations, balances) = Self::get_balanced(from)?;
@@ -31,7 +37,7 @@ impl OneStepFlowCacheTrait for OneStepFlowCacheImpl {
     }
 }
 
-impl OneStepFlowCacheImpl {
+impl<T> OneStepFlowCacheImpl<T> where T: OneStepFlowDaoTrait {
     fn get_balanced(from: &Thing) -> Result<(Option<Vec<OneStepFlow>>, Option<HashMap<Thing, Range<f32>>>)> {
         let mut cache = CACHE_MAPPING.lock().unwrap();
         if let Some(balances) = cache.get(from) {
@@ -39,7 +45,7 @@ impl OneStepFlowCacheImpl {
             return Ok(balances.clone());
         }
         debug!("get balances from db for thing : {:?}", from);
-        let rtn = match OneStepFlowDaoImpl::get_relations(from) {
+        let rtn = match T::get_relations(from) {
             Ok(None) => (None, None),
             Ok(Some(relations)) => {
                 let label_groups = Self::get_label_groups(&relations);

@@ -6,10 +6,11 @@ extern crate nature;
 extern crate rocket;
 extern crate rocket_contrib;
 extern crate serde_json;
+extern crate nature_common;
 
 use common::*;
 use nature::global::*;
-use self::nature::data::Instance;
+use nature_common::Instance;
 use self::nature::db::*;
 use self::nature::fg_service::*;
 use std::thread;

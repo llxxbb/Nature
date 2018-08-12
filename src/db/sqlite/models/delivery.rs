@@ -1,10 +1,11 @@
 use chrono::prelude::*;
+use data::Carrier;
+use global::*;
+use nature_common::*;
 use serde::Serialize;
 use std::fmt::Debug;
 use super::super::schema::delivery;
 use util::u128_to_vec_u8;
-use data::Carrier;
-use nature_common::*;
 
 #[derive(Debug)]
 #[derive(Insertable)]

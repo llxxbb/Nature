@@ -4,9 +4,11 @@ extern crate uuid;
 pub use self::channels::*;
 pub use self::error::*;
 pub use self::service_type_define::*;
+use std;
 use std::thread::JoinHandle;
 use util::setup_logger;
 
+pub type Result<T> = std::result::Result<T, NatureErrorWrapper>;
 
 // for product and mock
 lazy_static! {
@@ -28,7 +30,7 @@ pub fn sys_init() -> Vec<JoinHandle<()>> {
 
 pub fn finish_threads<T>(threads: Vec<JoinHandle<T>>) {
     for t in threads {
-        let _ =t.join();
+        let _ = t.join();
     }
 }
 

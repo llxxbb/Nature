@@ -36,21 +36,25 @@ impl<SP, SD, SS> ConvertServiceTrait for ConvertServiceImpl<SP, SD, SS>
             Ok(ConverterReturned::Instances(instances)) => {
                 match Self::handle_instances(&carrier, &instances) {
                     Ok(_) => (),
-                    Err(NatureError::DaoEnvironmentError(_)) => (),
-                    Err(err) => {
-                        SD::move_to_err(err, carrier.clone());
+                    Err(err) => match err.err {
+                        NatureError::DaoEnvironmentError(_) => (),
+                        _ => SD::move_to_err(err.err, carrier.clone())
                     }
                 }
             }
             Ok(ConverterReturned::Delay(delay)) => {
-                let _ = DeliveryDaoImpl::update_execute_time(carrier.id, carrier.execute_time + delay as i64);
+                let _ = SD::update_execute_time(carrier.id, carrier.execute_time + delay as i64);
                 ()
             }
-            Err(err) => match err {
+            Ok(ConverterReturned::LogicalError(ss)) => {
+                SD::move_to_err(NatureError::ConverterLogicalError(ss), carrier.clone())
+            }
+            Ok(ConverterReturned::EnvError) => (),
+            Err(err) => match err.err {
                 // only **Environment Error** will be retry
                 NatureError::ConverterEnvironmentError(_) => (),
                 // other error will drop into error
-                _ => SD::move_to_err(err, carrier)
+                _ => SD::move_to_err(err.err, carrier)
             }
         };
     }
@@ -97,7 +101,7 @@ fn verify(to: &Thing, instances: &Vec<Instance>) -> Result<Vec<Instance>> {
     let define = ThingDefineCacheImpl::get(to)?;
     if define.is_status() {
         if instances.len() > 1 {
-            return Err(NatureError::ConverterLogicalError("[status thing] must return less 2 instances!".to_string()));
+            return Err(NatureErrorWrapper::from(NatureError::ConverterLogicalError("[status thing] must return less 2 instances!".to_string())));
         }
 
         // status version must equal old + 1
@@ -156,20 +160,18 @@ impl ConverterInfo {
     fn check_last(last: &HashSet<String>, demand: &LastStatusDemand) -> Result<()> {
         for s in &demand.target_status_include {
             if !last.contains(s) {
-                return Err(NatureError::TargetInstanceNotIncludeStatus(s.clone()));
+                return Err(NatureErrorWrapper::from(NatureError::TargetInstanceNotIncludeStatus(s.clone())));
             }
         }
         for s in &demand.target_status_include {
             if last.contains(s) {
-                return Err(NatureError::TargetInstanceContainsExcludeStatus(s.clone()));
+                return Err(NatureErrorWrapper::from(NatureError::TargetInstanceContainsExcludeStatus(s.clone())));
             }
         }
         Ok(())
     }
-}
 
-impl CallOutParameter {
-    pub fn new(internal: &Carrier<ConverterInfo>) -> Self {
+    pub fn to_out_parameter(internal: &Carrier<ConverterInfo>) -> CallOutParameter {
         CallOutParameter {
             from: internal.from.clone(),
             last_status: internal.last_status.clone(),
@@ -177,3 +179,4 @@ impl CallOutParameter {
         }
     }
 }
+

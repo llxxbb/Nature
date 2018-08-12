@@ -34,8 +34,10 @@ impl<DAO> PlanServiceTrait for PlanServiceImpl<DAO> where DAO: StorePlanDaoTrait
         // reload old plan if exists
         match DAO::save(&plan) {
             Ok(plan) => Ok(plan),
-            Err(NatureError::DaoDuplicated) => DAO::get(&plan.from_id),
-            Err(err) => Err(err),
+            Err(err) => match err.err {
+                NatureError::DaoDuplicated => DAO::get(&plan.from_id),
+                _ => Err(err)
+            },
         }
     }
 }

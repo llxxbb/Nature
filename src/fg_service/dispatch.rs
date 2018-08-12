@@ -20,10 +20,12 @@ impl<T: DeliveryServiceTrait> DispatchServiceTrait for DispatchServiceImpl<T> {
 
         let converters = match Self::generate_converter_info(&carrier) {
             Ok(new) => new,
-            Err(NatureError::DaoEnvironmentError(_)) => return,
-            Err(err) => {
-                T::move_to_err(err, carrier);
-                return;
+            Err(err) => match err.err {
+                NatureError::DaoEnvironmentError(_) => return,
+                _ => {
+                    T::move_to_err(err.err, carrier);
+                    return;
+                }
             }
         };
         let biz = carrier.instance.thing.key.clone();
@@ -41,7 +43,7 @@ impl<T: DeliveryServiceTrait> DispatchServiceTrait for DispatchServiceImpl<T> {
     fn re_dispatch(carrier: Carrier<StoreTaskInfo>) -> Result<()> {
         if carrier.upstream.is_none() {
             T::move_to_err(NatureError::InstanceStatusVersionConflict, carrier);
-            return Err(NatureError::InstanceStatusVersionConflict);
+            return Err(NatureErrorWrapper::from(NatureError::InstanceStatusVersionConflict));
         }
         let converter = &carrier.content.data.upstream.clone().unwrap();
         let task = ConverterInfo::new(&converter.from, &converter.target)?;

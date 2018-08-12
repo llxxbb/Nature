@@ -17,6 +17,7 @@ pub trait DeliveryServiceTrait {
     fn new_carrier<T>(task: T, thing: String, data_type: u8) -> Result<Carrier<T>> where T: Sized + Serialize + Debug;
     fn send_carrier<T>(sender: &Mutex<Sender<Carrier<T>>>, carrier: Carrier<T>)
         where T: 'static + Sized + Serialize + Sync + Send + Debug;
+    fn update_execute_time(_id: u128, _new_time: i64) -> Result<()>;
 }
 
 
@@ -98,5 +99,9 @@ impl<TD: DeliveryDaoTrait> DeliveryServiceTrait for DeliveryServiceImpl<TD> {
         where T: 'static + Sized + Serialize + Sync + Send + Debug {
         debug!("send carrier for id: {:?}", carrier.id);
         let _send_status = sender.lock().unwrap().send(carrier);
+    }
+
+    fn update_execute_time(id: u128, new_time: i64) -> Result<()> {
+        TD::update_execute_time(id, new_time)
     }
 }

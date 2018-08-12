@@ -1,3 +1,5 @@
+use db::trait_define::StorePlanDaoTrait;
+use fg_service::PlanInfo;
 use super::*;
 
 pub struct StorePlanDaoImpl;

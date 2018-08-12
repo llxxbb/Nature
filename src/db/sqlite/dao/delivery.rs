@@ -1,9 +1,8 @@
-use super::*;
 use db::*;
 use diesel::result::*;
 use serde::Serialize;
 use std::fmt::Debug;
-use std::ops::Deref;
+use super::*;
 use util::*;
 
 pub struct DeliveryDaoImpl;
@@ -26,16 +25,16 @@ impl DeliveryDaoTrait for DeliveryDaoImpl {
                     Ok(vec_to_u128(&id))
                 }
                 DatabaseErrorKind::__Unknown => {
-                    Err(Box::new(NatureError::DaoEnvironmentError(format!("{:?}", info))))
+                    Err(NatureErrorWrapper::from(NatureError::DaoEnvironmentError(format!("{:?}", info))))
                 }
-                _ => Err(Box::new(NatureError::DaoLogicalError(format!("{:?}", info)))),
+                _ => Err(NatureErrorWrapper::from(NatureError::DaoLogicalError(format!("{:?}", info)))),
             },
             Err(e) => {
                 debug!(
                     "insert carrier to db for id: {:?} occurred error",
                     carrier.id
                 );
-                Err(e)
+                Err(NatureErrorWrapper::from(e))
             }
         }
     }
@@ -51,7 +50,7 @@ impl DeliveryDaoTrait for DeliveryDaoImpl {
             }
             Err(err) => {
                 debug!("delete carrier for id: {:?} occurred error", carrier_id);
-                Err(DBNatureError::from(err).deref())
+                Err(NatureErrorWrapper::from(err))
             }
         }
     }

@@ -1,10 +1,11 @@
 extern crate nature;
+extern crate nature_common;
 extern crate rocket;
 extern crate serde_json;
 
-use self::nature::data::Instance;
-use self::rocket::http::ContentType;
 use common::*;
+use nature_common::Instance;
+use self::rocket::http::ContentType;
 
 mod common;
 

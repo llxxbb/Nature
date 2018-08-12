@@ -1,3 +1,4 @@
+use db::trait_define::ThingDefineDaoTrait;
 use diesel::prelude::*;
 use super::*;
 
@@ -5,7 +6,7 @@ pub struct ThingDefineDaoImpl;
 
 impl ThingDefineDaoTrait for ThingDefineDaoImpl {
     fn get(thing: &Thing) -> Result<Option<ThingDefine>> {
-        use self::schema::thing_defines::dsl::*;
+        use super::schema::thing_defines::dsl::*;
         let conn: &SqliteConnection = &CONN.lock().unwrap();
         let def = thing_defines.filter(key.eq(&thing.key))
             .filter(version.eq(thing.version))
@@ -13,7 +14,7 @@ impl ThingDefineDaoTrait for ThingDefineDaoImpl {
         match def.len() {
             0 => Ok(None),
             1 => Ok(Some(def[0].clone())),
-            _ => Err(Box::new(NatureError::SystemError("should less than 2 record return".to_string()))),
+            _ => Err(NatureErrorWrapper::from(NatureError::SystemError("should less than 2 record return".to_string()))),
         }
     }
 
@@ -25,7 +26,7 @@ impl ThingDefineDaoTrait for ThingDefineDaoImpl {
             .execute(conn);
         match rtn {
             Ok(x) => Ok(x),
-            Err(e) => Err(NatureError::from(e))
+            Err(e) => Err(NatureErrorWrapper::from(e))
         }
     }
 
@@ -36,7 +37,7 @@ impl ThingDefineDaoTrait for ThingDefineDaoImpl {
             .execute(conn);
         match rtn {
             Ok(x) => Ok(x),
-            Err(err) => Err(NatureError::from(err))
+            Err(err) => Err(NatureErrorWrapper::from(err))
         }
     }
 }

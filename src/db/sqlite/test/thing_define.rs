@@ -2,6 +2,7 @@ use chrono::prelude::*;
 use db::trait_define::ThingDefineDaoTrait;
 use nature_common::*;
 use super::*;
+use std::ops::Deref;
 
 
 #[test]
@@ -29,7 +30,7 @@ fn define_test() {
     assert_eq!(rtn.unwrap(), 1);
     // repeat insert
     let rtn = ThingDefineDaoImpl::insert(&define);
-    assert_eq!(rtn.err().unwrap(), NatureError::DaoDuplicated);
+    assert_eq!(*rtn.err().unwrap().deref(), NatureError::DaoDuplicated);
     // find inserted
     let row = ThingDefineDaoImpl::get(&thing).unwrap().unwrap();
     assert_eq!(row, define);

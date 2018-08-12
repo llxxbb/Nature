@@ -3,10 +3,11 @@ extern crate log;
 extern crate nature;
 extern crate rocket;
 extern crate serde_json;
+extern crate nature_common;
 
 use common::*;
 use nature::global::sys_init;
-use self::nature::data::Instance;
+use nature_common::Instance;
 use self::nature::db::*;
 use self::rocket::http::ContentType;
 use std::thread;

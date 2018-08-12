@@ -1,5 +1,5 @@
-use super::*;
 use std::marker::PhantomData;
+use super::*;
 
 #[derive(Debug, Serialize, Deserialize, Clone, Default)]
 pub struct StoreTaskInfo {
@@ -27,13 +27,13 @@ pub struct StoreServiceImpl<D, V, S, C, P, R> {
 }
 
 impl<D, V, S, C, P, R> StoreServiceTrait for StoreServiceImpl<D, V, S, C, P, R>
-where
-    D: DeliveryServiceTrait,
-    V: InstanceServiceTrait,
-    S: InstanceDaoTrait,
-    C: ThingDefineCacheTrait,
-    P: DispatchServiceTrait,
-    R: RouteServiceTrait,
+    where
+        D: DeliveryServiceTrait,
+        V: InstanceServiceTrait,
+        S: InstanceDaoTrait,
+        C: ThingDefineCacheTrait,
+        P: DispatchServiceTrait,
+        R: RouteServiceTrait,
 {
     /// born an instance which is the beginning of the changes.
     fn input(mut instance: Instance) -> Result<u128> {
@@ -63,7 +63,7 @@ where
     fn do_store_task(carrier: Carrier<StoreTaskInfo>) {
         debug!("------------------do_store_task------------------------");
         if let Err(err) = Self::save(carrier.clone()) {
-            D::move_to_err(err.downcast::<NatureError>().unwrap(), carrier)
+            D::move_to_err(err.err, carrier)
         };
     }
 
@@ -82,11 +82,11 @@ where
 }
 
 impl<D, V, S, C, P, R> StoreServiceImpl<D, V, S, C, P, R>
-where
-    D: DeliveryServiceTrait,
-    C: ThingDefineCacheTrait,
-    P: DispatchServiceTrait,
-    S: InstanceDaoTrait,
+    where
+        D: DeliveryServiceTrait,
+        C: ThingDefineCacheTrait,
+        P: DispatchServiceTrait,
+        S: InstanceDaoTrait,
 {
     /// save to db and handle duplicated data
     fn save(carrier: Carrier<StoreTaskInfo>) -> Result<u128> {
@@ -98,18 +98,12 @@ where
                 D::send_carrier(&CHANNEL_DISPATCH.sender, carrier);
                 Ok(id)
             }
-            Err(err) => {
-                if err.is::<NatureError>() {
-                    match err.downcast_ref().unwrap() {
-                        NatureError::DaoDuplicated => {
-                            Self::handle_duplicated(carrier)?;
-                            Ok(id)
-                        }
-                        _ => Err(err)
-                    }
-                } else {
-                    Err(err)
+            Err(err) => match err.err {
+                NatureError::DaoDuplicated => {
+                    Self::handle_duplicated(carrier)?;
+                    Ok(id)
                 }
+                _ => Err(err)
             }
         }
     }

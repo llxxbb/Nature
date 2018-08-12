@@ -1,6 +1,6 @@
-use super::*;
+use db::trait_define::InstanceDaoTrait;
 use diesel::prelude::*;
-use std::ops::Deref;
+use super::*;
 use util::id_tool::u128_to_vec_u8;
 
 pub struct InstanceDaoImpl;
@@ -10,9 +10,12 @@ impl InstanceDaoTrait for InstanceDaoImpl {
         use self::schema::instances;
         let new = NewInstance::new(instance)?;
         let conn: &SqliteConnection = &CONN.lock().unwrap();
-        diesel::insert_into(instances::table)
+        match diesel::insert_into(instances::table)
             .values(new)
-            .execute(conn)
+            .execute(conn) {
+            Ok(rtn) => Ok(rtn),
+            Err(err) => Err(NatureErrorWrapper::from(err))
+        }
     }
 
     /// check whether source stored earlier
@@ -31,9 +34,9 @@ impl InstanceDaoTrait for InstanceDaoImpl {
             Ok(rs) => match rs.len() {
                 0 => Ok(false),
                 1 => Ok(true),
-                _ => Err(Box::new(NatureError::SystemError("should less than 2 record return".to_string()))
+                _ => Err(NatureErrorWrapper::from(NatureError::SystemError("should less than 2 record return".to_string())))
             },
-            Err(e) => Err(e)
+            Err(e) => Err(NatureErrorWrapper::from(e))
         }
     }
     fn get_by_id(instance_id: u128) -> Result<Option<Instance>> {
@@ -46,10 +49,8 @@ impl InstanceDaoTrait for InstanceDaoImpl {
             .load::<NewInstance>(conn)?;
         match def.len() {
             0 => Ok(None),
-            1 => Ok(Some(Instance::from(def[0].clone())?)),
-            _ => Err(NatureError::SystemError(
-                "should less than 2 record return".to_string(),
-            )),
+            1 => Ok(Some(def[0].to()?)),
+            _ => Err(NatureErrorWrapper::from(NatureError::SystemError("should less than 2 record return".to_string(),))),
         }
     }
 }
