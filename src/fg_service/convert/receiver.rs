@@ -1,25 +1,27 @@
-use fg_service::convert::caller::ConvertImpl;
+use data::*;
+use db::*;
+use fg_service::*;
+use global::*;
 use std::collections::HashSet;
 use std::marker::PhantomData;
 use std::str::FromStr;
-use super::*;
-
 
 pub trait ConvertServiceTrait {
     fn submit_callback(delayed: DelayedInstances) -> Result<()>;
     fn do_convert_task(carrier: Carrier<ConverterInfo>);
 }
 
-pub struct ConvertServiceImpl<SP, SD, SS> {
+pub struct ConvertServiceImpl<SP, SD, SS, SC> {
     plan: PhantomData<SP>,
     delivery: PhantomData<SD>,
     store: PhantomData<SS>,
+    caller: PhantomData<SC>,
 }
 
-impl<SP, SD, SS> ConvertServiceTrait for ConvertServiceImpl<SP, SD, SS>
-    where SP: PlanServiceTrait, SD: DeliveryServiceTrait, SS: StoreServiceTrait {
+impl<SP, SD, SS, SC> ConvertServiceTrait for ConvertServiceImpl<SP, SD, SS, SC>
+    where SP: PlanServiceTrait, SD: DeliveryServiceTrait, SS: StoreServiceTrait, SC: CallOutTrait {
     fn submit_callback(delayed: DelayedInstances) -> Result<()> {
-        let carrier = DeliveryDaoImpl::get::<ConverterInfo>(delayed.carrier_id)?;
+        let carrier = SD::get::<ConverterInfo>(delayed.carrier_id)?;
         match delayed.result {
             CallbackResult::Err(err) => {
                 let err = NatureError::ConverterLogicalError(err);
@@ -30,7 +32,7 @@ impl<SP, SD, SS> ConvertServiceTrait for ConvertServiceImpl<SP, SD, SS>
         }
     }
     fn do_convert_task(carrier: Carrier<ConverterInfo>) {
-        let _ = match ConvertImpl::convert(&carrier) {
+        let _ = match SC::convert(&carrier) {
             Ok(ConverterReturned::Instances(instances)) => {
                 match Self::handle_instances(&carrier, &instances) {
                     Ok(_) => (),
@@ -58,8 +60,8 @@ impl<SP, SD, SS> ConvertServiceTrait for ConvertServiceImpl<SP, SD, SS>
     }
 }
 
-impl<SP, SD, SS> ConvertServiceImpl<SP, SD, SS>
-    where SP: PlanServiceTrait, SD: DeliveryServiceTrait, SS: StoreServiceTrait {
+impl<SP, SD, SS, SC> ConvertServiceImpl<SP, SD, SS, SC>
+    where SP: PlanServiceTrait, SD: DeliveryServiceTrait, SS: StoreServiceTrait, SC: CallOutTrait {
     fn handle_instances(carrier: &Carrier<ConverterInfo>, instances: &Vec<Instance>) -> Result<()> {
 // check status version to avoid loop
         let instances = verify(&carrier.target.to, &instances)?;

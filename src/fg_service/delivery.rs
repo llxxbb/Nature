@@ -1,4 +1,5 @@
 use chrono::prelude::*;
+use global::*;
 use serde::Serialize;
 use std::fmt::Debug;
 use std::marker::PhantomData;
@@ -18,6 +19,7 @@ pub trait DeliveryServiceTrait {
     fn send_carrier<T>(sender: &Mutex<Sender<Carrier<T>>>, carrier: Carrier<T>)
         where T: 'static + Sized + Serialize + Sync + Send + Debug;
     fn update_execute_time(_id: u128, _new_time: i64) -> Result<()>;
+    fn get<T: Sized + Serialize + Debug>(_id: u128) -> Result<Carrier<T>>;
 }
 
 
@@ -103,5 +105,9 @@ impl<TD: DeliveryDaoTrait> DeliveryServiceTrait for DeliveryServiceImpl<TD> {
 
     fn update_execute_time(id: u128, new_time: i64) -> Result<()> {
         TD::update_execute_time(id, new_time)
+    }
+
+    fn get<T: Sized + Serialize + Debug>(id: u128) -> Result<Carrier<T>> {
+        TD::get(id)
     }
 }
