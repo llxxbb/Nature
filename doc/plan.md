@@ -2,7 +2,6 @@
 
 ## for the nearer term
 
-* add local converter support 
 * integrate test
     multi downstream
 

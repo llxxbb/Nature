@@ -1,6 +1,5 @@
 extern crate libloading as lib;
 
-use data::*;
 use global::*;
 use lru_time_cache::LruCache;
 use nature_common::*;
@@ -17,21 +16,23 @@ lazy_static! {
 
 
 pub trait LocalExecutorTrait {
-    fn execute(executor: &Executor, para: &CallOutParameter) -> ConverterReturned;
+    fn execute(executor: &str, para: &CallOutParameter) -> ConverterReturned;
 }
 
 pub struct LocalExecutorImpl;
 
 impl LocalExecutorTrait for LocalExecutorImpl {
-    fn execute(executor: &Executor, para: &CallOutParameter) -> ConverterReturned {
-        match Self::get_entry(&executor.url) {
+    fn execute(executor: &str, para: &CallOutParameter) -> ConverterReturned {
+        match Self::get_entry(executor) {
             None => ConverterReturned::None,
             Some(entry) => {
                 // get config of lib
                 let mut lib_cache = CACHE_LIB.lock().unwrap();
                 let path = entry.path.clone();
+                debug!("load library for :[{}]", path);
                 let cfg_lib = lib_cache.entry(entry.path).or_insert_with(move || lib::Library::new(path).unwrap());
                 // get entry to call
+                debug!("call entry for :[{}]", entry.entry);
                 let fun: CALLER = unsafe {
                     cfg_lib.get(entry.entry.as_bytes()).unwrap()
                 };
@@ -53,7 +54,7 @@ impl LocalExecutorImpl {
         cache.entry(path.to_string()).or_insert_with(|| {
             match Self::entry_from_str(path) {
                 Ok(e) => Some(e),
-                Err(e) => {
+                Err(_) => {
                     // TODO send a error message out
                     None
                 }

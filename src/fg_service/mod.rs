@@ -1,7 +1,7 @@
 use data::*;
 use db::*;
 use nature_common::*;
-pub use self::convert::{CallOutImpl, CallOutTrait, ConvertServiceImpl, ConvertServiceTrait};
+pub use self::convert::{CallOutImpl, CallOutTrait, ConvertServiceImpl, ConvertServiceTrait, LocalExecutorImpl, LocalExecutorTrait};
 pub use self::delivery::{DeliveryServiceImpl, DeliveryServiceTrait};
 pub use self::dispatch::{DispatchServiceImpl, DispatchServiceTrait};
 pub use self::instance::{InstanceServiceImpl, InstanceServiceTrait};

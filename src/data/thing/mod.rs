@@ -1,9 +1,6 @@
 use chrono::prelude::*;
-use global::*;
-use nature_common::*;
 
 
-//trace_macros!(true);
 
 /// `Thing`'s extended information
 /// `DateTime` is not implement `Default` trait
@@ -25,7 +22,6 @@ pub struct ThingDefine {
     pub create_time: NaiveDateTime,
 }
 
-//trace_macros!(false);
 
 impl Default for ThingDefine {
     fn default() -> Self {

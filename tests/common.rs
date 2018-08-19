@@ -20,13 +20,13 @@ pub fn new_thing_define(key: &str) {
 }
 
 #[allow(dead_code)]
-pub fn new_one_step_flow(from: &str, to: &str, url: &str) {
+pub fn new_one_step_flow(from: &str, to: &str, url: &str, protocol: &str) {
     let row = OneStepFlowRow {
         from_thing: from.to_string(),
         from_version: 0,
         to_thing: to.to_string(),
         to_version: 0,
-        exe_protocol: "http".to_string(),
+        exe_protocol: protocol.to_string(),
         exe_url: url.to_string(),
         selector: None,
         group: None,

@@ -23,15 +23,12 @@ mod common;
 fn local_converter() {
     let _ = sys_init();
     println!("------------------ insert thing define -----------------");
-    let from = "/multi_downstream/from";
-    let to_a = "/multi_downstream/toA";
-    let to_b = "/multi_downstream/toB";
+    let from = "/local_converter/from";
+    let to = "/local_converter/to";
     new_thing_define(from);
-    new_thing_define(to_a);
-    new_thing_define(to_b);
-    let url = format!("local://multi_downstream");
-    new_one_step_flow(from, to_a, &url, "LocalRust");
-    new_one_step_flow(from, to_b, &url, "LocalRust");
+    new_thing_define(to);
+    let url = r#"../../../Nature-integrate-test-converter/target/debug/nature_integrate_test_converter.dll:rtn_one"#;
+    new_one_step_flow(from, to, &url, "LocalRust");
     println!("------------------ prepare instance to submit -----------------");
     // prepare input para
     let mut instance = Instance::default();

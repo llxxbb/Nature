@@ -1,3 +1,4 @@
+use nature_common::*;
 use super::*;
 
 #[test]

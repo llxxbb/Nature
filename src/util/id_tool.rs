@@ -1,5 +1,4 @@
 use global::Result;
-use nature_common::*;
 use serde::Serialize;
 use serde_json;
 use uuid::*;
