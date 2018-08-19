@@ -3,7 +3,7 @@ use nature_common::*;
 use std::collections::HashSet;
 use std::str::FromStr;
 
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Ord, PartialOrd, Eq)]
 pub enum Protocol {
     LocalRust,
     Http,
@@ -33,7 +33,7 @@ impl Default for Protocol {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq, Ord, PartialOrd, Eq)]
 pub struct Executor {
     pub protocol: Protocol,
     /// url do not contain's protocol define

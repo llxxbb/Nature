@@ -75,7 +75,7 @@ impl NewInstance {
             Some(ref from) => (Some(from.thing.key.clone()), Some(from.thing.version), Some(from.status_version))
         };
         Ok(NewInstance {
-            id: instance.id.to_bytes().to_vec(),
+            id: instance.id.to_ne_bytes().to_vec(),
             thing: instance.thing.key.clone(),
             version: instance.thing.version,
             content: instance.content.clone(),

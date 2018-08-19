@@ -32,6 +32,7 @@ impl<SP, SD, SS, SC> ConvertServiceTrait for ConvertServiceImpl<SP, SD, SS, SC>
         }
     }
     fn do_convert_task(carrier: Carrier<ConverterInfo>) {
+        // TODO
         let _ = match SC::convert(&carrier) {
             Ok(ConverterReturned::Instances(instances)) => {
                 match Self::handle_instances(&carrier, &instances) {
@@ -50,6 +51,7 @@ impl<SP, SD, SS, SC> ConvertServiceTrait for ConvertServiceImpl<SP, SD, SS, SC>
                 SD::move_to_err(NatureError::ConverterLogicalError(ss), carrier.clone())
             }
             Ok(ConverterReturned::EnvError) => (),
+            Ok(ConverterReturned::None) => (),
             Err(err) => match err.err {
                 // only **Environment Error** will be retry
                 NatureError::ConverterEnvironmentError(_) => (),

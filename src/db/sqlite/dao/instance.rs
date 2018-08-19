@@ -23,7 +23,7 @@ impl InstanceDaoTrait for InstanceDaoImpl {
         use self::schema::instances::dsl::*;
         let conn: &SqliteConnection = &CONN.lock().unwrap();
         let def = instances
-            .filter(id.eq(ins.id.to_bytes().to_vec()))
+            .filter(id.eq(ins.id.to_ne_bytes().to_vec()))
             .filter(thing.eq(ins.thing.key.clone()))
             .filter(version.eq(ins.thing.version))
             .filter(status_version.eq(ins.status_version))
@@ -61,7 +61,7 @@ impl InstanceDaoImpl {
         use self::schema::instances::dsl::*;
         let conn: &SqliteConnection = &CONN.lock().unwrap();
         let rows = instances
-            .filter(id.eq(ins.id.to_bytes().to_vec()))
+            .filter(id.eq(ins.id.to_ne_bytes().to_vec()))
             .filter(thing.eq(ins.thing.key.clone()))
             .filter(version.eq(ins.thing.version))
             .filter(status_version.eq(ins.status_version));
