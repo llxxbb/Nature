@@ -11,7 +11,7 @@ impl DeliveryDaoTrait for DeliveryDaoImpl {
     fn insert<T: Sized + Serialize + Send + Debug>(carrier: &Carrier<T>) -> Result<u128> {
         use self::schema::delivery;
         let conn: &SqliteConnection = &CONN.lock().unwrap();
-        let d = Delivery::new(carrier)?;
+        let d = RawDelivery::new(carrier)?;
         let id = d.id.clone();
         let rtn = diesel::insert_into(delivery::table).values(d).execute(conn);
         match rtn {

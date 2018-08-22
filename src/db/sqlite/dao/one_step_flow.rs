@@ -11,7 +11,7 @@ impl OneStepFlowDaoTrait for OneStepFlowDaoImpl {
         let def = one_step_flow
             .filter(from_thing.eq(&from.key))
             .filter(from_version.eq(from.version))
-            .load::<OneStepFlowRow>(conn)?;
+            .load::<RawOneStepFlow>(conn)?;
         match def.len() {
             0 => Ok(None),
             x if x > 0 => {
@@ -33,7 +33,7 @@ impl OneStepFlowDaoTrait for OneStepFlowDaoImpl {
 }
 
 impl OneStepFlowDaoImpl {
-    pub fn insert(one: OneStepFlowRow) -> Result<usize> {
+    pub fn insert(one: RawOneStepFlow) -> Result<usize> {
         use self::schema::one_step_flow;
         let conn: &SqliteConnection = &CONN.lock().unwrap();
         let rtn = diesel::insert_into(one_step_flow::table)

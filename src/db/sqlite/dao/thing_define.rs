@@ -22,7 +22,7 @@ impl ThingDefineDaoTrait for ThingDefineDaoImpl {
         use self::schema::thing_defines;
         let conn: &SqliteConnection = &CONN.lock().unwrap();
         let rtn = diesel::insert_into(thing_defines::table)
-            .values(NewThingDefine::new(define))
+            .values(RawThingDefine::new(define))
             .execute(conn);
         match rtn {
             Ok(x) => Ok(x),

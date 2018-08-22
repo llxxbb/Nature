@@ -21,7 +21,7 @@ pub fn new_thing_define(key: &str) {
 
 #[allow(dead_code)]
 pub fn new_one_step_flow(from: &str, to: &str, url: &str, protocol: &str) {
-    let row = OneStepFlowRow {
+    let row = RawOneStepFlow {
         from_thing: from.to_string(),
         from_version: 0,
         to_thing: to.to_string(),

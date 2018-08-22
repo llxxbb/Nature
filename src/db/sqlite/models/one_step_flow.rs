@@ -8,7 +8,7 @@ use super::super::schema::one_step_flow;
 #[derive(Debug)]
 #[derive(Insertable, Queryable)]
 #[table_name = "one_step_flow"]
-pub struct OneStepFlowRow {
+pub struct RawOneStepFlow {
     pub from_thing: String,
     pub from_version: i32,
     pub to_thing: String,
@@ -21,7 +21,7 @@ pub struct OneStepFlowRow {
 }
 
 impl OneStepFlow {
-    pub fn from_row(val: OneStepFlowRow) -> Result<OneStepFlow> {
+    pub fn from_row(val: RawOneStepFlow) -> Result<OneStepFlow> {
         let selector = match val.selector {
             None => None,
             Some(x) => {

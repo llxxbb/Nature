@@ -9,7 +9,7 @@ use util::*;
 
 #[derive(Insertable, Queryable, Debug, Clone)]
 #[table_name = "instances"]
-pub struct NewInstance {
+pub struct RawInstance {
     id: Vec<u8>,
     thing: String,
     version: i32,
@@ -25,7 +25,7 @@ pub struct NewInstance {
     create_time: NaiveDateTime,
 }
 
-impl NewInstance {
+impl RawInstance {
     pub fn to(&self) -> Result<Instance> {
         let from = match &self.from_thing {
             None => None,
@@ -68,13 +68,13 @@ impl NewInstance {
     }
 }
 
-impl NewInstance {
-    pub fn new(instance: &Instance) -> Result<NewInstance> {
+impl RawInstance {
+    pub fn new(instance: &Instance) -> Result<RawInstance> {
         let (from_thing, from_version, from_status_version) = match instance.from {
             None => (None, None, None),
             Some(ref from) => (Some(from.thing.key.clone()), Some(from.thing.version), Some(from.status_version))
         };
-        Ok(NewInstance {
+        Ok(RawInstance {
             id: instance.id.to_ne_bytes().to_vec(),
             thing: instance.thing.key.clone(),
             version: instance.thing.version,

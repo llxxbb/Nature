@@ -45,3 +45,5 @@ root = "D:/common/sqlite3230100"
 cargo install diesel_cli --no-default-features --features sqlite
 
 
+
+

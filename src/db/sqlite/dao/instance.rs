@@ -8,7 +8,7 @@ pub struct InstanceDaoImpl;
 impl InstanceDaoTrait for InstanceDaoImpl {
     fn insert(instance: &Instance) -> Result<usize> {
         use self::schema::instances;
-        let new = NewInstance::new(instance)?;
+        let new = RawInstance::new(instance)?;
         let conn: &SqliteConnection = &CONN.lock().unwrap();
         match diesel::insert_into(instances::table)
             .values(new)
@@ -29,7 +29,7 @@ impl InstanceDaoTrait for InstanceDaoImpl {
             .filter(status_version.eq(ins.status_version))
             .order(status_version.desc())
             .limit(1)
-            .load::<NewInstance>(conn);
+            .load::<RawInstance>(conn);
         match def {
             Ok(rs) => match rs.len() {
                 0 => Ok(false),
@@ -46,7 +46,7 @@ impl InstanceDaoTrait for InstanceDaoImpl {
             .filter(id.eq(u128_to_vec_u8(instance_id)))
             .order(status_version.desc())
             .limit(1)
-            .load::<NewInstance>(conn)?;
+            .load::<RawInstance>(conn)?;
         match def.len() {
             0 => Ok(None),
             1 => Ok(Some(def[0].to()?)),

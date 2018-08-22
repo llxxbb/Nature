@@ -1,7 +1,6 @@
 use chrono::prelude::*;
 use data::Carrier;
 use global::*;
-use nature_common::*;
 use serde::Serialize;
 use std::fmt::Debug;
 use super::super::schema::delivery;
@@ -10,7 +9,7 @@ use util::u128_to_vec_u8;
 #[derive(Debug)]
 #[derive(Insertable)]
 #[table_name = "delivery"]
-pub struct Delivery {
+pub struct RawDelivery {
     pub id: Vec<u8>,
     pub thing: String,
     pub data_type: i16,
@@ -20,10 +19,10 @@ pub struct Delivery {
     pub retried_times: i16,
 }
 
-impl Delivery {
-    pub fn new<T: Serialize + Send + Debug>(carrier: &Carrier<T>) -> Result<Delivery> {
+impl RawDelivery {
+    pub fn new<T: Serialize + Send + Debug>(carrier: &Carrier<T>) -> Result<RawDelivery> {
         let json = serde_json::to_string(&carrier.content)?;
-        Ok(Delivery {
+        Ok(RawDelivery {
             id: u128_to_vec_u8(carrier.id),
             thing: carrier.content.thing.clone(),
             data_type: carrier.content.data_type as i16,

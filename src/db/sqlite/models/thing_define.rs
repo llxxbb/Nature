@@ -5,7 +5,7 @@ use data::*;
 #[derive(Debug)]
 #[derive(Insertable)]
 #[table_name = "thing_defines"]
-pub struct NewThingDefine<'a> {
+pub struct RawThingDefine<'a> {
     pub key: &'a str,
 
     /// For human readable what the `Thing` is.
@@ -22,9 +22,9 @@ pub struct NewThingDefine<'a> {
     pub create_time: &'a NaiveDateTime,
 }
 
-impl<'a> NewThingDefine<'a> {
-    pub fn new(define: &'a ThingDefine) -> NewThingDefine {
-        NewThingDefine {
+impl<'a> RawThingDefine<'a> {
+    pub fn new(define: &'a ThingDefine) -> RawThingDefine {
+        RawThingDefine {
             key: &define.key,
             description: define.description.clone(),
             version: define.version,
