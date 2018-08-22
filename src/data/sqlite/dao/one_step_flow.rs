@@ -1,4 +1,3 @@
-use db::trait_define::OneStepFlowDaoTrait;
 use diesel::prelude::*;
 use super::*;
 

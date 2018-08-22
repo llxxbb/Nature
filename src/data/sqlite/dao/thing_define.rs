@@ -1,4 +1,3 @@
-use db::trait_define::ThingDefineDaoTrait;
 use diesel::prelude::*;
 use super::*;
 

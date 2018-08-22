@@ -1,6 +1,5 @@
 use data::*;
 use global::*;
-use nature_common::*;
 use serde_json;
 use std::str::FromStr;
 use super::super::schema::one_step_flow;

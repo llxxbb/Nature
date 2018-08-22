@@ -1,7 +1,6 @@
 use chrono::prelude::*;
-use db::trait_define::ThingDefineDaoTrait;
-use nature_common::*;
-use super::*;
+use data::*;
+use data::thing::ThingDefine;
 use std::ops::Deref;
 
 

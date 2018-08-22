@@ -1,5 +1,5 @@
 use data::*;
-use fg_service::convert::local::LocalExecutorTrait;
+use flow::LocalExecutorTrait;
 use global::*;
 use nature_common::*;
 use std::marker::PhantomData;

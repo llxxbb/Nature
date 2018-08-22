@@ -3,7 +3,7 @@ extern crate nature_common;
 extern crate rocket;
 extern crate serde_json;
 
-use nature::fg_service::StoreServiceTrait;
+use nature::flow::*;
 use nature::global::*;
 use nature_common::*;
 

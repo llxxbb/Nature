@@ -1,4 +1,3 @@
-use db::*;
 use diesel::result::*;
 use serde::Serialize;
 use std::fmt::Debug;

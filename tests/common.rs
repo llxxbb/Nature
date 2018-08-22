@@ -2,7 +2,6 @@ extern crate nature;
 extern crate rocket;
 
 use nature::data::*;
-use nature::db::*;
 use nature::rpc::start_rocket_server;
 use rocket::local::Client;
 

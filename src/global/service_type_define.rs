@@ -1,5 +1,5 @@
-use db::*;
-use fg_service::*;
+use data::*;
+use flow::*;
 
 pub type DeliveryService = DeliveryServiceImpl<DeliveryDaoImpl>;
 pub type DispatchService = DispatchServiceImpl<DeliveryService>;

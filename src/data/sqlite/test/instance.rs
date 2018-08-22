@@ -1,8 +1,6 @@
-use db::trait_define::*;
-use nature_common::*;
+use data::*;
 use std::collections::HashMap;
 use std::collections::HashSet;
-use super::*;
 
 #[test]
 fn instance_insert_exists_delete_test() {

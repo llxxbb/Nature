@@ -4,18 +4,6 @@ use std::marker::PhantomData;
 use super::*;
 
 
-/// **unique key**
-/// * from_id
-/// * from_thing
-#[derive(Debug)]
-pub struct PlanInfo {
-    pub from_id: u128,
-    pub from_thing: Thing,
-    pub to: Thing,
-    pub plan: Vec<Instance>,
-}
-
-
 pub trait PlanServiceTrait {
     fn new(converter_info: &ConverterInfo, instances: &Vec<Instance>) -> Result<PlanInfo>;
 }

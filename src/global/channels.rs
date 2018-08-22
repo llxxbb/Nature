@@ -1,11 +1,11 @@
 use data::*;
-use fg_service::*;
+use flow::*;
 use global::service_type_define::*;
+use nature_common::*;
 use std::sync::mpsc::*;
 use std::sync::Mutex;
 use std::thread;
 use std::thread::JoinHandle;
-use nature_common::*;
 
 lazy_static! {
     pub static ref CHANNEL_DISPATCH : Channel<Carrier<StoreTaskInfo>> = Channel::new();

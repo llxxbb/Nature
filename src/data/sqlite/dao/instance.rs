@@ -1,7 +1,7 @@
-use db::trait_define::InstanceDaoTrait;
 use diesel::prelude::*;
 use super::*;
 use util::id_tool::u128_to_vec_u8;
+
 
 pub struct InstanceDaoImpl;
 

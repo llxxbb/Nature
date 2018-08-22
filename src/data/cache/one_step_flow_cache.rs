@@ -1,10 +1,8 @@
 extern crate rand;
 
 use data::*;
-use db::trait_define::OneStepFlowDaoTrait;
 use global::Result;
 use lru_time_cache::LruCache;
-use nature_common::*;
 use self::rand::{Rng, thread_rng};
 use std::collections::HashMap;
 use std::marker::PhantomData;

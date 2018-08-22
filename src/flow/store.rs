@@ -34,7 +34,7 @@ impl<D, V, S, C, P, R> StoreServiceTrait for StoreServiceImpl<D, V, S, C, P, R>
         S: InstanceDaoTrait,
         C: ThingDefineCacheTrait,
         P: DispatchServiceTrait,
-        R: RouteServiceTrait,
+        R: RouteServiceTrait
 {
     /// born an instance which is the beginning of the changes.
     fn input(mut instance: Instance) -> Result<u128> {

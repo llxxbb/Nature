@@ -11,8 +11,8 @@ extern crate serde_json;
 use common::*;
 use nature::global::*;
 use nature_common::Instance;
-use self::nature::db::*;
-use self::nature::fg_service::*;
+use self::nature::data::*;
+use self::nature::flow::*;
 use std::thread;
 use std::time;
 

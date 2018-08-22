@@ -15,6 +15,7 @@ extern crate lazy_static;
 #[macro_use]
 extern crate log;
 extern crate lru_time_cache;
+extern crate nature_common;
 extern crate r2d2;
 extern crate r2d2_diesel;
 extern crate rand;
@@ -24,14 +25,9 @@ extern crate serde;
 extern crate serde_derive;
 extern crate serde_json;
 extern crate uuid;
-extern crate nature_common;
 
 pub mod global;
 pub mod util;
 pub mod rpc;
 pub mod data;
-pub mod db;
-pub mod fg_service;
-
-pub mod bg_service;
-
+pub mod flow;
