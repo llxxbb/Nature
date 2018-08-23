@@ -3,7 +3,7 @@
 ## for the nearer term
 
 * integrate test
-    multi downstream
+    local converter
 
 * integrate test
     multi downstream
@@ -12,6 +12,8 @@
     batch_parallel
 * unit test:
   * store 
+  * plan 
+    - plan already exists
 * test task
   * process line
     * dispatch
@@ -21,6 +23,9 @@
     * delivery
   * new converter info 
   * new call-out-parameter
+* snowflake for 128 bit implement.
+* StorTaskInfo
+    need include next delivery id to use
 * delay execute
 * optimise : dispatch need not to save to delivery
 * Thing's key support parametrization

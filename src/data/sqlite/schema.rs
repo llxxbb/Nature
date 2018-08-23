@@ -54,6 +54,16 @@ table! {
 }
 
 table! {
+    plan (upstream, to_biz, to_version) {
+        upstream -> Text,
+        to_biz -> Text,
+        to_version -> Integer,
+        content -> Text,
+        create_time -> Timestamp,
+    }
+}
+
+table! {
     thing_defines (key, version) {
         key -> Text,
         description -> Nullable<Text>,
@@ -69,5 +79,6 @@ allow_tables_to_appear_in_same_query!(
     delivery_error,
     instances,
     one_step_flow,
+    plan,
     thing_defines,
 );

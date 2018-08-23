@@ -35,6 +35,5 @@ pub trait InstanceDaoTrait {
 
 pub trait StorePlanDaoTrait {
     /// replace the plan if plan exists.
-    fn save(plan: &PlanInfo) -> Result<PlanInfo>;
-    fn get(from_id: &u128) -> Result<PlanInfo>;
+    fn save(plan: &mut PlanInfo) -> Result<()>;
 }

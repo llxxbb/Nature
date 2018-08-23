@@ -59,3 +59,12 @@ CREATE TABLE `delivery_error` (
 	`msg`	TEXT NOT NULL,
 	PRIMARY KEY(`id`)
 );
+
+CREATE TABLE `plan` (
+	`upstream`	TEXT NOT NULL,
+	`to_biz`	TEXT NOT NULL,
+	`to_version`	INTEGER NOT NULL,
+	`content`	TEXT NOT NULL,
+	`create_time`	DATETIME NOT NULL,
+	PRIMARY KEY(`upstream`,`to_version`,`to_biz`)
+);

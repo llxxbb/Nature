@@ -4,3 +4,4 @@ DROP TABLE `one_step_flow`;
 DROP TABLE `instances`;
 DROP TABLE `delivery`;
 DROP TABLE `delivery_error`;
+DROP TABLE `plan`;

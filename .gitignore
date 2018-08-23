@@ -7,3 +7,4 @@ output.log
 rls/
 target/
 nature.sqlite
+nature.sqlite-journal
