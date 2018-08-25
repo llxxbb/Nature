@@ -25,7 +25,7 @@ pub struct OneStepFlowCacheImpl<T> {
 
 impl<T> OneStepFlowCacheTrait for OneStepFlowCacheImpl<T> where T: OneStepFlowDaoTrait {
     fn get(from: &Thing) -> Result<Option<Vec<OneStepFlow>>> {
-        debug!("get relation for thing : {:?}", from);
+//        debug!("get relation for thing : {:?}", from);
         let (relations, balances) = Self::get_balanced(from)?;
         if relations.is_none() {
             Ok(None)

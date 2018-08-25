@@ -2,6 +2,7 @@ use data::*;
 use flow::*;
 use global::*;
 use std::collections::HashSet;
+use std::iter::Iterator;
 use std::marker::PhantomData;
 use std::str::FromStr;
 
@@ -10,15 +11,17 @@ pub trait ConvertServiceTrait {
     fn do_convert_task(carrier: Carrier<ConverterInfo>);
 }
 
-pub struct ConvertServiceImpl<SP, SD, SS, SC> {
+pub struct ConvertServiceImpl<SP, SD, SS, SC, SI> {
     plan: PhantomData<SP>,
     delivery: PhantomData<SD>,
     store: PhantomData<SS>,
     caller: PhantomData<SC>,
+    ins_verify: PhantomData<SI>,
 }
 
-impl<SP, SD, SS, SC> ConvertServiceTrait for ConvertServiceImpl<SP, SD, SS, SC>
-    where SP: PlanServiceTrait, SD: DeliveryServiceTrait, SS: StoreServiceTrait, SC: CallOutTrait {
+impl<SP, SD, SS, SC, SI> ConvertServiceTrait for ConvertServiceImpl<SP, SD, SS, SC, SI>
+    where SP: PlanServiceTrait, SD: DeliveryServiceTrait,
+          SS: StoreServiceTrait, SC: CallOutTrait, SI: InstanceServiceTrait {
     fn submit_callback(delayed: DelayedInstances) -> Result<()> {
         let carrier = SD::get::<ConverterInfo>(delayed.carrier_id)?;
         match delayed.result {
@@ -27,14 +30,14 @@ impl<SP, SD, SS, SC> ConvertServiceTrait for ConvertServiceImpl<SP, SD, SS, SC>
                 SD::move_to_err(err, carrier);
                 Ok(())
             }
-            CallbackResult::Instances(ins) => Self::handle_instances(&carrier, &ins)
+            CallbackResult::Instances(mut ins) => Self::handle_instances(&carrier, &mut ins)
         }
     }
     fn do_convert_task(carrier: Carrier<ConverterInfo>) {
-        // TODO
         let _ = match SC::convert(&carrier) {
-            Ok(ConverterReturned::Instances(instances)) => {
-                match Self::handle_instances(&carrier, &instances) {
+            Ok(ConverterReturned::Instances(mut instances)) => {
+                debug!("converted instances : {:?}", instances);
+                match Self::handle_instances(&carrier, &mut instances) {
                     Ok(_) => (),
                     Err(err) => match err.err {
                         NatureError::DaoEnvironmentError(_) => (),
@@ -61,10 +64,16 @@ impl<SP, SD, SS, SC> ConvertServiceTrait for ConvertServiceImpl<SP, SD, SS, SC>
     }
 }
 
-impl<SP, SD, SS, SC> ConvertServiceImpl<SP, SD, SS, SC>
-    where SP: PlanServiceTrait, SD: DeliveryServiceTrait, SS: StoreServiceTrait, SC: CallOutTrait {
-    fn handle_instances(carrier: &Carrier<ConverterInfo>, instances: &Vec<Instance>) -> Result<()> {
-// check status version to avoid loop
+impl<SP, SD, SS, SC, SI> ConvertServiceImpl<SP, SD, SS, SC, SI>
+    where SP: PlanServiceTrait, SD: DeliveryServiceTrait,
+          SS: StoreServiceTrait, SC: CallOutTrait, SI: InstanceServiceTrait {
+    fn handle_instances(carrier: &Carrier<ConverterInfo>, instances: &mut Vec<Instance>) -> Result<()> {
+        // check status version to avoid loop
+        let _ = instances.iter_mut().map(|one: &mut Instance| {
+            one.data.thing = carrier.target.to.clone();
+            let _= SI::verify(one);
+            one
+        }).collect::<Vec<_>>();
         let instances = verify(&carrier.target.to, &instances)?;
         let plan = SP::new(&carrier.content.data, &instances)?;
         Self::do_store(carrier, plan);

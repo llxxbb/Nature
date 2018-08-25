@@ -43,7 +43,7 @@ fn local_converter() {
     println!("------------------ submit new instance -----------------");
     let rtn = StoreService::input(instance);
     println!("saved instance id : {}", rtn.unwrap());
-    thread::sleep(time::Duration::from_millis(500));
+    thread::sleep(time::Duration::from_millis(1000000));
     println!("------------------ verify -----------------");
     // TODO
     // get instance which is saved to db
