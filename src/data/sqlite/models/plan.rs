@@ -1,7 +1,6 @@
 use chrono::prelude::*;
 use data::*;
 use global::*;
-use nature_common::*;
 use serde_json;
 use super::super::schema::plan;
 
@@ -35,7 +34,7 @@ impl RawPlanInfo {
         Ok(PlanInfo {
             from_thing: Thing {
                 key: x[0].to_string(),
-                version: x[2].parse()?,
+                version: x[1].parse()?,
                 thing_type: ThingType::Business,
             },
             from_sn: x[2].parse()?,
@@ -50,3 +49,10 @@ impl RawPlanInfo {
     }
 }
 
+#[cfg(test)]
+mod test{
+    #[test]
+    fn to_plan_info(){
+        RawPlanInfo
+    }
+}

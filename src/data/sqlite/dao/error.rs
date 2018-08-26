@@ -9,7 +9,7 @@ impl From<Error> for NatureErrorWrapper {
         match err {
             Error::DatabaseError(kind, info) => match kind {
                 DatabaseErrorKind::UniqueViolation => NatureErrorWrapper {
-                    err: NatureError::DaoDuplicated,
+                    err: NatureError::DaoDuplicated("".to_string()),
                 },
                 DatabaseErrorKind::__Unknown => NatureErrorWrapper {
                     err: NatureError::DaoEnvironmentError(format!("{:?}", info)),

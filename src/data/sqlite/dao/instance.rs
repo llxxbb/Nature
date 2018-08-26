@@ -107,7 +107,7 @@ mod test {
         // insert one
         assert_eq!(Ok(1), InstanceDaoImpl::insert(&instance));
         // insert twice
-        assert_eq!(InstanceDaoImpl::insert(&instance), Err(NatureErrorWrapper { err: NatureError::DaoDuplicated }));
+        assert_eq!(InstanceDaoImpl::insert(&instance), Err(NatureErrorWrapper { err: NatureError::DaoDuplicated("".to_string()) }));
         // exists
         assert_eq!(true, InstanceDaoImpl::is_exists(&instance).unwrap());
         // delete it

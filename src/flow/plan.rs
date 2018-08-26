@@ -14,7 +14,7 @@ pub struct PlanServiceImpl<DAO> {
 
 impl<DAO> PlanServiceTrait for PlanServiceImpl<DAO> where DAO: StorePlanDaoTrait {
     fn new(converter_info: &ConverterInfo, instances: &Vec<Instance>) -> Result<PlanInfo> {
-        let mut plan = PlanInfo {
+        let plan = PlanInfo {
             from_sn: converter_info.from.id,
             from_thing: converter_info.from.thing.clone(),
             from_sta_ver: converter_info.from.status_version,
@@ -22,9 +22,20 @@ impl<DAO> PlanServiceTrait for PlanServiceImpl<DAO> where DAO: StorePlanDaoTrait
             plan: instances.clone(),
         };
         // reload old plan if exists
-        match DAO::save(&mut plan) {
+        match DAO::save(&plan) {
             Ok(_) => Ok(plan),
-            Err(err) => Err(err),
+            Err(err) => match err.err {
+                NatureError::DaoDuplicated(msg) => {
+                    let old = DAO::get(&msg)?;
+                    match old {
+                        Some(o) => {
+                            Ok(o)
+                        }
+                        None => Err(NatureErrorWrapper::from(NatureError::SystemError(format!("old should exists for : {}", msg))))
+                    }
+                }
+                _ => Err(err)
+            }
         }
     }
 }

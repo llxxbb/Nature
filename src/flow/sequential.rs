@@ -107,7 +107,7 @@ impl<SD, SS, SI> SequentialServiceImpl<SD, SS, SI>
                 Ok(_) => succeeded_id.push(instance.id),
                 Err(err) => match err.err {
                     NatureError::DaoEnvironmentError(_) => return Err(err),
-                    NatureError::DaoDuplicated => succeeded_id.push(instance.id),
+                    NatureError::DaoDuplicated(_) => succeeded_id.push(instance.id),
                     _ => {
                         errors.push(format!("{:?}", err));
                         continue;

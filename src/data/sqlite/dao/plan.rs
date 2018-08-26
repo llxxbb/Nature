@@ -6,7 +6,7 @@ use super::*;
 pub struct StorePlanDaoImpl;
 
 impl StorePlanDaoTrait for StorePlanDaoImpl {
-    fn save(plan: &mut PlanInfo) -> Result<()> {
+    fn save(plan: &PlanInfo) -> Result<()> {
         use self::schema::plan;
         let conn: &SqliteConnection = &CONN.lock().unwrap();
         let will_save = RawPlanInfo::new(plan)?;
@@ -17,29 +17,18 @@ impl StorePlanDaoTrait for StorePlanDaoImpl {
         match rtn {
             Ok(x) => match x {
                 1 => Ok(()),
-                num => Err(NatureErrorWrapper::from(NatureError::DaoLogicalError(format!("not 1 and 0 but get {}", num))))
+                num => Err(NatureErrorWrapper::from(NatureError::DaoLogicalError(format!("should insert 1 but get {}", num)))),
             },
-            Err(e) => {
-                let wrapper = NatureErrorWrapper::from(e);
-                match wrapper.err {
-                    NatureError::DaoDuplicated => {
-                        let old = Self::get(&upstream)?;
-                        match old {
-                            Some(o) => {
-                                *plan = o;
-                                Ok(())
-                            }
-                            None => Err(NatureErrorWrapper::from(NatureError::SystemError(format!("old should exists for : {}", upstream))))
-                        }
-                    }
-                    _ => Err(wrapper)
+            Err(e) => Err({
+                let wapper = NatureErrorWrapper::from(e);
+                match wapper.err {
+                    NatureError::DaoDuplicated(_) => NatureErrorWrapper::from(NatureError::DaoDuplicated(upstream)),
+                    _ => wapper,
                 }
-            }
+            }),
         }
     }
-}
 
-impl StorePlanDaoImpl {
     fn get(key: &str) -> Result<Option<PlanInfo>> {
         use super::schema::plan::dsl::*;
         let conn: &SqliteConnection = &CONN.lock().unwrap();

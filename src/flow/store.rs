@@ -99,7 +99,7 @@ impl<D, V, S, C, P, R> StoreServiceImpl<D, V, S, C, P, R>
                 Ok(id)
             }
             Err(err) => match err.err {
-                NatureError::DaoDuplicated => {
+                NatureError::DaoDuplicated(_) => {
                     // delivery will be retry by back-end.service
                     Ok(id)
                 }
