@@ -27,21 +27,22 @@ impl<SP, SD, SS, SC, SI> ConvertServiceTrait for ConvertServiceImpl<SP, SD, SS, 
         match delayed.result {
             CallbackResult::Err(err) => {
                 let err = NatureError::ConverterLogicalError(err);
-                SD::move_to_err(err, carrier);
+                SD::move_to_err(err, &carrier);
                 Ok(())
             }
             CallbackResult::Instances(mut ins) => Self::handle_instances(&carrier, &mut ins)
         }
     }
     fn do_convert_task(carrier: Carrier<ConverterInfo>) {
+        debug!("------------------do_convert_task------------------------");
         let _ = match SC::convert(&carrier) {
             Ok(ConverterReturned::Instances(mut instances)) => {
-                debug!("converted instances : {:?}", instances);
+                debug!("converted {} instances for `Thing`: {:?}", instances.len(), &carrier.content.thing);
                 match Self::handle_instances(&carrier, &mut instances) {
                     Ok(_) => (),
                     Err(err) => match err.err {
                         NatureError::DaoEnvironmentError(_) => (),
-                        _ => SD::move_to_err(err.err, carrier.clone())
+                        _ => SD::move_to_err(err.err, &carrier)
                     }
                 }
             }
@@ -50,7 +51,7 @@ impl<SP, SD, SS, SC, SI> ConvertServiceTrait for ConvertServiceImpl<SP, SD, SS, 
                 ()
             }
             Ok(ConverterReturned::LogicalError(ss)) => {
-                SD::move_to_err(NatureError::ConverterLogicalError(ss), carrier.clone())
+                SD::move_to_err(NatureError::ConverterLogicalError(ss), &carrier)
             }
             Ok(ConverterReturned::EnvError) => (),
             Ok(ConverterReturned::None) => (),
@@ -58,7 +59,7 @@ impl<SP, SD, SS, SC, SI> ConvertServiceTrait for ConvertServiceImpl<SP, SD, SS, 
                 // only **Environment Error** will be retry
                 NatureError::ConverterEnvironmentError(_) => (),
                 // other error will drop into error
-                _ => SD::move_to_err(err.err, carrier)
+                _ => SD::move_to_err(err.err, &carrier)
             }
         };
     }
@@ -71,7 +72,7 @@ impl<SP, SD, SS, SC, SI> ConvertServiceImpl<SP, SD, SS, SC, SI>
         // check status version to avoid loop
         let _ = instances.iter_mut().map(|one: &mut Instance| {
             one.data.thing = carrier.target.to.clone();
-            let _= SI::verify(one);
+            let _ = SI::verify(one);
             one
         }).collect::<Vec<_>>();
         let instances = verify(&carrier.target.to, &instances)?;
@@ -80,25 +81,30 @@ impl<SP, SD, SS, SC, SI> ConvertServiceImpl<SP, SD, SS, SC, SI>
         Ok(())
     }
     fn do_store(carrier: &Carrier<ConverterInfo>, plan: PlanInfo) {
-        let mut store_infos: Vec<StoreTaskInfo> = Vec::new();
+        let mut store_infos: Vec<Carrier<StoreTaskInfo>> = Vec::new();
         for instance in plan.plan.iter() {
             match SS::generate_store_task(instance.clone()) {
-                Ok(task) => store_infos.push(task),
+                Ok(task) => {
+                    match SD::new_carrier(task, &plan.to.key, DataType::Store as u8) {
+                        Ok(x) => store_infos.push(x),
+                        Err(e) => {
+                            error!("{}", e);
+                            SD::move_to_err(e.err, carrier);
+                            return;
+                        }
+                    }
+                }
                 // break process will environment error occurs.
-                _ => return
+                Err(e) => {
+                    error!("{}", e);
+                    return;
+                }
             }
         }
-        let new_tasks = SD::create_batch_and_finish_carrier(
-            store_infos,
-            carrier.to_owned(),
-            carrier.target.to.key.clone(),
-            DataType::Convert as u8,
-        );
-        if new_tasks.is_err() {
-            return;
-        }
-        for task in new_tasks.unwrap() {
-            SD::send_carrier(&CHANNEL_STORE.sender, task)
+        if let Ok(_) = SD::create_batch_and_finish_carrier(&store_infos, &carrier.to_owned()) {
+            for task in store_infos {
+                SD::send_carrier(&CHANNEL_STORE.sender, task)
+            }
         }
     }
 }

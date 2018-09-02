@@ -29,10 +29,10 @@ impl LocalExecutorTrait for LocalExecutorImpl {
                 // get config of lib
                 let mut lib_cache = CACHE_LIB.lock().unwrap();
                 let path = entry.path.clone();
-                debug!("load library for :[{}]", path);
+//                debug!("load library for :[{}]", path);
                 let cfg_lib = lib_cache.entry(entry.path).or_insert_with(move || lib::Library::new(path).unwrap());
                 // get entry to call
-                debug!("call entry for :[{}]", entry.entry);
+//                debug!("call entry for :[{}]", entry.entry);
                 let fun: CALLER = unsafe {
                     cfg_lib.get(entry.entry.as_bytes()).unwrap()
                 };

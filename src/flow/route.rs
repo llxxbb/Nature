@@ -31,7 +31,7 @@ impl<D, O> RouteServiceTrait for RouteServiceImpl<D, O>
 
 impl<D, O> RouteServiceImpl<D, O> {
     fn filter_relations(instance: &Instance, maps: Vec<OneStepFlow>) -> Option<Vec<Mission>> {
-        debug!("filter relations for instance: {:?}", instance);
+//        debug!("filter relations for instance: {:?}", instance);
         let mut rtn: Vec<Mission> = Vec::new();
         for m in maps {
             if !m.selector.is_none() {

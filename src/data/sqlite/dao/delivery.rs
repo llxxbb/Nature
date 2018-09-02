@@ -15,12 +15,11 @@ impl DeliveryDaoTrait for DeliveryDaoImpl {
         let rtn = diesel::insert_into(delivery::table).values(d).execute(conn);
         match rtn {
             Ok(_) => {
-                debug!("insert carrier to db for id: {:?} successful", carrier.id);
+//                debug!("insert carrier to db for id: {:?} successful", carrier.id);
                 Ok(vec_to_u128(&id))
             }
             Err(Error::DatabaseError(kind, info)) => match kind {
                 DatabaseErrorKind::UniqueViolation => {
-                    debug!("already insert carrier for : {:?}", id);
                     Ok(vec_to_u128(&id))
                 }
                 DatabaseErrorKind::__Unknown => {
@@ -29,7 +28,7 @@ impl DeliveryDaoTrait for DeliveryDaoImpl {
                 _ => Err(NatureErrorWrapper::from(NatureError::DaoLogicalError(format!("{:?}", info)))),
             },
             Err(e) => {
-                debug!(
+                error!(
                     "insert carrier to db for id: {:?} occurred error",
                     carrier.id
                 );
@@ -43,14 +42,8 @@ impl DeliveryDaoTrait for DeliveryDaoImpl {
         let conn: &SqliteConnection = &CONN.lock().unwrap();
         let rtn = diesel::delete(delivery.filter(id.eq(u128_to_vec_u8(carrier_id)))).execute(conn);
         match rtn {
-            Ok(_) => {
-                debug!("delete carrier for id: {:?} successful", carrier_id);
-                Ok(())
-            }
-            Err(err) => {
-                debug!("delete carrier for id: {:?} occurred error", carrier_id);
-                Err(NatureErrorWrapper::from(err))
-            }
+            Ok(_) => Ok(()),
+            Err(err) => Err(NatureErrorWrapper::from(err))
         }
     }
 

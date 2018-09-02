@@ -33,7 +33,7 @@ fn local_converter() {
     // prepare input para
     let mut instance = Instance::default();
     instance.data.thing.key = from.to_string();
-    let id = InstanceServiceImpl::verify(&mut instance).unwrap();
+    let _id = InstanceServiceImpl::verify(&mut instance).unwrap();
     println!("------------------ remove existed instance -----------------");
     // remove if instance exists
     let will_del = instance.clone();
@@ -41,12 +41,10 @@ fn local_converter() {
         println!("deleted : {} row", x);
     }
     println!("------------------ submit new instance -----------------");
-    let rtn = StoreService::input(instance);
-    println!("saved instance id : {}", rtn.unwrap());
-    thread::sleep(time::Duration::from_millis(1000000));
+    let _rtn = StoreService::input(instance);
+    thread::sleep(time::Duration::from_millis(1000));
     println!("------------------ verify -----------------");
-    // TODO
     // get instance which is saved to db
-    let _ins_db = InstanceDaoImpl::get_by_id(id).unwrap().unwrap();
+    let _ins_db = InstanceDaoImpl::get_by_key("/local_converter/to",217789594388339757346716979317903552035).unwrap().unwrap();
 }
 

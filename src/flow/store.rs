@@ -48,9 +48,8 @@ impl<D, V, S, C, P, R> StoreServiceTrait for StoreServiceImpl<D, V, S, C, P, R>
     /// generate `StoreTaskInfo` include route information.
     /// `Err` on environment error
     fn generate_store_task(instance: Instance) -> Result<StoreTaskInfo> {
-        debug!("generate store task for instance id : {:?}", instance.id);
+//        let key = &instance.thing.key;
         let target = R::get_route(&instance)?;
-        debug!("routes info for instance : {:?}", target);
         // save to delivery to make it can redo
         let task = StoreTaskInfo {
             instance,
@@ -63,18 +62,18 @@ impl<D, V, S, C, P, R> StoreServiceTrait for StoreServiceImpl<D, V, S, C, P, R>
     fn do_store_task(carrier: Carrier<StoreTaskInfo>) {
         debug!("------------------do_store_task------------------------");
         if let Err(err) = Self::save(carrier.clone()) {
-            D::move_to_err(err.err, carrier)
+            D::move_to_err(err.err, &carrier)
         };
     }
 
     fn send_store_task(task: StoreTaskInfo) -> Result<()> {
         // get route info
         let biz = task.instance.data.thing.key.clone();
-        debug!(
-            "create carrier for store task, the instance id is : {:?}",
-            task.instance.id
-        );
-        let carrier = D::create_carrier(task, biz, DataType::Store as u8)?;
+//        debug!(
+//            "create carrier for store task, the instance id is : {:?}",
+//            task.instance.id
+//        );
+        let carrier = D::create_carrier(task, &biz, DataType::Store as u8)?;
         // send to this service again to unify the store process.
         D::send_carrier(&CHANNEL_STORE.sender, carrier);
         Ok(())
@@ -91,7 +90,7 @@ impl<D, V, S, C, P, R> StoreServiceImpl<D, V, S, C, P, R>
     /// save to db and handle duplicated data
     fn save(carrier: Carrier<StoreTaskInfo>) -> Result<u128> {
         let id = carrier.instance.id;
-        debug!("save instance for id: {:?}", id);
+        debug!("save instance for `Thing` {:?}, id: {:?}", carrier.instance.thing.key, id);
         let result = S::insert(&carrier.instance);
         match result {
             Ok(_) => {

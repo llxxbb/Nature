@@ -29,9 +29,9 @@ impl<T> Deref for Carrier<T> where T: Sized + Serialize + Debug {
 
 
 #[derive(Debug)]
-pub struct CarryError<T> where T: Sized + Serialize + Debug {
+pub struct CarryError<'a, T: 'a> where T: Sized + Serialize + Debug {
     pub err: NatureError,
-    pub carrier: Carrier<T>,
+    pub carrier: &'a Carrier<T>,
 }
 
 pub enum DataType {

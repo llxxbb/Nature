@@ -53,6 +53,22 @@ impl InstanceDaoTrait for InstanceDaoImpl {
             _ => Err(NatureErrorWrapper::from(NatureError::SystemError("should less than 2 record return".to_string()))),
         }
     }
+
+    fn get_by_key(biz_key: &str, row_id: u128) -> Result<Option<Instance>> {
+        use self::schema::instances::dsl::*;
+        let conn: &SqliteConnection = &CONN.lock().unwrap();
+        let def = instances
+            .filter(thing.eq(biz_key))
+            .filter(id.eq(u128_to_vec_u8(row_id)))
+            .order(status_version.desc())
+            .limit(1)
+            .load::<RawInstance>(conn)?;
+        match def.len() {
+            0 => Ok(None),
+            1 => Ok(Some(def[0].to()?)),
+            _ => Err(NatureErrorWrapper::from(NatureError::SystemError("should less than 2 record return".to_string()))),
+        }
+    }
 }
 
 impl InstanceDaoImpl {

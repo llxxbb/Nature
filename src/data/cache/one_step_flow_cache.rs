@@ -39,10 +39,10 @@ impl<T> OneStepFlowCacheImpl<T> where T: OneStepFlowDaoTrait {
     fn get_balanced(from: &Thing) -> Result<(Option<Vec<OneStepFlow>>, Option<HashMap<Thing, Range<f32>>>)> {
         let mut cache = CACHE_MAPPING.lock().unwrap();
         if let Some(balances) = cache.get(from) {
-            debug!("get balances from cache for thing : {:?}", from);
+//            debug!("get balances from cache for thing : {:?}", from);
             return Ok(balances.clone());
         }
-        debug!("get balances from db for thing : {:?}", from);
+//        debug!("get balances from db for thing : {:?}", from);
         let rtn = match T::get_relations(from) {
             Ok(None) => (None, None),
             Ok(Some(relations)) => {

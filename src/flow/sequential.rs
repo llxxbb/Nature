@@ -27,7 +27,7 @@ impl<SD, SS, SI> SequentialTrait for SequentialServiceImpl<SD, SS, SI>
     where SD: DeliveryServiceTrait, SS: StoreServiceTrait, SI: InstanceServiceTrait
 {
     fn submit_serial(batch: SerialBatchInstance) -> Result<()> {
-        match SD::create_carrier(batch, "".to_string(), DataType::QueueBatch as u8) {
+        match SD::create_carrier(batch, "", DataType::QueueBatch as u8) {
             Ok(carrier) => {
                 // to process asynchronous
                 SD::send_carrier(&CHANNEL_SERIAL.sender, carrier);
@@ -47,7 +47,7 @@ impl<SD, SS, SI> SequentialTrait for SequentialServiceImpl<SD, SS, SI>
 
         let instance = match Self::new_virtual_instance(&carrier, sf.unwrap()) {
             Err(err) => {
-                SD::move_to_err(err.err, carrier);
+                SD::move_to_err(err.err, &carrier);
                 return;
             }
             Ok(ins) => ins,

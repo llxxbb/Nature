@@ -2,9 +2,11 @@
 
 ## for the nearer term
 
-* integrate test
-    local converter
-
+* use reference parameter to improve performance
+    StoreServiceTrait
+        generate_store_task .
+        new_carrier
+        
 * integrate test
     multi downstream
     callback

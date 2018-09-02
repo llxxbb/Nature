@@ -31,6 +31,7 @@ pub trait InstanceDaoTrait {
     /// check whether source stored earlier
     fn is_exists(instance: &Instance) -> Result<bool>;
     fn get_by_id(id: u128) -> Result<Option<Instance>>;
+    fn get_by_key(key: &str, id: u128) -> Result<Option<Instance>>;
 }
 
 pub trait StorePlanDaoTrait {

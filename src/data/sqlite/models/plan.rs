@@ -49,10 +49,3 @@ impl RawPlanInfo {
     }
 }
 
-#[cfg(test)]
-mod test{
-    #[test]
-    fn to_plan_info(){
-        RawPlanInfo
-    }
-}
