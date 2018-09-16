@@ -24,14 +24,14 @@ impl<DAO> PlanServiceTrait for PlanServiceImpl<DAO> where DAO: StorePlanDaoTrait
         // reload old plan if exists
         match DAO::save(&plan) {
             Ok(_) => Ok(plan),
-            Err(err) => match err.err {
+            Err(err) => match err {
                 NatureError::DaoDuplicated(msg) => {
                     let old = DAO::get(&msg)?;
                     match old {
                         Some(o) => {
                             Ok(o)
                         }
-                        None => Err(NatureErrorWrapper::from(NatureError::SystemError(format!("old should exists for : {}", msg))))
+                        None => Err(NatureError::SystemError(format!("old should exists for : {}", msg)))
                     }
                 }
                 _ => Err(err)

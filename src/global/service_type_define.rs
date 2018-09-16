@@ -1,5 +1,5 @@
-use data::*;
 use flow::*;
+use nature_db::*;
 
 pub type DeliveryService = DeliveryServiceImpl<DeliveryDaoImpl>;
 pub type DispatchService = DispatchServiceImpl<DeliveryService>;

@@ -62,7 +62,7 @@ impl<D, V, S, C, P, R> StoreServiceTrait for StoreServiceImpl<D, V, S, C, P, R>
     fn do_store_task(carrier: Carrier<StoreTaskInfo>) {
         debug!("------------------do_store_task------------------------");
         if let Err(err) = Self::save(carrier.clone()) {
-            D::move_to_err(err.err, &carrier)
+            D::move_to_err(err, &carrier)
         };
     }
 
@@ -97,7 +97,7 @@ impl<D, V, S, C, P, R> StoreServiceImpl<D, V, S, C, P, R>
                 D::send_carrier(&CHANNEL_DISPATCH.sender, carrier);
                 Ok(id)
             }
-            Err(err) => match err.err {
+            Err(err) => match err {
                 NatureError::DaoDuplicated(_) => {
                     // delivery will be retry by back-end.service
                     Ok(id)

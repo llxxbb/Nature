@@ -47,7 +47,7 @@ impl<SD, SS, SI> SequentialTrait for SequentialServiceImpl<SD, SS, SI>
 
         let instance = match Self::new_virtual_instance(&carrier, sf.unwrap()) {
             Err(err) => {
-                SD::move_to_err(err.err, &carrier);
+                SD::move_to_err(err, &carrier);
                 return;
             }
             Ok(ins) => ins,
@@ -105,7 +105,7 @@ impl<SD, SS, SI> SequentialServiceImpl<SD, SS, SI>
             }
             match InstanceDaoImpl::insert(&instance) {
                 Ok(_) => succeeded_id.push(instance.id),
-                Err(err) => match err.err {
+                Err(err) => match err {
                     NatureError::DaoEnvironmentError(_) => return Err(err),
                     NatureError::DaoDuplicated(_) => succeeded_id.push(instance.id),
                     _ => {

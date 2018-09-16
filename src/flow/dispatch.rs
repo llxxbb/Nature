@@ -20,10 +20,10 @@ impl<T: DeliveryServiceTrait> DispatchServiceTrait for DispatchServiceImpl<T> {
         }
         let converters = match Self::generate_converter_info(&carrier) {
             Ok(new) => new,
-            Err(err) => match err.err {
+            Err(err) => match err {
                 NatureError::DaoEnvironmentError(_) => return,
                 _ => {
-                    T::move_to_err(err.err, &carrier);
+                    T::move_to_err(err, &carrier);
                     return;
                 }
             }
@@ -41,10 +41,10 @@ impl<T: DeliveryServiceTrait> DispatchServiceTrait for DispatchServiceImpl<T> {
     fn re_dispatch(carrier: Carrier<StoreTaskInfo>) -> Result<()> {
         if carrier.upstream.is_none() {
             T::move_to_err(NatureError::InstanceStatusVersionConflict, &carrier);
-            return Err(NatureErrorWrapper::from(NatureError::InstanceStatusVersionConflict));
+            return Err(NatureError::InstanceStatusVersionConflict);
         }
         let converter = &carrier.content.data.upstream.clone().unwrap();
-        let task = ConverterInfo::new(&converter.from, &converter.target)?;
+        let task = ConvertService::new(&converter.from, &converter.target)?;
         let carrier = T::create_and_finish_carrier(task, carrier, converter.target.to.key.clone(), DataType::Convert as u8)?;
         T::send_carrier(&CHANNEL_CONVERT.sender, carrier);
         Ok(())
@@ -57,7 +57,7 @@ impl<T: DeliveryServiceTrait> DispatchServiceImpl<T> {
         let target = carrier.mission.clone();
         let tar = target.unwrap();
         for c in tar {
-            match ConverterInfo::new(&carrier.instance, &c) {
+            match ConvertService::new(&carrier.instance, &c) {
                 Err(err) => return Err(err),
                 Ok(x) => {
                     let car = T::new_carrier(x, &c.to.key, DataType::Convert as u8)?;

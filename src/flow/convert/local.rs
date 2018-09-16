@@ -65,7 +65,7 @@ impl LocalExecutorImpl {
     fn entry_from_str(path: &str) -> Result<LibraryEntry> {
         let x: Vec<&str> = path.split(":").collect();
         if x.len() != 2 {
-            Err(NatureErrorWrapper::from(NatureError::VerifyError(format!("illegal format : [{}]", path))))
+            Err(NatureError::VerifyError(format!("illegal format : [{}]", path)))
         } else {
             Ok(LibraryEntry {
                 path: x[0].to_string(),

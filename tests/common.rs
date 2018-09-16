@@ -1,9 +1,10 @@
 extern crate nature;
+extern crate nature_db;
 extern crate rocket;
 
-use nature::data::*;
 use nature::rpc::start_rocket_server;
 use rocket::local::Client;
+use self::nature_db::*;
 
 #[allow(dead_code)]
 pub fn get_test_client() -> Client {

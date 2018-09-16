@@ -1,7 +1,7 @@
-use data::*;
 use flow::LocalExecutorTrait;
 use global::*;
 use nature_common::*;
+use nature_db::*;
 use std::marker::PhantomData;
 
 pub trait CallOutTrait {
@@ -16,7 +16,7 @@ impl<LR> CallOutTrait for CallOutImpl<LR> where LR: LocalExecutorTrait {
     fn convert(carrier: &Carrier<ConverterInfo>) -> Result<ConverterReturned> {
         match carrier.target.executor.protocol {
             Protocol::LocalRust => {
-                let para = ConverterInfo::gen_out_parameter(carrier);
+                let para = ConvertService::gen_out_parameter(carrier);
                 Ok(LR::execute(&carrier.target.executor.url, &para))
             }
             _ => {

@@ -1,4 +1,3 @@
-use data::*;
 use flow::*;
 use global::*;
 use std::collections::HashSet;
@@ -40,9 +39,9 @@ impl<SP, SD, SS, SC, SI> ConvertServiceTrait for ConvertServiceImpl<SP, SD, SS, 
                 debug!("converted {} instances for `Thing`: {:?}", instances.len(), &carrier.content.thing);
                 match Self::handle_instances(&carrier, &mut instances) {
                     Ok(_) => (),
-                    Err(err) => match err.err {
+                    Err(err) => match err {
                         NatureError::DaoEnvironmentError(_) => (),
-                        _ => SD::move_to_err(err.err, &carrier)
+                        _ => SD::move_to_err(err, &carrier)
                     }
                 }
             }
@@ -55,11 +54,11 @@ impl<SP, SD, SS, SC, SI> ConvertServiceTrait for ConvertServiceImpl<SP, SD, SS, 
             }
             Ok(ConverterReturned::EnvError) => (),
             Ok(ConverterReturned::None) => (),
-            Err(err) => match err.err {
+            Err(err) => match err {
                 // only **Environment Error** will be retry
                 NatureError::ConverterEnvironmentError(_) => (),
                 // other error will drop into error
-                _ => SD::move_to_err(err.err, &carrier)
+                _ => SD::move_to_err(err, &carrier)
             }
         };
     }
@@ -89,7 +88,7 @@ impl<SP, SD, SS, SC, SI> ConvertServiceImpl<SP, SD, SS, SC, SI>
                         Ok(x) => store_infos.push(x),
                         Err(e) => {
                             error!("{}", e);
-                            SD::move_to_err(e.err, carrier);
+                            SD::move_to_err(e, carrier);
                             return;
                         }
                     }
@@ -107,40 +106,7 @@ impl<SP, SD, SS, SC, SI> ConvertServiceImpl<SP, SD, SS, SC, SI>
             }
         }
     }
-}
 
-
-fn verify(to: &Thing, instances: &Vec<Instance>) -> Result<Vec<Instance>> {
-    let mut rtn: Vec<Instance> = Vec::new();
-
-    // only one status instance should return
-    let define = ThingDefineCacheImpl::get(to)?;
-    if define.is_status() {
-        if instances.len() > 1 {
-            return Err(NatureErrorWrapper::from(NatureError::ConverterLogicalError("[status thing] must return less 2 instances!".to_string())));
-        }
-
-        // status version must equal old + 1
-        if instances.len() == 1 {
-            let mut ins = instances[0].clone();
-            ins.data.status_version += 1;
-            ins.data.thing = to.clone();
-            rtn.push(ins);
-        }
-        return Ok(rtn);
-    }
-
-    // all biz must same to "to"
-    for mut r in instances {
-        let mut instance = r.clone();
-        instance.data.thing = to.clone();
-        rtn.push(instance);
-    }
-
-    Ok(rtn)
-}
-
-impl ConverterInfo {
     /// **Error:**
     /// * Dao
     /// * DefineNotFind
@@ -176,12 +142,12 @@ impl ConverterInfo {
     fn check_last(last: &HashSet<String>, demand: &LastStatusDemand) -> Result<()> {
         for s in &demand.target_status_include {
             if !last.contains(s) {
-                return Err(NatureErrorWrapper::from(NatureError::TargetInstanceNotIncludeStatus(s.clone())));
+                return Err(NatureError::TargetInstanceNotIncludeStatus(s.clone()));
             }
         }
         for s in &demand.target_status_include {
             if last.contains(s) {
-                return Err(NatureErrorWrapper::from(NatureError::TargetInstanceContainsExcludeStatus(s.clone())));
+                return Err(NatureError::TargetInstanceContainsExcludeStatus(s.clone()));
             }
         }
         Ok(())
@@ -194,5 +160,36 @@ impl ConverterInfo {
             carrier_id: internal.id.clone(),
         }
     }
+}
+
+
+fn verify(to: &Thing, instances: &Vec<Instance>) -> Result<Vec<Instance>> {
+    let mut rtn: Vec<Instance> = Vec::new();
+
+    // only one status instance should return
+    let define = ThingDefineCacheImpl::get(to)?;
+    if define.is_status() {
+        if instances.len() > 1 {
+            return Err(NatureError::ConverterLogicalError("[status thing] must return less 2 instances!".to_string()));
+        }
+
+        // status version must equal old + 1
+        if instances.len() == 1 {
+            let mut ins = instances[0].clone();
+            ins.data.status_version += 1;
+            ins.data.thing = to.clone();
+            rtn.push(ins);
+        }
+        return Ok(rtn);
+    }
+
+    // all biz must same to "to"
+    for mut r in instances {
+        let mut instance = r.clone();
+        instance.data.thing = to.clone();
+        rtn.push(instance);
+    }
+
+    Ok(rtn)
 }
 

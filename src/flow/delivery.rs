@@ -1,12 +1,12 @@
 use chrono::prelude::*;
 use global::*;
+use nature_common::util::id_tool::generate_id;
 use serde::Serialize;
 use std::fmt::Debug;
 use std::marker::PhantomData;
 use std::sync::mpsc::Sender;
 use std::sync::Mutex;
 use super::*;
-use util::id_tool::generate_id;
 
 
 pub trait DeliveryServiceTrait {

@@ -1,14 +1,14 @@
 ///! World Connection Service provider
 extern crate uuid;
 
+use nature_common::*;
+use nature_common::util::setup_logger;
 pub use self::channels::*;
-pub use self::error::*;
 pub use self::service_type_define::*;
 use std;
 use std::thread::JoinHandle;
-use util::setup_logger;
 
-pub type Result<T> = std::result::Result<T, NatureErrorWrapper>;
+pub type Result<T> = std::result::Result<T, NatureError>;
 
 // for product and mock
 lazy_static! {
@@ -34,7 +34,6 @@ pub fn finish_threads<T>(threads: Vec<JoinHandle<T>>) {
     }
 }
 
-mod error;
 mod channels;
 
 mod service_type_define;
