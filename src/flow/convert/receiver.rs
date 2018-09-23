@@ -82,7 +82,7 @@ impl<SP, SD, SS, SC, SI> ConvertServiceImpl<SP, SD, SS, SC, SI>
     fn do_store(carrier: &Carrier<ConverterInfo>, plan: PlanInfo) {
         let mut store_infos: Vec<Carrier<StoreTaskInfo>> = Vec::new();
         for instance in plan.plan.iter() {
-            match SS::generate_store_task(instance.clone()) {
+            match SS::generate_store_task(instance) {
                 Ok(task) => {
                     match SD::new_carrier(task, &plan.to.key, DataType::Store as u8) {
                         Ok(x) => store_infos.push(x),

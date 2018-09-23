@@ -53,7 +53,7 @@ impl<SD, SS, SI> SequentialTrait for SequentialServiceImpl<SD, SS, SI>
             Ok(ins) => ins,
         };
 
-        let si = SS::generate_store_task(instance);
+        let si = SS::generate_store_task(&instance);
         if si.is_err() {
             return;
         }

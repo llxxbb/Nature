@@ -29,7 +29,7 @@ impl<SD, SS> ParallelServiceTrait for ParallelServiceImpl<SD, SS>
     fn do_parallel_task(carrier: Carrier<ParallelBatchInstance>) {
         let mut tasks: Vec<Carrier<StoreTaskInfo>> = Vec::new();
         for instance in carrier.content.data.0.iter() {
-            match SS::generate_store_task(instance.clone()) {
+            match SS::generate_store_task(instance) {
                 Ok(task) => {
                     match SD::new_carrier(task, &instance.thing.key, DataType::Store as u8) {
                         Ok(car) => tasks.push(car),

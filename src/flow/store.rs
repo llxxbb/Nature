@@ -15,7 +15,7 @@ pub trait StoreServiceTrait {
     fn input(instance: Instance) -> Result<u128>;
     fn do_store_task(carrier: Carrier<StoreTaskInfo>);
     fn send_store_task(task: StoreTaskInfo) -> Result<()>;
-    fn generate_store_task(instance: Instance) -> Result<StoreTaskInfo>;
+    fn generate_store_task(instance: &Instance) -> Result<StoreTaskInfo>;
 }
 
 pub struct StoreServiceImpl<D, V, S, C, P, R> {
@@ -40,19 +40,19 @@ impl<D, V, S, C, P, R> StoreServiceTrait for StoreServiceImpl<D, V, S, C, P, R>
     fn input(mut instance: Instance) -> Result<u128> {
         instance.data.thing.thing_type = ThingType::Business;
         let uuid = V::verify(&mut instance)?;
-        let task = Self::generate_store_task(instance)?;
+        let task = Self::generate_store_task(&instance)?;
         Self::send_store_task(task)?;
         Ok(uuid)
     }
 
     /// generate `StoreTaskInfo` include route information.
     /// `Err` on environment error
-    fn generate_store_task(instance: Instance) -> Result<StoreTaskInfo> {
+    fn generate_store_task(instance: &Instance) -> Result<StoreTaskInfo> {
 //        let key = &instance.thing.key;
-        let target = R::get_route(&instance)?;
+        let target = R::get_route(instance)?;
         // save to delivery to make it can redo
         let task = StoreTaskInfo {
-            instance,
+            instance: instance.clone(),
             upstream: None,
             mission: target,
         };

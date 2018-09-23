@@ -2,11 +2,6 @@
 
 ## for the nearer term
 
-* use reference parameter to improve performance
-    StoreServiceTrait
-        generate_store_task .
-        new_carrier
-        
 * integrate test
     multi downstream
     callback
