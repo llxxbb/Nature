@@ -1,6 +1,5 @@
 extern crate libloading as lib;
 
-use global::*;
 use lru_time_cache::LruCache;
 use nature_common::*;
 use std::sync::Mutex;

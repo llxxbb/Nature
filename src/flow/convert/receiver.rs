@@ -110,7 +110,6 @@ impl<SP, SD, SS, SC, SI> ConvertServiceImpl<SP, SD, SS, SC, SI>
     /// **Error:**
     /// * Dao
     /// * DefineNotFind
-    /// * uuid parse
     pub fn new(instance: &Instance, mapping: &Mission) -> Result<ConverterInfo> {
         let define = ThingDefineCacheImpl::get(&mapping.to)?;
         let last_target = match define.is_status() {

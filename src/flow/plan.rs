@@ -1,4 +1,3 @@
-use global::*;
 use nature_common::*;
 use std::marker::PhantomData;
 use super::*;
@@ -22,11 +21,13 @@ impl<DAO> PlanServiceTrait for PlanServiceImpl<DAO> where DAO: StorePlanDaoTrait
             plan: instances.clone(),
         };
         // reload old plan if exists
-        match DAO::save(&plan) {
+        let will_save = RawPlanInfo::new(&plan)?;
+
+        match DAO::save(&will_save) {
             Ok(_) => Ok(plan),
             Err(err) => match err {
                 NatureError::DaoDuplicated(msg) => {
-                    let old = DAO::get(&msg)?;
+                    let old = DAO::get(&will_save.upstream)?;
                     match old {
                         Some(o) => {
                             Ok(o)
