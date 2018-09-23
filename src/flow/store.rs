@@ -1,4 +1,5 @@
-use global::*;
+use flow::delivery::DeliveryServiceTrait;
+use flow::route::RouteServiceTrait;
 use std::marker::PhantomData;
 use super::*;
 
@@ -11,40 +12,22 @@ pub struct StoreTaskInfo {
 }
 
 pub trait StoreServiceTrait {
-    /// verify input data first then `do_store`
-    fn input(instance: Instance) -> Result<u128>;
-    fn do_store_task(carrier: Carrier<StoreTaskInfo>);
-    fn send_store_task(task: StoreTaskInfo) -> Result<()>;
     fn generate_store_task(instance: &Instance) -> Result<StoreTaskInfo>;
+    fn save(carrier: &Carrier<StoreTaskInfo>) -> Result<u128>;
 }
 
-pub struct StoreServiceImpl<D, V, S, C, P, R> {
+pub struct StoreServiceImpl<D, S, R> {
     delivery: PhantomData<D>,
-    instance_trait: PhantomData<V>,
     instance_dao: PhantomData<S>,
-    thing_define_cache_trait: PhantomData<C>,
-    dispatch_service: PhantomData<P>,
     route: PhantomData<R>,
 }
 
-impl<D, V, S, C, P, R> StoreServiceTrait for StoreServiceImpl<D, V, S, C, P, R>
+impl<D, S, R> StoreServiceTrait for StoreServiceImpl<D, S, R>
     where
         D: DeliveryServiceTrait,
-        V: InstanceServiceTrait,
         S: InstanceDaoTrait,
-        C: ThingDefineCacheTrait,
-        P: DispatchServiceTrait,
         R: RouteServiceTrait
 {
-    /// born an instance which is the beginning of the changes.
-    fn input(mut instance: Instance) -> Result<u128> {
-        instance.data.thing.thing_type = ThingType::Business;
-        let uuid = V::verify(&mut instance)?;
-        let task = Self::generate_store_task(&instance)?;
-        Self::send_store_task(task)?;
-        Ok(uuid)
-    }
-
     /// generate `StoreTaskInfo` include route information.
     /// `Err` on environment error
     fn generate_store_task(instance: &Instance) -> Result<StoreTaskInfo> {
@@ -59,42 +42,14 @@ impl<D, V, S, C, P, R> StoreServiceTrait for StoreServiceImpl<D, V, S, C, P, R>
         Ok(task)
     }
 
-    fn do_store_task(carrier: Carrier<StoreTaskInfo>) {
-        debug!("------------------do_store_task------------------------");
-        if let Err(err) = Self::save(carrier.clone()) {
-            D::move_to_err(err, &carrier)
-        };
-    }
-
-    fn send_store_task(task: StoreTaskInfo) -> Result<()> {
-        // get route info
-        let biz = task.instance.data.thing.key.clone();
-//        debug!(
-//            "create carrier for store task, the instance id is : {:?}",
-//            task.instance.id
-//        );
-        let carrier = D::create_carrier(task, &biz, DataType::Store as u8)?;
-        // send to this service again to unify the store process.
-        D::send_carrier(&CHANNEL_STORE.sender, carrier);
-        Ok(())
-    }
-}
-
-impl<D, V, S, C, P, R> StoreServiceImpl<D, V, S, C, P, R>
-    where
-        D: DeliveryServiceTrait,
-        C: ThingDefineCacheTrait,
-        P: DispatchServiceTrait,
-        S: InstanceDaoTrait,
-{
     /// save to db and handle duplicated data
-    fn save(carrier: Carrier<StoreTaskInfo>) -> Result<u128> {
+    fn save(carrier: &Carrier<StoreTaskInfo>) -> Result<u128> {
         let id = carrier.instance.id;
         debug!("save instance for `Thing` {:?}, id: {:?}", carrier.instance.thing.key, id);
         let result = S::insert(&carrier.instance);
         match result {
             Ok(_) => {
-                D::send_carrier(&CHANNEL_DISPATCH.sender, carrier);
+                D::send_carrier(&CHANNEL_DISPATCH.sender, carrier.clone());
                 Ok(id)
             }
             Err(err) => match err {
@@ -107,3 +62,4 @@ impl<D, V, S, C, P, R> StoreServiceImpl<D, V, S, C, P, R>
         }
     }
 }
+

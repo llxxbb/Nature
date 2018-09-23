@@ -1,6 +1,8 @@
-use global::*;
 use std::marker::PhantomData;
 use super::*;
+use flow::delivery::DeliveryServiceTrait;
+use flow::store::StoreServiceTrait;
+use flow::store::StoreTaskInfo;
 
 pub trait ParallelServiceTrait {
     fn submit_parallel(batch: ParallelBatchInstance) -> Result<()>;

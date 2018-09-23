@@ -1,13 +1,20 @@
 use flow::*;
-use global::*;
+use flow::convert::caller::CallOutTrait;
+use flow::delivery::DeliveryServiceTrait;
+use flow::plan::PlanServiceTrait;
+use flow::store::StoreServiceTrait;
+use flow::store::StoreTaskInfo;
 use std::collections::HashSet;
 use std::iter::Iterator;
 use std::marker::PhantomData;
 use std::str::FromStr;
+use system::*;
 
 pub trait ConvertServiceTrait {
     fn submit_callback(delayed: DelayedInstances) -> Result<()>;
     fn do_convert_task(carrier: Carrier<ConverterInfo>);
+    fn new(instance: &Instance, mapping: &Mission) -> Result<ConverterInfo>;
+    fn gen_out_parameter(internal: &Carrier<ConverterInfo>) -> CallOutParameter;
 }
 
 pub struct ConvertServiceImpl<SP, SD, SS, SC, SI> {
@@ -32,9 +39,11 @@ impl<SP, SD, SS, SC, SI> ConvertServiceTrait for ConvertServiceImpl<SP, SD, SS, 
             CallbackResult::Instances(mut ins) => Self::handle_instances(&carrier, &mut ins)
         }
     }
+
     fn do_convert_task(carrier: Carrier<ConverterInfo>) {
         debug!("------------------do_convert_task------------------------");
-        let _ = match SC::convert(&carrier) {
+        let parameter = Self::gen_out_parameter(&carrier);
+        let _ = match SC::convert(&carrier, &parameter) {
             Ok(ConverterReturned::Instances(mut instances)) => {
                 debug!("converted {} instances for `Thing`: {:?}", instances.len(), &carrier.content.thing);
                 match Self::handle_instances(&carrier, &mut instances) {
@@ -61,6 +70,45 @@ impl<SP, SD, SS, SC, SI> ConvertServiceTrait for ConvertServiceImpl<SP, SD, SS, 
                 _ => SD::move_to_err(err, &carrier)
             }
         };
+    }
+
+    /// **Error:**
+/// * Dao
+/// * DefineNotFind
+    fn new(instance: &Instance, mapping: &Mission) -> Result<ConverterInfo> {
+        let define = ThingDefineCacheImpl::get(&mapping.to)?;
+        let last_target = match define.is_status() {
+            false => None,
+            true => {
+                match instance.context.get(&*CONTEXT_TARGET_INSTANCE_ID) {
+                    // context have target id
+                    Some(status_id) => {
+                        let status_id = u128::from_str(status_id)?;
+                        InstanceDaoImpl::get_by_id(status_id)?
+                    }
+                    None => None,
+                }
+            }
+        };
+        if let Some(ref last) = last_target {
+            if let Some(demand) = &mapping.last_status_demand {
+                Self::check_last(&last.status, demand)?;
+            }
+        };
+        let rtn = ConverterInfo {
+            from: instance.clone(),
+            target: mapping.clone(),
+            last_status: last_target,
+        };
+        Ok(rtn)
+    }
+
+    fn gen_out_parameter(internal: &Carrier<ConverterInfo>) -> CallOutParameter {
+        CallOutParameter {
+            from: internal.from.clone(),
+            last_status: internal.last_status.clone(),
+            carrier_id: internal.id.clone(),
+        }
     }
 }
 
@@ -107,36 +155,6 @@ impl<SP, SD, SS, SC, SI> ConvertServiceImpl<SP, SD, SS, SC, SI>
         }
     }
 
-    /// **Error:**
-    /// * Dao
-    /// * DefineNotFind
-    pub fn new(instance: &Instance, mapping: &Mission) -> Result<ConverterInfo> {
-        let define = ThingDefineCacheImpl::get(&mapping.to)?;
-        let last_target = match define.is_status() {
-            false => None,
-            true => {
-                match instance.context.get(&*CONTEXT_TARGET_INSTANCE_ID) {
-                    // context have target id
-                    Some(status_id) => {
-                        let status_id = u128::from_str(status_id)?;
-                        InstanceDaoImpl::get_by_id(status_id)?
-                    }
-                    None => None,
-                }
-            }
-        };
-        if let Some(ref last) = last_target {
-            if let Some(demand) = &mapping.last_status_demand {
-                Self::check_last(&last.status, demand)?;
-            }
-        };
-        let rtn = ConverterInfo {
-            from: instance.clone(),
-            target: mapping.clone(),
-            last_status: last_target,
-        };
-        Ok(rtn)
-    }
 
     fn check_last(last: &HashSet<String>, demand: &LastStatusDemand) -> Result<()> {
         for s in &demand.target_status_include {
@@ -150,14 +168,6 @@ impl<SP, SD, SS, SC, SI> ConvertServiceImpl<SP, SD, SS, SC, SI>
             }
         }
         Ok(())
-    }
-
-    pub fn gen_out_parameter(internal: &Carrier<ConverterInfo>) -> CallOutParameter {
-        CallOutParameter {
-            from: internal.from.clone(),
-            last_status: internal.last_status.clone(),
-            carrier_id: internal.id.clone(),
-        }
     }
 }
 

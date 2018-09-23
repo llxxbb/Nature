@@ -7,7 +7,7 @@ extern crate rocket;
 extern crate serde_json;
 
 use common::*;
-use nature::global::sys_init;
+use nature::system::sys_init;
 use nature_common::Instance;
 use nature_db::*;
 use self::rocket::http::ContentType;

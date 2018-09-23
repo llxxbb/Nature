@@ -4,14 +4,13 @@ extern crate rocket;
 extern crate serde_json;
 
 use nature::flow::*;
-use nature::global::*;
 use nature_common::*;
 
 mod common;
 
 #[test]
 fn instance_key_is_null() {
-    let rtn = StoreService::input(Instance::default());
+    let rtn = Controller::input(Instance::default());
     match rtn.err().unwrap() {
         NatureError::VerifyError(ss) => assert_eq!(ss, "key length can\'t be zero"),
         err => {
@@ -26,7 +25,7 @@ fn instance_key_undefined() {
     // prepare input para
     let mut instance = Instance::default();
     instance.data.thing.key = "/key/undefined".to_string();
-    let rtn = StoreService::input(instance);
+    let rtn = Controller::input(instance);
     match rtn.err().unwrap() {
         NatureError::ThingNotDefined(ss) => assert_eq!(ss, "/key/undefined not defined"),
         err => {

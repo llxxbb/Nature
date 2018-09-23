@@ -1,4 +1,5 @@
-use global::*;
+use flow::delivery::DeliveryServiceTrait;
+use flow::store::StoreTaskInfo;
 use std::marker::PhantomData;
 use super::*;
 
@@ -7,15 +8,18 @@ pub trait DispatchServiceTrait {
     fn re_dispatch(carrier: Carrier<StoreTaskInfo>) -> Result<()>;
 }
 
-pub struct DispatchServiceImpl<T> {
-    delivery_service: PhantomData<T>
+pub struct DispatchServiceImpl<D, C> {
+    delivery_service: PhantomData<D>,
+    converter_service: PhantomData<C>,
 }
 
-impl<T: DeliveryServiceTrait> DispatchServiceTrait for DispatchServiceImpl<T> {
+impl<D, C> DispatchServiceTrait for DispatchServiceImpl<D, C>
+    where D: DeliveryServiceTrait, C: ConvertServiceTrait
+{
     fn do_dispatch_task(carrier: Carrier<StoreTaskInfo>) {
         debug!("------------------do_dispatch_task------------------------");
         if carrier.content.data.mission.is_none() {
-            let _ = T::finish_carrier(carrier.id);
+            let _ = D::finish_carrier(carrier.id);
             return;
         }
         let converters = match Self::generate_converter_info(&carrier) {
@@ -23,16 +27,16 @@ impl<T: DeliveryServiceTrait> DispatchServiceTrait for DispatchServiceImpl<T> {
             Err(err) => match err {
                 NatureError::DaoEnvironmentError(_) => return,
                 _ => {
-                    T::move_to_err(err, &carrier);
+                    D::move_to_err(err, &carrier);
                     return;
                 }
             }
         };
         let biz = &carrier.instance.thing.key;
-        if let Ok(_) = T::create_batch_and_finish_carrier(&converters, &carrier) {
+        if let Ok(_) = D::create_batch_and_finish_carrier(&converters, &carrier) {
             debug!("will dispatch {} convert tasks for `Thing` : {:?}", converters.len(), biz);
             for task in converters {
-                T::send_carrier(&CHANNEL_CONVERT.sender, task)
+                D::send_carrier(&CHANNEL_CONVERT.sender, task)
             }
         };
     }
@@ -40,27 +44,29 @@ impl<T: DeliveryServiceTrait> DispatchServiceTrait for DispatchServiceImpl<T> {
     /// Get last status version and re-convert
     fn re_dispatch(carrier: Carrier<StoreTaskInfo>) -> Result<()> {
         if carrier.upstream.is_none() {
-            T::move_to_err(NatureError::InstanceStatusVersionConflict, &carrier);
+            D::move_to_err(NatureError::InstanceStatusVersionConflict, &carrier);
             return Err(NatureError::InstanceStatusVersionConflict);
         }
         let converter = &carrier.content.data.upstream.clone().unwrap();
-        let task = ConvertService::new(&converter.from, &converter.target)?;
-        let carrier = T::create_and_finish_carrier(task, carrier, converter.target.to.key.clone(), DataType::Convert as u8)?;
-        T::send_carrier(&CHANNEL_CONVERT.sender, carrier);
+        let task = C::new(&converter.from, &converter.target)?;
+        let carrier = D::create_and_finish_carrier(task, carrier, converter.target.to.key.clone(), DataType::Convert as u8)?;
+        D::send_carrier(&CHANNEL_CONVERT.sender, carrier);
         Ok(())
     }
 }
 
-impl<T: DeliveryServiceTrait> DispatchServiceImpl<T> {
+impl<D, C> DispatchServiceImpl<D, C>
+    where D: DeliveryServiceTrait, C: ConvertServiceTrait
+{
     fn generate_converter_info(carrier: &Carrier<StoreTaskInfo>) -> Result<Vec<Carrier<ConverterInfo>>> {
         let mut new_carriers: Vec<Carrier<ConverterInfo>> = Vec::new();
         let target = carrier.mission.clone();
         let tar = target.unwrap();
         for c in tar {
-            match ConvertService::new(&carrier.instance, &c) {
+            match C::new(&carrier.instance, &c) {
                 Err(err) => return Err(err),
                 Ok(x) => {
-                    let car = T::new_carrier(x, &c.to.key, DataType::Convert as u8)?;
+                    let car = D::new_carrier(x, &c.to.key, DataType::Convert as u8)?;
                     new_carriers.push(car);
                 }
             }

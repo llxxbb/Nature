@@ -1,7 +1,5 @@
 use flow::*;
-use global::service_type_define::*;
-use nature_common::*;
-use nature_db::*;
+use flow::store::StoreTaskInfo;
 use std::sync::mpsc::*;
 use std::sync::Mutex;
 use std::thread;
@@ -20,7 +18,7 @@ pub fn start_receive_threads() -> Vec<JoinHandle<()>> {
     info!("to start receive threads");
     threads.push(start_thread(&CHANNEL_DISPATCH.receiver, DispatchService::do_dispatch_task));
     threads.push(start_thread(&CHANNEL_CONVERT.receiver, ConvertService::do_convert_task));
-    threads.push(start_thread(&CHANNEL_STORE.receiver, StoreService::do_store_task));
+    threads.push(start_thread(&CHANNEL_STORE.receiver, Controller::do_store_task));
     threads.push(start_thread(&CHANNEL_PARALLEL.receiver, ParallelService::do_parallel_task));
     threads.push(start_thread(&CHANNEL_SERIAL.receiver, SequentialService::do_serial_task));
     threads

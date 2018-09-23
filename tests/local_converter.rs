@@ -10,7 +10,7 @@ extern crate rocket_contrib;
 extern crate serde_json;
 
 use common::*;
-use nature::global::*;
+use nature::system::*;
 use nature_common::Instance;
 use nature_db::*;
 use self::nature::flow::*;
@@ -42,7 +42,7 @@ fn local_converter() {
         println!("deleted : {} row", x);
     }
     println!("------------------ submit new instance -----------------");
-    let _rtn = StoreService::input(instance);
+    let _rtn = Controller::input(instance);
     thread::sleep(time::Duration::from_millis(1000));
     println!("------------------ verify -----------------");
     // get instance which is saved to db

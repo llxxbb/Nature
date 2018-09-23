@@ -2,7 +2,7 @@ extern crate chrono;
 extern crate fern;
 extern crate nature;
 
-use nature::global::*;
+use nature::system::*;
 use nature::rpc::*;
 
 fn main() {

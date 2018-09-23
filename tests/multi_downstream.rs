@@ -11,7 +11,7 @@ extern crate serde_json;
 
 
 use common::*;
-use nature::global::*;
+use nature::system::*;
 use nature_common::Instance;
 use self::nature::flow::*;
 use self::nature_db::*;
@@ -46,7 +46,7 @@ fn local_converter() {
         println!("deleted : {} row", x);
     }
     println!("------------------ submit new instance -----------------");
-    let rtn = StoreService::input(instance);
+    let rtn = Controller::input(instance);
     println!("saved instance id : {}", rtn.unwrap());
     thread::sleep(time::Duration::from_millis(500));
     println!("------------------ verify -----------------");

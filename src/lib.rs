@@ -21,6 +21,6 @@ extern crate serde_derive;
 extern crate serde_json;
 extern crate uuid;
 
-pub mod global;
+pub mod system;
 pub mod rpc;
 pub mod flow;

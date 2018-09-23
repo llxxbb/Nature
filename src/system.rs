@@ -1,9 +1,8 @@
 ///! World Connection Service provider
 extern crate uuid;
 
+use flow::*;
 use nature_common::util::setup_logger;
-pub use self::channels::*;
-pub use self::service_type_define::*;
 use std::thread::JoinHandle;
 
 // for product and mock
@@ -20,8 +19,7 @@ pub fn sys_init() -> Vec<JoinHandle<()>> {
 
     // read config
 //    let config = world_connection::util::get_settings();
-
-    start_receive_threads()
+    Controller::start()
 }
 
 pub fn finish_threads<T>(threads: Vec<JoinHandle<T>>) {
@@ -30,7 +28,4 @@ pub fn finish_threads<T>(threads: Vec<JoinHandle<T>>) {
     }
 }
 
-mod channels;
-
-mod service_type_define;
 
