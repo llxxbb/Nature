@@ -83,7 +83,7 @@ impl<S, R, D, V> StoreServiceImpl<S, R, D, V>
             D::move_to_err(err.clone(), carrier);
             Err(err)
         } else {
-            D::send_carrier(&CHANNEL_DISPATCH.sender, carrier.clone());
+            D::send_carrier(&CHANNEL_STORED.sender, carrier.clone());
             Ok(())
         }
     }

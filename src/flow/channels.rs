@@ -4,8 +4,9 @@ use std::thread;
 use std::thread::JoinHandle;
 use super::*;
 
+/// `CHANNEL_PARALLEL` & `CHANNEL_SERIAL` are used to short caller response time
 lazy_static! {
-    pub static ref CHANNEL_DISPATCH : Channel<Carrier<StoreTaskInfo>> = Channel::new();
+    pub static ref CHANNEL_STORED : Channel<Carrier<StoreTaskInfo>> = Channel::new();
     pub static ref CHANNEL_CONVERT : Channel<Carrier<ConverterInfo>> = Channel::new();
     pub static ref CHANNEL_STORE : Channel<Carrier<StoreTaskInfo>> = Channel::new();
     pub static ref CHANNEL_PARALLEL : Channel<Carrier<ParallelBatchInstance>> = Channel::new();
@@ -15,9 +16,10 @@ lazy_static! {
 pub fn start_receive_threads() -> Vec<JoinHandle<()>> {
     let mut threads: Vec<JoinHandle<()>> = Vec::new();
     info!("to start receive threads");
-    threads.push(start_thread(&CHANNEL_DISPATCH.receiver, DispatchService::dispatch));
+    threads.push(start_thread(&CHANNEL_STORED.receiver, Controller::channel_stored));
     threads.push(start_thread(&CHANNEL_CONVERT.receiver, ConvertService::convert));
     threads.push(start_thread(&CHANNEL_STORE.receiver, StoreService::store));
+    // used to improve caller response time
     threads.push(start_thread(&CHANNEL_PARALLEL.receiver, ParallelService::do_parallel_task));
     threads.push(start_thread(&CHANNEL_SERIAL.receiver, SequentialService::do_serial_task));
     threads

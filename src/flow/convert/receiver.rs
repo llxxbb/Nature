@@ -9,6 +9,7 @@ pub trait ConvertServiceTrait {
     fn callback(delayed: DelayedInstances) -> Result<()>;
     fn convert(carrier: Carrier<ConverterInfo>);
     fn new(instance: &Instance, mapping: &Mission) -> Result<ConverterInfo>;
+    fn generate_converter_info(carrier: &Carrier<StoreTaskInfo>) -> Result<Vec<Carrier<ConverterInfo>>>;
 }
 
 pub struct ConvertServiceImpl<SP, SD, SS, SC, SI> {
@@ -92,6 +93,22 @@ impl<SP, SD, SS, SC, SI> ConvertServiceTrait for ConvertServiceImpl<SP, SD, SS, 
             last_status: last_target,
         };
         Ok(rtn)
+    }
+
+    fn generate_converter_info(carrier: &Carrier<StoreTaskInfo>) -> Result<Vec<Carrier<ConverterInfo>>> {
+        let mut new_carriers: Vec<Carrier<ConverterInfo>> = Vec::new();
+        let target = carrier.mission.clone();
+        let tar = target.unwrap();
+        for c in tar {
+            match Self::new(&carrier.instance, &c) {
+                Err(err) => return Err(err),
+                Ok(x) => {
+                    let car = SD::new_carrier(x, &c.to.key, DataType::Convert as u8)?;
+                    new_carriers.push(car);
+                }
+            }
+        }
+        Ok(new_carriers)
     }
 }
 
