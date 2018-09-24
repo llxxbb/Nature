@@ -1,4 +1,3 @@
-use flow::delivery::DeliveryServiceTrait;
 use flow::store::StoreServiceTrait;
 use flow::store::StoreTaskInfo;
 use std::marker::PhantomData;

@@ -2,7 +2,6 @@ use std::collections::HashMap;
 use std::collections::HashSet;
 use std::marker::PhantomData;
 use super::*;
-use flow::delivery::DeliveryServiceTrait;
 
 pub trait RouteServiceTrait {
     fn get_route(instance: &Instance) -> Result<Option<Vec<Mission>>>;

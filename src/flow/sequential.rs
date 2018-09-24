@@ -1,5 +1,4 @@
 use chrono::prelude::*;
-use flow::delivery::DeliveryServiceTrait;
 use flow::store::StoreServiceTrait;
 use serde_json;
 use std::collections::HashMap;

@@ -3,20 +3,15 @@ use nature_db::*;
 use self::channels::*;
 pub use self::controller::*;
 use self::convert::*;
-use self::delivery::*;
 use self::parallel::*;
-use self::plan::*;
-use self::route::*;
 use self::sequential::*;
 use self::store::*;
+use support::*;
 
-mod plan;
 mod store;
-mod route;
 mod sequential;
 mod parallel;
 mod convert;
-mod delivery;
 mod controller;
 mod channels;
 

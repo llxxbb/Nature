@@ -1,4 +1,3 @@
-use flow::route::RouteServiceTrait;
 use std::marker::PhantomData;
 use super::*;
 
