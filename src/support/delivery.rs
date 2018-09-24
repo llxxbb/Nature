@@ -73,9 +73,7 @@ impl<TD: DeliveryDaoTrait> DeliveryServiceTrait for DeliveryServiceImpl<TD> {
         thing: String,
         data_type: u8,
     ) -> Result<Carrier<T>>
-    where
-        T: Sized + Serialize + Debug,
-        U: Sized + Serialize + Debug,
+    where T: Sized + Serialize + Debug,U: Sized + Serialize + Debug,
     {
         let mut carrier = match Self::new_carrier(valuable, &thing, data_type) {
             Ok(new) => new,
@@ -112,11 +110,12 @@ impl<TD: DeliveryDaoTrait> DeliveryServiceTrait for DeliveryServiceImpl<TD> {
         let _ = TD::move_to_error(CarryError { err, carrier });
     }
 
+    /// Same task will get same ID for carrier always.
     fn new_carrier<T>(task: T, thing: &str, data_type: u8) -> Result<Carrier<T>>
     where
         T: Sized + Serialize + Debug,
     {
-        // this can avoid regenerate same content with different id
+        // hash code as id
         let new_id = generate_id(&task)?;
         Ok(Carrier {
             content: CarrierContent {

@@ -30,3 +30,6 @@ rocket_contrib = "0.3"
 # self project group
 nature_common = {path = "../Nature-Common"}
 nature_db = {path = "../Nature-DB"}
+
+#[profile.test]
+#debug = true
