@@ -1,8 +1,8 @@
-use super::*;
 use std::collections::HashSet;
 use std::iter::Iterator;
 use std::marker::PhantomData;
 use std::str::FromStr;
+use super::*;
 use system::*;
 
 pub trait ConvertServiceTrait {
@@ -12,17 +12,15 @@ pub trait ConvertServiceTrait {
     fn generate_converter_info(carrier: &Carrier<StoreTaskInfo>) -> Result<Vec<Carrier<ConverterInfo>>>;
 }
 
-pub struct ConvertServiceImpl<SP, SD, SS, SC, SI> {
-    plan: PhantomData<SP>,
+pub struct ConvertServiceImpl<SD, SC, SI> {
     delivery: PhantomData<SD>,
-    store: PhantomData<SS>,
     caller: PhantomData<SC>,
     ins_verify: PhantomData<SI>,
 }
 
-impl<SP, SD, SS, SC, SI> ConvertServiceTrait for ConvertServiceImpl<SP, SD, SS, SC, SI>
-    where SP: PlanServiceTrait, SD: DeliveryServiceTrait,
-          SS: StoreServiceTrait, SC: CallOutTrait, SI: InstanceServiceTrait {
+impl<SD, SC, SI> ConvertServiceTrait for ConvertServiceImpl<SD, SC, SI>
+    where SD: DeliveryServiceTrait,
+          SC: CallOutTrait, SI: InstanceServiceTrait {
     fn callback(delayed: DelayedInstances) -> Result<()> {
         let carrier = SD::get::<ConverterInfo>(delayed.carrier_id)?;
         match delayed.result {
@@ -112,9 +110,9 @@ impl<SP, SD, SS, SC, SI> ConvertServiceTrait for ConvertServiceImpl<SP, SD, SS, 
     }
 }
 
-impl<SP, SD, SS, SC, SI> ConvertServiceImpl<SP, SD, SS, SC, SI>
-    where SP: PlanServiceTrait, SD: DeliveryServiceTrait,
-          SS: StoreServiceTrait, SC: CallOutTrait, SI: InstanceServiceTrait {
+impl<SD, SC, SI> ConvertServiceImpl<SD, SC, SI>
+    where SD: DeliveryServiceTrait,
+          SC: CallOutTrait, SI: InstanceServiceTrait {
     fn handle_instances(carrier: &Carrier<ConverterInfo>, instances: &mut Vec<Instance>) -> Result<()> {
         // check status version to avoid loop
         let _ = instances.iter_mut().map(|one: &mut Instance| {
@@ -123,38 +121,13 @@ impl<SP, SD, SS, SC, SI> ConvertServiceImpl<SP, SD, SS, SC, SI>
             one
         }).collect::<Vec<_>>();
         let instances = verify(&carrier.target.to, &instances)?;
-        let plan = SP::new(&carrier.content.data, &instances)?;
-        Self::do_store(carrier, plan);
+        let rtn = Converted {
+            done_task: carrier.to_owned(),
+            converted: instances,
+        };
+        let _ = CHANNEL_CONVERTED.sender.lock().unwrap().send(rtn);
         Ok(())
     }
-    fn do_store(carrier: &Carrier<ConverterInfo>, plan: PlanInfo) {
-        let mut store_infos: Vec<Carrier<StoreTaskInfo>> = Vec::new();
-        for instance in plan.plan.iter() {
-            match SS::generate_store_task(instance) {
-                Ok(task) => {
-                    match SD::new_carrier(task, &plan.to.key, DataType::Store as u8) {
-                        Ok(x) => store_infos.push(x),
-                        Err(e) => {
-                            error!("{}", e);
-                            SD::move_to_err(e, carrier);
-                            return;
-                        }
-                    }
-                }
-                // break process will environment error occurs.
-                Err(e) => {
-                    error!("{}", e);
-                    return;
-                }
-            }
-        }
-        if let Ok(_) = SD::create_batch_and_finish_carrier(&store_infos, &carrier.to_owned()) {
-            for task in store_infos {
-                SD::send_carrier(&CHANNEL_STORE.sender, task)
-            }
-        }
-    }
-
 
     fn check_last(last: &HashSet<String>, demand: &LastStatusDemand) -> Result<()> {
         for s in &demand.target_status_include {
