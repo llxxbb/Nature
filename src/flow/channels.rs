@@ -1,9 +1,8 @@
-use flow::*;
-use flow::store::StoreTaskInfo;
 use std::sync::mpsc::*;
 use std::sync::Mutex;
 use std::thread;
 use std::thread::JoinHandle;
+use super::*;
 
 lazy_static! {
     pub static ref CHANNEL_DISPATCH : Channel<Carrier<StoreTaskInfo>> = Channel::new();
@@ -16,9 +15,9 @@ lazy_static! {
 pub fn start_receive_threads() -> Vec<JoinHandle<()>> {
     let mut threads: Vec<JoinHandle<()>> = Vec::new();
     info!("to start receive threads");
-    threads.push(start_thread(&CHANNEL_DISPATCH.receiver, DispatchService::do_dispatch_task));
-    threads.push(start_thread(&CHANNEL_CONVERT.receiver, ConvertService::do_convert_task));
-    threads.push(start_thread(&CHANNEL_STORE.receiver, Controller::do_store_task));
+    threads.push(start_thread(&CHANNEL_DISPATCH.receiver, DispatchService::dispatch));
+    threads.push(start_thread(&CHANNEL_CONVERT.receiver, ConvertService::convert));
+    threads.push(start_thread(&CHANNEL_STORE.receiver, StoreService::store));
     threads.push(start_thread(&CHANNEL_PARALLEL.receiver, ParallelService::do_parallel_task));
     threads.push(start_thread(&CHANNEL_SERIAL.receiver, SequentialService::do_serial_task));
     threads

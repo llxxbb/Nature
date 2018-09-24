@@ -1,9 +1,4 @@
-use flow::*;
-use flow::convert::caller::CallOutTrait;
-use flow::delivery::DeliveryServiceTrait;
-use flow::plan::PlanServiceTrait;
-use flow::store::StoreServiceTrait;
-use flow::store::StoreTaskInfo;
+use super::*;
 use std::collections::HashSet;
 use std::iter::Iterator;
 use std::marker::PhantomData;
@@ -11,10 +6,9 @@ use std::str::FromStr;
 use system::*;
 
 pub trait ConvertServiceTrait {
-    fn submit_callback(delayed: DelayedInstances) -> Result<()>;
-    fn do_convert_task(carrier: Carrier<ConverterInfo>);
+    fn callback(delayed: DelayedInstances) -> Result<()>;
+    fn convert(carrier: Carrier<ConverterInfo>);
     fn new(instance: &Instance, mapping: &Mission) -> Result<ConverterInfo>;
-    fn gen_out_parameter(internal: &Carrier<ConverterInfo>) -> CallOutParameter;
 }
 
 pub struct ConvertServiceImpl<SP, SD, SS, SC, SI> {
@@ -28,7 +22,7 @@ pub struct ConvertServiceImpl<SP, SD, SS, SC, SI> {
 impl<SP, SD, SS, SC, SI> ConvertServiceTrait for ConvertServiceImpl<SP, SD, SS, SC, SI>
     where SP: PlanServiceTrait, SD: DeliveryServiceTrait,
           SS: StoreServiceTrait, SC: CallOutTrait, SI: InstanceServiceTrait {
-    fn submit_callback(delayed: DelayedInstances) -> Result<()> {
+    fn callback(delayed: DelayedInstances) -> Result<()> {
         let carrier = SD::get::<ConverterInfo>(delayed.carrier_id)?;
         match delayed.result {
             CallbackResult::Err(err) => {
@@ -40,7 +34,7 @@ impl<SP, SD, SS, SC, SI> ConvertServiceTrait for ConvertServiceImpl<SP, SD, SS, 
         }
     }
 
-    fn do_convert_task(carrier: Carrier<ConverterInfo>) {
+    fn convert(carrier: Carrier<ConverterInfo>) {
         debug!("------------------do_convert_task------------------------");
         let parameter = Self::gen_out_parameter(&carrier);
         let _ = match SC::convert(&carrier, &parameter) {
@@ -72,9 +66,6 @@ impl<SP, SD, SS, SC, SI> ConvertServiceTrait for ConvertServiceImpl<SP, SD, SS, 
         };
     }
 
-    /// **Error:**
-/// * Dao
-/// * DefineNotFind
     fn new(instance: &Instance, mapping: &Mission) -> Result<ConverterInfo> {
         let define = ThingDefineCacheImpl::get(&mapping.to)?;
         let last_target = match define.is_status() {
@@ -101,14 +92,6 @@ impl<SP, SD, SS, SC, SI> ConvertServiceTrait for ConvertServiceImpl<SP, SD, SS, 
             last_status: last_target,
         };
         Ok(rtn)
-    }
-
-    fn gen_out_parameter(internal: &Carrier<ConverterInfo>) -> CallOutParameter {
-        CallOutParameter {
-            from: internal.from.clone(),
-            last_status: internal.last_status.clone(),
-            carrier_id: internal.id.clone(),
-        }
     }
 }
 
@@ -168,6 +151,13 @@ impl<SP, SD, SS, SC, SI> ConvertServiceImpl<SP, SD, SS, SC, SI>
             }
         }
         Ok(())
+    }
+    fn gen_out_parameter(internal: &Carrier<ConverterInfo>) -> CallOutParameter {
+        CallOutParameter {
+            from: internal.from.clone(),
+            last_status: internal.last_status.clone(),
+            carrier_id: internal.id.clone(),
+        }
     }
 }
 

@@ -15,7 +15,7 @@ pub struct SerialFinished {
 }
 
 pub trait SequentialTrait {
-    fn submit_serial(batch: SerialBatchInstance) -> Result<()>;
+    fn one_by_one(batch: SerialBatchInstance) -> Result<()>;
     fn do_serial_task(carrier: Carrier<SerialBatchInstance>);
 }
 
@@ -28,7 +28,7 @@ pub struct SequentialServiceImpl<SD, SS, SI> {
 impl<SD, SS, SI> SequentialTrait for SequentialServiceImpl<SD, SS, SI>
     where SD: DeliveryServiceTrait, SS: StoreServiceTrait, SI: InstanceServiceTrait
 {
-    fn submit_serial(batch: SerialBatchInstance) -> Result<()> {
+    fn one_by_one(batch: SerialBatchInstance) -> Result<()> {
         match SD::create_carrier(batch, "", DataType::QueueBatch as u8) {
             Ok(carrier) => {
                 // to process asynchronous

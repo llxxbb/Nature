@@ -1,11 +1,11 @@
-use std::marker::PhantomData;
-use super::*;
 use flow::delivery::DeliveryServiceTrait;
 use flow::store::StoreServiceTrait;
 use flow::store::StoreTaskInfo;
+use std::marker::PhantomData;
+use super::*;
 
 pub trait ParallelServiceTrait {
-    fn submit_parallel(batch: ParallelBatchInstance) -> Result<()>;
+    fn parallel(batch: ParallelBatchInstance) -> Result<()>;
     fn do_parallel_task(carrier: Carrier<ParallelBatchInstance>);
 }
 
@@ -17,7 +17,7 @@ pub struct ParallelServiceImpl<SD, SS> {
 impl<SD, SS> ParallelServiceTrait for ParallelServiceImpl<SD, SS>
     where SD: DeliveryServiceTrait, SS: StoreServiceTrait
 {
-    fn submit_parallel(batch: ParallelBatchInstance) -> Result<()> {
+    fn parallel(batch: ParallelBatchInstance) -> Result<()> {
         match SD::create_carrier(batch, "", DataType::ParallelBatch as u8) {
             Ok(carrier) => {
                 // to process asynchronous

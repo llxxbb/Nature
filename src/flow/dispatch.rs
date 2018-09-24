@@ -4,8 +4,7 @@ use std::marker::PhantomData;
 use super::*;
 
 pub trait DispatchServiceTrait {
-    fn do_dispatch_task(carrier: Carrier<StoreTaskInfo>);
-    fn re_dispatch(carrier: Carrier<StoreTaskInfo>) -> Result<()>;
+    fn dispatch(carrier: Carrier<StoreTaskInfo>);
 }
 
 pub struct DispatchServiceImpl<D, C> {
@@ -16,7 +15,7 @@ pub struct DispatchServiceImpl<D, C> {
 impl<D, C> DispatchServiceTrait for DispatchServiceImpl<D, C>
     where D: DeliveryServiceTrait, C: ConvertServiceTrait
 {
-    fn do_dispatch_task(carrier: Carrier<StoreTaskInfo>) {
+    fn dispatch(carrier: Carrier<StoreTaskInfo>) {
         debug!("------------------do_dispatch_task------------------------");
         if carrier.content.data.mission.is_none() {
             let _ = D::finish_carrier(carrier.id);
@@ -40,19 +39,6 @@ impl<D, C> DispatchServiceTrait for DispatchServiceImpl<D, C>
             }
         };
     }
-
-    /// Get last status version and re-convert
-    fn re_dispatch(carrier: Carrier<StoreTaskInfo>) -> Result<()> {
-        if carrier.upstream.is_none() {
-            D::move_to_err(NatureError::InstanceStatusVersionConflict, &carrier);
-            return Err(NatureError::InstanceStatusVersionConflict);
-        }
-        let converter = &carrier.content.data.upstream.clone().unwrap();
-        let task = C::new(&converter.from, &converter.target)?;
-        let carrier = D::create_and_finish_carrier(task, carrier, converter.target.to.key.clone(), DataType::Convert as u8)?;
-        D::send_carrier(&CHANNEL_CONVERT.sender, carrier);
-        Ok(())
-    }
 }
 
 impl<D, C> DispatchServiceImpl<D, C>
@@ -74,3 +60,4 @@ impl<D, C> DispatchServiceImpl<D, C>
         Ok(new_carriers)
     }
 }
+
