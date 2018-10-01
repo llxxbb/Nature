@@ -1,9 +1,7 @@
-extern crate chrono;
-extern crate fern;
 extern crate nature;
 
-use nature::system::*;
 use nature::rpc::*;
+use nature::system::*;
 
 fn main() {
     sys_init();

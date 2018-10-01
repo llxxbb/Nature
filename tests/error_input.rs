@@ -2,6 +2,7 @@ extern crate nature;
 extern crate nature_common;
 extern crate rocket;
 extern crate serde_json;
+extern crate dotenv;
 
 use nature::flow::*;
 use nature_common::*;
@@ -22,6 +23,7 @@ fn instance_key_is_null() {
 
 #[test]
 fn instance_key_undefined() {
+    dotenv::dotenv().ok();
     // prepare input para
     let mut instance = Instance::default();
     instance.data.thing.key = "/key/undefined".to_string();

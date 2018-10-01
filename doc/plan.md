@@ -36,9 +36,6 @@ https://github.com/rust-lang/rust/pull/51042
 * diesel::result::Error => NatureError
 * init system : check "/S/serial" whether defined, if not create one
 
-
-### Retry carry
-
 ### Unit and Integrate test 
 
 #### Integrate test

@@ -1,7 +1,6 @@
 #![feature(plugin, proc_macro_gen)]
 #![plugin(rocket_codegen)]
 #![feature(range_contains)]
-#![feature(extern_prelude)]
 #![feature(trace_macros)]
 #![feature(try_from)] // vec to array
 #![feature(box_patterns)]

@@ -1,8 +1,10 @@
+extern crate dotenv;
 ///! World Connection Service provider
 extern crate uuid;
 
 use flow::*;
 use nature_common::util::setup_logger;
+use self::dotenv::dotenv;
 use std::thread::JoinHandle;
 
 // for product and mock
@@ -15,10 +17,9 @@ lazy_static! {
 }
 
 pub fn sys_init() -> Vec<JoinHandle<()>> {
+    dotenv().ok();
     let _ = setup_logger();
 
-    // read config
-//    let config = world_connection::util::get_settings();
     Controller::start()
 }
 
