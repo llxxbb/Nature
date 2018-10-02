@@ -10,7 +10,7 @@ use std::sync::Mutex;
 pub trait DeliveryServiceTrait {
     fn create_carrier<T>(valuable: T, thing: &str, data_type: u8) -> Result<Carrier<T>>
     where
-        T: Sized + Serialize + Send + Debug;
+        T: SSS + Debug;
 
     fn create_and_finish_carrier<T, U>(
         valuable: T,
@@ -19,8 +19,8 @@ pub trait DeliveryServiceTrait {
         data_type: u8,
     ) -> Result<Carrier<T>>
     where
-        T: Sized + Serialize + Debug,
-        U: Sized + Serialize + Debug;
+        T: SS + Debug,
+        U: SS + Debug;
 
     fn create_batch_and_finish_carrier<T, U>(
         news: &Vec<Carrier<T>>,

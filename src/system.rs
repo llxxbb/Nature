@@ -1,5 +1,5 @@
+//! World Connection Service provider
 extern crate dotenv;
-///! World Connection Service provider
 extern crate uuid;
 
 use flow::*;
@@ -13,7 +13,7 @@ lazy_static! {
     pub static ref SYS_KEY_SERIAL : String = "/serial".to_string();
 
     // sys context define
-    pub static ref CONTEXT_TARGET_INSTANCE_ID : String = "sys.target_instance_id".to_string();
+    pub static ref CONTEXT_TARGET_INSTANCE_ID : String = "sys.target".to_string();
 }
 
 pub fn sys_init() -> Vec<JoinHandle<()>> {
