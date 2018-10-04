@@ -1,4 +1,3 @@
-use super::*;
 use chrono::prelude::*;
 use nature_common::util::id_tool::generate_id;
 use serde::Serialize;
@@ -6,11 +5,12 @@ use std::fmt::Debug;
 use std::marker::PhantomData;
 use std::sync::mpsc::Sender;
 use std::sync::Mutex;
+use super::*;
 
 pub trait DeliveryServiceTrait {
     fn create_carrier<T>(valuable: T, thing: &str, data_type: u8) -> Result<Carrier<T>>
-    where
-        T: SSS + Debug;
+        where
+            T: Serialize + Sized + Send + Debug;
 
     fn create_and_finish_carrier<T, U>(
         valuable: T,
@@ -18,31 +18,31 @@ pub trait DeliveryServiceTrait {
         thing: String,
         data_type: u8,
     ) -> Result<Carrier<T>>
-    where
-        T: SS + Debug,
-        U: SS + Debug;
+        where
+            T: Serialize + Send + Debug,
+            U: Serialize + Send + Debug;
 
     fn create_batch_and_finish_carrier<T, U>(
         news: &Vec<Carrier<T>>,
         old: &Carrier<U>,
     ) -> Result<()>
-    where
-        T: Sized + Serialize + Send + Debug,
-        U: Sized + Serialize + Debug;
+        where
+            T: Sized + Serialize + Send + Debug,
+            U: Sized + Serialize + Debug;
 
     fn finish_carrier(id: u128) -> Result<usize>;
 
-    fn move_to_err<T>(err: NatureError, carrier: &Carrier<T>)
-    where
-        T: Sized + Serialize + Debug;
+    fn move_to_err<T>(err: &NatureError, carrier: &Carrier<T>)
+        where
+            T: Serialize + Debug;
 
     fn new_carrier<T>(task: T, thing: &str, data_type: u8) -> Result<Carrier<T>>
-    where
-        T: Sized + Serialize + Debug;
+        where
+            T: Sized + Serialize + Debug;
 
     fn send_carrier<T>(sender: &Mutex<Sender<Carrier<T>>>, carrier: Carrier<T>)
-    where
-        T: 'static + Sized + Serialize + Sync + Send + Debug;
+        where
+            T: 'static + Sized + Serialize + Sync + Send + Debug;
 
     fn update_execute_time(_id: u128, _new_time: i64) -> Result<()>;
 
@@ -55,8 +55,8 @@ pub struct DeliveryServiceImpl<TD> {
 
 impl<TD: DeliveryDaoTrait> DeliveryServiceTrait for DeliveryServiceImpl<TD> {
     fn create_carrier<T>(valuable: T, thing: &str, data_type: u8) -> Result<Carrier<T>>
-    where
-        T: Sized + Serialize + Send + Debug,
+        where
+            T: Sized + Serialize + Send + Debug,
     {
         let carrier = Self::new_carrier(valuable, &thing, data_type)?;
         let _ = TD::insert(&carrier)?;
@@ -73,12 +73,12 @@ impl<TD: DeliveryDaoTrait> DeliveryServiceTrait for DeliveryServiceImpl<TD> {
         thing: String,
         data_type: u8,
     ) -> Result<Carrier<T>>
-    where T: Sized + Serialize + Debug,U: Sized + Serialize + Debug,
+        where T: Sized + Serialize + Debug, U: Sized + Serialize + Debug,
     {
         let mut carrier = match Self::new_carrier(valuable, &thing, data_type) {
             Ok(new) => new,
             Err(err) => {
-                DeliveryServiceImpl::<DeliveryDaoImpl>::move_to_err(err.clone(), &old);
+                Self::move_to_err(&err, &old);
                 return Err(err);
             }
         };
@@ -87,9 +87,9 @@ impl<TD: DeliveryDaoTrait> DeliveryServiceTrait for DeliveryServiceImpl<TD> {
     }
 
     fn create_batch_and_finish_carrier<T, U>(news: &Vec<Carrier<T>>, old: &Carrier<U>) -> Result<()>
-    where
-        T: Sized + Serialize + Send + Debug,
-        U: Sized + Serialize + Debug,
+        where
+            T: Sized + Serialize + Send + Debug,
+            U: Sized + Serialize + Debug,
     {
         for v in news {
             TD::insert(v)?;
@@ -103,17 +103,17 @@ impl<TD: DeliveryDaoTrait> DeliveryServiceTrait for DeliveryServiceImpl<TD> {
         TD::delete(id)
     }
 
-    fn move_to_err<T>(err: NatureError, carrier: &Carrier<T>)
-    where
-        T: Sized + Serialize + Debug,
+    fn move_to_err<T>(err: &NatureError, carrier: &Carrier<T>)
+        where
+            T: Serialize + Debug,
     {
-        let _ = TD::move_to_error(CarryError { err, carrier });
+        let _ = TD::carrier_to_error(err, carrier);
     }
 
     /// Same task will get same ID for carrier always.
     fn new_carrier<T>(task: T, thing: &str, data_type: u8) -> Result<Carrier<T>>
-    where
-        T: Sized + Serialize + Debug,
+        where
+            T: Sized + Serialize + Debug,
     {
         // hash code as id
         let new_id = generate_id(&task)?;
@@ -129,8 +129,8 @@ impl<TD: DeliveryDaoTrait> DeliveryServiceTrait for DeliveryServiceImpl<TD> {
         })
     }
     fn send_carrier<T>(sender: &Mutex<Sender<Carrier<T>>>, carrier: Carrier<T>)
-    where
-        T: 'static + Sized + Serialize + Sync + Send + Debug,
+        where
+            T: 'static + Sized + Serialize + Sync + Send + Debug,
     {
         let _send_status = sender.lock().unwrap().send(carrier);
     }

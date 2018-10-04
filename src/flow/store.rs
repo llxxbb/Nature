@@ -79,7 +79,7 @@ impl<S, R, D, V> StoreServiceImpl<S, R, D, V>
     fn do_task(carrier: &Carrier<StoreTaskInfo>) -> Result<()> {
         debug!("------------------do_store_task------------------------");
         if let Err(err) = Self::save(carrier) {
-            D::move_to_err(err.clone(), carrier);
+            D::move_to_err(&err, carrier);
             Err(err)
         } else {
             D::send_carrier(&CHANNEL_STORED.sender, carrier.clone());

@@ -54,7 +54,7 @@ impl<STORE, DELIVERY, BS, BP, CONVERTER, PLAN> ControllerImpl<STORE, DELIVERY, B
             Err(err) => match err {
                 NatureError::DaoEnvironmentError(_) => return,
                 _ => {
-                    DELIVERY::move_to_err(err, &carrier);
+                    DELIVERY::move_to_err(&err, &carrier);
                     return;
                 }
             }
@@ -86,7 +86,7 @@ impl<STORE, DELIVERY, BS, BP, CONVERTER, PLAN> ControllerImpl<STORE, DELIVERY, B
                         Ok(x) => store_infos.push(x),
                         Err(e) => {
                             error!("{}", e);
-                            DELIVERY::move_to_err(e, carrier);
+                            DELIVERY::move_to_err(&e, carrier);
                             return;
                         }
                     }

@@ -26,7 +26,7 @@ impl<SD, SC, SI> ConvertServiceTrait for ConvertServiceImpl<SD, SC, SI>
         match delayed.result {
             CallbackResult::Err(err) => {
                 let err = NatureError::ConverterLogicalError(err);
-                SD::move_to_err(err, &carrier);
+                SD::move_to_err(&err, &carrier);
                 Ok(())
             }
             CallbackResult::Instances(mut ins) => Self::handle_instances(&carrier, &mut ins)
@@ -43,7 +43,7 @@ impl<SD, SC, SI> ConvertServiceTrait for ConvertServiceImpl<SD, SC, SI>
                     Ok(_) => (),
                     Err(err) => match err {
                         NatureError::DaoEnvironmentError(_) => (),
-                        _ => SD::move_to_err(err, &carrier)
+                        _ => SD::move_to_err(&err, &carrier)
                     }
                 }
             }
@@ -52,7 +52,7 @@ impl<SD, SC, SI> ConvertServiceTrait for ConvertServiceImpl<SD, SC, SI>
                 ()
             }
             Ok(ConverterReturned::LogicalError(ss)) => {
-                SD::move_to_err(NatureError::ConverterLogicalError(ss), &carrier)
+                SD::move_to_err(&NatureError::ConverterLogicalError(ss), &carrier)
             }
             Ok(ConverterReturned::EnvError) => (),
             Ok(ConverterReturned::None) => (),
@@ -60,7 +60,7 @@ impl<SD, SC, SI> ConvertServiceTrait for ConvertServiceImpl<SD, SC, SI>
                 // only **Environment Error** will be retry
                 NatureError::ConverterEnvironmentError(_) => (),
                 // other error will drop into error
-                _ => SD::move_to_err(err, &carrier)
+                _ => SD::move_to_err(&err, &carrier)
             }
         };
     }

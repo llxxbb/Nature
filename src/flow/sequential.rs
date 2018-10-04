@@ -48,7 +48,7 @@ impl<SD, SS, SI> SequentialTrait for SequentialServiceImpl<SD, SS, SI>
 
         let instance = match Self::new_virtual_instance(&carrier, sf.unwrap()) {
             Err(err) => {
-                SD::move_to_err(err, &carrier);
+                SD::move_to_err(&err, &carrier);
                 return;
             }
             Ok(ins) => ins,
