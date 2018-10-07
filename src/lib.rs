@@ -1,4 +1,4 @@
-#![feature(plugin, proc_macro_gen)]
+#![feature(plugin)]
 #![plugin(rocket_codegen)]
 #![feature(range_contains)]
 #![feature(trace_macros)]
@@ -24,3 +24,4 @@ pub mod system;
 pub mod rpc;
 pub mod flow;
 pub mod support;
+mod channels;

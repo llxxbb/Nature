@@ -1,39 +1,42 @@
 use flow::store::StoreServiceTrait;
-use flow::store::StoreTaskInfo;
-use std::marker::PhantomData;
+use std::rc::Rc;
 use super::*;
 
 pub trait ParallelServiceTrait {
-    fn parallel(batch: ParallelBatchInstance) -> Result<()>;
-    fn do_parallel_task(carrier: Carrier<ParallelBatchInstance>);
+    fn parallel(&self, batch: ParallelBatchInstance) -> Result<()>;
+    fn do_parallel_task(&self, instances: &Vec<Instance>, carrier: RawDelivery);
 }
 
-pub struct ParallelServiceImpl<SD, SS> {
-    delivery: PhantomData<SD>,
-    store: PhantomData<SS>,
+pub struct ParallelServiceImpl {
+    delivery_svc: Rc<DeliveryServiceTrait>,
+    delivery_dao: Rc<DeliveryDaoTrait>,
+    store: Rc<StoreServiceTrait>,
 }
 
-impl<SD, SS> ParallelServiceTrait for ParallelServiceImpl<SD, SS>
-    where SD: DeliveryServiceTrait, SS: StoreServiceTrait
-{
-    fn parallel(batch: ParallelBatchInstance) -> Result<()> {
-        match SD::create_carrier(batch, "", DataType::ParallelBatch as u8) {
+impl ParallelServiceTrait for ParallelServiceImpl {
+    fn parallel(&self, batch: ParallelBatchInstance) -> Result<()> {
+        let raw = RawDelivery::new(&batch, &batch.thing.key, DataType::ParallelBatch as i16)?;
+        match self.delivery_dao.insert(&raw) {
             Ok(carrier) => {
                 // to process asynchronous
-                SD::send_carrier(&CHANNEL_PARALLEL.sender, carrier);
+                CHANNEL_PARALLEL.sender.lock().unwrap().send((batch, raw));
                 Ok(())
             }
             Err(err) => Err(err),
         }
     }
 
-    fn do_parallel_task(carrier: Carrier<ParallelBatchInstance>) {
-        let mut tasks: Vec<Carrier<StoreTaskInfo>> = Vec::new();
-        for instance in carrier.content.data.0.iter() {
-            match SS::generate_store_task(instance) {
+    fn do_parallel_task(&self, instances: &Vec<Instance>, carrier: RawDelivery) {
+        let mut tasks: Vec<RawDelivery> = Vec::new();
+        let mut tuple: Vec<(StoreTaskInfo, RawDelivery)> = Vec::new();
+        for instance in instances.iter() {
+            match self.store.generate_store_task(instance) {
                 Ok(task) => {
-                    match SD::new_carrier(task, &instance.thing.key, DataType::Store as u8) {
-                        Ok(car) => tasks.push(car),
+                    match RawDelivery::new(&task, &instance.thing.key, DataType::Store as i16) {
+                        Ok(car) => {
+                            tasks.push(car.clone());
+                            tuple.push((task, car))
+                        }
                         Err(e) => {
                             error!("{}", e);
                             return;
@@ -44,9 +47,9 @@ impl<SD, SS> ParallelServiceTrait for ParallelServiceImpl<SD, SS>
                 _ => return
             }
         }
-        if let Ok(_) = SD::create_batch_and_finish_carrier(&tasks, &carrier) {
-            for c in tasks {
-                SD::send_carrier(&CHANNEL_STORE.sender, c);
+        if let Ok(_) = self.delivery_svc.create_batch_and_finish_carrier(&tasks, &carrier.id) {
+            for c in tuple {
+                CHANNEL_STORE.sender.lock().unwrap().send(c);
             }
         }
     }

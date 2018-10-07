@@ -14,6 +14,7 @@ use nature::system::*;
 use nature_common::Instance;
 use nature_db::*;
 use self::nature::flow::*;
+use self::nature_db::service::*;
 use std::thread;
 use std::time;
 
@@ -34,7 +35,7 @@ fn local_converter() {
     // prepare input para
     let mut instance = Instance::default();
     instance.data.thing.key = from.to_string();
-    let _id = InstanceServiceImpl::verify(&mut instance).unwrap();
+    let _id = SVC_INSTANCE.verify(&mut instance).unwrap();
     println!("------------------ remove existed instance -----------------");
     // remove if instance exists
     let will_del = instance.clone();
@@ -46,6 +47,6 @@ fn local_converter() {
     thread::sleep(time::Duration::from_millis(1000));
     println!("------------------ verify -----------------");
     // get instance which is saved to db
-    let _ins_db = InstanceDaoImpl::get_by_key("/local_converter/to",217789594388339757346716979317903552035).unwrap().unwrap();
+    let _ins_db = InstanceDaoImpl::get_by_key("/local_converter/to", 217789594388339757346716979317903552035).unwrap().unwrap();
 }
 

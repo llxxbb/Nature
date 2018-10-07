@@ -1,145 +1,32 @@
-use chrono::prelude::*;
-use nature_common::util::id_tool::generate_id;
-use serde::Serialize;
-use std::fmt::Debug;
-use std::marker::PhantomData;
-use std::sync::mpsc::Sender;
-use std::sync::Mutex;
+use std::rc::Rc;
 use super::*;
 
 pub trait DeliveryServiceTrait {
-    fn create_carrier<T>(valuable: T, thing: &str, data_type: u8) -> Result<Carrier<T>>
-        where
-            T: Serialize + Sized + Send + Debug;
+    fn create_and_finish_carrier(&self, old: &RawDelivery, new: &mut RawDelivery) -> Result<usize>;
 
-    fn create_and_finish_carrier<T, U>(
-        valuable: T,
-        old: Carrier<U>,
-        thing: String,
-        data_type: u8,
-    ) -> Result<Carrier<T>>
-        where
-            T: Serialize + Send + Debug,
-            U: Serialize + Send + Debug;
-
-    fn create_batch_and_finish_carrier<T, U>(
-        news: &Vec<Carrier<T>>,
-        old: &Carrier<U>,
-    ) -> Result<()>
-        where
-            T: Sized + Serialize + Send + Debug,
-            U: Sized + Serialize + Debug;
-
-    fn finish_carrier(id: u128) -> Result<usize>;
-
-    fn move_to_err<T>(err: &NatureError, carrier: &Carrier<T>)
-        where
-            T: Serialize + Debug;
-
-    fn new_carrier<T>(task: T, thing: &str, data_type: u8) -> Result<Carrier<T>>
-        where
-            T: Sized + Serialize + Debug;
-
-    fn send_carrier<T>(sender: &Mutex<Sender<Carrier<T>>>, carrier: Carrier<T>)
-        where
-            T: 'static + Sized + Serialize + Sync + Send + Debug;
-
-    fn update_execute_time(_id: u128, _new_time: i64) -> Result<()>;
-
-    fn get<T: Sized + Serialize + Debug>(_id: u128) -> Result<Carrier<T>>;
+    fn create_batch_and_finish_carrier(&self, news: &Vec<RawDelivery>, old_id: &Vec<u8>) -> Result<()>;
 }
 
-pub struct DeliveryServiceImpl<TD> {
-    table_delivery: PhantomData<TD>,
+pub struct DeliveryServiceImpl {
+    table_delivery: Rc<DeliveryDaoTrait>,
 }
 
-impl<TD: DeliveryDaoTrait> DeliveryServiceTrait for DeliveryServiceImpl<TD> {
-    fn create_carrier<T>(valuable: T, thing: &str, data_type: u8) -> Result<Carrier<T>>
-        where
-            T: Sized + Serialize + Send + Debug,
-    {
-        let carrier = Self::new_carrier(valuable, &thing, data_type)?;
-        let _ = TD::insert(&carrier)?;
-        Ok(carrier)
-    }
-
+impl DeliveryServiceTrait for DeliveryServiceImpl {
     /// by performance reason, for one-to-one carry we can reuse the beginning carry to finish all flows.
     /// That way we need not to communicate with DB for create new and delete old carrier.
     /// But for failure we must redo from beginning. but I think it has small chance.
     /// Another disadvantage is the failure information will be attached to the beginning.
-    fn create_and_finish_carrier<T, U>(
-        valuable: T,
-        old: Carrier<U>,
-        thing: String,
-        data_type: u8,
-    ) -> Result<Carrier<T>>
-        where T: Sized + Serialize + Debug, U: Sized + Serialize + Debug,
-    {
-        let mut carrier = match Self::new_carrier(valuable, &thing, data_type) {
-            Ok(new) => new,
-            Err(err) => {
-                Self::move_to_err(&err, &old);
-                return Err(err);
-            }
-        };
-        carrier.id = old.id; // the id is used for final finished
-        Ok(carrier)
+    fn create_and_finish_carrier(&self, old: &RawDelivery, new: &mut RawDelivery) -> Result<usize> {
+        // TODO  当遇到错误时如果要结束的 delivery ID 和新的delivery 不一样 需要结束之前的 delivery 并创建新的 delivery
+        new.id = old.id; // the id is used for final finished
+        Ok(1)
     }
 
-    fn create_batch_and_finish_carrier<T, U>(news: &Vec<Carrier<T>>, old: &Carrier<U>) -> Result<()>
-        where
-            T: Sized + Serialize + Send + Debug,
-            U: Sized + Serialize + Debug,
-    {
+    fn create_batch_and_finish_carrier(&self, news: &Vec<RawDelivery>, old_id: &Vec<u8>) -> Result<()> {
         for v in news {
-            TD::insert(v)?;
+            self.table_delivery.insert(v)?;
         }
-        TD::delete(old.id)?;
+        self.table_delivery.delete(old_id)?;
         Ok(())
-    }
-
-    fn finish_carrier(id: u128) -> Result<usize> {
-        debug!("finished carrier for id: {:?}", id);
-        TD::delete(id)
-    }
-
-    fn move_to_err<T>(err: &NatureError, carrier: &Carrier<T>)
-        where
-            T: Serialize + Debug,
-    {
-        let _ = TD::carrier_to_error(err, carrier);
-    }
-
-    /// Same task will get same ID for carrier always.
-    fn new_carrier<T>(task: T, thing: &str, data_type: u8) -> Result<Carrier<T>>
-        where
-            T: Sized + Serialize + Debug,
-    {
-        // hash code as id
-        let new_id = generate_id(&task)?;
-        Ok(Carrier {
-            content: CarrierContent {
-                data: task,
-                thing: thing.to_string(),
-                data_type,
-            },
-            id: new_id,
-            create_time: Local::now().timestamp_millis(),
-            execute_time: Local::now().timestamp_millis(),
-        })
-    }
-    fn send_carrier<T>(sender: &Mutex<Sender<Carrier<T>>>, carrier: Carrier<T>)
-        where
-            T: 'static + Sized + Serialize + Sync + Send + Debug,
-    {
-        let _send_status = sender.lock().unwrap().send(carrier);
-    }
-
-    fn update_execute_time(id: u128, new_time: i64) -> Result<()> {
-        TD::update_execute_time(id, new_time)
-    }
-
-    fn get<T: Sized + Serialize + Debug>(id: u128) -> Result<Carrier<T>> {
-        TD::get(id)
     }
 }

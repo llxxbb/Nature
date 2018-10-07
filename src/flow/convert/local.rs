@@ -15,13 +15,13 @@ lazy_static! {
 
 
 pub trait LocalExecutorTrait {
-    fn execute(executor: &str, para: &CallOutParameter) -> ConverterReturned;
+    fn execute(&self, executor: &str, para: &CallOutParameter) -> ConverterReturned;
 }
 
 pub struct LocalExecutorImpl;
 
 impl LocalExecutorTrait for LocalExecutorImpl {
-    fn execute(executor: &str, para: &CallOutParameter) -> ConverterReturned {
+    fn execute(&self, executor: &str, para: &CallOutParameter) -> ConverterReturned {
         match Self::get_entry(executor) {
             None => ConverterReturned::None,
             Some(entry) => {

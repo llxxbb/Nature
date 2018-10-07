@@ -1,21 +1,21 @@
 use flow::convert::local::LocalExecutorTrait;
 use nature_common::*;
 use nature_db::*;
-use std::marker::PhantomData;
+use std::rc::Rc;
 
 pub trait CallOutTrait {
-    fn convert(converter_info: &Carrier<ConverterInfo>, para: &CallOutParameter) -> Result<ConverterReturned>;
+    fn convert(&self, mission: &Mission, para: &CallOutParameter) -> Result<ConverterReturned>;
 }
 
-pub struct CallOutImpl<LR> {
-    local_rust: PhantomData<LR>,
+pub struct CallOutImpl {
+    local_rust: Rc<LocalExecutorTrait>,
 }
 
-impl<LR> CallOutTrait for CallOutImpl<LR> where LR: LocalExecutorTrait {
-    fn convert(converter_info: &Carrier<ConverterInfo>, para: &CallOutParameter) -> Result<ConverterReturned> {
-        match converter_info.target.executor.protocol {
+impl CallOutTrait for CallOutImpl {
+    fn convert(&self, mission: &Mission, para: &CallOutParameter) -> Result<ConverterReturned> {
+        match mission.executor.protocol {
             Protocol::LocalRust => {
-                Ok(LR::execute(&converter_info.target.executor.url, para))
+                Ok(self.local_rust.execute(&mission.executor.url, para))
             }
             _ => {
                 // TODO

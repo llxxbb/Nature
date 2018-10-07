@@ -1,6 +1,6 @@
 use super::*;
 
 pub struct Converted {
-    pub done_task: Carrier<ConverterInfo>,
+    pub done_task: RawDelivery,
     pub converted: Vec<Instance>,
 }

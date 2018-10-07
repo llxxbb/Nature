@@ -5,6 +5,7 @@ use flow::*;
 use nature_common::*;
 use nature_db::*;
 use self::rocket_contrib::Json;
+use system::*;
 
 pub fn start_rocket_server() -> Rocket {
     ignite()
@@ -17,25 +18,25 @@ pub fn start_rocket_server() -> Rocket {
 /// **Note** This do not receive System `Thing`'s instances
 #[post("/input", format = "application/json", data = "<instance>")]
 fn input(instance: Json<Instance>) -> Json<Result<u128>> {
-    let x = Controller::input(instance.0);
+    let x = SVC_NATURE.input(instance.0);
     Json(x)
 }
 
 #[post("/callback", format = "application/json", data = "<delayed>")]
 fn callback(delayed: Json<DelayedInstances>) -> Json<Result<()>> {
-    let x = Controller::callback(delayed.0);
+    let x = SVC_NATURE.callback(delayed.0);
     Json(x)
 }
 
 
 #[post("/serial_batch", format = "application/json", data = "<serial_batch>")]
 fn batch_for_serial(serial_batch: Json<SerialBatchInstance>) -> Json<Result<()>> {
-    let x = Controller::serial(serial_batch.0);
+    let x = SVC_NATURE.serial(serial_batch.0);
     Json(x)
 }
 
 #[post("/parallel_batch", format = "application/json", data = "<parallel_batch>")]
 fn batch_for_parallel(parallel_batch: Json<ParallelBatchInstance>) -> Json<Result<()>> {
-    let x = Controller::parallel(parallel_batch.0);
+    let x = SVC_NATURE.parallel(parallel_batch.0);
     Json(x)
 }

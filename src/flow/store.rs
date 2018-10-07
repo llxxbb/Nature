@@ -1,4 +1,4 @@
-use std::marker::PhantomData;
+use std::rc::Rc;
 use super::*;
 
 #[derive(Debug, Serialize, Deserialize, Clone, Default)]
@@ -10,43 +10,38 @@ pub struct StoreTaskInfo {
 }
 
 pub trait StoreServiceTrait {
-    fn input(instance: Instance) -> Result<u128>;
-    fn store(carrier: Carrier<StoreTaskInfo>);
-    fn generate_store_task(instance: &Instance) -> Result<StoreTaskInfo>;
+    fn input(&self, instance: Instance) -> Result<u128>;
+    fn store(&self, task: &StoreTaskInfo, carrier: &RawDelivery);
+    fn generate_store_task(&self, instance: &Instance) -> Result<StoreTaskInfo>;
 }
 
-pub struct StoreServiceImpl<S, R, D, V> {
-    instance_dao: PhantomData<S>,
-    route: PhantomData<R>,
-    delivery: PhantomData<D>,
-    ins_svc: PhantomData<V>,
+pub struct StoreServiceImpl {
+    instance_dao: Rc<InstanceDaoTrait>,
+    route: Rc<RouteServiceTrait>,
+    delivery_svc: Rc<DeliveryServiceTrait>,
+    delivery_dao: Rc<DeliveryDaoTrait>,
+    svc_instance: Rc<InstanceServiceTrait>,
 }
 
-impl<S, R, D, V> StoreServiceTrait for StoreServiceImpl<S, R, D, V>
-    where
-        S: InstanceDaoTrait,
-        R: RouteServiceTrait,
-        D: DeliveryServiceTrait,
-        V: InstanceServiceTrait
-{
-    fn input(mut instance: Instance) -> Result<u128> {
+impl StoreServiceTrait for StoreServiceImpl {
+    fn input(&self, mut instance: Instance) -> Result<u128> {
         instance.data.thing.thing_type = ThingType::Business;
-        let uuid = V::verify(&mut instance)?;
-        let task = Self::generate_store_task(&instance)?;
-        let carrier = D::create_carrier(task, &instance.data.thing.key, DataType::Store as u8)?;
-        Self::do_task(&carrier)?;
+        let uuid = self.svc_instance.verify(&mut instance)?;
+        let task = self.generate_store_task(&instance)?;
+        let carrier = RawDelivery::new(&task, &instance.thing.key, DataType::Store as i16)?;
+        self.do_task(&task, &carrier)?;
         Ok(uuid)
     }
 
-    fn store(carrier: Carrier<StoreTaskInfo>) {
-        let _ = Self::do_task(&carrier);
+    fn store(&self, task: &StoreTaskInfo, carrier: &RawDelivery) {
+        let _ = self.do_task(task, carrier);
     }
 
     /// generate `StoreTaskInfo` include route information.
     /// `Err` on environment error
-    fn generate_store_task(instance: &Instance) -> Result<StoreTaskInfo> {
+    fn generate_store_task(&self, instance: &Instance) -> Result<StoreTaskInfo> {
 //        let key = &instance.thing.key;
-        let target = R::get_route(instance)?;
+        let target = self.route.get_route(instance)?;
         // save to delivery to make it can redo
         let task = StoreTaskInfo {
             instance: instance.clone(),
@@ -57,32 +52,27 @@ impl<S, R, D, V> StoreServiceTrait for StoreServiceImpl<S, R, D, V>
     }
 }
 
-impl<S, R, D, V> StoreServiceImpl<S, R, D, V>
-    where
-        D: DeliveryServiceTrait,
-        S: InstanceDaoTrait
-{
+impl StoreServiceImpl {
     /// save to db and handle duplicated data
-    fn save(carrier: &Carrier<StoreTaskInfo>) -> Result<u128> {
-        let id = carrier.instance.id;
-        debug!("save instance for `Thing` {:?}, id: {:?}", carrier.instance.thing.key, id);
-        let result = S::insert(&carrier.instance);
+    fn save(&self, instance: &Instance) -> Result<usize> {
+        debug!("save instance for `Thing` {:?}", instance.thing.key);
+        let result = self.instance_dao.insert(instance);
         match result {
-            Ok(_) => Ok(id),
+            Ok(num) => Ok(num),
             Err(err) => match err {
-                NatureError::DaoDuplicated(_) => Ok(id),
+                NatureError::DaoDuplicated(_) => Ok(0),
                 _ => Err(err)
             }
         }
     }
 
-    fn do_task(carrier: &Carrier<StoreTaskInfo>) -> Result<()> {
+    fn do_task(&self, task: &StoreTaskInfo, carrier: &RawDelivery) -> Result<()> {
         debug!("------------------do_store_task------------------------");
-        if let Err(err) = Self::save(carrier) {
-            D::move_to_err(&err, carrier);
+        if let Err(err) = self.save(&task.instance) {
+            self.delivery_dao.raw_to_error(&err, carrier);
             Err(err)
         } else {
-            D::send_carrier(&CHANNEL_STORED.sender, carrier.clone());
+            CHANNEL_STORED.sender.lock().unwrap().send((task.to_owned(), carrier.to_owned()));
             Ok(())
         }
     }

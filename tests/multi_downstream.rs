@@ -15,8 +15,10 @@ use nature::system::*;
 use nature_common::Instance;
 use self::nature::flow::*;
 use self::nature_db::*;
+use self::nature_db::service::*;
 use std::thread;
 use std::time;
+
 
 mod common;
 
@@ -38,7 +40,7 @@ fn local_converter() {
     // prepare input para
     let mut instance = Instance::default();
     instance.data.thing.key = from.to_string();
-    let id = InstanceServiceImpl::verify(&mut instance).unwrap();
+    let id = SVC_INSTANCE.verify(&mut instance).unwrap();
     println!("------------------ remove existed instance -----------------");
     // remove if instance exists
     let will_del = instance.clone();
