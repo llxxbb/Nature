@@ -7,18 +7,18 @@ use system::*;
 
 pub trait ConvertServiceTrait {
     fn callback(&self, delayed: DelayedInstances) -> Result<()>;
-    fn convert(&self, task: &ConverterInfo, carrier: RawDelivery);
+    fn convert(&self, task: &ConverterInfo, carrier: &RawDelivery);
     fn new(&self, instance: &Instance, mapping: &Mission) -> Result<ConverterInfo>;
     fn generate_converter_info(&self, task: &StoreTaskInfo) -> Result<Vec<(ConverterInfo, RawDelivery)>>;
 }
 
 pub struct ConvertServiceImpl {
-    svc_delivery: Rc<DeliveryServiceTrait>,
-    dao_delivery: Rc<DeliveryDaoTrait>,
-    caller: Rc<CallOutTrait>,
-    svc_define: Rc<ThingDefineCacheTrait>,
-    dao_instance: Rc<InstanceDaoTrait>,
-    svc_instance: Rc<InstanceServiceTrait>,
+    pub svc_delivery: Rc<DeliveryServiceTrait>,
+    pub dao_delivery: Rc<DeliveryDaoTrait>,
+    pub caller: Rc<CallOutTrait>,
+    pub svc_define: Rc<ThingDefineCacheTrait>,
+    pub dao_instance: Rc<InstanceDaoTrait>,
+    pub svc_instance: Rc<InstanceServiceTrait>,
 }
 
 impl ConvertServiceTrait for ConvertServiceImpl {
@@ -27,7 +27,7 @@ impl ConvertServiceTrait for ConvertServiceImpl {
         match delayed.result {
             CallbackResult::Err(err) => {
                 let err = NatureError::ConverterLogicalError(err);
-                self.dao_delivery.raw_to_error(&err, &carrier);
+                let _ = self.dao_delivery.raw_to_error(&err, &carrier);
                 Err(err)
             }
             CallbackResult::Instances(mut ins) => {
@@ -37,9 +37,9 @@ impl ConvertServiceTrait for ConvertServiceImpl {
         }
     }
 
-    fn convert(&self, task: &ConverterInfo, carrier: RawDelivery) {
+    fn convert(&self, task: &ConverterInfo, carrier: &RawDelivery) {
         debug!("------------------do_convert_task------------------------");
-        let parameter = Self::gen_out_parameter(task, carrier.id);
+        let parameter = Self::gen_out_parameter(task, carrier.id.clone());
         match self.caller.convert(&task.target, &parameter) {
             Ok(ConverterReturned::Instances(mut instances)) => {
                 debug!("converted {} instances for `Thing`: {:?}", instances.len(), &task.target.to);
@@ -48,16 +48,16 @@ impl ConvertServiceTrait for ConvertServiceImpl {
                     Err(err) => match err {
                         NatureError::DaoEnvironmentError(_) => (),
                         _ => {
-                            self.dao_delivery.raw_to_error(&err, &carrier);
+                            let _ = self.dao_delivery.raw_to_error(&err, &carrier);
                         }
                     }
                 }
             }
             Ok(ConverterReturned::Delay(delay)) => {
-                self.dao_delivery.update_execute_time(&carrier.id, delay as i64);
+                let _ = self.dao_delivery.update_execute_time(&carrier.id, delay as i64);
             }
             Ok(ConverterReturned::LogicalError(ss)) => {
-                self.dao_delivery.raw_to_error(&NatureError::ConverterLogicalError(ss), &carrier);
+                let _ = self.dao_delivery.raw_to_error(&NatureError::ConverterLogicalError(ss), &carrier);
             }
             Ok(ConverterReturned::EnvError) => (),
             Ok(ConverterReturned::None) => (),
@@ -66,7 +66,7 @@ impl ConvertServiceTrait for ConvertServiceImpl {
                 NatureError::ConverterEnvironmentError(_) => (),
                 // other error will drop into error
                 _ => {
-                    self.dao_delivery.raw_to_error(&err, &carrier);
+                    let _ = self.dao_delivery.raw_to_error(&err, &carrier);
                 }
             }
         };
@@ -102,8 +102,8 @@ impl ConvertServiceTrait for ConvertServiceImpl {
 
     fn generate_converter_info(&self, task: &StoreTaskInfo) -> Result<Vec<(ConverterInfo, RawDelivery)>> {
         let mut new_carriers: Vec<(ConverterInfo, RawDelivery)> = Vec::new();
-        let tar = task.mission.unwrap();
-        for c in tar {
+        let missions = task.mission.clone().unwrap();
+        for c in missions {
             match self.new(&task.instance, &c) {
                 Err(err) => return Err(err),
                 Ok(x) => {
@@ -129,7 +129,7 @@ impl ConvertServiceImpl {
             done_task: carrier.to_owned(),
             converted: instances,
         };
-        let _ = CHANNEL_CONVERTED.sender.lock().unwrap().send(rtn);
+        let _ = CHANNEL_CONVERTED.sender.lock().unwrap().send((task.to_owned(), rtn));
         Ok(())
     }
 

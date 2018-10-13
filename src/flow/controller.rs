@@ -5,6 +5,10 @@ use nature_db::service::*;
 use std::rc::Rc;
 use super::*;
 
+lazy_static! {
+    static ref SVC_NATURE : ControllerImpl = ControllerImpl::new();
+}
+
 pub struct ControllerImpl {
     pub store_svc: Rc<StoreServiceTrait>,
     pub delivery_svc: Rc<DeliveryServiceTrait>,
@@ -62,62 +66,78 @@ impl ControllerImpl {
     }
 
     /// born an instance which is the beginning of the changes.
-    pub fn input(&self, instance: Instance) -> Result<u128> {
-        self.store_svc.input(instance)
+    pub fn input(instance: Instance) -> Result<u128> {
+        SVC_NATURE.store_svc.input(instance)
     }
 
-    pub fn callback(&self, delayed: DelayedInstances) -> Result<()> {
-        self.converter_svc.callback(delayed)
+    pub fn callback(delayed: DelayedInstances) -> Result<()> {
+        SVC_NATURE.converter_svc.callback(delayed)
     }
 
-    pub fn serial(&self, batch: SerialBatchInstance) -> Result<()> {
-        self.batch_serial_svc.one_by_one(&batch)
+    pub fn channel_serial(task: (SerialBatchInstance, RawDelivery)) {
+        SVC_NATURE.batch_serial_svc.do_serial_task(task.0, &task.1)
+    }
+    pub fn serial(batch: SerialBatchInstance) -> Result<()> {
+        SVC_NATURE.batch_serial_svc.one_by_one(&batch)
     }
 
-    pub fn parallel(&self, batch: ParallelBatchInstance) -> Result<()> {
-        self.batch_parallel_svc.parallel(batch)
+    pub fn channel_parallel(task: (ParallelBatchInstance, RawDelivery)) {
+        SVC_NATURE.batch_parallel_svc.do_parallel_task(task.0, task.1)
+    }
+    pub fn parallel(batch: ParallelBatchInstance) -> Result<()> {
+        SVC_NATURE.batch_parallel_svc.parallel(batch)
     }
 
-    pub fn channel_stored(&self, task: &StoreTaskInfo, carrier: RawDelivery) {
-        if task.mission.is_none() {
-            let _ = self.delivery_dao.delete(&carrier.id);
+    pub fn channel_store(store: (StoreTaskInfo, RawDelivery)) {
+        let _ = SVC_NATURE.store_svc.do_task(&store.0, &store.1);
+    }
+    pub fn channel_stored(store: (StoreTaskInfo, RawDelivery)) {
+        if store.0.mission.is_none() {
+            let _ = SVC_NATURE.delivery_dao.delete(&&store.1.id);
             return;
         }
-        let converters = match self.converter_svc.generate_converter_info(task) {
+        let converters = match SVC_NATURE.converter_svc.generate_converter_info(&store.0) {
             Ok(new) => new,
             Err(err) => match err {
                 NatureError::DaoEnvironmentError(_) => return,
                 _ => {
-                    self.delivery_dao.raw_to_error(&err, &carrier);
+                    let _ = SVC_NATURE.delivery_dao.raw_to_error(&err, &store.1);
                     return;
                 }
             }
         };
-        let biz = &task.instance.thing.key;
-        let raws: Vec<RawDelivery> = converters.iter().map(|x| x.1).collect();
-        if let Ok(_) = self.delivery_svc.create_batch_and_finish_carrier(&raws, &carrier.id) {
+        let biz = &store.0.instance.thing.key;
+        let raws: Vec<RawDelivery> = converters.iter().map(|x| x.1.clone()).collect();
+        if let Ok(_) = SVC_NATURE.delivery_svc.create_batch_and_finish_carrier(&raws, &store.1.id) {
             debug!("will dispatch {} convert tasks for `Thing` : {:?}", converters.len(), biz);
             for task in converters {
-                CHANNEL_CONVERT.sender.lock().unwrap().send(task);
+                let _ = CHANNEL_CONVERT.sender.lock().unwrap().send(task);
             }
         };
     }
 
-    pub fn channel_converted(&self, converted: Converted) {
-        if let Ok(plan) = self.plan_svc.new(&converted.done_task.content.data, &converted.converted) {
-            self.prepare_to_store(&converted.done_task, plan);
+    pub fn channel_convert(task: (ConverterInfo, RawDelivery)) {
+        SVC_NATURE.converter_svc.convert(&task.0, &task.1);
+    }
+    pub fn channel_converted(task: (ConverterInfo, Converted)) {
+        if let Ok(plan) = SVC_NATURE.plan_svc.new(&task.0, &task.1.converted) {
+            SVC_NATURE.prepare_to_store(&task.1.done_task, plan);
         }
     }
     fn prepare_to_store(&self, carrier: &RawDelivery, plan: PlanInfo) {
         let mut store_infos: Vec<RawDelivery> = Vec::new();
+        let mut t_d: Vec<(StoreTaskInfo, RawDelivery)> = Vec::new();
         for instance in plan.plan.iter() {
             match self.store_svc.generate_store_task(instance) {
                 Ok(task) => {
-                    match RawDelivery::new(task, &plan.to.key, DataType::Store as i16) {
-                        Ok(x) => store_infos.push(x),
+                    match RawDelivery::new(&task, &plan.to.key, DataType::Store as i16) {
+                        Ok(x) => {
+                            store_infos.push(x.clone());
+                            t_d.push((task, x))
+                        }
                         Err(e) => {
                             error!("{}", e);
-                            self.delivery_dao.raw_to_error(&e, carrier);
+                            let _ = self.delivery_dao.raw_to_error(&e, carrier);
                             return;
                         }
                     }
@@ -129,9 +149,9 @@ impl ControllerImpl {
                 }
             }
         }
-        if let Ok(_) = self.delivery_svc.create_batch_and_finish_carrier(&store_infos, &carrier) {
-            for task in store_infos {
-                self.delivery_svc.send_carrier(&CHANNEL_STORE.sender, task)
+        if let Ok(_) = self.delivery_svc.create_batch_and_finish_carrier(&store_infos, &carrier.id) {
+            for task in t_d {
+                let _ = CHANNEL_STORE.sender.lock().unwrap().send(task);
             }
         }
     }

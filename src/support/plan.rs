@@ -8,7 +8,7 @@ pub trait PlanServiceTrait {
 }
 
 pub struct PlanServiceImpl {
-    dao: Rc<StorePlanDaoTrait>
+    pub dao: Rc<StorePlanDaoTrait>
 }
 
 impl PlanServiceTrait for PlanServiceImpl {

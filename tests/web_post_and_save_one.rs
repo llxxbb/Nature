@@ -50,6 +50,7 @@ fn web_post_and_save_one() {
     println!("{:?}", rtn);
     assert_eq!(rtn, r#"{"Ok":327082908364944575799907940044792342105}"#);
     // get instance which is saved to db
-    let _ins_db = InstanceDaoImpl::get_by_id(327082908364944575799907940044792342105).unwrap().unwrap();
+    let i_d = InstanceDaoImpl {};
+    let _ins_db = i_d.get_by_id(327082908364944575799907940044792342105).unwrap().unwrap();
 }
 

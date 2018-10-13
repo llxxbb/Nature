@@ -15,50 +15,51 @@ pub struct SerialFinished {
 
 pub trait SequentialTrait {
     fn one_by_one(&self, batch: &SerialBatchInstance) -> Result<()>;
-    fn do_serial_task(&self, task: &SerialBatchInstance, carrier: &RawDelivery);
+    fn do_serial_task(&self, task: SerialBatchInstance, carrier: &RawDelivery);
 }
 
 pub struct SequentialServiceImpl {
-    svc_delivery: Rc<DeliveryServiceTrait>,
-    dao_delivery: Rc<DeliveryDaoTrait>,
-    store: Rc<StoreServiceTrait>,
-    svc_instance: Rc<InstanceServiceTrait>,
-    dao_instance: Rc<InstanceDaoTrait>,
+    pub svc_delivery: Rc<DeliveryServiceTrait>,
+    pub dao_delivery: Rc<DeliveryDaoTrait>,
+    pub store: Rc<StoreServiceTrait>,
+    pub svc_instance: Rc<InstanceServiceTrait>,
+    pub dao_instance: Rc<InstanceDaoTrait>,
 }
 
 impl SequentialTrait for SequentialServiceImpl {
     fn one_by_one(&self, batch: &SerialBatchInstance) -> Result<()> {
         let raw = RawDelivery::new(batch, &batch.thing.key, DataType::QueueBatch as i16)?;
         match self.dao_delivery.insert(&raw) {
-            Ok(carrier) => {
+            Ok(_carrier) => {
                 // to process asynchronous
-                CHANNEL_SERIAL.sender.lock().unwrap().send((batch.to_owned(), raw));
+                let _ = CHANNEL_SERIAL.sender.lock().unwrap().send((batch.to_owned(), raw));
                 Ok(())
             }
             Err(err) => Err(err),
         }
     }
 
-    fn do_serial_task(&self, task: &SerialBatchInstance, carrier: &RawDelivery) {
+    fn do_serial_task(&self, task: SerialBatchInstance, carrier: &RawDelivery) {
+        let finish = &task.context_for_finish.clone();
         if let (Ok(si)) = self.store_batch_items(task) {
-            match Self::new_virtual_instance(&task.context_for_finish, si) {
+            match Self::new_virtual_instance(finish, si) {
                 Ok(instance) => {
                     if let (Ok(si)) = self.store.generate_store_task(&instance) {
                         match RawDelivery::new(&si, &instance.thing.key, DataType::QueueBatch as i16) {
                             Ok(new) => {
                                 let mut new = new;
-                                if let Ok(route) = self.svc_delivery.create_and_finish_carrier(carrier, &mut new) {
-                                    CHANNEL_STORED.sender.lock().unwrap().send((si, new));
+                                if let Ok(_route) = self.svc_delivery.create_and_finish_carrier(carrier, &mut new) {
+                                    let _ = CHANNEL_STORED.sender.lock().unwrap().send((si, new));
                                 }
                             }
                             Err(err) => {
-                                self.dao_delivery.raw_to_error(&err, &carrier);
+                                let _ = self.dao_delivery.raw_to_error(&err, &carrier);
                             }
                         }
                     }
                 }
                 Err(err) => {
-                    self.dao_delivery.raw_to_error(&err, &carrier);
+                    let _ = self.dao_delivery.raw_to_error(&err, &carrier);
                 }
             };
         }
@@ -93,13 +94,13 @@ impl SequentialServiceImpl {
         })
     }
 
-    fn store_batch_items(&self, task: &SerialBatchInstance) -> Result<SerialFinished>
+    fn store_batch_items(&self, task: SerialBatchInstance) -> Result<SerialFinished>
     {
         let mut errors: Vec<String> = Vec::new();
         let mut succeeded_id: Vec<u128> = Vec::new();
         for mut instance in task.instances {
             instance.data.thing.thing_type = ThingType::Business;
-            instance.data.thing = task.thing;
+            instance.data.thing = task.thing.clone();
             if let Err(err) = self.svc_instance.verify(&mut instance) {
                 errors.push(format!("{:?}", err));
                 continue;

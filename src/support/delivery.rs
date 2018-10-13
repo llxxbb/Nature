@@ -8,7 +8,7 @@ pub trait DeliveryServiceTrait {
 }
 
 pub struct DeliveryServiceImpl {
-    table_delivery: Rc<DeliveryDaoTrait>,
+    pub table_delivery: Rc<DeliveryDaoTrait>,
 }
 
 impl DeliveryServiceTrait for DeliveryServiceImpl {
@@ -18,7 +18,7 @@ impl DeliveryServiceTrait for DeliveryServiceImpl {
     /// Another disadvantage is the failure information will be attached to the beginning.
     fn create_and_finish_carrier(&self, old: &RawDelivery, new: &mut RawDelivery) -> Result<usize> {
         // TODO  当遇到错误时如果要结束的 delivery ID 和新的delivery 不一样 需要结束之前的 delivery 并创建新的 delivery
-        new.id = old.id; // the id is used for final finished
+        new.id = old.id.clone(); // the id is used for final finished
         Ok(1)
     }
 

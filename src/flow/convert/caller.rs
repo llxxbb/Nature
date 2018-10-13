@@ -8,7 +8,7 @@ pub trait CallOutTrait {
 }
 
 pub struct CallOutImpl {
-    local_rust: Rc<LocalExecutorTrait>,
+    pub local_rust: Rc<LocalExecutorTrait>,
 }
 
 impl CallOutTrait for CallOutImpl {

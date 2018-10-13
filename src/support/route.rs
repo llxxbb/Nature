@@ -8,8 +8,8 @@ pub trait RouteServiceTrait {
 }
 
 pub struct RouteServiceImpl {
-    delivery_service: Rc<DeliveryServiceTrait>,
-    one_step_flow_cache: Rc<OneStepFlowCacheTrait>,
+    pub delivery_service: Rc<DeliveryServiceTrait>,
+    pub one_step_flow_cache: Rc<OneStepFlowCacheTrait>,
 }
 
 impl RouteServiceTrait for RouteServiceImpl {
