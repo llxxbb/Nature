@@ -23,17 +23,24 @@ pub struct ConvertServiceImpl {
 
 impl ConvertServiceTrait for ConvertServiceImpl {
     fn callback(&self, delayed: DelayedInstances) -> Result<()> {
-        let carrier = self.dao_delivery.get(&delayed.carrier_id)?;
-        match delayed.result {
-            CallbackResult::Err(err) => {
-                let err = NatureError::ConverterLogicalError(err);
-                let _ = self.dao_delivery.raw_to_error(&err, &carrier);
-                Err(err)
+        match self.dao_delivery.get(&delayed.carrier_id) {
+            Ok(raw) => {
+                match raw {
+                    None => Err(NatureError::VerifyError("Delivery data missed, maybe it had done already.".to_string())),
+                    Some(carrier) => match delayed.result {
+                        CallbackResult::Err(err) => {
+                            let err = NatureError::ConverterLogicalError(err);
+                            let _ = self.dao_delivery.raw_to_error(&err, &carrier);
+                            Err(err)
+                        }
+                        CallbackResult::Instances(mut ins) => {
+                            let task: ConverterInfo = serde_json::from_str(&carrier.data)?;
+                            self.handle_instances(&task, &carrier, &mut ins)
+                        }
+                    }
+                }
             }
-            CallbackResult::Instances(mut ins) => {
-                let task: ConverterInfo = serde_json::from_str(&carrier.data)?;
-                self.handle_instances(&task, &carrier, &mut ins)
-            }
+            Err(e) => Err(e)
         }
     }
 
