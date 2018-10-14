@@ -2,9 +2,6 @@
 
 ## for the nearer term
 
-introduce `mockers` library
-fix instance unit test
-
 * integrate test
     multi downstream
     callback
