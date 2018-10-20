@@ -41,10 +41,10 @@ impl SequentialTrait for SequentialServiceImpl {
 
     fn do_serial_task(&self, task: SerialBatchInstance, carrier: &RawDelivery) {
         let finish = &task.context_for_finish.clone();
-        if let (Ok(si)) = self.store_batch_items(task) {
+        if let Ok(si) = self.store_batch_items(task) {
             match Self::new_virtual_instance(finish, si) {
                 Ok(instance) => {
-                    if let (Ok(si)) = self.store.generate_store_task(&instance) {
+                    if let Ok(si) = self.store.generate_store_task(&instance) {
                         match RawDelivery::new(&si, &instance.thing.key, DataType::QueueBatch as i16) {
                             Ok(new) => {
                                 let mut new = new;

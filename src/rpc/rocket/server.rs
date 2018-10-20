@@ -12,6 +12,7 @@ pub fn start_rocket_server() -> Rocket {
         .mount("/", routes![batch_for_serial])
         .mount("/", routes![batch_for_parallel])
         .mount("/", routes![callback])
+        .mount("/", routes![redo_task])
 }
 
 /// **Note** This do not receive System `Thing`'s instances
@@ -37,5 +38,11 @@ fn batch_for_serial(serial_batch: Json<SerialBatchInstance>) -> Json<Result<()>>
 #[post("/parallel_batch", format = "application/json", data = "<parallel_batch>")]
 fn batch_for_parallel(parallel_batch: Json<ParallelBatchInstance>) -> Json<Result<()>> {
     let x = ControllerImpl::parallel(parallel_batch.0);
+    Json(x)
+}
+
+#[post("/redo_task", format = "application/json", data = "<task>")]
+fn redo_task(task: Json<RawDelivery>) -> Json<Result<()>> {
+    let x = ControllerImpl::redo_task(task.0);
     Json(x)
 }

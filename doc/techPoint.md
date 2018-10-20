@@ -6,7 +6,7 @@ example: rustup toolchain install nightly-2018-05-22
 
 last: 1.29.0-nightly (e06c87544 2018-07-06)
 
-## switchr toolchain
+## switch toolchain
 
 restup default nightly-yyyy-mm-dd
 
@@ -43,6 +43,11 @@ root = "D:/common/sqlite3230100"
 ### install diesel_cli
 
 cargo install diesel_cli --no-default-features --features sqlite
+
+## 架构设计理念
+
+### 消除下一步操作中的“不确定的数据”
+如，提前确定下一步要用的 `delivery.id`，这样在重新执行任务时就不会产生多余的副本。
 
 
 

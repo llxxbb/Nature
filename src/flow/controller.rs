@@ -74,6 +74,11 @@ impl ControllerImpl {
         SVC_NATURE.converter_svc.callback(delayed)
     }
 
+    pub fn redo_task(raw: RawDelivery) -> Result<()> {
+        // TODO
+        unimplemented!()
+    }
+
     pub fn channel_serial(task: (SerialBatchInstance, RawDelivery)) {
         SVC_NATURE.batch_serial_svc.do_serial_task(task.0, &task.1)
     }
