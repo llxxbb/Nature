@@ -15,7 +15,7 @@ pub struct ParallelServiceImpl {
 
 impl ParallelServiceTrait for ParallelServiceImpl {
     fn parallel(&self, batch: ParallelBatchInstance) -> Result<()> {
-        let raw = RawTask::new(&batch, &batch.thing.key, DataType::ParallelBatch as i16)?;
+        let raw = RawTask::new(&batch, &batch.thing.key, TaskType::ParallelBatch as i16)?;
         match self.delivery_dao.insert(&raw) {
             Ok(_carrier) => {
                 // to process asynchronous
@@ -32,7 +32,7 @@ impl ParallelServiceTrait for ParallelServiceImpl {
         for instance in batch.instances.iter() {
             match self.store.generate_store_task(instance) {
                 Ok(task) => {
-                    match RawTask::new(&task, &instance.thing.key, DataType::Store as i16) {
+                    match RawTask::new(&task, &instance.thing.key, TaskType::Store as i16) {
                         Ok(car) => {
                             tasks.push(car.clone());
                             tuple.push((task, car))

@@ -2,6 +2,9 @@ use flow::sequential::SequentialServiceImpl;
 use nature_common::*;
 use nature_db::*;
 use nature_db::service::*;
+use serde::Deserialize;
+use serde_json;
+use std::convert::TryFrom;
 use std::rc::Rc;
 use super::*;
 
@@ -75,8 +78,19 @@ impl ControllerImpl {
     }
 
     pub fn redo_task(raw: RawTask) -> Result<()> {
-        // TODO
-        unimplemented!()
+        match TaskType::try_from(raw.data_type)? {
+            TaskType::Store => Self::send_to_channel::<StoreTaskInfo>(&raw, &CHANNEL_STORED)?,
+            TaskType::Convert => Self::send_to_channel::<ConverterInfo>(&raw, &CHANNEL_CONVERT)?,
+            TaskType::ParallelBatch => Self::send_to_channel::<ParallelBatchInstance>(&raw, &CHANNEL_PARALLEL)?,
+            TaskType::QueueBatch => Self::send_to_channel::<SerialBatchInstance>(&raw, &CHANNEL_SERIAL)?,
+        }
+        Ok(())
+    }
+
+    fn send_to_channel<'a, T: Deserialize<'a>>(raw: &'a RawTask, channel: &Channel<(T, RawTask)>) -> Result<()> {
+        let task: T = serde_json::from_str(&raw.data)?;
+        let _ = channel.sender.lock().unwrap().send((task, raw.clone()));
+        Ok(())
     }
 
     pub fn channel_serial(task: (SerialBatchInstance, RawTask)) {
@@ -135,7 +149,7 @@ impl ControllerImpl {
         for instance in plan.plan.iter() {
             match self.store_svc.generate_store_task(instance) {
                 Ok(task) => {
-                    match RawTask::new(&task, &plan.to.key, DataType::Store as i16) {
+                    match RawTask::new(&task, &plan.to.key, TaskType::Store as i16) {
                         Ok(x) => {
                             store_infos.push(x.clone());
                             t_d.push((task, x))

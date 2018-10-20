@@ -114,7 +114,7 @@ impl ConvertServiceTrait for ConvertServiceImpl {
             match self.new(&task.instance, &c) {
                 Err(err) => return Err(err),
                 Ok(x) => {
-                    let car = RawTask::new(&x, &c.to.key, DataType::Convert as i16)?;
+                    let car = RawTask::new(&x, &c.to.key, TaskType::Convert as i16)?;
                     new_carriers.push((x, car));
                 }
             }

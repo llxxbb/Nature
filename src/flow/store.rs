@@ -28,7 +28,7 @@ impl StoreServiceTrait for StoreServiceImpl {
         instance.data.thing.thing_type = ThingType::Business;
         let uuid = self.svc_instance.verify(&mut instance)?;
         let task = self.generate_store_task(&instance)?;
-        let carrier = RawTask::new(&task, &instance.thing.key, DataType::Store as i16)?;
+        let carrier = RawTask::new(&task, &instance.thing.key, TaskType::Store as i16)?;
         self.do_task(&task, &carrier)?;
         Ok(uuid)
     }

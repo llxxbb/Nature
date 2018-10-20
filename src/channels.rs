@@ -19,7 +19,6 @@ lazy_static! {
 pub fn start_receive_threads() -> Vec<JoinHandle<()>> {
     let mut threads: Vec<JoinHandle<()>> = Vec::new();
     info!("to start receive threads");
-//    threads.push(start_thread(&CHANNEL_STORE.receiver, StoreServiceImpl::store_test));
     threads.push(start_thread(&CHANNEL_STORE.receiver, ControllerImpl::channel_store));
     threads.push(start_thread(&CHANNEL_STORED.receiver, ControllerImpl::channel_stored));
     threads.push(start_thread(&CHANNEL_CONVERT.receiver, ControllerImpl::channel_convert));
