@@ -8,12 +8,12 @@ use std::thread::JoinHandle;
 
 /// `CHANNEL_PARALLEL` & `CHANNEL_SERIAL` are used to short caller response time
 lazy_static! {
-    pub static ref CHANNEL_STORE : Channel<(StoreTaskInfo,RawDelivery)> = Channel::new();
-    pub static ref CHANNEL_STORED : Channel<(StoreTaskInfo,RawDelivery)> = Channel::new();
-    pub static ref CHANNEL_CONVERT : Channel<(ConverterInfo,RawDelivery)> = Channel::new();
+    pub static ref CHANNEL_STORE : Channel<(StoreTaskInfo,RawTask)> = Channel::new();
+    pub static ref CHANNEL_STORED : Channel<(StoreTaskInfo,RawTask)> = Channel::new();
+    pub static ref CHANNEL_CONVERT : Channel<(ConverterInfo,RawTask)> = Channel::new();
     pub static ref CHANNEL_CONVERTED : Channel<(ConverterInfo,Converted)> = Channel::new();
-    pub static ref CHANNEL_PARALLEL : Channel<(ParallelBatchInstance,RawDelivery)> = Channel::new();
-    pub static ref CHANNEL_SERIAL : Channel<(SerialBatchInstance,RawDelivery)> = Channel::new();
+    pub static ref CHANNEL_PARALLEL : Channel<(ParallelBatchInstance,RawTask)> = Channel::new();
+    pub static ref CHANNEL_SERIAL : Channel<(SerialBatchInstance,RawTask)> = Channel::new();
 }
 
 pub fn start_receive_threads() -> Vec<JoinHandle<()>> {

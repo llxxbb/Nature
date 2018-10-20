@@ -15,7 +15,7 @@ pub struct SerialFinished {
 
 pub trait SequentialTrait {
     fn one_by_one(&self, batch: &SerialBatchInstance) -> Result<()>;
-    fn do_serial_task(&self, task: SerialBatchInstance, carrier: &RawDelivery);
+    fn do_serial_task(&self, task: SerialBatchInstance, carrier: &RawTask);
 }
 
 pub struct SequentialServiceImpl {
@@ -28,7 +28,7 @@ pub struct SequentialServiceImpl {
 
 impl SequentialTrait for SequentialServiceImpl {
     fn one_by_one(&self, batch: &SerialBatchInstance) -> Result<()> {
-        let raw = RawDelivery::new(batch, &batch.thing.key, DataType::QueueBatch as i16)?;
+        let raw = RawTask::new(batch, &batch.thing.key, DataType::QueueBatch as i16)?;
         match self.dao_delivery.insert(&raw) {
             Ok(_carrier) => {
                 // to process asynchronous
@@ -39,13 +39,13 @@ impl SequentialTrait for SequentialServiceImpl {
         }
     }
 
-    fn do_serial_task(&self, task: SerialBatchInstance, carrier: &RawDelivery) {
+    fn do_serial_task(&self, task: SerialBatchInstance, carrier: &RawTask) {
         let finish = &task.context_for_finish.clone();
         if let Ok(si) = self.store_batch_items(task) {
             match Self::new_virtual_instance(finish, si) {
                 Ok(instance) => {
                     if let Ok(si) = self.store.generate_store_task(&instance) {
-                        match RawDelivery::new(&si, &instance.thing.key, DataType::QueueBatch as i16) {
+                        match RawTask::new(&si, &instance.thing.key, DataType::QueueBatch as i16) {
                             Ok(new) => {
                                 let mut new = new;
                                 if let Ok(_route) = self.svc_delivery.create_and_finish_carrier(carrier, &mut new) {

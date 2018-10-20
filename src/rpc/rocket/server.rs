@@ -42,7 +42,7 @@ fn batch_for_parallel(parallel_batch: Json<ParallelBatchInstance>) -> Json<Resul
 }
 
 #[post("/redo_task", format = "application/json", data = "<task>")]
-fn redo_task(task: Json<RawDelivery>) -> Json<Result<()>> {
+fn redo_task(task: Json<RawTask>) -> Json<Result<()>> {
     let x = ControllerImpl::redo_task(task.0);
     Json(x)
 }

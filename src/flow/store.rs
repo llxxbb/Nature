@@ -12,7 +12,7 @@ pub struct StoreTaskInfo {
 pub trait StoreServiceTrait {
     fn input(&self, instance: Instance) -> Result<u128>;
     fn generate_store_task(&self, instance: &Instance) -> Result<StoreTaskInfo>;
-    fn do_task(&self, task: &StoreTaskInfo, carrier: &RawDelivery) -> Result<()>;
+    fn do_task(&self, task: &StoreTaskInfo, carrier: &RawTask) -> Result<()>;
 }
 
 pub struct StoreServiceImpl {
@@ -28,7 +28,7 @@ impl StoreServiceTrait for StoreServiceImpl {
         instance.data.thing.thing_type = ThingType::Business;
         let uuid = self.svc_instance.verify(&mut instance)?;
         let task = self.generate_store_task(&instance)?;
-        let carrier = RawDelivery::new(&task, &instance.thing.key, DataType::Store as i16)?;
+        let carrier = RawTask::new(&task, &instance.thing.key, DataType::Store as i16)?;
         self.do_task(&task, &carrier)?;
         Ok(uuid)
     }
@@ -47,7 +47,7 @@ impl StoreServiceTrait for StoreServiceImpl {
         };
         Ok(task)
     }
-    fn do_task(&self, task: &StoreTaskInfo, carrier: &RawDelivery) -> Result<()> {
+    fn do_task(&self, task: &StoreTaskInfo, carrier: &RawTask) -> Result<()> {
         debug!("------------------do_store_task------------------------");
         if let Err(err) = self.save(&task.instance) {
             let _ = self.delivery_dao.raw_to_error(&err, carrier);

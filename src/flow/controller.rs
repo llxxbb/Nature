@@ -74,31 +74,31 @@ impl ControllerImpl {
         SVC_NATURE.converter_svc.callback(delayed)
     }
 
-    pub fn redo_task(raw: RawDelivery) -> Result<()> {
+    pub fn redo_task(raw: RawTask) -> Result<()> {
         // TODO
         unimplemented!()
     }
 
-    pub fn channel_serial(task: (SerialBatchInstance, RawDelivery)) {
+    pub fn channel_serial(task: (SerialBatchInstance, RawTask)) {
         SVC_NATURE.batch_serial_svc.do_serial_task(task.0, &task.1)
     }
     pub fn serial(batch: SerialBatchInstance) -> Result<()> {
         SVC_NATURE.batch_serial_svc.one_by_one(&batch)
     }
 
-    pub fn channel_parallel(task: (ParallelBatchInstance, RawDelivery)) {
+    pub fn channel_parallel(task: (ParallelBatchInstance, RawTask)) {
         SVC_NATURE.batch_parallel_svc.do_parallel_task(task.0, task.1)
     }
     pub fn parallel(batch: ParallelBatchInstance) -> Result<()> {
         SVC_NATURE.batch_parallel_svc.parallel(batch)
     }
 
-    pub fn channel_store(store: (StoreTaskInfo, RawDelivery)) {
+    pub fn channel_store(store: (StoreTaskInfo, RawTask)) {
         let _ = SVC_NATURE.store_svc.do_task(&store.0, &store.1);
     }
-    pub fn channel_stored(store: (StoreTaskInfo, RawDelivery)) {
+    pub fn channel_stored(store: (StoreTaskInfo, RawTask)) {
         if store.0.mission.is_none() {
-            let _ = SVC_NATURE.delivery_dao.delete(&&store.1.id);
+            let _ = SVC_NATURE.delivery_dao.delete(&&store.1.task_id);
             return;
         }
         let converters = match SVC_NATURE.converter_svc.generate_converter_info(&store.0) {
@@ -112,8 +112,8 @@ impl ControllerImpl {
             }
         };
         let biz = &store.0.instance.thing.key;
-        let raws: Vec<RawDelivery> = converters.iter().map(|x| x.1.clone()).collect();
-        if let Ok(_) = SVC_NATURE.delivery_svc.create_batch_and_finish_carrier(&raws, &store.1.id) {
+        let raws: Vec<RawTask> = converters.iter().map(|x| x.1.clone()).collect();
+        if let Ok(_) = SVC_NATURE.delivery_svc.create_batch_and_finish_carrier(&raws, &store.1.task_id) {
             debug!("will dispatch {} convert tasks for `Thing` : {:?}", converters.len(), biz);
             for task in converters {
                 let _ = CHANNEL_CONVERT.sender.lock().unwrap().send(task);
@@ -121,7 +121,7 @@ impl ControllerImpl {
         };
     }
 
-    pub fn channel_convert(task: (ConverterInfo, RawDelivery)) {
+    pub fn channel_convert(task: (ConverterInfo, RawTask)) {
         SVC_NATURE.converter_svc.convert(&task.0, &task.1);
     }
     pub fn channel_converted(task: (ConverterInfo, Converted)) {
@@ -129,13 +129,13 @@ impl ControllerImpl {
             SVC_NATURE.prepare_to_store(&task.1.done_task, plan);
         }
     }
-    fn prepare_to_store(&self, carrier: &RawDelivery, plan: PlanInfo) {
-        let mut store_infos: Vec<RawDelivery> = Vec::new();
-        let mut t_d: Vec<(StoreTaskInfo, RawDelivery)> = Vec::new();
+    fn prepare_to_store(&self, carrier: &RawTask, plan: PlanInfo) {
+        let mut store_infos: Vec<RawTask> = Vec::new();
+        let mut t_d: Vec<(StoreTaskInfo, RawTask)> = Vec::new();
         for instance in plan.plan.iter() {
             match self.store_svc.generate_store_task(instance) {
                 Ok(task) => {
-                    match RawDelivery::new(&task, &plan.to.key, DataType::Store as i16) {
+                    match RawTask::new(&task, &plan.to.key, DataType::Store as i16) {
                         Ok(x) => {
                             store_infos.push(x.clone());
                             t_d.push((task, x))
@@ -154,7 +154,7 @@ impl ControllerImpl {
                 }
             }
         }
-        if let Ok(_) = self.delivery_svc.create_batch_and_finish_carrier(&store_infos, &carrier.id) {
+        if let Ok(_) = self.delivery_svc.create_batch_and_finish_carrier(&store_infos, &carrier.task_id) {
             for task in t_d {
                 let _ = CHANNEL_STORE.sender.lock().unwrap().send(task);
             }

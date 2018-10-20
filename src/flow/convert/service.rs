@@ -7,9 +7,9 @@ use system::*;
 
 pub trait ConvertServiceTrait {
     fn callback(&self, delayed: DelayedInstances) -> Result<()>;
-    fn convert(&self, task: &ConverterInfo, carrier: &RawDelivery);
+    fn convert(&self, task: &ConverterInfo, carrier: &RawTask);
     fn new(&self, instance: &Instance, mapping: &Mission) -> Result<ConverterInfo>;
-    fn generate_converter_info(&self, task: &StoreTaskInfo) -> Result<Vec<(ConverterInfo, RawDelivery)>>;
+    fn generate_converter_info(&self, task: &StoreTaskInfo) -> Result<Vec<(ConverterInfo, RawTask)>>;
 }
 
 pub struct ConvertServiceImpl {
@@ -44,9 +44,9 @@ impl ConvertServiceTrait for ConvertServiceImpl {
         }
     }
 
-    fn convert(&self, task: &ConverterInfo, carrier: &RawDelivery) {
+    fn convert(&self, task: &ConverterInfo, carrier: &RawTask) {
         debug!("------------------do_convert_task------------------------");
-        let parameter = Self::gen_out_parameter(task, carrier.id.clone());
+        let parameter = Self::gen_out_parameter(task, carrier.task_id.clone());
         match self.caller.convert(&task.target, &parameter) {
             Ok(ConverterReturned::Instances(mut instances)) => {
                 debug!("converted {} instances for `Thing`: {:?}", instances.len(), &task.target.to);
@@ -61,7 +61,7 @@ impl ConvertServiceTrait for ConvertServiceImpl {
                 }
             }
             Ok(ConverterReturned::Delay(delay)) => {
-                let _ = self.dao_delivery.update_execute_time(&carrier.id, delay as i64);
+                let _ = self.dao_delivery.update_execute_time(&carrier.task_id, delay as i64);
             }
             Ok(ConverterReturned::LogicalError(ss)) => {
                 let _ = self.dao_delivery.raw_to_error(&NatureError::ConverterLogicalError(ss), &carrier);
@@ -107,14 +107,14 @@ impl ConvertServiceTrait for ConvertServiceImpl {
         Ok(rtn)
     }
 
-    fn generate_converter_info(&self, task: &StoreTaskInfo) -> Result<Vec<(ConverterInfo, RawDelivery)>> {
-        let mut new_carriers: Vec<(ConverterInfo, RawDelivery)> = Vec::new();
+    fn generate_converter_info(&self, task: &StoreTaskInfo) -> Result<Vec<(ConverterInfo, RawTask)>> {
+        let mut new_carriers: Vec<(ConverterInfo, RawTask)> = Vec::new();
         let missions = task.mission.clone().unwrap();
         for c in missions {
             match self.new(&task.instance, &c) {
                 Err(err) => return Err(err),
                 Ok(x) => {
-                    let car = RawDelivery::new(&x, &c.to.key, DataType::Convert as i16)?;
+                    let car = RawTask::new(&x, &c.to.key, DataType::Convert as i16)?;
                     new_carriers.push((x, car));
                 }
             }
@@ -124,7 +124,7 @@ impl ConvertServiceTrait for ConvertServiceImpl {
 }
 
 impl ConvertServiceImpl {
-    fn handle_instances(&self, task: &ConverterInfo, carrier: &RawDelivery, instances: &mut Vec<Instance>) -> Result<()> {
+    fn handle_instances(&self, task: &ConverterInfo, carrier: &RawTask, instances: &mut Vec<Instance>) -> Result<()> {
         // check status version to avoid loop
         let _ = instances.iter_mut().map(|one: &mut Instance| {
             one.data.thing = task.target.to.clone();
