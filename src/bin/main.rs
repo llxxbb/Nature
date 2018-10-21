@@ -5,7 +5,7 @@ use nature::system::*;
 
 fn main() {
     sys_init();
-    let _ = start_rocket_server().launch();
+    let _ = rocket_server().launch();
 }
 
 

@@ -2,13 +2,13 @@ extern crate nature;
 extern crate nature_db;
 extern crate rocket;
 
-use nature::rpc::start_rocket_server;
+use nature::rpc::rocket_server;
 use rocket::local::Client;
 use self::nature_db::*;
 
 #[allow(dead_code)]
 pub fn get_test_client() -> Client {
-    let rocket = start_rocket_server();
+    let rocket = rocket_server();
     Client::new(rocket).expect("valid rocket instance")
 }
 

@@ -78,6 +78,7 @@ impl ControllerImpl {
     }
 
     pub fn redo_task(raw: RawTask) -> Result<()> {
+        // TODO check busy first
         match TaskType::try_from(raw.data_type)? {
             TaskType::Store => Self::send_to_channel::<StoreTaskInfo>(&raw, &CHANNEL_STORED)?,
             TaskType::Convert => Self::send_to_channel::<ConverterInfo>(&raw, &CHANNEL_CONVERT)?,

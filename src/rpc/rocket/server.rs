@@ -6,7 +6,7 @@ use nature_common::*;
 use nature_db::*;
 use self::rocket_contrib::Json;
 
-pub fn start_rocket_server() -> Rocket {
+pub fn rocket_server() -> Rocket {
     ignite()
         .mount("/", routes![input])
         .mount("/", routes![batch_for_serial])
