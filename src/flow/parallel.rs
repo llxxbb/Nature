@@ -8,8 +8,8 @@ pub trait ParallelServiceTrait {
 }
 
 pub struct ParallelServiceImpl {
-    pub delivery_svc: Rc<DeliveryServiceTrait>,
-    pub delivery_dao: Rc<DeliveryDaoTrait>,
+    pub delivery_svc: Rc<TaskServiceTrait>,
+    pub delivery_dao: Rc<TaskDaoTrait>,
     pub store: Rc<StoreServiceTrait>,
 }
 

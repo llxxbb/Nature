@@ -1,11 +1,14 @@
-use chrono::prelude::*;
-use flow::store::StoreServiceTrait;
-use serde_json;
 use std::collections::HashMap;
 use std::collections::HashSet;
 use std::rc::Rc;
-use super::*;
+
+use chrono::prelude::*;
+use serde_json;
+
+use flow::store::StoreServiceTrait;
 use system::*;
+
+use super::*;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct SerialFinished {
@@ -19,8 +22,8 @@ pub trait SequentialTrait {
 }
 
 pub struct SequentialServiceImpl {
-    pub svc_delivery: Rc<DeliveryServiceTrait>,
-    pub dao_delivery: Rc<DeliveryDaoTrait>,
+    pub svc_delivery: Rc<TaskServiceTrait>,
+    pub dao_delivery: Rc<TaskDaoTrait>,
     pub store: Rc<StoreServiceTrait>,
     pub svc_instance: Rc<InstanceServiceTrait>,
     pub dao_instance: Rc<InstanceDaoTrait>,

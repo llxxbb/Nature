@@ -1,4 +1,5 @@
 use std::rc::Rc;
+
 use super::*;
 
 #[derive(Debug, Serialize, Deserialize, Clone, Default)]
@@ -18,8 +19,8 @@ pub trait StoreServiceTrait {
 pub struct StoreServiceImpl {
     pub instance_dao: Rc<InstanceDaoTrait>,
     pub route: Rc<RouteServiceTrait>,
-    pub delivery_svc: Rc<DeliveryServiceTrait>,
-    pub delivery_dao: Rc<DeliveryDaoTrait>,
+    pub delivery_svc: Rc<TaskServiceTrait>,
+    pub delivery_dao: Rc<TaskDaoTrait>,
     pub svc_instance: Rc<InstanceServiceTrait>,
 }
 

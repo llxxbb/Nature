@@ -1,17 +1,18 @@
 use std::rc::Rc;
+
 use super::*;
 
-pub trait DeliveryServiceTrait {
+pub trait TaskServiceTrait {
     fn create_and_finish_carrier(&self, old: &RawTask, new: &mut RawTask) -> Result<usize>;
 
     fn create_batch_and_finish_carrier(&self, news: &Vec<RawTask>, old_id: &Vec<u8>) -> Result<()>;
 }
 
-pub struct DeliveryServiceImpl {
-    pub table_delivery: Rc<DeliveryDaoTrait>,
+pub struct TaskServiceImpl {
+    pub table_delivery: Rc<TaskDaoTrait>,
 }
 
-impl DeliveryServiceTrait for DeliveryServiceImpl {
+impl TaskServiceTrait for TaskServiceImpl {
     /// by performance reason, for one-to-one carry we can reuse the beginning carry to finish all flows.
     /// That way we need not to communicate with DB for create new and delete old carrier.
     /// But for failure we must redo from beginning. but I think it has small chance.

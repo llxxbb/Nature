@@ -14,8 +14,8 @@ lazy_static! {
 
 pub struct ControllerImpl {
     pub store_svc: Rc<StoreServiceTrait>,
-    pub delivery_svc: Rc<DeliveryServiceTrait>,
-    pub delivery_dao: Rc<DeliveryDaoTrait>,
+    pub delivery_svc: Rc<TaskServiceTrait>,
+    pub delivery_dao: Rc<TaskDaoTrait>,
     pub batch_serial_svc: Rc<SequentialTrait>,
     pub batch_parallel_svc: Rc<ParallelServiceTrait>,
     pub converter_svc: Rc<ConvertServiceTrait>,
@@ -27,8 +27,8 @@ impl ControllerImpl {
         let cache_define = SVC_DB.thing_define.clone();
         let dao_instance = Rc::new(InstanceDaoImpl {});
         let svc_instance = Rc::new(InstanceServiceImpl { define_cache: cache_define.clone() });
-        let dao_delivery = Rc::new(DeliveryDaoImpl {});
-        let svc_delivery = Rc::new(DeliveryServiceImpl { table_delivery: dao_delivery.clone() });
+        let dao_delivery = Rc::new(TaskDaoImpl {});
+        let svc_delivery = Rc::new(TaskServiceImpl { table_delivery: dao_delivery.clone() });
         let svc_store = Rc::new(StoreServiceImpl {
             instance_dao: dao_instance.clone(),
             route: Rc::new(RouteServiceImpl {

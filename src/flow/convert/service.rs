@@ -13,8 +13,8 @@ pub trait ConvertServiceTrait {
 }
 
 pub struct ConvertServiceImpl {
-    pub svc_delivery: Rc<DeliveryServiceTrait>,
-    pub dao_delivery: Rc<DeliveryDaoTrait>,
+    pub svc_delivery: Rc<TaskServiceTrait>,
+    pub dao_delivery: Rc<TaskDaoTrait>,
     pub caller: Rc<CallOutTrait>,
     pub svc_define: Rc<ThingDefineCacheTrait>,
     pub dao_instance: Rc<InstanceDaoTrait>,
