@@ -9,13 +9,15 @@ extern crate rocket;
 extern crate rocket_contrib;
 extern crate serde_json;
 
+use std::thread;
+use std::time;
+
 use common::*;
 use nature::system::*;
 use nature_common::Instance;
 use nature_db::*;
+
 use self::nature::flow::*;
-use std::thread;
-use std::time;
 
 mod common;
 
@@ -41,7 +43,7 @@ fn local_converter() {
         println!("deleted : {} row", x);
     }
     println!("------------------ submit new instance -----------------");
-    let _rtn = ControllerImpl::input(instance);
+    let _rtn = IncomeController::input(instance);
     thread::sleep(time::Duration::from_millis(1000));
     println!("------------------ verify -----------------");
     // get instance which is saved to db

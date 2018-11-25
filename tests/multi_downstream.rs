@@ -46,7 +46,7 @@ fn local_converter() {
         println!("deleted : {} row", x);
     }
     println!("------------------ submit new instance -----------------");
-    let rtn = ControllerImpl::input(instance);
+    let rtn = IncomeController::input(instance);
     println!("saved instance id : {}", rtn.clone().unwrap());
     thread::sleep(time::Duration::from_millis(500));
     println!("------------------ verify -----------------");

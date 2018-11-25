@@ -19,13 +19,13 @@ lazy_static! {
 pub fn start_receive_threads() -> Vec<JoinHandle<()>> {
     let mut threads: Vec<JoinHandle<()>> = Vec::new();
     info!("to start receive threads");
-    threads.push(start_thread(&CHANNEL_STORE.receiver, ControllerImpl::channel_store));
-    threads.push(start_thread(&CHANNEL_STORED.receiver, ControllerImpl::channel_stored));
-    threads.push(start_thread(&CHANNEL_CONVERT.receiver, ControllerImpl::channel_convert));
-    threads.push(start_thread(&CHANNEL_CONVERTED.receiver, ControllerImpl::channel_converted));
+    threads.push(start_thread(&CHANNEL_STORE.receiver, InnerController::channel_store));
+    threads.push(start_thread(&CHANNEL_STORED.receiver, InnerController::channel_stored));
+    threads.push(start_thread(&CHANNEL_CONVERT.receiver, InnerController::channel_convert));
+    threads.push(start_thread(&CHANNEL_CONVERTED.receiver, InnerController::channel_converted));
     // used to improve caller response time
-    threads.push(start_thread(&CHANNEL_SERIAL.receiver, ControllerImpl::channel_serial));
-    threads.push(start_thread(&CHANNEL_PARALLEL.receiver, ControllerImpl::channel_parallel));
+    threads.push(start_thread(&CHANNEL_SERIAL.receiver, InnerController::channel_serial));
+    threads.push(start_thread(&CHANNEL_PARALLEL.receiver, InnerController::channel_parallel));
     threads
 }
 
