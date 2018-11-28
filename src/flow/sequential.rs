@@ -22,8 +22,8 @@ pub trait SequentialTrait {
 }
 
 pub struct SequentialServiceImpl {
-    pub svc_delivery: Rc<TaskServiceTrait>,
-    pub dao_delivery: Rc<TaskDaoTrait>,
+    pub svc_task: Rc<TaskServiceTrait>,
+    pub dao_task: Rc<TaskDaoTrait>,
     pub store: Rc<StoreServiceTrait>,
     pub svc_instance: Rc<InstanceServiceTrait>,
     pub dao_instance: Rc<InstanceDaoTrait>,
@@ -32,7 +32,7 @@ pub struct SequentialServiceImpl {
 impl SequentialTrait for SequentialServiceImpl {
     fn one_by_one(&self, batch: &SerialBatchInstance) -> Result<()> {
         let raw = RawTask::new(batch, &batch.thing.key, TaskType::QueueBatch as i16)?;
-        match self.dao_delivery.insert(&raw) {
+        match self.dao_task.insert(&raw) {
             Ok(_carrier) => {
                 // to process asynchronous
                 let _ = CHANNEL_SERIAL.sender.lock().unwrap().send((batch.to_owned(), raw));
@@ -51,18 +51,18 @@ impl SequentialTrait for SequentialServiceImpl {
                         match RawTask::new(&si, &instance.thing.key, TaskType::QueueBatch as i16) {
                             Ok(new) => {
                                 let mut new = new;
-                                if let Ok(_route) = self.svc_delivery.create_and_finish_carrier(carrier, &mut new) {
+                                if let Ok(_route) = self.svc_task.create_and_finish_carrier(carrier, &mut new) {
                                     let _ = CHANNEL_STORED.sender.lock().unwrap().send((si, new));
                                 }
                             }
                             Err(err) => {
-                                let _ = self.dao_delivery.raw_to_error(&err, &carrier);
+                                let _ = self.dao_task.raw_to_error(&err, &carrier);
                             }
                         }
                     }
                 }
                 Err(err) => {
-                    let _ = self.dao_delivery.raw_to_error(&err, &carrier);
+                    let _ = self.dao_task.raw_to_error(&err, &carrier);
                 }
             };
         }

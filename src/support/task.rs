@@ -9,7 +9,7 @@ pub trait TaskServiceTrait {
 }
 
 pub struct TaskServiceImpl {
-    pub table_delivery: Rc<TaskDaoTrait>,
+    pub table_task: Rc<TaskDaoTrait>,
 }
 
 impl TaskServiceTrait for TaskServiceImpl {
@@ -25,9 +25,9 @@ impl TaskServiceTrait for TaskServiceImpl {
 
     fn create_batch_and_finish_carrier(&self, news: &Vec<RawTask>, old_id: &Vec<u8>) -> Result<()> {
         for v in news {
-            self.table_delivery.insert(v)?;
+            self.table_task.insert(v)?;
         }
-        self.table_delivery.delete(old_id)?;
+        self.table_task.delete(old_id)?;
         Ok(())
     }
 }

@@ -19,8 +19,8 @@ pub trait StoreServiceTrait {
 pub struct StoreServiceImpl {
     pub instance_dao: Rc<InstanceDaoTrait>,
     pub route: Rc<RouteServiceTrait>,
-    pub delivery_svc: Rc<TaskServiceTrait>,
-    pub delivery_dao: Rc<TaskDaoTrait>,
+    pub task_svc: Rc<TaskServiceTrait>,
+    pub task_dao: Rc<TaskDaoTrait>,
     pub svc_instance: Rc<InstanceServiceTrait>,
 }
 
@@ -40,7 +40,7 @@ impl StoreServiceTrait for StoreServiceImpl {
     fn generate_store_task(&self, instance: &Instance) -> Result<StoreTaskInfo> {
 //        let key = &instance.thing.key;
         let target = self.route.get_route(instance)?;
-        // save to delivery to make it can redo
+        // save to task to make it can redo
         let task = StoreTaskInfo {
             instance: instance.clone(),
             upstream: None,
@@ -51,7 +51,7 @@ impl StoreServiceTrait for StoreServiceImpl {
     fn do_task(&self, task: &StoreTaskInfo, carrier: &RawTask) -> Result<()> {
         debug!("------------------do_store_task------------------------");
         if let Err(err) = self.save(&task.instance) {
-            let _ = self.delivery_dao.raw_to_error(&err, carrier);
+            let _ = self.task_dao.raw_to_error(&err, carrier);
             Err(err)
         } else {
             let _ = CHANNEL_STORED.sender.lock().unwrap().send((task.to_owned(), carrier.to_owned()));

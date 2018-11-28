@@ -50,7 +50,6 @@ fn local_converter() {
     println!("saved instance id : {}", rtn.clone().unwrap());
     thread::sleep(time::Duration::from_millis(500));
     println!("------------------ verify -----------------");
-    // TODO
     // get instance which is saved to db
     let i_d = InstanceDaoImpl {};
     let _ins_db = i_d.get_by_id(rtn.unwrap()).unwrap().unwrap();

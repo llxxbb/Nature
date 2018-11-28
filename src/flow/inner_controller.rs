@@ -16,7 +16,7 @@ impl InnerController {
     }
     pub fn channel_stored(store: (StoreTaskInfo, RawTask)) {
         if store.0.mission.is_none() {
-            let _ = SVC_NATURE.delivery_dao.delete(&&store.1.task_id);
+            let _ = SVC_NATURE.task_dao.delete(&&store.1.task_id);
             return;
         }
         let converters = match SVC_NATURE.converter_svc.generate_converter_info(&store.0) {
@@ -24,14 +24,14 @@ impl InnerController {
             Err(err) => match err {
                 NatureError::DaoEnvironmentError(_) => return,
                 _ => {
-                    let _ = SVC_NATURE.delivery_dao.raw_to_error(&err, &store.1);
+                    let _ = SVC_NATURE.task_dao.raw_to_error(&err, &store.1);
                     return;
                 }
             }
         };
         let biz = &store.0.instance.thing.key;
         let raws: Vec<RawTask> = converters.iter().map(|x| x.1.clone()).collect();
-        if let Ok(_) = SVC_NATURE.delivery_svc.create_batch_and_finish_carrier(&raws, &store.1.task_id) {
+        if let Ok(_) = SVC_NATURE.task_svc.create_batch_and_finish_carrier(&raws, &store.1.task_id) {
             debug!("will dispatch {} convert tasks for `Thing` : {:?}", converters.len(), biz);
             for task in converters {
                 let _ = CHANNEL_CONVERT.sender.lock().unwrap().send(task);
@@ -60,7 +60,7 @@ impl InnerController {
                         }
                         Err(e) => {
                             error!("{}", e);
-                            let _ = SVC_NATURE.delivery_dao.raw_to_error(&e, carrier);
+                            let _ = SVC_NATURE.task_dao.raw_to_error(&e, carrier);
                             return;
                         }
                     }
@@ -72,7 +72,7 @@ impl InnerController {
                 }
             }
         }
-        if let Ok(_) = SVC_NATURE.delivery_svc.create_batch_and_finish_carrier(&store_infos, &carrier.task_id) {
+        if let Ok(_) = SVC_NATURE.task_svc.create_batch_and_finish_carrier(&store_infos, &carrier.task_id) {
             for task in t_d {
                 let _ = CHANNEL_STORE.sender.lock().unwrap().send(task);
             }

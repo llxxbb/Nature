@@ -13,8 +13,8 @@ pub trait ConvertServiceTrait {
 }
 
 pub struct ConvertServiceImpl {
-    pub svc_delivery: Rc<TaskServiceTrait>,
-    pub dao_delivery: Rc<TaskDaoTrait>,
+    pub svc_task: Rc<TaskServiceTrait>,
+    pub dao_task: Rc<TaskDaoTrait>,
     pub caller: Rc<CallOutTrait>,
     pub svc_define: Rc<ThingDefineCacheTrait>,
     pub dao_instance: Rc<InstanceDaoTrait>,
@@ -23,14 +23,14 @@ pub struct ConvertServiceImpl {
 
 impl ConvertServiceTrait for ConvertServiceImpl {
     fn callback(&self, delayed: DelayedInstances) -> Result<()> {
-        match self.dao_delivery.get(&delayed.carrier_id) {
+        match self.dao_task.get(&delayed.carrier_id) {
             Ok(raw) => {
                 match raw {
-                    None => Err(NatureError::VerifyError("Delivery data missed, maybe it had done already.".to_string())),
+                    None => Err(NatureError::VerifyError("task data missed, maybe it had done already.".to_string())),
                     Some(carrier) => match delayed.result {
                         CallbackResult::Err(err) => {
                             let err = NatureError::ConverterLogicalError(err);
-                            let _ = self.dao_delivery.raw_to_error(&err, &carrier);
+                            let _ = self.dao_task.raw_to_error(&err, &carrier);
                             Err(err)
                         }
                         CallbackResult::Instances(mut ins) => {
@@ -55,16 +55,16 @@ impl ConvertServiceTrait for ConvertServiceImpl {
                     Err(err) => match err {
                         NatureError::DaoEnvironmentError(_) => (),
                         _ => {
-                            let _ = self.dao_delivery.raw_to_error(&err, &carrier);
+                            let _ = self.dao_task.raw_to_error(&err, &carrier);
                         }
                     }
                 }
             }
             Ok(ConverterReturned::Delay(delay)) => {
-                let _ = self.dao_delivery.update_execute_time(&carrier.task_id, delay as i64);
+                let _ = self.dao_task.update_execute_time(&carrier.task_id, delay as i64);
             }
             Ok(ConverterReturned::LogicalError(ss)) => {
-                let _ = self.dao_delivery.raw_to_error(&NatureError::ConverterLogicalError(ss), &carrier);
+                let _ = self.dao_task.raw_to_error(&NatureError::ConverterLogicalError(ss), &carrier);
             }
             Ok(ConverterReturned::EnvError) => (),
             Ok(ConverterReturned::None) => (),
@@ -73,7 +73,7 @@ impl ConvertServiceTrait for ConvertServiceImpl {
                 NatureError::ConverterEnvironmentError(_) => (),
                 // other error will drop into error
                 _ => {
-                    let _ = self.dao_delivery.raw_to_error(&err, &carrier);
+                    let _ = self.dao_task.raw_to_error(&err, &carrier);
                 }
             }
         };

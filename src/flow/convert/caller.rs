@@ -1,7 +1,8 @@
+use std::rc::Rc;
+
 use flow::convert::local::LocalExecutorTrait;
 use nature_common::*;
 use nature_db::*;
-use std::rc::Rc;
 
 pub trait CallOutTrait {
     fn convert(&self, mission: &Mission, para: &CallOutParameter) -> Result<ConverterReturned>;
@@ -18,8 +19,7 @@ impl CallOutTrait for CallOutImpl {
                 Ok(self.local_rust.execute(&mission.executor.url, para))
             }
             _ => {
-                // TODO
-                unimplemented!()
+                Err(NatureError::ConverterProtocalError(format!("Did not implement for protocal : {:?}", mission.executor.protocol)))
             }
         }
     }

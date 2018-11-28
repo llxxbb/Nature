@@ -17,14 +17,14 @@
     * convert
     * serial
     * parallel
-    * delivery
+    * task
   * new converter info 
   * new call-out-parameter
 * snowflake for 128 bit implement.
 * StorTaskInfo
-    need include next delivery id to use
+    need include next task id to use
 * delay execute
-* optimise : dispatch need not to save to delivery
+* optimise : dispatch need not to save to task
 * Thing's key support parametrization
 * diesel 1.3 have compile problem with last nightly rust. 2018年5月26日
 https://github.com/rust-lang/rust/issues/50825

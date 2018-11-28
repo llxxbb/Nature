@@ -1,9 +1,11 @@
 extern crate libloading as lib;
 
-use lru_time_cache::LruCache;
-use nature_common::*;
 use std::sync::Mutex;
 use std::time::Duration;
+
+use lru_time_cache::LruCache;
+
+use nature_common::*;
 
 type CALLER<'a> = lib::Symbol<'a, fn(&CallOutParameter) -> ConverterReturned>;
 type LIB = lib::Library;
@@ -54,7 +56,7 @@ impl LocalExecutorImpl {
             match Self::entry_from_str(path) {
                 Ok(e) => Some(e),
                 Err(_) => {
-                    // TODO send a error message out
+                    error!("can't load library for path : {}", path);
                     None
                 }
             }
