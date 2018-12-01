@@ -1,25 +1,14 @@
+extern crate dotenv;
 extern crate nature;
 extern crate nature_common;
 extern crate rocket;
 extern crate serde_json;
-extern crate dotenv;
 
 use nature::flow::*;
 use nature_common::*;
 
 mod common;
 
-#[test]
-fn instance_key_is_null() {
-    let rtn = IncomeController::input(Instance::default());
-    match rtn.err().unwrap() {
-        NatureError::VerifyError(ss) => assert_eq!(ss, "key length can\'t be zero"),
-        err => {
-            println!("{:?}", err);
-            panic!("un match")
-        }
-    }
-}
 
 #[test]
 fn instance_key_undefined() {

@@ -25,6 +25,7 @@ mod common;
 #[test]
 fn local_converter() {
     let _ = sys_init();
+    std::env::set_var("DATABASE_URL", "nature.sqlite");
     println!("------------------ insert thing define -----------------");
     let from = "/local_converter/from";
     let to = "/local_converter/to";
