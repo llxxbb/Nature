@@ -8,7 +8,7 @@ use lru_time_cache::LruCache;
 use nature_common::*;
 
 type CALLER<'a> = lib::Symbol<'a, fn(&CallOutParameter) -> ConverterReturned>;
-type LIB = lib::Library;
+type LIB = Option<lib::Library>;
 
 lazy_static! {
     static ref CACHE_LIB: Mutex<LruCache<String,LIB>> = Mutex::new(LruCache::<String, LIB>::with_expiry_duration(Duration::from_secs(3600)));
@@ -31,13 +31,26 @@ impl LocalExecutorTrait for LocalExecutorImpl {
                 let mut lib_cache = CACHE_LIB.lock().unwrap();
                 let path = entry.path.clone();
 //                debug!("load library for :[{}]", path);
-                let cfg_lib = lib_cache.entry(entry.path).or_insert_with(move || lib::Library::new(path).unwrap());
+                let cfg_lib = lib_cache.entry(entry.path).or_insert_with(move || {
+                    match lib::Library::new(path.clone()) {
+                        Err(e) => {
+                            error!("  load local lib error for path {}, error : {}", path, e);
+                            None
+                        }
+                        Ok(localLib) => Some(localLib)
+                    }
+                });
                 // get entry to call
-//                debug!("call entry for :[{}]", entry.entry);
-                let fun: CALLER = unsafe {
-                    cfg_lib.get(entry.entry.as_bytes()).unwrap()
-                };
-                fun(para)
+                debug!("call entry for :[{}]", entry.entry);
+                match cfg_lib {
+                    None => ConverterReturned::None,
+                    Some(local_lib) => {
+                        let fun: CALLER = unsafe {
+                            local_lib.get(entry.entry.as_bytes()).unwrap()
+                        };
+                        fun(para)
+                    }
+                }
             }
         }
     }

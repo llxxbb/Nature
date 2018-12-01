@@ -16,6 +16,7 @@ impl CallOutTrait for CallOutImpl {
     fn convert(&self, mission: &Mission, para: &CallOutParameter) -> Result<ConverterReturned> {
         match mission.executor.protocol {
             Protocol::LocalRust => {
+                debug!("  call local converter");
                 Ok(self.local_rust.execute(&mission.executor.url, para))
             }
             _ => {

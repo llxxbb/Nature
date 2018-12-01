@@ -25,13 +25,14 @@ mod common;
 #[test]
 fn local_converter() {
     let _ = sys_init();
-    std::env::set_var("DATABASE_URL", "nature.sqlite");
+//    std::env::set_var("DATABASE_URL", "nature.sqlite");
     println!("------------------ insert thing define -----------------");
     let from = "/local_converter/from";
     let to = "/local_converter/to";
     new_thing_define(from);
     new_thing_define(to);
     let url = r#"../../../Nature-integrate-test-converter/target/debug/nature_integrate_test_converter.dll:rtn_one"#;
+    one_step_flow_delete(from, to);
     new_one_step_flow(from, to, &url, "LocalRust");
     println!("------------------ prepare instance to submit -----------------");
     // prepare input para

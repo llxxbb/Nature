@@ -2,8 +2,10 @@ extern crate nature;
 extern crate nature_db;
 extern crate rocket;
 
-use nature::rpc::rocket_server;
 use rocket::local::Client;
+
+use nature::rpc::rocket_server;
+
 use self::nature_db::*;
 
 #[allow(dead_code)]
@@ -33,4 +35,19 @@ pub fn new_one_step_flow(from: &str, to: &str, url: &str, protocol: &str) {
         weight: None,
     };
     let _ = OneStepFlowDaoImpl::insert(row);
+}
+
+pub fn one_step_flow_delete(from: &str, to: &str) {
+    let row = RawOneStepFlow {
+        from_thing: from.to_string(),
+        from_version: 0,
+        to_thing: to.to_string(),
+        to_version: 0,
+        exe_protocol: String::new(),
+        exe_url: String::new(),
+        selector: None,
+        group: None,
+        weight: None,
+    };
+    let _ = OneStepFlowDaoImpl::delete(row);
 }
