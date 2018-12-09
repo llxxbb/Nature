@@ -12,6 +12,10 @@ restup default nightly-yyyy-mm-dd
 
 ## Environment setting.
 
+## clippy
+
+rustup component add clippy-preview
+
 ## project edit under windows
 
 A [reference](https://cmsd2.silvrback.com/rust-msvc) to use windows native dll for rust 

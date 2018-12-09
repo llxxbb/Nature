@@ -1,7 +1,9 @@
+use std::rc::Rc;
+
 use flow::sequential::SequentialServiceImpl;
 use nature_db::*;
 use nature_db::service::*;
-use std::rc::Rc;
+
 use super::*;
 
 lazy_static! {
@@ -62,6 +64,12 @@ impl ControllerImpl {
             plan_svc: Rc::new(PlanServiceImpl { dao: Rc::new(StorePlanDaoImpl {}) }),
             task_dao: dao_task.clone(),
         }
+    }
+}
+
+impl Default for ControllerImpl {
+    fn default() -> Self {
+        Self::new()
     }
 }
 

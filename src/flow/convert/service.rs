@@ -2,13 +2,15 @@ use std::collections::HashSet;
 use std::iter::Iterator;
 use std::rc::Rc;
 use std::str::FromStr;
-use super::*;
+
 use system::*;
+
+use super::*;
 
 pub trait ConvertServiceTrait {
     fn callback(&self, delayed: DelayedInstances) -> Result<()>;
     fn convert(&self, task: &ConverterInfo, carrier: &RawTask);
-    fn new(&self, instance: &Instance, mapping: &Mission) -> Result<ConverterInfo>;
+    fn new_converter_info(&self, instance: &Instance, mapping: &Mission) -> Result<ConverterInfo>;
     fn generate_converter_info(&self, task: &StoreTaskInfo) -> Result<Vec<(ConverterInfo, RawTask)>>;
 }
 
@@ -61,7 +63,7 @@ impl ConvertServiceTrait for ConvertServiceImpl {
                 }
             }
             Ok(ConverterReturned::Delay(delay)) => {
-                let _ = self.dao_task.update_execute_time(&carrier.task_id, delay as i64);
+                let _ = self.dao_task.update_execute_time(&carrier.task_id, i64::from(delay));
             }
             Ok(ConverterReturned::LogicalError(ss)) => {
                 let _ = self.dao_task.raw_to_error(&NatureError::ConverterLogicalError(ss), &carrier);
@@ -79,21 +81,18 @@ impl ConvertServiceTrait for ConvertServiceImpl {
         };
     }
 
-    fn new(&self, instance: &Instance, mapping: &Mission) -> Result<ConverterInfo> {
+    fn new_converter_info(&self, instance: &Instance, mapping: &Mission) -> Result<ConverterInfo> {
         let define = self.svc_define.get(&mapping.to)?;
-        let last_target = match define.is_status() {
-            false => None,
-            true => {
-                match instance.context.get(&*CONTEXT_TARGET_INSTANCE_ID) {
-                    // context have target id
-                    Some(status_id) => {
-                        let status_id = u128::from_str(status_id)?;
-                        self.dao_instance.get_by_id(status_id)?
-                    }
-                    None => None,
+        let last_target = if define.is_status() {
+            match instance.context.get(&*CONTEXT_TARGET_INSTANCE_ID) {
+                // context have target id
+                Some(status_id) => {
+                    let status_id = u128::from_str(status_id)?;
+                    self.dao_instance.get_by_id(status_id)?
                 }
+                None => None,
             }
-        };
+        } else { None };
         if let Some(ref last) = last_target {
             if let Some(demand) = &mapping.last_status_demand {
                 Self::check_last(&last.status, demand)?;
@@ -111,7 +110,7 @@ impl ConvertServiceTrait for ConvertServiceImpl {
         let mut new_carriers: Vec<(ConverterInfo, RawTask)> = Vec::new();
         let missions = task.mission.clone().unwrap();
         for c in missions {
-            match self.new(&task.instance, &c) {
+            match self.new_converter_info(&task.instance, &c) {
                 Err(err) => return Err(err),
                 Ok(x) => {
                     let car = RawTask::new(&x, &c.to.key, TaskType::Convert as i16)?;
@@ -161,7 +160,7 @@ impl ConvertServiceImpl {
         }
     }
 
-    fn verify(&self, to: &Thing, instances: &Vec<Instance>) -> Result<Vec<Instance>> {
+    fn verify(&self, to: &Thing, instances: &[Instance]) -> Result<Vec<Instance>> {
         let mut rtn: Vec<Instance> = Vec::new();
 
         // only one status instance should return

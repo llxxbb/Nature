@@ -1,5 +1,7 @@
-use flow::store::StoreServiceTrait;
 use std::rc::Rc;
+
+use flow::store::StoreServiceTrait;
+
 use super::*;
 
 pub trait ParallelServiceTrait {
@@ -47,7 +49,7 @@ impl ParallelServiceTrait for ParallelServiceImpl {
                 _ => return
             }
         }
-        if let Ok(_) = self.task_svc.create_batch_and_finish_carrier(&tasks, &carrier.task_id) {
+        if self.task_svc.create_batch_and_finish_carrier(&tasks, &carrier.task_id).is_ok() {
             for c in tuple {
                 let _ = CHANNEL_STORE.sender.lock().unwrap().send(c);
             }

@@ -37,7 +37,7 @@ impl LocalExecutorTrait for LocalExecutorImpl {
                             error!("  load local lib error for path {}, error : {}", path, e);
                             None
                         }
-                        Ok(localLib) => Some(localLib)
+                        Ok(local_lib) => Some(local_lib)
                     }
                 });
                 // get entry to call
@@ -77,7 +77,7 @@ impl LocalExecutorImpl {
     }
 
     fn entry_from_str(path: &str) -> Result<LibraryEntry> {
-        let x: Vec<&str> = path.split(":").collect();
+        let x: Vec<&str> = path.split(':').collect();
         if x.len() != 2 {
             Err(NatureError::VerifyError(format!("illegal format : [{}]", path)))
         } else {

@@ -5,7 +5,7 @@ use super::*;
 pub trait TaskServiceTrait {
     fn create_and_finish_carrier(&self, old: &RawTask, new: &mut RawTask) -> Result<usize>;
 
-    fn create_batch_and_finish_carrier(&self, news: &Vec<RawTask>, old_id: &Vec<u8>) -> Result<()>;
+    fn create_batch_and_finish_carrier(&self, news: &[RawTask], old_id: &[u8]) -> Result<()>;
 }
 
 pub struct TaskServiceImpl {
@@ -23,7 +23,7 @@ impl TaskServiceTrait for TaskServiceImpl {
         Ok(1)
     }
 
-    fn create_batch_and_finish_carrier(&self, news: &Vec<RawTask>, old_id: &Vec<u8>) -> Result<()> {
+    fn create_batch_and_finish_carrier(&self, news: &[RawTask], old_id: &[u8]) -> Result<()> {
         for v in news {
             self.table_task.insert(v)?;
         }

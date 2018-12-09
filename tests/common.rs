@@ -36,7 +36,7 @@ pub fn new_one_step_flow(from: &str, to: &str, url: &str, protocol: &str) {
     };
     let _ = OneStepFlowDaoImpl::insert(row);
 }
-
+#[allow(dead_code)]
 pub fn one_step_flow_delete(from: &str, to: &str) {
     let row = RawOneStepFlow {
         from_thing: from.to_string(),

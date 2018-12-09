@@ -31,7 +31,7 @@ impl InnerController {
         };
         let biz = &store.0.instance.thing.key;
         let raws: Vec<RawTask> = converters.iter().map(|x| x.1.clone()).collect();
-        if let Ok(_) = SVC_NATURE.task_svc.create_batch_and_finish_carrier(&raws, &store.1.task_id) {
+        if SVC_NATURE.task_svc.create_batch_and_finish_carrier(&raws, &store.1.task_id).is_ok() {
             debug!("will dispatch {} convert tasks for `Thing` : {:?}", converters.len(), biz);
             for task in converters {
                 let _ = CHANNEL_CONVERT.sender.lock().unwrap().send(task);
@@ -43,7 +43,7 @@ impl InnerController {
         SVC_NATURE.converter_svc.convert(&task.0, &task.1);
     }
     pub fn channel_converted(task: (ConverterInfo, Converted)) {
-        if let Ok(plan) = SVC_NATURE.plan_svc.new(&task.0, &task.1.converted) {
+        if let Ok(plan) = SVC_NATURE.plan_svc.new_plan_info(&task.0, &task.1.converted) {
             Self::prepare_to_store(&task.1.done_task, plan);
         }
     }
@@ -72,7 +72,7 @@ impl InnerController {
                 }
             }
         }
-        if let Ok(_) = SVC_NATURE.task_svc.create_batch_and_finish_carrier(&store_infos, &carrier.task_id) {
+        if SVC_NATURE.task_svc.create_batch_and_finish_carrier(&store_infos, &carrier.task_id).is_ok() {
             for task in t_d {
                 let _ = CHANNEL_STORE.sender.lock().unwrap().send(task);
             }

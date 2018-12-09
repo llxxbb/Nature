@@ -4,7 +4,8 @@ use super::*;
 
 
 pub trait PlanServiceTrait {
-    fn new(&self, converter_info: &ConverterInfo, instances: &Vec<Instance>) -> Result<PlanInfo>;
+    #[allow(clippy::ptr_arg)]
+    fn new_plan_info(&self, converter_info: &ConverterInfo, instances: &Vec<Instance>) -> Result<PlanInfo>;
 }
 
 pub struct PlanServiceImpl {
@@ -12,7 +13,8 @@ pub struct PlanServiceImpl {
 }
 
 impl PlanServiceTrait for PlanServiceImpl {
-    fn new(&self, converter_info: &ConverterInfo, instances: &Vec<Instance>) -> Result<PlanInfo> {
+    #[allow(clippy::ptr_arg)]
+    fn new_plan_info(&self, converter_info: &ConverterInfo, instances: &Vec<Instance>) -> Result<PlanInfo> {
         let plan = PlanInfo {
             from_sn: converter_info.from.id,
             from_thing: converter_info.from.thing.clone(),

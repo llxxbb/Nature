@@ -16,7 +16,7 @@ impl RouteServiceTrait for RouteServiceImpl {
     fn get_route(&self, instance: &Instance) -> Result<Option<Vec<Mission>>> {
         if let Ok(Some(relations)) = self.one_step_flow_cache.get(&instance.thing) {
             // no relations
-            if relations.len() == 0 {
+            if relations.is_empty() {
                 return Ok(None);
             }
             let rtn = Self::filter_relations(instance, relations);
@@ -32,7 +32,7 @@ impl RouteServiceImpl {
 //        debug!("filter relations for instance: {:?}", instance);
         let mut rtn: Vec<Mission> = Vec::new();
         for m in maps {
-            if !m.selector.is_none() {
+            if m.selector.is_some() {
                 let selector = &m.selector.clone().unwrap();
                 if !Self::context_check(&instance.data.context, selector) {
                     continue;
@@ -62,9 +62,9 @@ impl RouteServiceImpl {
         }
         match rtn.len() {
             x  if x > 0 => {
-                return Some(rtn);
+                Some(rtn)
             }
-            _ => return None
+            _ => None
         }
     }
 
