@@ -1,10 +1,11 @@
-use flow::*;
-use nature_common::*;
-use nature_db::*;
 use std::sync::mpsc::*;
 use std::sync::Mutex;
 use std::thread;
 use std::thread::JoinHandle;
+
+use flow::*;
+use nature_common::*;
+use nature_db::*;
 
 /// `CHANNEL_PARALLEL` & `CHANNEL_SERIAL` are used to short caller response time
 lazy_static! {
@@ -58,5 +59,11 @@ impl<T> Channel<T> {
             sender: Mutex::new(sx),
             receiver: Mutex::new(rx),
         }
+    }
+}
+
+impl<T> Default for Channel<T> {
+    fn default() -> Self {
+        Self::new()
     }
 }

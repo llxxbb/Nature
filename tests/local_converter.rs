@@ -1,5 +1,4 @@
 #![feature(plugin)]
-#![plugin(rocket_codegen)]
 extern crate chrono;
 extern crate log;
 extern crate nature;
@@ -22,10 +21,10 @@ use self::nature::flow::*;
 mod common;
 
 
+/// build  `nature_integrate_test_converter` first
 #[test]
 fn local_converter() {
     let _ = sys_init();
-//    std::env::set_var("DATABASE_URL", "nature.sqlite");
     println!("------------------ insert thing define -----------------");
     let from = "/local_converter/from";
     let to = "/local_converter/to";

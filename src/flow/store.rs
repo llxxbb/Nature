@@ -38,7 +38,6 @@ impl StoreServiceTrait for StoreServiceImpl {
     /// generate `StoreTaskInfo` include route information.
     /// `Err` on environment error
     fn generate_store_task(&self, instance: &Instance) -> Result<StoreTaskInfo> {
-//        let key = &instance.thing.key;
         let target = self.route.get_route(instance)?;
         // save to task to make it can redo
         let task = StoreTaskInfo {

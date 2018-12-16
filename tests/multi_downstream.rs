@@ -1,5 +1,4 @@
 #![feature(plugin)]
-#![plugin(rocket_codegen)]
 extern crate chrono;
 extern crate log;
 extern crate nature;

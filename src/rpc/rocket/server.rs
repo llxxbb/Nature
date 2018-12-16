@@ -1,12 +1,11 @@
 extern crate rocket_contrib;
 
 use ::rocket::{ignite, Rocket};
-
 use flow::*;
 use nature_common::*;
 use nature_db::*;
 
-use self::rocket_contrib::Json;
+use self::rocket_contrib::json::Json;
 
 pub fn rocket_server() -> Rocket {
     ignite()

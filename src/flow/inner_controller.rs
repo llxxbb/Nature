@@ -15,7 +15,10 @@ impl InnerController {
         let _ = SVC_NATURE.store_svc.do_task(&store.0, &store.1);
     }
     pub fn channel_stored(store: (StoreTaskInfo, RawTask)) {
+        debug!("------------------channel_stored------------------------");
+        let biz = store.0.instance.thing.key.clone();
         if store.0.mission.is_none() {
+            debug!("no follow data for : {}", biz);
             let _ = SVC_NATURE.task_dao.delete(&&store.1.task_id);
             return;
         }
@@ -24,12 +27,12 @@ impl InnerController {
             Err(err) => match err {
                 NatureError::DaoEnvironmentError(_) => return,
                 _ => {
+                    debug!("get `one step info` error for : {}", biz);
                     let _ = SVC_NATURE.task_dao.raw_to_error(&err, &store.1);
                     return;
                 }
             }
         };
-        let biz = &store.0.instance.thing.key;
         let raws: Vec<RawTask> = converters.iter().map(|x| x.1.clone()).collect();
         if SVC_NATURE.task_svc.create_batch_and_finish_carrier(&raws, &store.1.task_id).is_ok() {
             debug!("will dispatch {} convert tasks for `Thing` : {:?}", converters.len(), biz);

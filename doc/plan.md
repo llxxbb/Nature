@@ -2,6 +2,7 @@
 
 ## for the nearer term
 
+* use `min-max-heap` to support priority converter
 * integrate test
     multi downstream
     callback

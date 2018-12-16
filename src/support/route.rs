@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 use std::collections::HashSet;
 use std::rc::Rc;
+
 use super::*;
 
 pub trait RouteServiceTrait {
@@ -14,27 +15,35 @@ pub struct RouteServiceImpl {
 
 impl RouteServiceTrait for RouteServiceImpl {
     fn get_route(&self, instance: &Instance) -> Result<Option<Vec<Mission>>> {
-        if let Ok(Some(relations)) = self.one_step_flow_cache.get(&instance.thing) {
-            // no relations
-            if relations.is_empty() {
-                return Ok(None);
+        debug!("------------------get_route------------------------");
+        let key = &instance.thing.key;
+        match self.one_step_flow_cache.get(&instance.thing) {
+            Ok(rtn) => {
+                match rtn {
+                    Some(relations) => {
+                        let rtn = Self::filter_relations(instance, relations);
+                        Ok(rtn)
+                    }
+                    None => Ok(None)
+                }
             }
-            let rtn = Self::filter_relations(instance, relations);
-            Ok(rtn)
-        } else {
-            Ok(None)
+            Err(e) => {
+                debug!("occur error when routing for biz:err {}:{}", key, e);
+                Err(e)
+            }
         }
     }
 }
 
 impl RouteServiceImpl {
     fn filter_relations(instance: &Instance, maps: Vec<OneStepFlow>) -> Option<Vec<Mission>> {
-//        debug!("filter relations for instance: {:?}", instance);
+        debug!("------------------filter_relations------------------------");
         let mut rtn: Vec<Mission> = Vec::new();
         for m in maps {
             if m.selector.is_some() {
                 let selector = &m.selector.clone().unwrap();
                 if !Self::context_check(&instance.data.context, selector) {
+                    //        debug!("filter relations for instance: {}", &instance.thing.key);
                     continue;
                 }
                 if !Self::status_check(&instance.data.status, selector) {
