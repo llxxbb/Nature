@@ -18,13 +18,14 @@
 
 Easy and union redo ability.except finst call from outer all following process will automatic retry when **Environment Error** occurs.
 Even so the first call from outer which wuould be UI usually, so no need retry logic at all.
-而DataHub可以长期存储。
+而DataHub可以长期存储。数据是可检索的。
 流转管理是集中的。
 
 ### MQ
 need to handle every call for retry from outer.
-消息是暂态的，
+消息是暂态的，你不能查询一个特定的数据。
 消息流转管理是分散的
+
 
 ## compare to RPC
 

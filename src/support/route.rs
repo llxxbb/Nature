@@ -65,7 +65,6 @@ impl RouteServiceImpl {
                         }
                     }
                 },
-                weight: m.weight,
             };
             rtn.push(t);
         }

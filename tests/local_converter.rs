@@ -31,8 +31,8 @@ fn local_converter() {
     new_thing_define(from);
     new_thing_define(to);
     let url = r#"../../../Nature-integrate-test-converter/target/debug/nature_integrate_test_converter.dll:rtn_one"#;
-    one_step_flow_delete(from, to);
-    new_one_step_flow(from, to, &url, "LocalRust");
+    let _ = OneStepFlowDaoImpl::delete_by_biz(from, to);
+    let _ = OneStepFlowDaoImpl::insert_by_biz(from, to, &url, "LocalRust");
     println!("------------------ prepare instance to submit -----------------");
     // prepare input para
     let mut instance = Instance::default();

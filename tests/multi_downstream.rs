@@ -9,14 +9,15 @@ extern crate rocket_contrib;
 extern crate serde_json;
 
 
-use common::*;
-use nature::system::*;
-use nature_common::Instance;
-use self::nature::flow::*;
-use self::nature_db::*;
 use std::thread;
 use std::time;
 
+use common::*;
+use nature::system::*;
+use nature_common::Instance;
+
+use self::nature::flow::*;
+use self::nature_db::*;
 
 mod common;
 
@@ -32,8 +33,8 @@ fn local_converter() {
     new_thing_define(to_a);
     new_thing_define(to_b);
     let url = format!("local://multi_downstream");
-    new_one_step_flow(from, to_a, &url, "LocalRust");
-    new_one_step_flow(from, to_b, &url, "LocalRust");
+    let _ = OneStepFlowDaoImpl::insert_by_biz(from, to_a, &url, "LocalRust");
+    let _ = OneStepFlowDaoImpl::insert_by_biz(from, to_b, &url, "LocalRust");
     println!("------------------ prepare instance to submit -----------------");
     // prepare input para
     let mut instance = Instance::default();
