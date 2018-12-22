@@ -11,9 +11,8 @@ extern crate serde_json;
 use std::thread;
 use std::time;
 
-use common::*;
 use nature::system::*;
-use nature_common::Instance;
+use nature_common::*;
 use nature_db::*;
 
 use self::nature::flow::*;
@@ -28,15 +27,15 @@ fn local_converter() {
     println!("------------------ insert thing define -----------------");
     let from = "/local_converter/from";
     let to = "/local_converter/to";
-    new_thing_define(from);
-    new_thing_define(to);
-    let url = r#"../../../Nature-integrate-test-converter/target/debug/nature_integrate_test_converter.dll:rtn_one"#;
+    let _ = ThingDefineDaoImpl::new_by_key(from);
+    let _ = ThingDefineDaoImpl::new_by_key(to);
+    let url = r#"../../../../Nature-integrate-test-converter/target/debug/nature_integrate_test_converter.dll:rtn_one"#;
     let _ = OneStepFlowDaoImpl::delete_by_biz(from, to);
     let _ = OneStepFlowDaoImpl::insert_by_biz(from, to, &url, "LocalRust");
     println!("------------------ prepare instance to submit -----------------");
     // prepare input para
     let mut instance = Instance::default();
-    instance.data.thing.key = from.to_string();
+    instance.data.thing = Thing::new(from).unwrap();
     println!("------------------ remove existed instance -----------------");
     // remove if instance exists
     let will_del = instance.clone();
@@ -48,7 +47,7 @@ fn local_converter() {
     thread::sleep(time::Duration::from_millis(1000));
     println!("------------------ verify -----------------");
     // get instance which is saved to db
-    let i_d = InstanceDaoImpl {};
-    let _ins_db = i_d.get_by_key("/local_converter/to", 217789594388339757346716979317903552035).unwrap().unwrap();
+    let dao = InstanceDaoImpl {};
+    let _ins_db = dao.get_by_key("/local_converter/to", 301835496844617301207606872998758860434).unwrap().unwrap();
 }
 

@@ -62,7 +62,7 @@ impl StoreServiceTrait for StoreServiceImpl {
 impl StoreServiceImpl {
     /// save to db and handle duplicated data
     fn save(&self, instance: &Instance) -> Result<usize> {
-        debug!("save instance for `Thing` {:?}", instance.thing.key);
+        debug!("save instance for `Thing` {:?}, id : {:?}", instance.thing.key, instance.id);
         let result = self.instance_dao.insert(instance);
         match result {
             Ok(num) => Ok(num),
