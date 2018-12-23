@@ -105,3 +105,43 @@ impl RouteServiceImpl {
     }
 }
 
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn input_cfg_is_empty() {
+        let instance = Instance::default();
+        let osf : Vec<OneStepFlow> = Vec::new();
+        let option = RouteServiceImpl::filter_relations(&instance, osf);
+        assert_eq!(option.is_none(), true)
+    }
+
+    #[test]
+    fn instance_context_is_need_but_not_set() {
+        let instance = Instance::default();
+        let osf = vec![OneStepFlow{
+            from: Thing::new("from")?,
+            to: Thing::new("to")?,
+            selector: Some(Selector{
+                source_status_include: HashSet::new(),
+                source_status_exclude: HashSet::new(),
+                target_status_include: HashSet::new(),
+                target_status_exclude: HashSet::new(),
+                context_include: HashSet::new(),
+                context_exclude: HashSet::new()
+            }),
+            executor: Executor::default()
+        }];
+
+        let option = RouteServiceImpl::filter_relations(&instance, osf);
+        assert_eq!(option.is_none(), true)
+    }
+
+    #[test]
+    fn group_test() {}
+
+    #[test]
+    fn weight_test() {}
+}
+
