@@ -2,6 +2,9 @@
 
 ## for the nearer term
 
+* ignore Selector fields which is empty.
+* ignore ExecutorWithOptionWeight fields which is empty.
+
 * use `min-max-heap` to support priority converter
 * integrate test
     multi downstream
