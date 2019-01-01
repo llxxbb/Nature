@@ -1,9 +1,17 @@
 # plan
 
+## finished
+* source status test
+* context test
+* weight test
+* group test
+
 ## for the nearer term
 
-* ignore Selector fields which is empty.
-* ignore ExecutorWithOptionWeight fields which is empty.
+same_target_different_group
+* target status test 
+
+* status support `or` condition
 
 * use `min-max-heap` to support priority converter
 * integrate test

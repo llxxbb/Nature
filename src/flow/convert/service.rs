@@ -10,7 +10,7 @@ use super::*;
 pub trait ConvertServiceTrait {
     fn callback(&self, delayed: DelayedInstances) -> Result<()>;
     fn convert(&self, task: &ConverterInfo, carrier: &RawTask);
-    fn new_converter_info(&self, instance: &Instance, mapping: &Mission) -> Result<ConverterInfo>;
+    fn new_one_converter_info(&self, instance: &Instance, mapping: &Mission) -> Result<ConverterInfo>;
     fn generate_converter_info(&self, task: &StoreTaskInfo) -> Result<Vec<(ConverterInfo, RawTask)>>;
 }
 
@@ -81,7 +81,7 @@ impl ConvertServiceTrait for ConvertServiceImpl {
         };
     }
 
-    fn new_converter_info(&self, instance: &Instance, mapping: &Mission) -> Result<ConverterInfo> {
+    fn new_one_converter_info(&self, instance: &Instance, mapping: &Mission) -> Result<ConverterInfo> {
         let define = self.svc_define.get(&mapping.to)?;
         let last_target = if define.is_status() {
             match instance.context.get(&*CONTEXT_TARGET_INSTANCE_ID) {
@@ -110,7 +110,7 @@ impl ConvertServiceTrait for ConvertServiceImpl {
         let mut new_carriers: Vec<(ConverterInfo, RawTask)> = Vec::new();
         let missions = task.mission.clone().unwrap();
         for c in missions {
-            match self.new_converter_info(&task.instance, &c) {
+            match self.new_one_converter_info(&task.instance, &c) {
                 Err(err) => return Err(err),
                 Ok(x) => {
                     let car = RawTask::new(&x, &c.to.key, TaskType::Convert as i16)?;
