@@ -14,12 +14,20 @@ pub fn rocket_server() -> Rocket {
         .mount("/", routes![batch_for_parallel])
         .mount("/", routes![callback])
         .mount("/", routes![redo_task])
+        .mount("/", routes![self_route])
 }
 
 /// **Note** This do not receive System `Thing`'s instances
 #[post("/input", format = "application/json", data = "<instance>")]
 fn input(instance: Json<Instance>) -> Json<Result<u128>> {
     let x = IncomeController::input(instance.0);
+    Json(x)
+}
+
+/// Instance with route info
+#[post("/self_route", format = "application/json", data = "<instance>")]
+fn self_route(instance: Json<SelfRouteInstance>) -> Json<Result<u128>> {
+    let x = IncomeController::self_route(instance.0);
     Json(x)
 }
 

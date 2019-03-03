@@ -5,7 +5,8 @@ use std::rc::Rc;
 use super::*;
 
 pub trait RouteServiceTrait {
-    fn get_route(&self, instance: &Instance) -> Result<Option<Vec<Mission>>>;
+    fn get_mission(&self, instance: &Instance) -> Result<Option<Vec<Mission>>>;
+    fn get_dynamic_mission(&self, dynamic: Vec<DynamicConverter>) -> Result<Vec<Mission>>;
 }
 
 pub struct RouteServiceImpl {
@@ -14,7 +15,7 @@ pub struct RouteServiceImpl {
 }
 
 impl RouteServiceTrait for RouteServiceImpl {
-    fn get_route(&self, instance: &Instance) -> Result<Option<Vec<Mission>>> {
+    fn get_mission(&self, instance: &Instance) -> Result<Option<Vec<Mission>>> {
         debug!("------------------get_route------------------------");
         let key = &instance.thing.key;
         match self.one_step_flow_cache.get(&instance.thing) {
@@ -32,6 +33,23 @@ impl RouteServiceTrait for RouteServiceImpl {
                 Err(e)
             }
         }
+    }
+    fn get_dynamic_mission(&self, dynamic: Vec<DynamicConverter>) -> Result<Vec<Mission>> {
+        debug!("------------------get_dynamic_route------------------------");
+        let mut missions: Vec<Mission> = Vec::new();
+        for d in dynamic {
+            let t = match d.to {
+                None => Thing::new_null(),
+                Some(s) => Thing::new_with_type(&s, ThingType::Dynamic)?,
+            };
+            let mission = Mission {
+                to: t,
+                executor: d.fun.clone(),
+                last_status_demand: None,
+            };
+            missions.push(mission)
+        }
+        Ok(missions)
     }
 }
 

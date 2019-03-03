@@ -12,6 +12,7 @@ pub struct StoreTaskInfo {
 
 pub trait StoreServiceTrait {
     fn input(&self, instance: Instance) -> Result<u128>;
+    fn self_route(&self, instance: SelfRouteInstance) -> Result<u128>;
     fn generate_store_task(&self, instance: &Instance) -> Result<StoreTaskInfo>;
     fn do_task(&self, task: &StoreTaskInfo, carrier: &RawTask) -> Result<()>;
 }
@@ -34,11 +35,28 @@ impl StoreServiceTrait for StoreServiceImpl {
         Ok(uuid)
     }
 
+    fn self_route(&self, instance: SelfRouteInstance) -> Result<u128> {
+        if instance.converter.is_empty() {
+            return Err(NatureError::VerifyError("converter must not empty!".to_string()));
+        }
+        // Convert a Self-Route-Instance to Normal Instance
+        let mut ins = Instance {
+            id: 0,
+            data: instance.instance.data,
+        };
+        ins.data.thing.thing_type = ThingType::Dynamic;
+        let uuid = self.svc_instance.id_generate_if_not_set(&mut ins)?;
+        let task = self.generate_self_route_task(&ins, instance.converter)?;
+        let carrier = RawTask::new(&task, &ins.thing.key, TaskType::Store as i16)?;
+        self.do_task(&task, &carrier)?;
+        Ok(uuid)
+    }
+
 
     /// generate `StoreTaskInfo` include route information.
     /// `Err` on environment error
     fn generate_store_task(&self, instance: &Instance) -> Result<StoreTaskInfo> {
-        let target = self.route.get_route(instance)?;
+        let target = self.route.get_mission(instance)?;
         // save to task to make it can redo
         let task = StoreTaskInfo {
             instance: instance.clone(),
@@ -47,6 +65,7 @@ impl StoreServiceTrait for StoreServiceImpl {
         };
         Ok(task)
     }
+
     fn do_task(&self, task: &StoreTaskInfo, carrier: &RawTask) -> Result<()> {
         debug!("------------------do_store_task------------------------");
         if let Err(err) = self.save(&task.instance) {
@@ -71,5 +90,18 @@ impl StoreServiceImpl {
                 _ => Err(err)
             }
         }
+    }
+
+    /// generate `StoreTaskInfo` include route information.
+/// `Err` on environment error
+    fn generate_self_route_task(&self, instance: &Instance, dynamic: Vec<DynamicConverter>) -> Result<StoreTaskInfo> {
+        let target = self.route.get_dynamic_mission(dynamic)?;
+        // save to task to make it can redo
+        let task = StoreTaskInfo {
+            instance: instance.clone(),
+            upstream: None,
+            mission: Some(target),
+        };
+        Ok(task)
     }
 }

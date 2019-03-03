@@ -84,6 +84,7 @@ impl SequentialServiceImpl {
                     key: SYS_KEY_SERIAL.clone(),
                     version: 1,
                     thing_type: ThingType::System,
+                    is_null: false
                 },
                 event_time: time,
                 execute_time: time,

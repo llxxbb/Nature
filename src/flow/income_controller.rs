@@ -1,7 +1,8 @@
 use std::convert::TryFrom;
 
-use super::*;
 use serde::Deserialize;
+
+use super::*;
 
 pub struct IncomeController {}
 
@@ -9,6 +10,11 @@ impl IncomeController {
     /// born an instance which is the beginning of the changes.
     pub fn input(instance: Instance) -> Result<u128> {
         SVC_NATURE.store_svc.input(instance)
+    }
+
+    /// born an instance which is the beginning of the changes.
+    pub fn self_route(instance: SelfRouteInstance) -> Result<u128> {
+        SVC_NATURE.store_svc.self_route(instance)
     }
 
     pub fn callback(delayed: DelayedInstances) -> Result<()> {
@@ -39,6 +45,4 @@ impl IncomeController {
         let _ = channel.sender.lock().unwrap().send((task, raw.clone()));
         Ok(())
     }
-
-
 }
