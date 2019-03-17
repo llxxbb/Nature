@@ -1,7 +1,11 @@
 use std::rc::Rc;
 
+#[cfg(test)]
+use mockers_derive::mocked;
+
 use super::*;
 
+#[cfg_attr(test, mocked)]
 pub trait TaskServiceTrait {
     fn create_and_finish_carrier(&self, old: &RawTask, new: &mut RawTask) -> Result<usize>;
 

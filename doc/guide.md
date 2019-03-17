@@ -1,5 +1,13 @@
 # Guide
 
+## the `Tnstance` you put into `Nature`.
+
+We strongly recommend generate an ID for an `Instance` from outside of `Nature` before to do you business.
+The profit to do that is you can recommit to `Nature` when some environment errors occur,
+Otherwise you may submit many different instance but they are actually the same one.
+
+If instance not assigned we will generate one for you by Hash, but I think this is not the best way.
+
 ## implement converter
 
 **Input Parameter**

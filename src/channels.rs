@@ -7,6 +7,7 @@ use flow::*;
 use nature_common::*;
 use nature_db::*;
 
+#[allow(unused_doc_comments)]
 /// `CHANNEL_PARALLEL` & `CHANNEL_SERIAL` are used to short caller response time
 lazy_static! {
     pub static ref CHANNEL_STORE : Channel<(StoreTaskInfo,RawTask)> = Channel::new();

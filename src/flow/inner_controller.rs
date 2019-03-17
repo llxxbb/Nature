@@ -46,7 +46,7 @@ impl InnerController {
         SVC_NATURE.converter_svc.convert(&task.0, &task.1);
     }
     pub fn channel_converted(task: (ConverterInfo, Converted)) {
-        if let Ok(plan) = SVC_NATURE.plan_svc.new_plan_info(&task.0, &task.1.converted) {
+        if let Ok(plan) = SVC_NATURE.plan_svc.save_plan(&task.0, &task.1.converted) {
             Self::prepare_to_store(&task.1.done_task, plan);
         }
     }

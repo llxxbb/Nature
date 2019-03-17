@@ -1,7 +1,5 @@
 #![feature(plugin)]
-#![feature(range_contains)]
 #![feature(trace_macros)]
-#![feature(try_from)] // vec to array
 #![feature(box_patterns)]
 #![feature(proc_macro_hygiene, decl_macro)] // rocket
 
@@ -19,6 +17,8 @@ extern crate serde;
 extern crate serde_derive;
 extern crate serde_json;
 extern crate uuid;
+#[cfg(test)] extern crate mockers;
+#[cfg(test)] extern crate mockers_derive;
 
 pub mod system;
 pub mod rpc;

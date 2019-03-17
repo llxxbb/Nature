@@ -1,0 +1,28 @@
+@startuml
+' receive request from outside of `Nature`
+namespace rpc {
+    namespace rocket{
+        class server
+    }
+}
+
+namespace flow {
+    class IncomeController
+    class ControllerImpl
+    note top: "all services initialized here"
+}
+
+namespace DB{
+    class InstanceSvc
+}
+
+namespace channels {
+
+}
+
+namespace support {
+
+}
+
+
+@enduml

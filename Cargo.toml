@@ -31,3 +31,9 @@ rocket_contrib = "0.4"
 nature_common = {path = "../Nature-Common"}
 nature_db = {path = "../Nature-DB"}
 
+# test
+[dev-dependencies]
+mockers_derive = "0.13"
+mockers = "0.13"
+nature_common = {path = "../Nature-Common"}
+nature_db = {path = "../Nature-DB"}
