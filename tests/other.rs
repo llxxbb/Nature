@@ -8,7 +8,6 @@ fn string_parse_i32() {
         key: "lxb".to_string(),
         version: "0".parse().unwrap(),
         thing_type: ThingType::Business,
-        is_null: false
     };
     println!("{:?}", t);
 }

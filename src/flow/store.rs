@@ -202,6 +202,7 @@ mod test {
         let rtn = store_svc.input(instance);
         assert_eq!(rtn.err().unwrap(), NatureError::VerifyError("insert instance error".to_string()))
     }
+
     #[test]
     fn insert_instance_ok() {
         // prepare
@@ -220,7 +221,7 @@ mod test {
             .and_return(Ok(1)));
         // run
         let rtn = store_svc.input(instance);
-        assert_eq!(rtn.unwrap(), 272922323985461783011058310406187508637)
+        assert_eq!(rtn.unwrap(), 157623018616273791007256710966552945966)
     }
 
     fn init_store_svc(mockers: &MyMocks) -> StoreServiceImpl {
