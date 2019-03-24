@@ -2,12 +2,8 @@ use std::collections::HashMap;
 use std::collections::HashSet;
 use std::rc::Rc;
 
-#[cfg(test)]
-use mockers_derive::mocked;
-
 use super::*;
 
-#[cfg_attr(test, mocked)]
 pub trait RouteServiceTrait {
     fn get_mission(&self, instance: &Instance) -> Result<Option<Vec<Mission>>>;
     fn get_dynamic_mission(&self, dynamic: Vec<DynamicConverter>) -> Result<Vec<Mission>>;

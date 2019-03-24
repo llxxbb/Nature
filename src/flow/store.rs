@@ -109,65 +109,127 @@ impl StoreServiceImpl {
 
 #[cfg(test)]
 mod test {
-    use mockers::Scenario;
-    use mockers_derive::mock;
+    use mockers::matchers::{ANY, check};
+
+    use test_util::*;
 
     use super::*;
 
-    mock! {
-        InstanceDaoTraitMock,
-        test,
-        trait InstanceDaoTrait{
-            fn insert(&self, instance: &Instance) -> Result<usize>;
-            /// check whether source stored earlier
-            fn is_exists(&self, instance: &Instance) -> Result<bool>;
-            fn get_by_id(&self, id: u128) -> Result<Option<Instance>>;
-            fn get_by_key(&self, key: &str, id: u128) -> Result<Option<Instance>>;
-        }
-    }
-    mock! {
-        TaskDaoTraitMock,
-        test,
-        trait TaskDaoTrait{
-            fn insert(&self, raw: &RawTask) -> Result<usize>;
-            fn delete(&self, record_id: &[u8]) -> Result<usize>;
-            fn raw_to_error(&self, err: &NatureError, raw: &RawTask) -> Result<usize>;
-            fn update_execute_time(&self, record_id: &[u8], delay: i64) -> Result<()>;
-            fn increase_times_and_delay(&self, record_id: &[u8], delay: i32) -> Result<usize>;
-            fn get(&self, record_id: &[u8]) -> Result<Option<RawTask>>;
-            fn get_overdue(&self, seconds: &str) -> Result<Vec<RawTask>>;
-        }
-    }
-    mock! {
-        InstanceServiceTraitMock,
-        test,
-        trait InstanceServiceTrait {
-            fn verify(&self, instance: &mut Instance) -> Result<u128>;
-            /// gegerate by Hash.
-            fn id_generate_if_not_set(&self, instance: &mut Instance) -> Result<u128>;
-        }
+    #[test]
+    fn input_thing_type_must_be_business() {
+        // prepare
+        let mocks = MyMocks::new();
+        let store_svc = init_store_svc(&mocks);
+        // expect
+        mocks.s.expect(mocks.s_instance.verify_call(check(|x: &&mut Instance| x.thing.thing_type == ThingType::Business))
+            .and_return(Err(NatureError::VerifyError("deliberate".to_string()))));
+        let mut instance = Instance::default();
+        instance.data.thing.thing_type = ThingType::Dynamic;
+        // run
+        let _rtn = store_svc.input(instance);
     }
 
     #[test]
-    fn test_input() {
-        let scenario = Scenario::new();
-        let mut mock_instance_dao = scenario.create_mock::<InstanceDaoTraitMock>();
-        let mut mock_route_svc = scenario.create_mock_for::<RouteServiceTrait>();
-        let mut mock_task_svc = scenario.create_mock_for::<TaskServiceTrait>();
-        let mut mock_task_dao = scenario.create_mock::<TaskDaoTraitMock>();
-        let mut mock_instance_svc = scenario.create_mock::<InstanceServiceTraitMock>();
+    fn thing_must_be_defined() {
+        // prepare
+        let mocks = MyMocks::new();
+        let store_svc = init_store_svc(&mocks);
+        // expect
+        mocks.s.expect(mocks.s_instance.verify_call(ANY)
+            .and_return(Err(NatureError::VerifyError("Thing must be defined".to_string()))));
+        let mut instance = Instance::default();
+        instance.data.thing.thing_type = ThingType::Dynamic;
+        // run
+        let rtn = store_svc.input(instance);
+        assert_eq!(rtn.err().unwrap(), NatureError::VerifyError("Thing must be defined".to_string()))
+    }
 
-        let store_svc = StoreServiceImpl {
-            instance_dao: Rc::new(mock_instance_dao),
-            route: Rc::new(mock_route_svc),
-            task_svc: Rc::new(mock_task_svc),
-            task_dao: Rc::new(mock_task_dao),
-            svc_instance: Rc::new(mock_instance_svc),
-        };
-//        scenario.expect(cond.make_hotter_call(4).and_return(()));
-//
-        let instance = Instance::default();
-        scenario.expect(cond.get_temperature_call().and_return(16));
-        let rrn = store_svc.input(instance);
+    #[test]
+    fn generate_store_tasks_for_error() {
+        // prepare
+        let mocks = MyMocks::new();
+        let store_svc = init_store_svc(&mocks);
+        // expect
+        let mut instance = Instance::default();
+        instance.data.thing.key = "123".to_string();
+        mocks.s.expect(mocks.s_instance.verify_call(ANY)
+            .and_return(generate_id(&instance)));
+        mocks.s.expect(mocks.s_route.get_mission_call(check(|x: &&Instance| x.thing.key == "123"))
+            .and_return(Err(NatureError::VerifyError("get task error".to_string()))));
+        // run
+        let rtn = store_svc.input(instance);
+        assert_eq!(rtn.err().unwrap(), NatureError::VerifyError("get task error".to_string()))
+    }
+
+    #[test]
+    fn insert_task_error() {
+        // prepare
+        let mocks = MyMocks::new();
+        let store_svc = init_store_svc(&mocks);
+        // expect
+        let mut instance = Instance::default();
+        instance.data.thing.key = "123".to_string();
+        mocks.s.expect(mocks.s_instance.verify_call(ANY)
+            .and_return(generate_id(&instance)));
+        mocks.s.expect(mocks.s_route.get_mission_call(ANY)
+            .and_return(Ok(Some(vec![Mission::default()]))));
+        mocks.s.expect(mocks.d_task.insert_call(check(|x: &&RawTask| x.thing == "123"))
+            .and_return(Err(NatureError::VerifyError("insert task error".to_string()))));
+        // run
+        let rtn = store_svc.input(instance);
+        assert_eq!(rtn.err().unwrap(), NatureError::VerifyError("insert task error".to_string()))
+    }
+
+    #[test]
+    fn insert_instance_error() {
+        // prepare
+        let mocks = MyMocks::new();
+        let store_svc = init_store_svc(&mocks);
+        // expect
+        let mut instance = Instance::default();
+        instance.data.thing.key = "123".to_string();
+        mocks.s.expect(mocks.s_instance.verify_call(ANY)
+            .and_return(generate_id(&instance)));
+        mocks.s.expect(mocks.s_route.get_mission_call(ANY)
+            .and_return(Ok(Some(vec![Mission::default()]))));
+        mocks.s.expect(mocks.d_task.insert_call(ANY)
+            .and_return(Ok(1)));
+        mocks.s.expect(mocks.d_instance.insert_call(check(|x: &&Instance| x.thing.key == "123"))
+            .and_return(Err(NatureError::VerifyError("insert instance error".to_string()))));
+        mocks.s.expect(mocks.d_task.raw_to_error_call(ANY, check(|x: &&RawTask| x.thing == "123"))
+            .and_return(Ok(1)));
+        // run
+        let rtn = store_svc.input(instance);
+        assert_eq!(rtn.err().unwrap(), NatureError::VerifyError("insert instance error".to_string()))
+    }
+    #[test]
+    fn insert_instance_ok() {
+        // prepare
+        let mocks = MyMocks::new();
+        let store_svc = init_store_svc(&mocks);
+        // expect
+        let mut instance = Instance::default();
+        instance.data.thing.key = "123".to_string();
+        mocks.s.expect(mocks.s_instance.verify_call(ANY)
+            .and_return(generate_id(&instance)));
+        mocks.s.expect(mocks.s_route.get_mission_call(ANY)
+            .and_return(Ok(Some(vec![Mission::default()]))));
+        mocks.s.expect(mocks.d_task.insert_call(ANY)
+            .and_return(Ok(1)));
+        mocks.s.expect(mocks.d_instance.insert_call(check(|x: &&Instance| x.thing.key == "123"))
+            .and_return(Ok(1)));
+        // run
+        let rtn = store_svc.input(instance);
+        assert_eq!(rtn.unwrap(), 272922323985461783011058310406187508637)
+    }
+
+    fn init_store_svc(mockers: &MyMocks) -> StoreServiceImpl {
+        StoreServiceImpl {
+            instance_dao: mockers.d_instance.clone(),
+            route: mockers.s_route.clone(),
+            task_svc: mockers.s_task.clone(),
+            task_dao: mockers.d_task.clone(),
+            svc_instance: mockers.s_instance.clone(),
+        }
     }
 }
