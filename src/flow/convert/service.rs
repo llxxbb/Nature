@@ -124,6 +124,15 @@ impl ConvertServiceTrait for ConvertServiceImpl {
 
 impl ConvertServiceImpl {
     fn handle_instances(&self, task: &ConverterInfo, carrier: &RawTask, instances: &mut Vec<Instance>) -> Result<()> {
+        // check `ThingType` for Null
+        if task.target.to.thing_type == ThingType::Null {
+            let rtn = Converted {
+                done_task: carrier.to_owned(),
+                converted: Vec::new(),
+            };
+            let _ = CHANNEL_CONVERTED.sender.lock().unwrap().send((task.to_owned(), rtn));
+            return Ok(());
+        }
         // check status version to avoid loop
         let _ = instances.iter_mut().map(|one: &mut Instance| {
             one.data.thing = task.target.to.clone();
@@ -191,3 +200,32 @@ impl ConvertServiceImpl {
     }
 }
 
+#[cfg(test)]
+mod test {
+    use test_util::*;
+
+    use super::*;
+    use mockers::matchers::ANY;
+
+    #[test]
+    fn convert_for_null_target() {
+        let mocks = MyMocks::new();
+        let service_impl = init_svc(&mocks);
+        mocks.s.expect(mocks.call_out.convert_call(ANY,ANY)
+            .and_return(Ok(ConverterReturned::None)));
+        let info = ConverterInfo::default();
+        let raw = RawTask::new(&info, "hello", 10).unwrap();
+        service_impl.convert(&info, &raw)
+    }
+
+    fn init_svc(mockers: &MyMocks) -> ConvertServiceImpl {
+        ConvertServiceImpl {
+            svc_task: mockers.s_task.clone(),
+            dao_task: mockers.d_task.clone(),
+            caller: mockers.call_out.clone(),
+            svc_define: mockers.s_thing_define_cache.clone(),
+            svc_instance: mockers.s_instance.clone(),
+            dao_instance: mockers.d_instance.clone(),
+        }
+    }
+}

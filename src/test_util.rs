@@ -3,6 +3,7 @@ use std::rc::Rc;
 use mockers::Scenario;
 use mockers_derive::mock;
 
+use ::flow::*;
 use nature_common::*;
 use nature_db::*;
 use support::*;
@@ -60,6 +61,31 @@ mock! {
     }
 }
 
+mock! {
+    CallOutTraitMock,
+    self,
+    trait CallOutTrait {
+        fn convert(&self, mission: &Mission, para: &CallOutParameter) -> Result<ConverterReturned>;
+    }
+}
+
+mock! {
+    ThingDefineDaoTraitMock,
+    self,
+    trait ThingDefineDaoTrait {
+        fn get(thing: &Thing) -> Result<Option<ThingDefine>>;
+        fn insert(define: &ThingDefine) -> Result<usize>;
+        fn delete(thing: &Thing) -> Result<usize>;
+    }
+}
+
+mock! {
+    ThingDefineCacheTraitMock,
+    self,
+    trait ThingDefineCacheTrait {
+        fn get(&self, thing: &Thing) -> Result<ThingDefine>;
+    }
+}
 
 pub struct MyRouteServiceTraitMock { pub m: RouteServiceTraitMock }
 
@@ -67,28 +93,37 @@ unsafe impl Sync for MyRouteServiceTraitMock {}
 
 pub struct MyMocks {
     pub s: Scenario,
+    pub s_thing_define_cache: Rc<ThingDefineCacheTraitMock>,
+    pub d_thing_define: Rc<ThingDefineDaoTraitMock>,
     pub s_instance: Rc<InstanceServiceTraitMock>,
     pub d_instance: Rc<InstanceDaoTraitMock>,
     pub s_route: Rc<RouteServiceTraitMock>,
     pub s_task: Rc<TaskServiceTraitMock>,
     pub d_task: Rc<TaskDaoTraitMock>,
+    pub call_out: Rc<CallOutTraitMock>,
 }
 
 impl MyMocks {
     pub fn new() -> MyMocks {
         let s = Scenario::new();
+        let s_thing_define_cache = Rc::new(s.create_mock::<ThingDefineCacheTraitMock>());
+        let d_thing_define = Rc::new(s.create_mock::<ThingDefineDaoTraitMock>());
         let s_instance = Rc::new(s.create_mock::<InstanceServiceTraitMock>());
         let d_instance = Rc::new(s.create_mock::<InstanceDaoTraitMock>());
         let s_route = Rc::new(s.create_mock::<RouteServiceTraitMock>());
         let s_task = Rc::new(s.create_mock::<TaskServiceTraitMock>());
         let d_task = Rc::new(s.create_mock::<TaskDaoTraitMock>());
+        let call_out = Rc::new(s.create_mock::<CallOutTraitMock>());
         MyMocks {
             s,
+            s_thing_define_cache,
+            d_thing_define,
             s_instance,
             d_instance,
             s_route,
             s_task,
             d_task,
+            call_out,
         }
     }
 }
