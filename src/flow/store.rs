@@ -150,7 +150,7 @@ mod test {
         let mocks = MyMocks::new();
         let store_svc = init_store_svc(&mocks);
         // expect
-        let instance = Instance::new("123");
+        let instance = Instance::new("123").unwrap();
         mocks.s.expect(mocks.s_instance.verify_call(ANY)
             .and_return(generate_id(&instance)));
         mocks.s.expect(mocks.s_route.get_mission_call(check(|x: &&Instance| x.thing.get_full_key() == "/B/123"))
@@ -166,7 +166,7 @@ mod test {
         let mocks = MyMocks::new();
         let store_svc = init_store_svc(&mocks);
         // expect
-        let instance = Instance::new("123");
+        let instance = Instance::new("123").unwrap();
         mocks.s.expect(mocks.s_instance.verify_call(ANY)
             .and_return(generate_id(&instance)));
         mocks.s.expect(mocks.s_route.get_mission_call(ANY)
@@ -184,7 +184,7 @@ mod test {
         let mocks = MyMocks::new();
         let store_svc = init_store_svc(&mocks);
         // expect
-        let instance = Instance::new("123");
+        let instance = Instance::new("123").unwrap();
         mocks.s.expect(mocks.s_instance.verify_call(ANY)
             .and_return(generate_id(&instance)));
         mocks.s.expect(mocks.s_route.get_mission_call(ANY)
@@ -206,7 +206,7 @@ mod test {
         let mocks = MyMocks::new();
         let store_svc = init_store_svc(&mocks);
         // expect
-        let instance = Instance::new("123");
+        let instance = Instance::new("123").unwrap();
         mocks.s.expect(mocks.s_instance.verify_call(ANY)
             .and_return(generate_id(&instance)));
         mocks.s.expect(mocks.s_route.get_mission_call(ANY)

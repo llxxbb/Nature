@@ -41,7 +41,7 @@ impl LocalExecutorTrait for LocalExecutorImpl {
                     }
                 });
                 // get entry to call
-                debug!("call entry for :[{}]", entry.entry);
+//                debug!("call entry for :[{}]", entry.entry);
                 match cfg_lib {
                     None => ConverterReturned::None,
                     Some(local_lib) => {

@@ -2,9 +2,11 @@ extern crate nature;
 extern crate nature_common;
 extern crate nature_db;
 
-use std::env;
+use core::time;
+use std::{env, thread};
 
 use nature::flow::IncomeController;
+use nature::system::sys_init;
 use nature_common::*;
 use nature_db::*;
 
@@ -14,8 +16,7 @@ mod common;
 fn convert_is_empty() {
     env::set_var("DATABASE_URL", "nature.sqlite");
     // prepare input para
-    let mut instance = Instance::default();
-    instance.data.thing = Thing::new("/dynamic/converter/is/empty").unwrap();
+    let instance = Instance::new_with_type("/dynamic/converter/is/empty", ThingType::Dynamic).unwrap();
     let instance = SelfRouteInstance {
         instance,
         converter: vec![],
@@ -26,21 +27,16 @@ fn convert_is_empty() {
 
 
 #[test]
-fn has_one_converter() {
+fn target_is_null() {
+    let _ = sys_init();
     env::set_var("DATABASE_URL", "nature.sqlite");
     // prepare input para
-    let mut instance = Instance::default();
-    instance.data.thing = Thing::new("/dynamic/target/is/null").unwrap();
+    let instance = Instance::new_with_type("/dynamic/target/is/null", ThingType::Dynamic).unwrap();
     let instance = SelfRouteInstance {
         instance,
         converter: vec![DynamicConverter {
             to: None,
-            fun: Executor {
-                protocol: Protocol::LocalRust,
-                url: r#"../../../../Nature-integrate-test-converter/target/debug/nature_integrate_test_converter.dll:rtn_one"#.to_string(),
-                group: "".to_string(),
-                proportion: 0,
-            },
+            fun: Executor::for_local(""),
         }],
     };
     let rtn = IncomeController::self_route(instance);
@@ -49,34 +45,54 @@ fn has_one_converter() {
     let dao = InstanceDaoImpl {};
     let written = dao.get_by_id(67155089214163907246089937900589001447).unwrap().unwrap();
     assert_eq!("/D/dynamic/target/is/null", written.data.thing.get_full_key());
-    assert_eq!(ThingType::Dynamic, written.data.thing.get_thing_type());
 }
 
-// #[test]
-// fn write_one_target_to_db() {
-//     env::set_var("DATABASE_URL", "nature.sqlite");
-//     // prepare input para
-//     let mut instance = Instance::default();
-//     instance.data.thing.key = "/dynamic/write/one".to_string();
-//     let instance = SelfRouteInstance {
-//         instance,
-//         converter: vec![DynamicConverter {
-//             to: Some("/dynamic/one_target".to_string()),
-//             fun: Executor {
-//                 protocol: Protocol::LocalRust,
-//                 url: r#"../../../../Nature-integrate-test-converter/target/debug/nature_integrate_test_converter.dll:rtn_one"#.to_string(),
-//                 group: "".to_string(),
-//                 proportion: 0,
-//             },
-//         }],
-//     };
-//     let rtn = IncomeController::self_route(instance);
-//     assert_eq!(137820585092527411925203784740727265435, rtn.unwrap());
-//     // query target
-// //    assert_eq!()
-// }
-//
-//fn multi_converter() {
-//    // TODO
-//}
+#[test]
+fn write_one_target_to_db() {
+    let _ = sys_init();
+    env::set_var("DATABASE_URL", "nature.sqlite");
+    // prepare input para
+    let instance = Instance::new_with_type("/dynamic/write/one", ThingType::Dynamic).unwrap();
+    let instance = SelfRouteInstance {
+        instance,
+        converter: vec![DynamicConverter {
+            to: Some("/dynamic/one_target".to_string()),
+            fun: Executor::for_local(r#"nature_integrate_test_converter.dll:rtn_one"#),
+        }],
+    };
+    let rtn = IncomeController::self_route(instance);
+    assert_eq!(230241203652394260574473500578835056831, rtn.unwrap());
 
+    // query target
+    thread::sleep(time::Duration::from_millis(500));
+    let dao = InstanceDaoImpl {};
+    let _ins_db = dao.get_by_id(64608961992354323405453802188093613020).unwrap().unwrap();
+}
+
+#[test]
+fn write_two_target_to_db() {
+    let _ = sys_init();
+    env::set_var("DATABASE_URL", "nature.sqlite");
+    // prepare input para
+    let instance = Instance::new_with_type("/dynamic/write/two", ThingType::Dynamic).unwrap();
+    let instance = SelfRouteInstance {
+        instance,
+        converter: vec![
+            DynamicConverter {
+                to: Some("/dynamic/two_of_1".to_string()),
+                fun: Executor::for_local(r#"nature_integrate_test_converter.dll:rtn_one"#),
+            },
+            DynamicConverter {
+                to: Some("/dynamic/two_of_2".to_string()),
+                fun: Executor::for_local(r#"nature_integrate_test_converter.dll:rtn_one"#),
+            }],
+    };
+    let rtn = IncomeController::self_route(instance);
+    assert_eq!(226464870279356952826561520522393294145, rtn.unwrap());
+
+    // query target
+    thread::sleep(time::Duration::from_millis(2000));
+    let dao = InstanceDaoImpl {};
+    let _ins_db = dao.get_by_id(229131768420092721318239706157158451568).unwrap().unwrap();
+    let _ins_db = dao.get_by_id(217550842272210133848994195869177780408).unwrap().unwrap();
+}

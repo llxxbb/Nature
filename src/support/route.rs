@@ -49,6 +49,7 @@ impl RouteServiceTrait for RouteServiceImpl {
             };
             missions.push(mission)
         }
+        debug!("missions : {:?}", missions);
         Ok(missions)
     }
 }

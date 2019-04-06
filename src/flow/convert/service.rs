@@ -82,7 +82,10 @@ impl ConvertServiceTrait for ConvertServiceImpl {
     }
 
     fn new_one_converter_info(&self, instance: &Instance, mapping: &Mission) -> Result<ConverterInfo> {
-        let define = self.svc_define.get(&mapping.to)?;
+        let define = match mapping.to.get_thing_type() {
+            ThingType::Dynamic => ThingDefine::default(),
+            _ => self.svc_define.get(&mapping.to)?
+        };
         let last_target = if define.is_status() {
             match instance.context.get(&*CONTEXT_TARGET_INSTANCE_ID) {
                 // context have target id
@@ -171,14 +174,15 @@ impl ConvertServiceImpl {
 
     fn verify(&self, to: &Thing, instances: &[Instance]) -> Result<Vec<Instance>> {
         let mut rtn: Vec<Instance> = Vec::new();
-
         // only one status instance should return
-        let define = self.svc_define.get(to)?;
+        let define = match to.get_thing_type() {
+            ThingType::Dynamic => ThingDefine::default(),
+            _ => self.svc_define.get(to)?
+        };
         if define.is_status() {
             if instances.len() > 1 {
                 return Err(NatureError::ConverterLogicalError("[status thing] must return less 2 instances!".to_string()));
             }
-
             // status version must equal old + 1
             if instances.len() == 1 {
                 let mut ins = instances[0].clone();
@@ -189,10 +193,11 @@ impl ConvertServiceImpl {
             return Ok(rtn);
         }
 
-        // all biz must same to "to"
+        // all biz must same to "to" and set id
         for r in instances {
             let mut instance = r.clone();
             instance.data.thing = to.clone();
+            let _ = self.svc_instance.id_generate_if_not_set(&mut instance);
             rtn.push(instance);
         }
 
@@ -202,16 +207,17 @@ impl ConvertServiceImpl {
 
 #[cfg(test)]
 mod test {
+    use mockers::matchers::ANY;
+
     use crate::test_util::*;
 
     use super::*;
-    use mockers::matchers::ANY;
 
     #[test]
     fn convert_for_null_target() {
         let mocks = MyMocks::new();
         let service_impl = init_svc(&mocks);
-        mocks.s.expect(mocks.call_out.convert_call(ANY,ANY)
+        mocks.s.expect(mocks.call_out.convert_call(ANY, ANY)
             .and_return(Ok(ConverterReturned::None)));
         let info = ConverterInfo::default();
         let raw = RawTask::new(&info, "hello", 10).unwrap();

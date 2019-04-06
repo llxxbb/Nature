@@ -1,7 +1,8 @@
-use nature_common::*;
 use std::rc::Rc;
-use super::*;
 
+use nature_common::*;
+
+use super::*;
 
 pub trait PlanServiceTrait {
     #[allow(clippy::ptr_arg)]
@@ -22,9 +23,9 @@ impl PlanServiceTrait for PlanServiceImpl {
             to: converter_info.target.to.clone(),
             plan: instances.clone(),
         };
+
         // reload old plan if exists
         let will_save = RawPlanInfo::new(&plan)?;
-
         match self.dao.save(&will_save) {
             Ok(_) => Ok(plan),
             Err(err) => match err {
