@@ -1,6 +1,6 @@
 use std::rc::Rc;
 
-use flow::convert::local::LocalExecutorTrait;
+use crate::flow::convert::local::LocalExecutorTrait;
 use nature_common::*;
 use nature_db::*;
 

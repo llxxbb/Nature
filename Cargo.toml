@@ -2,6 +2,7 @@
 name = "nature"
 version = "0.0.1"
 authors = ["XueBin Li"]
+edition = "2018"
 
 [dependencies]
 # normal
@@ -37,3 +38,6 @@ mockers_derive = "0.13"
 mockers = "0.13"
 nature_common = {path = "../Nature-Common"}
 nature_db = {path = "../Nature-DB"}
+
+[workspace]
+members = ["../Nature-Common","../Nature-DB","../Nature-Retry","../Nature-integrate-test-converter"]

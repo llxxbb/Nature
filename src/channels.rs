@@ -3,7 +3,7 @@ use std::sync::Mutex;
 use std::thread;
 use std::thread::JoinHandle;
 
-use flow::*;
+use crate::flow::*;
 use nature_common::*;
 use nature_db::*;
 

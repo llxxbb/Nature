@@ -17,7 +17,7 @@ pub struct RouteServiceImpl {
 impl RouteServiceTrait for RouteServiceImpl {
     fn get_mission(&self, instance: &Instance) -> Result<Option<Vec<Mission>>> {
         debug!("------------------get_route------------------------");
-        let key = &instance.thing.key;
+        let key = &instance.thing.get_full_key();
         match self.one_step_flow_cache.get(&instance.thing) {
             Ok(rtn) => {
                 match rtn {

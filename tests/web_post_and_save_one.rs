@@ -34,7 +34,7 @@ fn web_post_and_save_one() {
     println!("------------------ remove existed instance -----------------");
     // remove if instance exists
     let mut will_del = instance.clone();
-    will_del.id = 299775797930108424859632506100300141137;
+    will_del.id = 50086162352625018456971694157959652318;
     if let Ok(x) = InstanceDaoImpl::delete(&will_del) {
         println!("delete {} rows", x);
     }
@@ -50,9 +50,9 @@ fn web_post_and_save_one() {
     // check return result
     let rtn = response.body_string().unwrap();
     println!("{:?}", rtn);
-    assert_eq!(rtn, r#"{"Ok":299775797930108424859632506100300141137}"#);
+    assert_eq!(rtn, r#"{"Ok":50086162352625018456971694157959652318}"#);
     // get instance which is saved to db
     let i_d = InstanceDaoImpl {};
-    let _ins_db = i_d.get_by_id(299775797930108424859632506100300141137).unwrap().unwrap();
+    let _ins_db = i_d.get_by_id(50086162352625018456971694157959652318).unwrap().unwrap();
 }
 

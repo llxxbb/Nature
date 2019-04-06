@@ -5,8 +5,8 @@ use std::rc::Rc;
 use chrono::prelude::*;
 use serde_json;
 
-use flow::store::StoreServiceTrait;
-use system::*;
+use crate::flow::store::StoreServiceTrait;
+use crate::system::*;
 
 use super::*;
 
@@ -31,7 +31,7 @@ pub struct SequentialServiceImpl {
 
 impl SequentialTrait for SequentialServiceImpl {
     fn one_by_one(&self, batch: &SerialBatchInstance) -> Result<()> {
-        let raw = RawTask::new(batch, &batch.thing.key, TaskType::QueueBatch as i16)?;
+        let raw = RawTask::new(batch, &batch.thing.get_full_key(), TaskType::QueueBatch as i16)?;
         match self.dao_task.insert(&raw) {
             Ok(_carrier) => {
                 // to process asynchronous
@@ -48,7 +48,7 @@ impl SequentialTrait for SequentialServiceImpl {
             match Self::new_virtual_instance(finish, si) {
                 Ok(instance) => {
                     if let Ok(si) = self.store.generate_store_task(&instance) {
-                        match RawTask::new(&si, &instance.thing.key, TaskType::QueueBatch as i16) {
+                        match RawTask::new(&si, &instance.thing.get_full_key(), TaskType::QueueBatch as i16) {
                             Ok(new) => {
                                 let mut new = new;
                                 if let Ok(_route) = self.svc_task.create_and_finish_carrier(carrier, &mut new) {
@@ -80,11 +80,7 @@ impl SequentialServiceImpl {
         Ok(Instance {
             id: 0,
             data: InstanceNoID {
-                thing: Thing {
-                    key: SYS_KEY_SERIAL.clone(),
-                    version: 1,
-                    thing_type: ThingType::System,
-                },
+                thing: Thing::new_with_type(&SYS_KEY_SERIAL, ThingType::System)?,
                 event_time: time,
                 execute_time: time,
                 create_time: time,
@@ -102,7 +98,7 @@ impl SequentialServiceImpl {
         let mut errors: Vec<String> = Vec::new();
         let mut succeeded_id: Vec<u128> = Vec::new();
         for mut instance in task.instances {
-            instance.data.thing.thing_type = ThingType::Business;
+            instance.data.thing.set_thing_type(ThingType::Business);
             instance.data.thing = task.thing.clone();
             if let Err(err) = self.svc_instance.verify(&mut instance) {
                 errors.push(format!("{:?}", err));

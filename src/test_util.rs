@@ -3,10 +3,11 @@ use std::rc::Rc;
 use mockers::Scenario;
 use mockers_derive::mock;
 
-use ::flow::*;
 use nature_common::*;
 use nature_db::*;
-use support::*;
+use crate::support::*;
+
+use crate::flow::*;
 
 mock! {
     InstanceDaoTraitMock,
@@ -16,7 +17,8 @@ mock! {
         /// check whether source stored earlier
         fn is_exists(&self, instance: &Instance) -> Result<bool>;
         fn get_by_id(&self, id: u128) -> Result<Option<Instance>>;
-        fn get_by_key(&self, key: &str, id: u128) -> Result<Option<Instance>>;
+        fn get_by_key(&self, key: &str, limit: i64) -> Result<Option<Vec<Instance>>>;
+        fn get_by_full_key(&self, key: &str, limit: i64) -> Result<Option<Vec<Instance>>>;
     }
 }
 mock! {

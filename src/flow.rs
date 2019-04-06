@@ -1,4 +1,4 @@
-use channels::*;
+use crate::channels::*;
 use nature_common::*;
 use nature_db::*;
 pub use self::controller::*;
@@ -8,7 +8,7 @@ pub use self::convert::*;
 pub use self::parallel::*;
 pub use self::sequential::*;
 pub use self::store::*;
-use support::*;
+use crate::support::*;
 
 mod store;
 mod sequential;

@@ -16,7 +16,7 @@ impl InnerController {
     }
     pub fn channel_stored(store: (StoreTaskInfo, RawTask)) {
         debug!("------------------channel_stored------------------------");
-        let biz = store.0.instance.thing.key.clone();
+        let biz = store.0.instance.thing.get_full_key();
         if store.0.mission.is_none() {
             debug!("no follow data for : {}", biz);
             let _ = SVC_NATURE.task_dao.delete(&&store.1.task_id);
@@ -56,7 +56,7 @@ impl InnerController {
         for instance in plan.plan.iter() {
             match SVC_NATURE.store_svc.generate_store_task(instance) {
                 Ok(task) => {
-                    match RawTask::new(&task, &plan.to.key, TaskType::Store as i16) {
+                    match RawTask::new(&task, &plan.to.get_full_key(), TaskType::Store as i16) {
                         Ok(x) => {
                             store_infos.push(x.clone());
                             t_d.push((task, x))

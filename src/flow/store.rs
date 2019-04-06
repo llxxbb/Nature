@@ -27,10 +27,10 @@ pub struct StoreServiceImpl {
 
 impl StoreServiceTrait for StoreServiceImpl {
     fn input(&self, mut instance: Instance) -> Result<u128> {
-        instance.data.thing.thing_type = ThingType::Business;
+        instance.data.thing.set_thing_type(ThingType::Business);
         let uuid = self.svc_instance.verify(&mut instance)?;
         let task = self.generate_store_task(&instance)?;
-        let carrier = RawTask::new(&task, &instance.thing.key, TaskType::Store as i16)?;
+        let carrier = RawTask::new(&task, &instance.thing.get_full_key(), TaskType::Store as i16)?;
         self.task_dao.insert(&carrier)?;
         self.do_task(&task, &carrier)?;
         Ok(uuid)
@@ -45,10 +45,10 @@ impl StoreServiceTrait for StoreServiceImpl {
             id: 0,
             data: instance.instance.data,
         };
-        ins.data.thing.thing_type = ThingType::Dynamic;
+        ins.data.thing.set_thing_type(ThingType::Dynamic);
         let uuid = self.svc_instance.id_generate_if_not_set(&mut ins)?;
         let task = self.generate_self_route_task(&ins, instance.converter)?;
-        let carrier = RawTask::new(&task, &ins.thing.key, TaskType::Store as i16)?;
+        let carrier = RawTask::new(&task, &ins.thing.get_full_key(), TaskType::Store as i16)?;
         self.do_task(&task, &carrier)?;
         Ok(uuid)
     }
@@ -82,7 +82,7 @@ impl StoreServiceTrait for StoreServiceImpl {
 impl StoreServiceImpl {
     /// save to db and handle duplicated data
     fn save(&self, instance: &Instance) -> Result<usize> {
-        debug!("save instance for `Thing` {:?}, id : {:?}", instance.thing.key, instance.id);
+        debug!("save instance for `Thing` {:?}, id : {:?}", instance.thing.get_full_key(), instance.id);
         let result = self.instance_dao.insert(instance);
         match result {
             Ok(num) => Ok(num),
@@ -111,7 +111,7 @@ impl StoreServiceImpl {
 mod test {
     use mockers::matchers::{ANY, check};
 
-    use test_util::*;
+    use crate::test_util::*;
 
     use super::*;
 
@@ -121,10 +121,10 @@ mod test {
         let mocks = MyMocks::new();
         let store_svc = init_store_svc(&mocks);
         // expect
-        mocks.s.expect(mocks.s_instance.verify_call(check(|x: &&mut Instance| x.thing.thing_type == ThingType::Business))
+        mocks.s.expect(mocks.s_instance.verify_call(check(|x: &&mut Instance| x.thing.get_thing_type() == ThingType::Business))
             .and_return(Err(NatureError::VerifyError("deliberate".to_string()))));
         let mut instance = Instance::default();
-        instance.data.thing.thing_type = ThingType::Dynamic;
+        instance.data.thing.set_thing_type(ThingType::Dynamic);
         // run
         let _rtn = store_svc.input(instance);
     }
@@ -138,7 +138,7 @@ mod test {
         mocks.s.expect(mocks.s_instance.verify_call(ANY)
             .and_return(Err(NatureError::VerifyError("Thing must be defined".to_string()))));
         let mut instance = Instance::default();
-        instance.data.thing.thing_type = ThingType::Dynamic;
+        instance.data.thing.set_thing_type(ThingType::Dynamic);
         // run
         let rtn = store_svc.input(instance);
         assert_eq!(rtn.err().unwrap(), NatureError::VerifyError("Thing must be defined".to_string()))
@@ -150,11 +150,10 @@ mod test {
         let mocks = MyMocks::new();
         let store_svc = init_store_svc(&mocks);
         // expect
-        let mut instance = Instance::default();
-        instance.data.thing.key = "123".to_string();
+        let instance = Instance::new("123");
         mocks.s.expect(mocks.s_instance.verify_call(ANY)
             .and_return(generate_id(&instance)));
-        mocks.s.expect(mocks.s_route.get_mission_call(check(|x: &&Instance| x.thing.key == "123"))
+        mocks.s.expect(mocks.s_route.get_mission_call(check(|x: &&Instance| x.thing.get_full_key() == "/B/123"))
             .and_return(Err(NatureError::VerifyError("get task error".to_string()))));
         // run
         let rtn = store_svc.input(instance);
@@ -167,13 +166,12 @@ mod test {
         let mocks = MyMocks::new();
         let store_svc = init_store_svc(&mocks);
         // expect
-        let mut instance = Instance::default();
-        instance.data.thing.key = "123".to_string();
+        let instance = Instance::new("123");
         mocks.s.expect(mocks.s_instance.verify_call(ANY)
             .and_return(generate_id(&instance)));
         mocks.s.expect(mocks.s_route.get_mission_call(ANY)
             .and_return(Ok(Some(vec![Mission::default()]))));
-        mocks.s.expect(mocks.d_task.insert_call(check(|x: &&RawTask| x.thing == "123"))
+        mocks.s.expect(mocks.d_task.insert_call(check(|x: &&RawTask| x.thing == "/B/123"))
             .and_return(Err(NatureError::VerifyError("insert task error".to_string()))));
         // run
         let rtn = store_svc.input(instance);
@@ -186,17 +184,16 @@ mod test {
         let mocks = MyMocks::new();
         let store_svc = init_store_svc(&mocks);
         // expect
-        let mut instance = Instance::default();
-        instance.data.thing.key = "123".to_string();
+        let instance = Instance::new("123");
         mocks.s.expect(mocks.s_instance.verify_call(ANY)
             .and_return(generate_id(&instance)));
         mocks.s.expect(mocks.s_route.get_mission_call(ANY)
             .and_return(Ok(Some(vec![Mission::default()]))));
         mocks.s.expect(mocks.d_task.insert_call(ANY)
             .and_return(Ok(1)));
-        mocks.s.expect(mocks.d_instance.insert_call(check(|x: &&Instance| x.thing.key == "123"))
+        mocks.s.expect(mocks.d_instance.insert_call(check(|x: &&Instance| x.thing.get_full_key() == "/B/123"))
             .and_return(Err(NatureError::VerifyError("insert instance error".to_string()))));
-        mocks.s.expect(mocks.d_task.raw_to_error_call(ANY, check(|x: &&RawTask| x.thing == "123"))
+        mocks.s.expect(mocks.d_task.raw_to_error_call(ANY, check(|x: &&RawTask| x.thing == "/B/123"))
             .and_return(Ok(1)));
         // run
         let rtn = store_svc.input(instance);
@@ -209,19 +206,18 @@ mod test {
         let mocks = MyMocks::new();
         let store_svc = init_store_svc(&mocks);
         // expect
-        let mut instance = Instance::default();
-        instance.data.thing.key = "123".to_string();
+        let instance = Instance::new("123");
         mocks.s.expect(mocks.s_instance.verify_call(ANY)
             .and_return(generate_id(&instance)));
         mocks.s.expect(mocks.s_route.get_mission_call(ANY)
             .and_return(Ok(Some(vec![Mission::default()]))));
         mocks.s.expect(mocks.d_task.insert_call(ANY)
             .and_return(Ok(1)));
-        mocks.s.expect(mocks.d_instance.insert_call(check(|x: &&Instance| x.thing.key == "123"))
+        mocks.s.expect(mocks.d_instance.insert_call(check(|x: &&Instance| x.thing.get_full_key() == "/B/123"))
             .and_return(Ok(1)));
         // run
         let rtn = store_svc.input(instance);
-        assert_eq!(rtn.unwrap(), 157623018616273791007256710966552945966)
+        assert_eq!(rtn.unwrap(), 47214786889964314131542807897190159873)
     }
 
     fn init_store_svc(mockers: &MyMocks) -> StoreServiceImpl {

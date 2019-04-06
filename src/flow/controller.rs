@@ -1,6 +1,6 @@
 use std::rc::Rc;
 
-use flow::sequential::SequentialServiceImpl;
+use crate::flow::sequential::SequentialServiceImpl;
 use nature_db::*;
 use nature_db::service::*;
 

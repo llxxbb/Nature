@@ -3,7 +3,7 @@ use std::iter::Iterator;
 use std::rc::Rc;
 use std::str::FromStr;
 
-use system::*;
+use crate::system::*;
 
 use super::*;
 
@@ -113,7 +113,7 @@ impl ConvertServiceTrait for ConvertServiceImpl {
             match self.new_one_converter_info(&task.instance, &c) {
                 Err(err) => return Err(err),
                 Ok(x) => {
-                    let car = RawTask::new(&x, &c.to.key, TaskType::Convert as i16)?;
+                    let car = RawTask::new(&x, &c.to.get_full_key(), TaskType::Convert as i16)?;
                     new_carriers.push((x, car));
                 }
             }
@@ -125,7 +125,7 @@ impl ConvertServiceTrait for ConvertServiceImpl {
 impl ConvertServiceImpl {
     fn handle_instances(&self, task: &ConverterInfo, carrier: &RawTask, instances: &mut Vec<Instance>) -> Result<()> {
         // check `ThingType` for Null
-        if task.target.to.thing_type == ThingType::Null {
+        if task.target.to.get_thing_type() == ThingType::Null {
             let rtn = Converted {
                 done_task: carrier.to_owned(),
                 converted: Vec::new(),
@@ -190,7 +190,7 @@ impl ConvertServiceImpl {
         }
 
         // all biz must same to "to"
-        for mut r in instances {
+        for r in instances {
             let mut instance = r.clone();
             instance.data.thing = to.clone();
             rtn.push(instance);
@@ -202,7 +202,7 @@ impl ConvertServiceImpl {
 
 #[cfg(test)]
 mod test {
-    use test_util::*;
+    use crate::test_util::*;
 
     use super::*;
     use mockers::matchers::ANY;

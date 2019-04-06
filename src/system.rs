@@ -2,7 +2,7 @@
 extern crate dotenv;
 extern crate uuid;
 
-use channels::start_receive_threads;
+use crate::channels::start_receive_threads;
 use nature_common::util::setup_logger;
 use self::dotenv::dotenv;
 use std::thread::JoinHandle;
