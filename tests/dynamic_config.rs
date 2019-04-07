@@ -66,7 +66,8 @@ fn write_one_target_to_db() {
     // query target
     thread::sleep(time::Duration::from_millis(500));
     let dao = InstanceDaoImpl {};
-    let _ins_db = dao.get_by_id(64608961992354323405453802188093613020).unwrap().unwrap();
+    let ins_db = dao.get_by_id(64608961992354323405453802188093613020).unwrap().unwrap();
+    assert_eq!("/D/dynamic/one_target", ins_db.thing.get_full_key());
 }
 
 #[test]
@@ -93,6 +94,8 @@ fn write_two_target_to_db() {
     // query target
     thread::sleep(time::Duration::from_millis(2000));
     let dao = InstanceDaoImpl {};
-    let _ins_db = dao.get_by_id(229131768420092721318239706157158451568).unwrap().unwrap();
-    let _ins_db = dao.get_by_id(217550842272210133848994195869177780408).unwrap().unwrap();
+    let ins_db = dao.get_by_id(229131768420092721318239706157158451568).unwrap().unwrap();
+    assert_eq!("/D/dynamic/two_of_1", ins_db.thing.get_full_key());
+    let ins_db = dao.get_by_id(217550842272210133848994195869177780408).unwrap().unwrap();
+    assert_eq!("/D/dynamic/two_of_2", ins_db.thing.get_full_key());
 }
