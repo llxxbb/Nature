@@ -6,6 +6,7 @@ use std::time::Duration;
 use lru_time_cache::LruCache;
 
 use nature_common::*;
+use crate::flow::convert::caller::ExecutorTrait;
 
 type CALLER<'a> = lib::Symbol<'a, fn(&CallOutParameter) -> ConverterReturned>;
 type LIB = Option<lib::Library>;
@@ -16,13 +17,10 @@ lazy_static! {
 }
 
 
-pub trait LocalExecutorTrait {
-    fn execute(&self, executor: &str, para: &CallOutParameter) -> ConverterReturned;
-}
 
 pub struct LocalExecutorImpl;
 
-impl LocalExecutorTrait for LocalExecutorImpl {
+impl ExecutorTrait for LocalExecutorImpl {
     fn execute(&self, executor: &str, para: &CallOutParameter) -> ConverterReturned {
         match Self::get_entry(executor) {
             None => ConverterReturned::None,

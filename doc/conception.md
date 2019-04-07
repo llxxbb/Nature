@@ -22,7 +22,23 @@ The same input `Thing` will get same `Thing`s output.
 
 ### Trace
 
+### consistent
 
+automatic Retry, callback
+
+## Orchestration
+
+### Static Orchestration
+
+Design how `Nature` to work before it process `Thing`s. 
+In this way `ThingDefine` and `Converter` will be cached so it's a efficient way, 
+
+### Dynamic Orchestration
+
+Design how `Nature` how to process `Thing` at runtime. 
+In this way you need provide `Converter` in every input `Thing`'s `Instance`, 
+and even in output `Instance` if it has downstream `Instance`.
+It can occupy more size of memory than `Static Orchestration`, but it's flexible.
 
 ## Thing
 

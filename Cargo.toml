@@ -27,6 +27,7 @@ dotenv = "0.11"
 # webup
 rocket = "0.4"
 rocket_contrib = "0.4"
+reqwest = "0.9"
 
 # self project group
 nature_common = {path = "../Nature-Common"}

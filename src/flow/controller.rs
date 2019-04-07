@@ -1,6 +1,6 @@
 use std::rc::Rc;
 
-use crate::flow::sequential::SequentialServiceImpl;
+use crate::flow::*;
 use nature_db::*;
 use nature_db::service::*;
 
@@ -55,7 +55,10 @@ impl ControllerImpl {
             converter_svc: Rc::new(ConvertServiceImpl {
                 svc_task: svc_task.clone(),
                 dao_task: dao_task.clone(),
-                caller: Rc::new(CallOutImpl { local_rust: Rc::new(LocalExecutorImpl {}) }),
+                caller: Rc::new(CallOutImpl {
+                    local_rust: Rc::new(LocalExecutorImpl {}),
+                    http_caller: Rc::new(HttpExecutorImpl {})
+                }),
                 svc_define: cache_define.clone(),
                 dao_instance: dao_instance.clone(),
                 svc_instance: svc_instance.clone(),
