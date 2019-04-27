@@ -33,14 +33,12 @@ actix-web = "0.7"
 
 # self project group
 nature_common = {path = "../Nature-Common"}
-nature_db = {path = "../Nature-DB"}
+nature_db = {path = "../Nature-DB", features = ["mysql"]}
 
 # test
 [dev-dependencies]
 mockers_derive = "0.13"
 mockers = "0.13"
-nature_common = {path = "../Nature-Common"}
-nature_db = {path = "../Nature-DB"}
 
 [workspace]
 members = ["../Nature-Common","../Nature-DB","../Nature-Retry","../Nature-integrate-test-converter"]

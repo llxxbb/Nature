@@ -14,7 +14,7 @@ mod common;
 
 #[test]
 fn convert_is_empty() {
-    env::set_var("DATABASE_URL", "nature.sqlite");
+    env::set_var("DATABASE_URL", "mysql://root@localhost/nature");
     // prepare input para
     let instance = Instance::new_with_type("/dynamic/converter/is/empty", ThingType::Dynamic).unwrap();
     let instance = SelfRouteInstance {
@@ -29,7 +29,7 @@ fn convert_is_empty() {
 #[test]
 fn target_is_null() {
     let _ = sys_init();
-    env::set_var("DATABASE_URL", "nature.sqlite");
+    env::set_var("DATABASE_URL", "mysql://root@localhost/nature");
     // prepare input para
     let instance = Instance::new_with_type("/dynamic/target/is/null", ThingType::Dynamic).unwrap();
     let instance = SelfRouteInstance {
@@ -50,7 +50,7 @@ fn target_is_null() {
 #[test]
 fn write_one_target_to_db() {
     let _ = sys_init();
-    env::set_var("DATABASE_URL", "nature.sqlite");
+    env::set_var("DATABASE_URL", "mysql://root@localhost/nature");
     // prepare input para
     let instance = Instance::new_with_type("/dynamic/write/one", ThingType::Dynamic).unwrap();
     let instance = SelfRouteInstance {
@@ -73,7 +73,7 @@ fn write_one_target_to_db() {
 #[test]
 fn write_two_target_to_db() {
     let _ = sys_init();
-    env::set_var("DATABASE_URL", "nature.sqlite");
+    env::set_var("DATABASE_URL", "mysql://root@localhost/nature");
     // prepare input para
     let instance = Instance::new_with_type("/dynamic/write/two", ThingType::Dynamic).unwrap();
     let instance = SelfRouteInstance {
