@@ -9,6 +9,7 @@ use crate::flow::store::StoreServiceTrait;
 use crate::system::*;
 
 use super::*;
+use nature_db::task_type::TaskType;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct SerialFinished {

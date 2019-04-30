@@ -6,6 +6,8 @@ use std::str::FromStr;
 use crate::system::*;
 
 use super::*;
+use nature_db::converter_cfg::{ConverterInfo, Mission, LastStatusDemand};
+use nature_db::task_type::TaskType;
 
 pub trait ConvertServiceTrait {
     fn callback(&self, delayed: DelayedInstances) -> Result<()>;

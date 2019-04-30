@@ -1,6 +1,8 @@
 use std::rc::Rc;
 
 use super::*;
+use nature_db::converter_cfg::{ConverterInfo, Mission};
+use nature_db::task_type::TaskType;
 
 #[derive(Debug, Serialize, Deserialize, Clone, Default)]
 pub struct StoreTaskInfo {

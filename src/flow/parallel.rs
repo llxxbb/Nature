@@ -3,6 +3,7 @@ use std::rc::Rc;
 use crate::flow::store::StoreServiceTrait;
 
 use super::*;
+use nature_db::task_type::TaskType;
 
 pub trait ParallelServiceTrait {
     fn parallel(&self, batch: ParallelBatchInstance) -> Result<()>;
