@@ -1,20 +1,64 @@
 # Nature
 
+Nature Help you to manage your data from a __High Perspective__. and automatic converting one data to another data incessantly, this will be continuing until all data __assigned by you__ be converted.
+
+Sorry for the  __Nature__ word that named for this project.  Nature means all things,  surely this Nature can not, but I could not think out an suitable word to describe it. It can do all the topic's (__Workflow__, __Message Queue__, __Stream__, __BPM__, __Map Reduce__, __Gateway__, __Distributed_System__ and __Database__) works which I list for this project.
+
+Please do not think it too complicated. there are only few things be introduced in this project: __data__ and __relation__ between data. Just like atoms and there relations make up the complex world, in this project __thing__ make up all your business. So I like the name __Nature__. 
+
+## A big question
+
+This project orient to many fields, and each field have their own mature and good projects. why do I give a new one? 
+
+No, the project only focus on one field: __Data__. I have no intention of compelling with other fields, it's just in these fields, let us to see it deeper.
+
+### Functions vs goals
+
+__Workflow__, __Message Queue__, __Stream__, __BPM__, __Map Reduce__ are __functions__ oriented, it may let business go, but when business grow very large, you may __lost__ in functions, because function can __hide goals(data) inadvertently__ and one function can be easily replaced with another, so we maintain functions uneasy.
+
+Nature let you to plan your __goals__ (data), so there are clearly in there and not be replaced easily.  nature __"hide functions deliberately"__ for you to easy you work. So nature can simplify your Road Map or current Topographic Map greatly.
+
+### Bottom-up management vs top-down management
+
+__Gateway__, __Distributed_System__ and __Database__ are __bottom-up management__. They are technology oriented, there manage their own affairs in their own way, so it's hard to unify and simple the management.
+
+Nature let you declare the relation  between goals  and who can do transfer between the goals.  This is all you need to do, other things nature will take care.
+
+- Nature like a __gateway__: You don't care the data go where and how to go.
+- Nature like a __distributed system__: you don't care data availability and consistently.
+- Nature like a __KV-database__:  you can query data you putted in and transferred.
+
+So Nature let you manage your business on the __Top perspective__,   don't care __Route__, __Distribute__,__Store__ and other problems. But these is not all, Nature will support plugins(not implement yet.).
+
+## A concrete example
+
+​	Assume we want to implement an Online-Shop  system.
+
+### plan goals
+
+### runtime
+
+
+
+
+
+## Not finishing
+
 Nature is a abstract from the real nature. It is a __dynamic system__ which changes `thing`s and transforms `thing`s __incessantly__ over time, but all It's history could be __traced__. 
 
 Nature is a __business process choreographer__, she decouple business data from technology such as __service__, __Interface__ etc.,
 and take care of your data in consistence state, 
 but you need to give the data to Nature first.
- 
+
 Nature like a proxy between services, and make the service easy to develop and maintenance.
 
-Nature now is in very earlier stage. 
+Important : Nature now is in very earlier stage.
 
-## Pain point
-![Alt text](doc/img/幻灯片4.jpg)
+## Pain points of the reality
+
+![data consistency under distribute system](doc/img/幻灯片4.jpg)
 Communication between services is unreliable, 
-It would be a complex, repetitive and hard work for checking, retrying and ensuring data idempotent,
-It would spend our much time and money on it.
+It would be a complex, repetitive and hard work for coding, testing. Another important thing  is to make a call idempotent. It would spend our much time and money on it.
 
 ![Alt text](doc/img/幻灯片5.jpg)
 Service is the owner of data, and control the entry for the data. 
