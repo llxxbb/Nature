@@ -6,15 +6,15 @@ fork
     :pay for the order;
     |nature|
     :write payment to db;
-    :remark order status to "payed";
+    :mark order status to "payed";
 fork again
     |#AntiqueWhite|nature|
     :write order to db;
-    :remark order status to "new";
+    :mark order status to "new";
 end fork
 |nature|
 fork
-:remark order status to "stork removing";
+:mark order status to "stork removing";
 fork again
 :write release application to db;
 :dispatch release application to warehouse;
@@ -24,7 +24,7 @@ fork again
 :write outbound order to db;
 end fork
 fork
-:remark order status to "shipping";
+:mark order status to "shipping";
 fork again
 :write deliver application to db;
 :dispatch deliver application to logistics;
@@ -33,6 +33,6 @@ fork again
 |nature|
 :write receipt form to db;
 end fork
-:remark order status to "finished";
+:mark order status to "finished";
 stop
 @enduml

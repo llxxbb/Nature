@@ -22,6 +22,12 @@ one input and one output
 
 
 
+## Status Data & Stateless Data
+
+stateless data have only one version for an instance, but status data can have many version for a instance. If we look from outer, the stateless is immutable and status data is mutable.
+
+例如 Order and OrderStatus.
+
 ## handle error
 
 environment exception and business exception
