@@ -1,0 +1,9 @@
+@startuml
+(Order)-d->(OrderStatus):>new
+(Payment)-d->(OrderStatus):c:orderId>payed
+(OutboundOrder)-u->(OrderStatus):c:orderId>shipping
+(ReceiptForm)-u->(OrderStatus):c:orderId>finished
+(OrderStatus)->(ReleaseApplication):s:payed
+(ReleaseApplication)->(OrderStatus):c:orderId>stock removing
+(OutboundOrder)-->(DeliverApplication):c:orderId
+@enduml

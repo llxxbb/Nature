@@ -13,3 +13,7 @@ introduce actix-web to replace with rocket
 ## gateway
 
 ## support plugins
+
+## 配置管理页面
+
+  更新配置时能够更新多个实例上的缓存

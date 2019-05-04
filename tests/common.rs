@@ -11,3 +11,6 @@ pub fn get_test_client() -> Client {
     Client::new(rocket).expect("valid rocket instance")
 }
 
+#[allow(dead_code)]
+//pub static CONN_STR : &str = "mysql://root@localhost/nature";
+pub static CONN_STR : &str = "nature.sqlite";

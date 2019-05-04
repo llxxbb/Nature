@@ -1,0 +1,38 @@
+@startuml
+|user|
+start
+:submit an order;
+fork
+    :pay for the order;
+    |nature|
+    :write payment to db;
+    :remark order status to "payed";
+fork again
+    |#AntiqueWhite|nature|
+    :write order to db;
+    :remark order status to "new";
+end fork
+|nature|
+fork
+:remark order status to "stork removing";
+fork again
+:write release application to db;
+:dispatch release application to warehouse;
+|warehouse|
+:order picking;
+|nature|
+:write outbound order to db;
+end fork
+fork
+:remark order status to "shipping";
+fork again
+:write deliver application to db;
+:dispatch deliver application to logistics;
+|logistics|
+:shipping;
+|nature|
+:write receipt form to db;
+end fork
+:remark order status to "finished";
+stop
+@enduml

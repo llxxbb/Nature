@@ -10,11 +10,13 @@ use nature::system::sys_init;
 use nature_common::*;
 use nature_db::*;
 
-mod common;
+use crate::common::CONN_STR;
+
+pub mod common;
 
 #[test]
 fn convert_is_empty() {
-    env::set_var("DATABASE_URL", "mysql://root@localhost/nature");
+    env::set_var("DATABASE_URL", CONN_STR);
     // prepare input para
     let instance = Instance::new_with_type("/dynamic/converter/is/empty", ThingType::Dynamic).unwrap();
     let instance = SelfRouteInstance {
@@ -29,7 +31,7 @@ fn convert_is_empty() {
 #[test]
 fn target_is_null() {
     let _ = sys_init();
-    env::set_var("DATABASE_URL", "mysql://root@localhost/nature");
+    env::set_var("DATABASE_URL", CONN_STR);
     // prepare input para
     let instance = Instance::new_with_type("/dynamic/target/is/null", ThingType::Dynamic).unwrap();
     let instance = SelfRouteInstance {
@@ -50,7 +52,7 @@ fn target_is_null() {
 #[test]
 fn write_one_target_to_db() {
     let _ = sys_init();
-    env::set_var("DATABASE_URL", "mysql://root@localhost/nature");
+    env::set_var("DATABASE_URL", CONN_STR);
     // prepare input para
     let instance = Instance::new_with_type("/dynamic/write/one", ThingType::Dynamic).unwrap();
     let instance = SelfRouteInstance {
@@ -73,7 +75,7 @@ fn write_one_target_to_db() {
 #[test]
 fn write_two_target_to_db() {
     let _ = sys_init();
-    env::set_var("DATABASE_URL", "mysql://root@localhost/nature");
+    env::set_var("DATABASE_URL", CONN_STR);
     // prepare input para
     let instance = Instance::new_with_type("/dynamic/write/two", ThingType::Dynamic).unwrap();
     let instance = SelfRouteInstance {

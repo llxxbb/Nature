@@ -1,0 +1,25 @@
+@startuml
+
+class Order
+
+Enum OrderStatus{
+    new
+    payed
+    stock removing
+    shipping
+    finished
+}
+
+class Payment
+
+class ReleaseApplication
+
+class OutboundOrder
+
+class DeliverApplication
+
+class ReceiptForm
+
+
+
+@enduml

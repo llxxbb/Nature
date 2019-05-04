@@ -16,3 +16,19 @@ retry
 
 Nature __short process__ can organize all the your business into a web directly,
 
+
+
+one input and one output
+
+
+
+## handle error
+
+environment exception and business exception
+
+## compatibility
+
+
+
+## hot pluggable
+
