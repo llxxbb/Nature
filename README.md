@@ -53,6 +53,9 @@ Backend data process, that is __asynchronized__. I have a plan to handle data __
 
 [A concrete example](doc\help\demo\demo.md)
 
+[Guide](doc\help\guide.md)
+
 [Concept](doc\help\concept.md)
 
 [Architecture](doc\help\architecture.md)
+
