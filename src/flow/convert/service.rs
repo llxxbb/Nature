@@ -85,7 +85,7 @@ impl ConvertServiceTrait for ConvertServiceImpl {
 
     fn new_one_converter_info(&self, instance: &Instance, mapping: &Mission) -> Result<ConverterInfo> {
         let define = match mapping.to.get_thing_type() {
-            ThingType::Dynamic => ThingDefine::default(),
+            ThingType::Dynamic => RawThingDefine::default(),
             _ => self.svc_define.get(&mapping.to)?
         };
         let last_target = if define.is_status() {
@@ -178,7 +178,7 @@ impl ConvertServiceImpl {
         let mut rtn: Vec<Instance> = Vec::new();
         // only one status instance should return
         let define = match to.get_thing_type() {
-            ThingType::Dynamic => ThingDefine::default(),
+            ThingType::Dynamic => RawThingDefine::default(),
             _ => self.svc_define.get(to)?
         };
         if define.is_status() {

@@ -75,8 +75,8 @@ mock! {
     ThingDefineDaoTraitMock,
     self,
     trait ThingDefineDaoTrait {
-        fn get(thing: &Thing) -> Result<Option<ThingDefine>>;
-        fn insert(define: &ThingDefine) -> Result<usize>;
+        fn get(thing: &Thing) -> Result<Option<RawThingDefine>>;
+        fn insert(define: &RawThingDefine) -> Result<usize>;
         fn delete(thing: &Thing) -> Result<usize>;
     }
 }
@@ -85,7 +85,7 @@ mock! {
     ThingDefineCacheTraitMock,
     self,
     trait ThingDefineCacheTrait {
-        fn get(&self, thing: &Thing) -> Result<ThingDefine>;
+        fn get(&self, thing: &Thing) -> Result<RawThingDefine>;
     }
 }
 
