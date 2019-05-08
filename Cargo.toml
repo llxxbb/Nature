@@ -30,7 +30,6 @@ rocket_contrib = "0.4"
 reqwest = "0.9"
 actix-web = "0.7"
 
-
 # self project group
 nature_common = {path = "../Nature-Common"}
 nature_db = {path = "../Nature-DB", features = ["sqlite"]}

@@ -58,3 +58,25 @@ Nature support four `Thing Type`:
 ```
 LOCALRUST|HTTP|HTTPS
 ```
+
+### Protocol example
+
+- Http
+
+```json
+{
+    "protocol":"Http",
+    "url":"http://some_domain:8081/some_converter"
+}
+```
+
+- LocalRust
+
+```json
+{
+    "protocol":"LocalRust",
+    "url":"some_lib.dll:some_converter"
+}
+```
+
+  
