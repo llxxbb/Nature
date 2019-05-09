@@ -3,11 +3,12 @@ use std::iter::Iterator;
 use std::rc::Rc;
 use std::str::FromStr;
 
+use nature_db::converter_cfg::{ConverterInfo, LastStatusDemand, Mission};
+use nature_db::task_type::TaskType;
+
 use crate::system::*;
 
 use super::*;
-use nature_db::converter_cfg::{ConverterInfo, Mission, LastStatusDemand};
-use nature_db::task_type::TaskType;
 
 pub trait ConvertServiceTrait {
     fn callback(&self, delayed: DelayedInstances) -> Result<()>;
@@ -22,7 +23,6 @@ pub struct ConvertServiceImpl {
     pub caller: Rc<CallOutTrait>,
     pub svc_define: Rc<ThingDefineCacheTrait>,
     pub dao_instance: Rc<InstanceDaoTrait>,
-    pub svc_instance: Rc<InstanceServiceTrait>,
 }
 
 impl ConvertServiceTrait for ConvertServiceImpl {
@@ -141,7 +141,7 @@ impl ConvertServiceImpl {
         // check status version to avoid loop
         let _ = instances.iter_mut().map(|one: &mut Instance| {
             one.data.thing = task.target.to.clone();
-            let _ = self.svc_instance.verify(one);
+            let _ = one.fix_id();
             one
         }).collect::<Vec<_>>();
         let instances = self.verify(&task.target.to, &instances)?;
@@ -199,7 +199,7 @@ impl ConvertServiceImpl {
         for r in instances {
             let mut instance = r.clone();
             instance.data.thing = to.clone();
-            let _ = self.svc_instance.id_generate_if_not_set(&mut instance);
+            let _ = instance.fix_id();
             rtn.push(instance);
         }
 
@@ -232,7 +232,6 @@ mod test {
             dao_task: mockers.d_task.clone(),
             caller: mockers.call_out.clone(),
             svc_define: mockers.s_thing_define_cache.clone(),
-            svc_instance: mockers.s_instance.clone(),
             dao_instance: mockers.d_instance.clone(),
         }
     }

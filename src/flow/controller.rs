@@ -21,7 +21,6 @@ impl ControllerImpl {
     pub fn new() -> Self {
         let cache_define = SVC_DB.thing_define.clone();
         let dao_instance = Rc::new(InstanceDaoImpl {});
-        let svc_instance = Rc::new(InstanceServiceImpl { define_cache: cache_define.clone() });
         let dao_task = Rc::new(TaskDaoImpl {});
         let svc_task = Rc::new(TaskServiceImpl { table_task: dao_task.clone() });
         let svc_store = Rc::new(StoreServiceImpl {
@@ -32,7 +31,6 @@ impl ControllerImpl {
             }),
             task_svc: svc_task.clone(),
             task_dao: dao_task.clone(),
-            svc_instance: svc_instance.clone(),
         });
 
         ControllerImpl {
@@ -41,7 +39,6 @@ impl ControllerImpl {
                 svc_task: svc_task.clone(),
                 dao_task: dao_task.clone(),
                 store: svc_store.clone(),
-                svc_instance: svc_instance.clone(),
                 dao_instance: dao_instance.clone(),
             }),
             batch_parallel_svc: Rc::new(ParallelServiceImpl {
@@ -58,7 +55,6 @@ impl ControllerImpl {
                 }),
                 svc_define: cache_define.clone(),
                 dao_instance: dao_instance.clone(),
-                svc_instance: svc_instance.clone(),
             }),
             task_svc: svc_task.clone(),
             plan_svc: Rc::new(PlanServiceImpl { dao: Rc::new(StorePlanDaoImpl {}) }),

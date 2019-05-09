@@ -5,11 +5,12 @@ use std::rc::Rc;
 use chrono::prelude::*;
 use serde_json;
 
+use nature_db::task_type::TaskType;
+
 use crate::flow::store::StoreServiceTrait;
 use crate::system::*;
 
 use super::*;
-use nature_db::task_type::TaskType;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct SerialFinished {
@@ -26,7 +27,6 @@ pub struct SequentialServiceImpl {
     pub svc_task: Rc<TaskServiceTrait>,
     pub dao_task: Rc<TaskDaoTrait>,
     pub store: Rc<StoreServiceTrait>,
-    pub svc_instance: Rc<InstanceServiceTrait>,
     pub dao_instance: Rc<InstanceDaoTrait>,
 }
 
@@ -101,10 +101,11 @@ impl SequentialServiceImpl {
         for mut instance in task.instances {
             instance.data.thing.set_thing_type(ThingType::Business);
             instance.data.thing = task.thing.clone();
-            if let Err(err) = self.svc_instance.verify(&mut instance) {
+            if let Err(err) = instance.thing.check(|x| ThingDefineCacheImpl.get(x)) {
                 errors.push(format!("{:?}", err));
                 continue;
             }
+            let _ = instance.fix_id();
             match self.dao_instance.insert(&instance) {
                 Ok(_) => succeeded_id.push(instance.id),
                 Err(err) => match err {

@@ -36,16 +36,6 @@ mock! {
 }
 
 mock! {
-    InstanceServiceTraitMock,
-    nature_db,
-    trait InstanceServiceTrait {
-        fn verify(&self, instance: &mut Instance) -> Result<u128>;
-        /// gegerate by Hash.
-        fn id_generate_if_not_set(&self, instance: &mut Instance) -> Result<u128>;
-    }
-}
-
-mock! {
     RouteServiceTraitMock,
     self,
     trait RouteServiceTrait {
@@ -97,7 +87,6 @@ pub struct MyMocks {
     pub s: Scenario,
     pub s_thing_define_cache: Rc<ThingDefineCacheTraitMock>,
     pub d_thing_define: Rc<ThingDefineDaoTraitMock>,
-    pub s_instance: Rc<InstanceServiceTraitMock>,
     pub d_instance: Rc<InstanceDaoTraitMock>,
     pub s_route: Rc<RouteServiceTraitMock>,
     pub s_task: Rc<TaskServiceTraitMock>,
@@ -110,7 +99,6 @@ impl MyMocks {
         let s = Scenario::new();
         let s_thing_define_cache = Rc::new(s.create_mock::<ThingDefineCacheTraitMock>());
         let d_thing_define = Rc::new(s.create_mock::<ThingDefineDaoTraitMock>());
-        let s_instance = Rc::new(s.create_mock::<InstanceServiceTraitMock>());
         let d_instance = Rc::new(s.create_mock::<InstanceDaoTraitMock>());
         let s_route = Rc::new(s.create_mock::<RouteServiceTraitMock>());
         let s_task = Rc::new(s.create_mock::<TaskServiceTraitMock>());
@@ -120,7 +108,6 @@ impl MyMocks {
             s,
             s_thing_define_cache,
             d_thing_define,
-            s_instance,
             d_instance,
             s_route,
             s_task,
