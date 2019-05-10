@@ -25,15 +25,13 @@ pub trait SequentialTrait {
 
 pub struct SequentialServiceImpl {
     pub svc_task: Rc<TaskServiceTrait>,
-    pub dao_task: Rc<TaskDaoTrait>,
     pub store: Rc<StoreServiceTrait>,
-    pub dao_instance: Rc<InstanceDaoTrait>,
 }
 
 impl SequentialTrait for SequentialServiceImpl {
     fn one_by_one(&self, batch: &SerialBatchInstance) -> Result<()> {
         let raw = RawTask::new(batch, &batch.thing.get_full_key(), TaskType::QueueBatch as i16)?;
-        match self.dao_task.insert(&raw) {
+        match TaskDaoImpl::insert(&raw) {
             Ok(_carrier) => {
                 // to process asynchronous
                 let _ = CHANNEL_SERIAL.sender.lock().unwrap().send((batch.to_owned(), raw));
@@ -48,7 +46,7 @@ impl SequentialTrait for SequentialServiceImpl {
         if let Ok(si) = self.store_batch_items(task) {
             match Self::new_virtual_instance(finish, si) {
                 Ok(instance) => {
-                    if let Ok(si) = self.store.generate_store_task(&instance) {
+                    if let Ok(si) = IncomeController::gen_store_task(&instance) {
                         match RawTask::new(&si, &instance.thing.get_full_key(), TaskType::QueueBatch as i16) {
                             Ok(new) => {
                                 let mut new = new;
@@ -57,13 +55,13 @@ impl SequentialTrait for SequentialServiceImpl {
                                 }
                             }
                             Err(err) => {
-                                let _ = self.dao_task.raw_to_error(&err, &carrier);
+                                let _ = TaskDaoImpl::raw_to_error(&err, &carrier);
                             }
                         }
                     }
                 }
                 Err(err) => {
-                    let _ = self.dao_task.raw_to_error(&err, &carrier);
+                    let _ = TaskDaoImpl::raw_to_error(&err, &carrier);
                 }
             };
         }
@@ -106,7 +104,7 @@ impl SequentialServiceImpl {
                 continue;
             }
             let _ = instance.fix_id();
-            match self.dao_instance.insert(&instance) {
+            match InstanceDaoImpl::insert(&instance) {
                 Ok(_) => succeeded_id.push(instance.id),
                 Err(err) => match err {
                     NatureError::DaoEnvironmentError(_) => return Err(err),

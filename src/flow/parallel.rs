@@ -12,14 +12,13 @@ pub trait ParallelServiceTrait {
 
 pub struct ParallelServiceImpl {
     pub task_svc: Rc<TaskServiceTrait>,
-    pub task_dao: Rc<TaskDaoTrait>,
     pub store: Rc<StoreServiceTrait>,
 }
 
 impl ParallelServiceTrait for ParallelServiceImpl {
     fn parallel(&self, batch: ParallelBatchInstance) -> Result<()> {
         let raw = RawTask::new(&batch, &batch.thing.get_full_key(), TaskType::ParallelBatch as i16)?;
-        match self.task_dao.insert(&raw) {
+        match TaskDaoImpl::insert(&raw) {
             Ok(_carrier) => {
                 // to process asynchronous
                 let _ = CHANNEL_PARALLEL.sender.lock().unwrap().send((batch, raw));
@@ -33,7 +32,7 @@ impl ParallelServiceTrait for ParallelServiceImpl {
         let mut tasks: Vec<RawTask> = Vec::new();
         let mut tuple: Vec<(StoreTaskInfo, RawTask)> = Vec::new();
         for instance in batch.instances.iter() {
-            match self.store.generate_store_task(instance) {
+            match IncomeController::gen_store_task(instance) {
                 Ok(task) => {
                     match RawTask::new(&task, &instance.thing.get_full_key(), TaskType::Store as i16) {
                         Ok(car) => {

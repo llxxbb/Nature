@@ -19,7 +19,7 @@ impl InnerController {
         let biz = store.0.instance.thing.get_full_key();
         if store.0.mission.is_none() {
             debug!("no follow data for : {}", biz);
-            let _ = SVC_NATURE.task_dao.delete(&&store.1.task_id);
+            let _ = TaskDaoImpl::delete(&&store.1.task_id);
             return;
         }
         let converters = match SVC_NATURE.converter_svc.generate_converter_info(&store.0) {
@@ -28,7 +28,7 @@ impl InnerController {
                 NatureError::DaoEnvironmentError(_) => return,
                 _ => {
                     debug!("get `one step info` error for : {}", biz);
-                    let _ = SVC_NATURE.task_dao.raw_to_error(&err, &store.1);
+                    let _ = TaskDaoImpl::raw_to_error(&err, &store.1);
                     return;
                 }
             }
@@ -54,7 +54,7 @@ impl InnerController {
         let mut store_infos: Vec<RawTask> = Vec::new();
         let mut t_d: Vec<(StoreTaskInfo, RawTask)> = Vec::new();
         for instance in plan.plan.iter() {
-            match SVC_NATURE.store_svc.generate_store_task(instance) {
+            match IncomeController::gen_store_task(instance) {
                 Ok(task) => {
                     match RawTask::new(&task, &plan.to.get_full_key(), TaskType::Store as i16) {
                         Ok(x) => {
@@ -63,7 +63,7 @@ impl InnerController {
                         }
                         Err(e) => {
                             error!("{}", e);
-                            let _ = SVC_NATURE.task_dao.raw_to_error(&e, carrier);
+                            let _ = TaskDaoImpl::raw_to_error(&e, carrier);
                             return;
                         }
                     }

@@ -10,36 +10,9 @@ use crate::support::*;
 use crate::flow::*;
 
 mock! {
-    InstanceDaoTraitMock,
-    nature_db,
-    trait InstanceDaoTrait{
-        fn insert(&self, instance: &Instance) -> Result<usize>;
-        /// check whether source stored earlier
-        fn is_exists(&self, instance: &Instance) -> Result<bool>;
-        fn get_by_id(&self, id: u128) -> Result<Option<Instance>>;
-        fn get_by_key(&self, key: &str, limit: i64) -> Result<Option<Vec<Instance>>>;
-        fn get_by_full_key(&self, key: &str, limit: i64) -> Result<Option<Vec<Instance>>>;
-    }
-}
-mock! {
-    TaskDaoTraitMock,
-    nature_db,
-    trait TaskDaoTrait{
-        fn insert(&self, raw: &RawTask) -> Result<usize>;
-        fn delete(&self, record_id: &[u8]) -> Result<usize>;
-        fn raw_to_error(&self, err: &NatureError, raw: &RawTask) -> Result<usize>;
-        fn update_execute_time(&self, record_id: &[u8], delay: i64) -> Result<()>;
-        fn increase_times_and_delay(&self, record_id: &[u8], delay: i32) -> Result<usize>;
-        fn get(&self, record_id: &[u8]) -> Result<Option<RawTask>>;
-        fn get_overdue(&self, seconds: &str) -> Result<Vec<RawTask>>;
-    }
-}
-
-mock! {
     RouteServiceTraitMock,
     self,
     trait RouteServiceTrait {
-        fn get_mission(&self, instance: &Instance) -> Result<Option<Vec<Mission>>>;
         fn get_dynamic_mission(&self, dynamic: Vec<DynamicConverter>) -> Result<Vec<Mission>>;
     }
 }
@@ -87,10 +60,8 @@ pub struct MyMocks {
     pub s: Scenario,
     pub s_thing_define_cache: Rc<ThingDefineCacheTraitMock>,
     pub d_thing_define: Rc<ThingDefineDaoTraitMock>,
-    pub d_instance: Rc<InstanceDaoTraitMock>,
     pub s_route: Rc<RouteServiceTraitMock>,
     pub s_task: Rc<TaskServiceTraitMock>,
-    pub d_task: Rc<TaskDaoTraitMock>,
     pub call_out: Rc<CallOutTraitMock>,
 }
 
@@ -99,19 +70,15 @@ impl MyMocks {
         let s = Scenario::new();
         let s_thing_define_cache = Rc::new(s.create_mock::<ThingDefineCacheTraitMock>());
         let d_thing_define = Rc::new(s.create_mock::<ThingDefineDaoTraitMock>());
-        let d_instance = Rc::new(s.create_mock::<InstanceDaoTraitMock>());
         let s_route = Rc::new(s.create_mock::<RouteServiceTraitMock>());
         let s_task = Rc::new(s.create_mock::<TaskServiceTraitMock>());
-        let d_task = Rc::new(s.create_mock::<TaskDaoTraitMock>());
         let call_out = Rc::new(s.create_mock::<CallOutTraitMock>());
         MyMocks {
             s,
             s_thing_define_cache,
             d_thing_define,
-            d_instance,
             s_route,
             s_task,
-            d_task,
             call_out,
         }
     }

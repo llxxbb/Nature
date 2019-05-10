@@ -3,7 +3,7 @@ use std::iter::Iterator;
 use std::rc::Rc;
 use std::str::FromStr;
 
-use nature_db::converter_cfg::{ConverterInfo, LastStatusDemand, Mission};
+use nature_db::converter_cfg::{ConverterInfo};
 use nature_db::task_type::TaskType;
 
 use crate::system::*;
@@ -19,22 +19,20 @@ pub trait ConvertServiceTrait {
 
 pub struct ConvertServiceImpl {
     pub svc_task: Rc<TaskServiceTrait>,
-    pub dao_task: Rc<TaskDaoTrait>,
     pub caller: Rc<CallOutTrait>,
     pub svc_define: Rc<ThingDefineCacheTrait>,
-    pub dao_instance: Rc<InstanceDaoTrait>,
 }
 
 impl ConvertServiceTrait for ConvertServiceImpl {
     fn callback(&self, delayed: DelayedInstances) -> Result<()> {
-        match self.dao_task.get(&delayed.carrier_id) {
+        match TaskDaoImpl::get(&delayed.carrier_id) {
             Ok(raw) => {
                 match raw {
                     None => Err(NatureError::VerifyError("task data missed, maybe it had done already.".to_string())),
                     Some(carrier) => match delayed.result {
                         CallbackResult::Err(err) => {
                             let err = NatureError::ConverterLogicalError(err);
-                            let _ = self.dao_task.raw_to_error(&err, &carrier);
+                            let _ = TaskDaoImpl::raw_to_error(&err, &carrier);
                             Err(err)
                         }
                         CallbackResult::Instances(mut ins) => {
@@ -59,16 +57,16 @@ impl ConvertServiceTrait for ConvertServiceImpl {
                     Err(err) => match err {
                         NatureError::DaoEnvironmentError(_) => (),
                         _ => {
-                            let _ = self.dao_task.raw_to_error(&err, &carrier);
+                            let _ = TaskDaoImpl::raw_to_error(&err, &carrier);
                         }
                     }
                 }
             }
             Ok(ConverterReturned::Delay(delay)) => {
-                let _ = self.dao_task.update_execute_time(&carrier.task_id, i64::from(delay));
+                let _ = TaskDaoImpl::update_execute_time(&carrier.task_id, i64::from(delay));
             }
             Ok(ConverterReturned::LogicalError(ss)) => {
-                let _ = self.dao_task.raw_to_error(&NatureError::ConverterLogicalError(ss), &carrier);
+                let _ = TaskDaoImpl::raw_to_error(&NatureError::ConverterLogicalError(ss), &carrier);
             }
             Ok(ConverterReturned::EnvError) => (),
             Ok(ConverterReturned::None) => (),
@@ -77,7 +75,7 @@ impl ConvertServiceTrait for ConvertServiceImpl {
                 NatureError::ConverterEnvironmentError(_) => (),
                 // other error will drop into error
                 _ => {
-                    let _ = self.dao_task.raw_to_error(&err, &carrier);
+                    let _ = TaskDaoImpl::raw_to_error(&err, &carrier);
                 }
             }
         };
@@ -93,7 +91,7 @@ impl ConvertServiceTrait for ConvertServiceImpl {
                 // context have target id
                 Some(status_id) => {
                     let status_id = u128::from_str(status_id)?;
-                    self.dao_instance.get_by_id(status_id)?
+                    InstanceDaoImpl::get_by_id(status_id)?
                 }
                 None => None,
             }
@@ -229,10 +227,8 @@ mod test {
     fn init_svc(mockers: &MyMocks) -> ConvertServiceImpl {
         ConvertServiceImpl {
             svc_task: mockers.s_task.clone(),
-            dao_task: mockers.d_task.clone(),
             caller: mockers.call_out.clone(),
             svc_define: mockers.s_thing_define_cache.clone(),
-            dao_instance: mockers.d_instance.clone(),
         }
     }
 }

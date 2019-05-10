@@ -1,5 +1,3 @@
-use std::rc::Rc;
-
 use super::*;
 
 pub trait TaskServiceTrait {
@@ -8,9 +6,7 @@ pub trait TaskServiceTrait {
     fn create_batch_and_finish_carrier(&self, news: &[RawTask], old_id: &[u8]) -> Result<()>;
 }
 
-pub struct TaskServiceImpl {
-    pub table_task: Rc<TaskDaoTrait>,
-}
+pub struct TaskServiceImpl;
 
 impl TaskServiceTrait for TaskServiceImpl {
     /// by performance reason, for one-to-one carry we can reuse the beginning carry to finish all flows.
@@ -25,9 +21,9 @@ impl TaskServiceTrait for TaskServiceImpl {
 
     fn create_batch_and_finish_carrier(&self, news: &[RawTask], old_id: &[u8]) -> Result<()> {
         for v in news {
-            self.table_task.insert(v)?;
+            TaskDaoImpl::insert(v)?;
         }
-        self.table_task.delete(old_id)?;
+        TaskDaoImpl::delete(old_id)?;
         Ok(())
     }
 }

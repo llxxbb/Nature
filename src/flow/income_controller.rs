@@ -8,8 +8,32 @@ pub struct IncomeController {}
 
 impl IncomeController {
     /// born an instance which is the beginning of the changes.
-    pub fn input(instance: Instance) -> Result<u128> {
-        SVC_NATURE.store_svc.input(instance)
+    pub fn input(mut instance: Instance) -> Result<u128> {
+        instance.mut_biz(ThingType::Business);
+        let _ = instance.thing.check(|x| ThingDefineCacheImpl.get(x));
+        let _ = instance.fix_id()?;
+        let task = IncomeController::gen_store_task(&instance)?;
+        let carrier = RawTask::new(&task, &instance.thing.get_full_key(), TaskType::Store as i16)?;
+        TaskDaoImpl::insert(&carrier)?;
+        // do_task -> make a reusable method
+        if let Err(err) = InstanceDaoImpl::save(&task.instance) {
+            let _ = TaskDaoImpl::raw_to_error(&err, &carrier);
+            return Err(err);
+        } else {
+            let _ = CHANNEL_STORED.sender.lock().unwrap().send((task.to_owned(), carrier.to_owned()));
+        }
+        Ok(instance.id)
+    }
+
+    pub fn gen_store_task(instance: &Instance) -> Result<StoreTaskInfo> {
+        let steps = match OneStepFlowCacheImpl::get(&instance.thing)? {
+            Some(steps) => {
+                Mission::filter_relations(&instance, steps)
+            }
+            None => None
+        };
+        let task = StoreTaskInfo::make_task(&instance, steps);
+        Ok(task)
     }
 
     /// born an instance which is the beginning of the changes.
