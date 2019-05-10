@@ -54,7 +54,7 @@ impl InnerController {
         let mut store_infos: Vec<RawTask> = Vec::new();
         let mut t_d: Vec<(StoreTaskInfo, RawTask)> = Vec::new();
         for instance in plan.plan.iter() {
-            match IncomeController::gen_store_task(instance) {
+            match StoreTaskInfo::gen_task(&instance,OneStepFlowCacheImpl::get,Mission::filter_relations) {
                 Ok(task) => {
                     match RawTask::new(&task, &plan.to.get_full_key(), TaskType::Store as i16) {
                         Ok(x) => {

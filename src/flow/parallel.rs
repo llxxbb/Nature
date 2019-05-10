@@ -1,9 +1,10 @@
 use std::rc::Rc;
 
+use nature_db::task_type::TaskType;
+
 use crate::flow::store::StoreServiceTrait;
 
 use super::*;
-use nature_db::task_type::TaskType;
 
 pub trait ParallelServiceTrait {
     fn parallel(&self, batch: ParallelBatchInstance) -> Result<()>;
@@ -32,7 +33,7 @@ impl ParallelServiceTrait for ParallelServiceImpl {
         let mut tasks: Vec<RawTask> = Vec::new();
         let mut tuple: Vec<(StoreTaskInfo, RawTask)> = Vec::new();
         for instance in batch.instances.iter() {
-            match IncomeController::gen_store_task(instance) {
+            match StoreTaskInfo::gen_task(&instance,OneStepFlowCacheImpl::get,Mission::filter_relations) {
                 Ok(task) => {
                     match RawTask::new(&task, &instance.thing.get_full_key(), TaskType::Store as i16) {
                         Ok(car) => {

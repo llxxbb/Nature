@@ -10,30 +10,13 @@ impl IncomeController {
     /// born an instance which is the beginning of the changes.
     pub fn input(mut instance: Instance) -> Result<u128> {
         instance.mut_biz(ThingType::Business);
-        let _ = instance.thing.check(|x| ThingDefineCacheImpl.get(x));
-        let _ = instance.fix_id()?;
-        let task = IncomeController::gen_store_task(&instance)?;
-        let carrier = RawTask::new(&task, &instance.thing.get_full_key(), TaskType::Store as i16)?;
-        TaskDaoImpl::insert(&carrier)?;
+        let _ = instance.check_and_fix_id(|x| ThingDefineCacheImpl.get(x));
+        let task = StoreTaskInfo::gen_task(&instance,OneStepFlowCacheImpl::get,Mission::filter_relations)?;
+        let carrier = RawTask::save(&task, &instance.thing.get_full_key(), TaskType::Store as i16, TaskDaoImpl::insert)?;
         // do_task -> make a reusable method
-        if let Err(err) = InstanceDaoImpl::save(&task.instance) {
-            let _ = TaskDaoImpl::raw_to_error(&err, &carrier);
-            return Err(err);
-        } else {
-            let _ = CHANNEL_STORED.sender.lock().unwrap().send((task.to_owned(), carrier.to_owned()));
-        }
+        instance.save(InstanceDaoImpl::save)?;
+        let _ = task.send(&carrier, &CHANNEL_STORED.sender.lock().unwrap());
         Ok(instance.id)
-    }
-
-    pub fn gen_store_task(instance: &Instance) -> Result<StoreTaskInfo> {
-        let steps = match OneStepFlowCacheImpl::get(&instance.thing)? {
-            Some(steps) => {
-                Mission::filter_relations(&instance, steps)
-            }
-            None => None
-        };
-        let task = StoreTaskInfo::make_task(&instance, steps);
-        Ok(task)
     }
 
     /// born an instance which is the beginning of the changes.

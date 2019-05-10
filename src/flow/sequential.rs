@@ -46,7 +46,7 @@ impl SequentialTrait for SequentialServiceImpl {
         if let Ok(si) = self.store_batch_items(task) {
             match Self::new_virtual_instance(finish, si) {
                 Ok(instance) => {
-                    if let Ok(si) = IncomeController::gen_store_task(&instance) {
+                    if let Ok(si) = StoreTaskInfo::gen_task(&instance, OneStepFlowCacheImpl::get, Mission::filter_relations) {
                         match RawTask::new(&si, &instance.thing.get_full_key(), TaskType::QueueBatch as i16) {
                             Ok(new) => {
                                 let mut new = new;

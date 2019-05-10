@@ -1,27 +1,8 @@
 use std::rc::Rc;
 
-use nature_db::converter_cfg::ConverterInfo;
 use nature_db::task_type::TaskType;
 
 use super::*;
-
-#[derive(Debug, Serialize, Deserialize, Clone, Default)]
-pub struct StoreTaskInfo {
-    pub instance: Instance,
-    /// save outside has non converter info.
-    pub upstream: Option<ConverterInfo>,
-    pub mission: Option<Vec<Mission>>,
-}
-
-impl StoreTaskInfo {
-    pub fn make_task(instance: &Instance, target: Option<Vec<Mission>>) -> Self {
-        StoreTaskInfo {
-            instance: instance.clone(),
-            upstream: None,
-            mission: target,
-        }
-    }
-}
 
 pub trait StoreServiceTrait {
     fn self_route(&self, instance: SelfRouteInstance) -> Result<u128>;
