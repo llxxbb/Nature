@@ -10,10 +10,9 @@ impl IncomeController {
     /// born an instance which is the beginning of the changes.
     pub fn input(mut instance: Instance) -> Result<u128> {
         instance.mut_biz(ThingType::Business);
-        let _ = instance.check_and_fix_id(|x| ThingDefineCacheImpl.get(x));
+        let _ = instance.check_and_fix_id(ThingDefineCacheImpl::get);
         let task = StoreTaskInfo::gen_task(&instance,OneStepFlowCacheImpl::get,Mission::filter_relations)?;
         let carrier = RawTask::save(&task, &instance.thing.get_full_key(), TaskType::Store as i16, TaskDaoImpl::insert)?;
-        // do_task -> make a reusable method
         instance.save(InstanceDaoImpl::save)?;
         let _ = task.send(&carrier, &CHANNEL_STORED.sender.lock().unwrap());
         Ok(instance.id)

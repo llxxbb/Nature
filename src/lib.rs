@@ -28,6 +28,3 @@ pub mod rpc;
 pub mod flow;
 pub mod support;
 mod channels;
-
-#[cfg(test)]
-pub mod test_util;

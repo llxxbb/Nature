@@ -1,6 +1,8 @@
-use nature_common::{Instance, Result, Thing};
-use nature_db::{ConverterInfo, Mission, OneStepFlow, RawTask};
 use std::sync::mpsc::Sender;
+
+use nature_common::{Instance, Result, Thing};
+use nature_db::{Mission, OneStepFlow, RawTask};
+use crate::flow::ConverterInfo;
 
 #[derive(Debug, Serialize, Deserialize, Clone, Default)]
 pub struct StoreTaskInfo {
@@ -9,6 +11,7 @@ pub struct StoreTaskInfo {
     pub upstream: Option<ConverterInfo>,
     pub mission: Option<Vec<Mission>>,
 }
+
 
 impl StoreTaskInfo {
     pub fn gen_task<FG, FF>(instance: &Instance, step_getter: FG, mission_filter: FF) -> Result<Self> where
@@ -30,7 +33,7 @@ impl StoreTaskInfo {
         )
     }
 
-    pub fn send(&self, raw: &RawTask, sender: &Sender<(StoreTaskInfo,RawTask)>){
-        let _ = sender.send((self.to_owned(),raw.to_owned()));
+    pub fn send(&self, raw: &RawTask, sender: &Sender<(StoreTaskInfo, RawTask)>) {
+        let _ = sender.send((self.to_owned(), raw.to_owned()));
     }
 }

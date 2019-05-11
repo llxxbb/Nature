@@ -3,6 +3,7 @@ use std::rc::Rc;
 use nature_common::*;
 
 use super::*;
+use crate::flow::ConverterInfo;
 
 pub trait PlanServiceTrait {
     #[allow(clippy::ptr_arg)]

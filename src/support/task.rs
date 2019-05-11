@@ -2,8 +2,6 @@ use super::*;
 
 pub trait TaskServiceTrait {
     fn create_and_finish_carrier(&self, old: &RawTask, new: &mut RawTask) -> Result<usize>;
-
-    fn create_batch_and_finish_carrier(&self, news: &[RawTask], old_id: &[u8]) -> Result<()>;
 }
 
 pub struct TaskServiceImpl;
@@ -17,13 +15,5 @@ impl TaskServiceTrait for TaskServiceImpl {
         // TODO  当遇到错误时如果要结束的 delivery ID 和新的delivery 不一样 需要结束之前的 delivery 并创建新的 delivery
         new.task_id = old.task_id.clone(); // the id is used for final finished
         Ok(1)
-    }
-
-    fn create_batch_and_finish_carrier(&self, news: &[RawTask], old_id: &[u8]) -> Result<()> {
-        for v in news {
-            TaskDaoImpl::insert(v)?;
-        }
-        TaskDaoImpl::delete(old_id)?;
-        Ok(())
     }
 }

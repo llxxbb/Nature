@@ -99,7 +99,7 @@ impl SequentialServiceImpl {
         for mut instance in task.instances {
             instance.data.thing.set_thing_type(ThingType::Business);
             instance.data.thing = task.thing.clone();
-            if let Err(err) = instance.thing.check(|x| ThingDefineCacheImpl.get(x)) {
+            if let Err(err) = instance.thing.check(ThingDefineCacheImpl::get) {
                 errors.push(format!("{:?}", err));
                 continue;
             }

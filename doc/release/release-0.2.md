@@ -1,10 +1,16 @@
 # Release 0.2
 
+    未发布
 ## plan
 
 introduce actix-web to replace with rocket
 
 * quick start
+
+## 维护后台
+
+    转换器要对 thing 的定义进行验证。
+    对 thing 进行变更时要验证是否被转换器用到。
 
 ## 转换器
   * status support `or` condition
@@ -21,6 +27,8 @@ introduce actix-web to replace with rocket
 
 ## ID generator
 * snowflake for 128 bit implement.
+
+
 
 
 ## support plugins

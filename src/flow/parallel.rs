@@ -8,7 +8,6 @@ use super::*;
 
 pub trait ParallelServiceTrait {
     fn parallel(&self, batch: ParallelBatchInstance) -> Result<()>;
-    fn do_parallel_task(&self, instances: ParallelBatchInstance, carrier: RawTask);
 }
 
 pub struct ParallelServiceImpl {
@@ -28,12 +27,16 @@ impl ParallelServiceTrait for ParallelServiceImpl {
             Err(err) => Err(err),
         }
     }
+}
 
-    fn do_parallel_task(&self, batch: ParallelBatchInstance, carrier: RawTask) {
+impl ParallelServiceImpl {
+    pub fn save<FI, FD>(batch: ParallelBatchInstance, carrier: RawTask, raw_insert: FI, raw_delete: FD)
+        where FI: Fn(&RawTask) -> Result<usize>, FD: Fn(&[u8]) -> Result<usize>,
+    {
         let mut tasks: Vec<RawTask> = Vec::new();
         let mut tuple: Vec<(StoreTaskInfo, RawTask)> = Vec::new();
         for instance in batch.instances.iter() {
-            match StoreTaskInfo::gen_task(&instance,OneStepFlowCacheImpl::get,Mission::filter_relations) {
+            match StoreTaskInfo::gen_task(&instance, OneStepFlowCacheImpl::get, Mission::filter_relations) {
                 Ok(task) => {
                     match RawTask::new(&task, &instance.thing.get_full_key(), TaskType::Store as i16) {
                         Ok(car) => {
@@ -50,11 +53,11 @@ impl ParallelServiceTrait for ParallelServiceImpl {
                 _ => return
             }
         }
-        if self.task_svc.create_batch_and_finish_carrier(&tasks, &carrier.task_id).is_ok() {
-            for c in tuple {
-                let _ = CHANNEL_STORE.sender.lock().unwrap().send(c);
-            }
+        if RawTask::save_batch(&tasks, &carrier.task_id, raw_insert, raw_delete).is_err() {
+            return;
+        }
+        for c in tuple {
+            let _ = CHANNEL_STORE.sender.lock().unwrap().send(c);
         }
     }
 }
-

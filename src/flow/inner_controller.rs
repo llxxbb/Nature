@@ -8,77 +8,75 @@ impl InnerController {
     }
 
     pub fn channel_parallel(task: (ParallelBatchInstance, RawTask)) {
-        SVC_NATURE.batch_parallel_svc.do_parallel_task(task.0, task.1)
+        ParallelServiceImpl::save(task.0, task.1,
+                                  TaskDaoImpl::insert, TaskDaoImpl::delete)
     }
 
     pub fn channel_store(store: (StoreTaskInfo, RawTask)) {
         let _ = SVC_NATURE.store_svc.do_task(&store.0, &store.1);
     }
     pub fn channel_stored(store: (StoreTaskInfo, RawTask)) {
-        debug!("------------------channel_stored------------------------");
-        let biz = store.0.instance.thing.get_full_key();
-        if store.0.mission.is_none() {
-            debug!("no follow data for : {}", biz);
-            let _ = TaskDaoImpl::delete(&&store.1.task_id);
-            return;
-        }
-        let converters = match SVC_NATURE.converter_svc.generate_converter_info(&store.0) {
-            Ok(new) => new,
+        match ConvertServiceImpl::generate(&store.0, &store.1,
+                                           TaskDaoImpl::delete, ThingDefineCacheImpl::get, InstanceDaoImpl::get_by_id) {
             Err(err) => match err {
-                NatureError::DaoEnvironmentError(_) => return,
-                _ => {
-                    debug!("get `one step info` error for : {}", biz);
-                    let _ = TaskDaoImpl::raw_to_error(&err, &store.1);
+                NatureError::Break => return,
+                e => {
+                    let _ = TaskDaoImpl::raw_to_error(&e, &store.1);
                     return;
                 }
             }
-        };
-        let raws: Vec<RawTask> = converters.iter().map(|x| x.1.clone()).collect();
-        if SVC_NATURE.task_svc.create_batch_and_finish_carrier(&raws, &store.1.task_id).is_ok() {
-            debug!("will dispatch {} convert tasks for `Thing` : {:?}", converters.len(), biz);
-            for task in converters {
-                let _ = CHANNEL_CONVERT.sender.lock().unwrap().send(task);
+            Ok(converters) => {
+                let raws: Vec<RawTask> = converters.iter().map(|x| x.1.clone()).collect();
+                if RawTask::save_batch(&raws, &store.1.task_id, TaskDaoImpl::insert, TaskDaoImpl::delete).is_err() {
+                    return;
+                }
+                debug!("will dispatch {} convert tasks for `Thing` : {:?}", converters.len(), store.0.instance.thing.get_full_key());
+                for task in converters {
+                    let _ = &CHANNEL_CONVERT.sender.lock().unwrap().send(task);
+                }
             }
-        };
+        }
     }
 
     pub fn channel_convert(task: (ConverterInfo, RawTask)) {
         SVC_NATURE.converter_svc.convert(&task.0, &task.1);
     }
+
     pub fn channel_converted(task: (ConverterInfo, Converted)) {
         if let Ok(plan) = SVC_NATURE.plan_svc.save_plan(&task.0, &task.1.converted) {
-            Self::prepare_to_store(&task.1.done_task, plan);
+            prepare_to_store(&task.1.done_task, plan);
         }
     }
-    fn prepare_to_store(carrier: &RawTask, plan: PlanInfo) {
-        let mut store_infos: Vec<RawTask> = Vec::new();
-        let mut t_d: Vec<(StoreTaskInfo, RawTask)> = Vec::new();
-        for instance in plan.plan.iter() {
-            match StoreTaskInfo::gen_task(&instance,OneStepFlowCacheImpl::get,Mission::filter_relations) {
-                Ok(task) => {
-                    match RawTask::new(&task, &plan.to.get_full_key(), TaskType::Store as i16) {
-                        Ok(x) => {
-                            store_infos.push(x.clone());
-                            t_d.push((task, x))
-                        }
-                        Err(e) => {
-                            error!("{}", e);
-                            let _ = TaskDaoImpl::raw_to_error(&e, carrier);
-                            return;
-                        }
+}
+
+fn prepare_to_store(carrier: &RawTask, plan: PlanInfo) {
+    let mut store_infos: Vec<RawTask> = Vec::new();
+    let mut t_d: Vec<(StoreTaskInfo, RawTask)> = Vec::new();
+    for instance in plan.plan.iter() {
+        match StoreTaskInfo::gen_task(&instance, OneStepFlowCacheImpl::get, Mission::filter_relations) {
+            Ok(task) => {
+                match RawTask::new(&task, &plan.to.get_full_key(), TaskType::Store as i16) {
+                    Ok(x) => {
+                        store_infos.push(x.clone());
+                        t_d.push((task, x))
+                    }
+                    Err(e) => {
+                        error!("{}", e);
+                        let _ = TaskDaoImpl::raw_to_error(&e, carrier);
+                        return;
                     }
                 }
-                // break process will environment error occurs.
-                Err(e) => {
-                    error!("{}", e);
-                    return;
-                }
+            }
+// break process will environment error occurs.
+            Err(e) => {
+                error!("{}", e);
+                return;
             }
         }
-        if SVC_NATURE.task_svc.create_batch_and_finish_carrier(&store_infos, &carrier.task_id).is_ok() {
-            for task in t_d {
-                let _ = CHANNEL_STORE.sender.lock().unwrap().send(task);
-            }
+    }
+    if RawTask::save_batch(&store_infos, &carrier.task_id, TaskDaoImpl::insert, TaskDaoImpl::delete).is_ok() {
+        for task in t_d {
+            let _ = CHANNEL_STORE.sender.lock().unwrap().send(task);
         }
     }
 }
