@@ -39,7 +39,30 @@ impl InnerController {
     }
 
     pub fn channel_convert(task: (ConverterInfo, RawTask)) {
-        SVC_NATURE.converter_svc.convert(&task.0, &task.1);
+        let parameter = CallOutParaSvc::gen(&task.0, task.1.task_id.clone());
+        match CallerService::convert(&task.0.target, &parameter) {
+            Err(err) => match err {
+                // only **Environment Error** will be retry
+                NatureError::ConverterEnvironmentError(_) => (),
+                // other error will drop into error
+                _ => {
+                    let _ = TaskDaoImpl::raw_to_error(&err, &task.1);
+                }
+            }
+            Ok(returned) => match returned {
+                ConverterReturned::Instances(mut instances) => {
+                    let _ = Self::received_instance(&task.0, &task.1, &mut instances);
+                }
+                ConverterReturned::Delay(delay) => {
+                    let _ = TaskDaoImpl::update_execute_time(&task.1.task_id, i64::from(delay));
+                }
+                ConverterReturned::LogicalError(ss) => {
+                    let _ = TaskDaoImpl::raw_to_error(&NatureError::ConverterLogicalError(ss), &task.1);
+                }
+                ConverterReturned::EnvError => (),
+                ConverterReturned::None => (),
+            }
+        };
     }
 
     pub fn channel_converted(task: (ConverterInfo, Converted)) {
@@ -47,7 +70,22 @@ impl InnerController {
             prepare_to_store(&task.1.done_task, plan);
         }
     }
+
+    pub fn received_instance(task: &ConverterInfo, raw: &RawTask, mut instances: &mut Vec<Instance>) -> Result<()> {
+        debug!("converted {} instances for `Thing`: {:?}", instances.len(), &task.target.to);
+        match Converted::gen(&task, &raw, &mut instances, ThingDefineCacheImpl::get) {
+            Ok(rtn) => {
+                let _ = CHANNEL_CONVERTED.sender.lock().unwrap().send((task.to_owned(), rtn));
+                Ok(())
+            }
+            Err(err) => {
+                let _ = TaskDaoImpl::raw_to_error(&err, &raw);
+                Err(err)
+            }
+        }
+    }
 }
+
 
 fn prepare_to_store(carrier: &RawTask, plan: PlanInfo) {
     let mut store_infos: Vec<RawTask> = Vec::new();

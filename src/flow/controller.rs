@@ -11,7 +11,6 @@ pub struct ControllerImpl {
     pub task_svc: Rc<TaskServiceTrait>,
     pub batch_serial_svc: Rc<SequentialTrait>,
     pub batch_parallel_svc: Rc<ParallelServiceTrait>,
-    pub converter_svc: Rc<ConvertServiceTrait>,
     pub plan_svc: Rc<PlanServiceTrait>,
 }
 
@@ -34,13 +33,6 @@ impl ControllerImpl {
             batch_parallel_svc: Rc::new(ParallelServiceImpl {
                 task_svc: svc_task.clone(),
                 store: svc_store.clone(),
-            }),
-            converter_svc: Rc::new(ConvertServiceImpl {
-                svc_task: svc_task.clone(),
-                caller: Rc::new(CallOutImpl {
-                    local_rust: Rc::new(LocalExecutorImpl {}),
-                    http_caller: Rc::new(HttpExecutorImpl {}),
-                }),
             }),
             task_svc: svc_task.clone(),
             plan_svc: Rc::new(PlanServiceImpl { dao: Rc::new(StorePlanDaoImpl {}) }),

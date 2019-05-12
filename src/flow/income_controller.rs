@@ -11,7 +11,7 @@ impl IncomeController {
     pub fn input(mut instance: Instance) -> Result<u128> {
         instance.mut_biz(ThingType::Business);
         let _ = instance.check_and_fix_id(ThingDefineCacheImpl::get);
-        let task = StoreTaskInfo::gen_task(&instance,OneStepFlowCacheImpl::get,Mission::filter_relations)?;
+        let task = StoreTaskInfo::gen_task(&instance, OneStepFlowCacheImpl::get, Mission::filter_relations)?;
         let carrier = RawTask::save(&task, &instance.thing.get_full_key(), TaskType::Store as i16, TaskDaoImpl::insert)?;
         instance.save(InstanceDaoImpl::save)?;
         let _ = task.send(&carrier, &CHANNEL_STORED.sender.lock().unwrap());
@@ -24,7 +24,25 @@ impl IncomeController {
     }
 
     pub fn callback(delayed: DelayedInstances) -> Result<()> {
-        SVC_NATURE.converter_svc.callback(delayed)
+        match TaskDaoImpl::get(&delayed.carrier_id) {
+            Ok(raw) => {
+                match raw {
+                    None => Err(NatureError::VerifyError("task data missed, maybe it had done already.".to_string())),
+                    Some(carrier) => match delayed.result {
+                        CallbackResult::Err(err) => {
+                            let err = NatureError::ConverterLogicalError(err);
+                            let _ = TaskDaoImpl::raw_to_error(&err, &carrier);
+                            Ok(())
+                        }
+                        CallbackResult::Instances(mut ins) => {
+                            let task: ConverterInfo = serde_json::from_str(&carrier.data)?;
+                            InnerController::received_instance(&task, &carrier, &mut ins)
+                        }
+                    }
+                }
+            }
+            Err(e) => Err(e)
+        }
     }
 
     pub fn redo_task(raw: RawTask) -> Result<()> {

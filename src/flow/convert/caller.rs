@@ -1,35 +1,32 @@
-use std::rc::Rc;
-
 use nature_common::*;
 use nature_db::*;
 
-pub trait ExecutorTrait {
+use crate::flow::{HttpExecutorImpl, LocalExecutorImpl};
+
+pub trait ExecutorTrait: Sync {
     fn execute(&self, executor: &str, para: &CallOutParameter) -> ConverterReturned;
 }
 
-
-pub trait CallOutTrait {
+trait CallOutTrait {
     fn convert(&self, mission: &Mission, para: &CallOutParameter) -> Result<ConverterReturned>;
 }
 
-pub struct CallOutImpl {
-    pub local_rust: Rc<ExecutorTrait>,
-    pub http_caller:Rc<ExecutorTrait>,
-}
+static HTTP_CALLER: &ExecutorTrait = &HttpExecutorImpl;
+static LOCAL_RUST_CALLER: &ExecutorTrait = &LocalExecutorImpl;
 
-impl CallOutTrait for CallOutImpl {
-    fn convert(&self, mission: &Mission, para: &CallOutParameter) -> Result<ConverterReturned> {
-        match mission.executor.protocol {
-            Protocol::LocalRust => {
-                debug!("  call local converter");
-                Ok(self.local_rust.execute(&mission.executor.url, para))
-            }
-            Protocol::Http => {
-                Ok(self.http_caller.execute(&mission.executor.url, para))
-            }
-            _ => {
-                Err(NatureError::ConverterProtocalError(format!("Did not implement for protocal : {:?}", mission.executor.protocol)))
-            }
+pub struct CallerService;
+
+impl CallerService {
+    pub fn convert(mission: &Mission, para: &CallOutParameter) -> Result<ConverterReturned> {
+        let executer = Self::get_executer(&mission.executor.protocol)?;
+        Ok(executer.execute(&mission.executor.url, para))
+    }
+
+    fn get_executer(protocol: &Protocol) -> Result<&'static ExecutorTrait> {
+        match protocol {
+            Protocol::Http => Ok(HTTP_CALLER),
+            Protocol::LocalRust => Ok(LOCAL_RUST_CALLER),
+            _ => Err(NatureError::ConverterProtocalError(format!("Did not implement for protocal : {:?}", protocol)))
         }
     }
 }

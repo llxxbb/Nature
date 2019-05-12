@@ -1,5 +1,4 @@
 use std::collections::HashSet;
-use std::iter::Iterator;
 use std::rc::Rc;
 use std::str::FromStr;
 
@@ -7,73 +6,8 @@ use crate::system::CONTEXT_TARGET_INSTANCE_ID;
 
 use super::*;
 
-pub trait ConvertServiceTrait {
-    fn callback(&self, delayed: DelayedInstances) -> Result<()>;
-    fn convert(&self, task: &ConverterInfo, carrier: &RawTask);
-}
-
 pub struct ConvertServiceImpl {
     pub svc_task: Rc<TaskServiceTrait>,
-    pub caller: Rc<CallOutTrait>,
-}
-
-impl ConvertServiceTrait for ConvertServiceImpl {
-    fn callback(&self, delayed: DelayedInstances) -> Result<()> {
-        match TaskDaoImpl::get(&delayed.carrier_id) {
-            Ok(raw) => {
-                match raw {
-                    None => Err(NatureError::VerifyError("task data missed, maybe it had done already.".to_string())),
-                    Some(carrier) => match delayed.result {
-                        CallbackResult::Err(err) => {
-                            let err = NatureError::ConverterLogicalError(err);
-                            let _ = TaskDaoImpl::raw_to_error(&err, &carrier);
-                            Err(err)
-                        }
-                        CallbackResult::Instances(mut ins) => {
-                            let task: ConverterInfo = serde_json::from_str(&carrier.data)?;
-                            self.handle_instances(&task, &carrier, &mut ins)
-                        }
-                    }
-                }
-            }
-            Err(e) => Err(e)
-        }
-    }
-
-    fn convert(&self, task: &ConverterInfo, carrier: &RawTask) {
-        debug!("------------------do_convert_task------------------------");
-        let parameter = Self::gen_out_parameter(task, carrier.task_id.clone());
-        match self.caller.convert(&task.target, &parameter) {
-            Ok(ConverterReturned::Instances(mut instances)) => {
-                debug!("converted {} instances for `Thing`: {:?}", instances.len(), &task.target.to);
-                match self.handle_instances(task, &carrier, &mut instances) {
-                    Ok(_) => (),
-                    Err(err) => match err {
-                        NatureError::DaoEnvironmentError(_) => (),
-                        _ => {
-                            let _ = TaskDaoImpl::raw_to_error(&err, &carrier);
-                        }
-                    }
-                }
-            }
-            Ok(ConverterReturned::Delay(delay)) => {
-                let _ = TaskDaoImpl::update_execute_time(&carrier.task_id, i64::from(delay));
-            }
-            Ok(ConverterReturned::LogicalError(ss)) => {
-                let _ = TaskDaoImpl::raw_to_error(&NatureError::ConverterLogicalError(ss), &carrier);
-            }
-            Ok(ConverterReturned::EnvError) => (),
-            Ok(ConverterReturned::None) => (),
-            Err(err) => match err {
-                // only **Environment Error** will be retry
-                NatureError::ConverterEnvironmentError(_) => (),
-                // other error will drop into error
-                _ => {
-                    let _ = TaskDaoImpl::raw_to_error(&err, &carrier);
-                }
-            }
-        };
-    }
 }
 
 impl ConvertServiceImpl {
@@ -144,31 +78,6 @@ impl ConvertServiceImpl {
         Ok(rtn)
     }
 
-    fn handle_instances(&self, task: &ConverterInfo, carrier: &RawTask, instances: &mut Vec<Instance>) -> Result<()> {
-        // check `ThingType` for Null
-        if task.target.to.get_thing_type() == ThingType::Null {
-            let rtn = Converted {
-                done_task: carrier.to_owned(),
-                converted: Vec::new(),
-            };
-            let _ = CHANNEL_CONVERTED.sender.lock().unwrap().send((task.to_owned(), rtn));
-            return Ok(());
-        }
-        // check status version to avoid loop
-        let _ = instances.iter_mut().map(|one: &mut Instance| {
-            one.data.thing = task.target.to.clone();
-            let _ = one.fix_id();
-            one
-        }).collect::<Vec<_>>();
-        let instances = self.verify(&task.target.to, &instances)?;
-        let rtn = Converted {
-            done_task: carrier.to_owned(),
-            converted: instances,
-        };
-        let _ = CHANNEL_CONVERTED.sender.lock().unwrap().send((task.to_owned(), rtn));
-        Ok(())
-    }
-
     fn check_last(last: &HashSet<String>, demand: &LastStatusDemand) -> Result<()> {
         for s in &demand.target_status_include {
             if !last.contains(s) {
@@ -181,46 +90,6 @@ impl ConvertServiceImpl {
             }
         }
         Ok(())
-    }
-    fn gen_out_parameter(task: &ConverterInfo, carrier_id: Vec<u8>) -> CallOutParameter {
-        CallOutParameter {
-            from: task.from.clone(),
-            last_status: task.last_status.clone(),
-            carrier_id,
-        }
-    }
-
-    fn verify(&self, to: &Thing, instances: &[Instance]) -> Result<Vec<Instance>> {
-        let mut rtn: Vec<Instance> = Vec::new();
-        // only one status instance should return
-        let define = match to.get_thing_type() {
-            ThingType::Dynamic => RawThingDefine::default(),
-            // TODO need be replaced
-            _ => ThingDefineCacheImpl::get(to)?
-        };
-        if define.is_status() {
-            if instances.len() > 1 {
-                return Err(NatureError::ConverterLogicalError("[status thing] must return less 2 instances!".to_string()));
-            }
-            // status version must equal old + 1
-            if instances.len() == 1 {
-                let mut ins = instances[0].clone();
-                ins.data.status_version += 1;
-                ins.data.thing = to.clone();
-                rtn.push(ins);
-            }
-            return Ok(rtn);
-        }
-
-        // all biz must same to "to" and set id
-        for r in instances {
-            let mut instance = r.clone();
-            instance.data.thing = to.clone();
-            let _ = instance.fix_id();
-            rtn.push(instance);
-        }
-
-        Ok(rtn)
     }
 }
 
