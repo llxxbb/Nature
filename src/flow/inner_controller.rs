@@ -16,8 +16,8 @@ impl InnerController {
         let _ = SVC_NATURE.store_svc.do_task(&store.0, &store.1);
     }
     pub fn channel_stored(store: (StoreTaskInfo, RawTask)) {
-        match ConvertServiceImpl::generate(&store.0, &store.1,
-                                           TaskDaoImpl::delete, ThingDefineCacheImpl::get, InstanceDaoImpl::get_by_id) {
+        match ConverterInfo::generate(&store.0, &store.1,
+                                      TaskDaoImpl::delete, ThingDefineCacheImpl::get, InstanceDaoImpl::get_by_id) {
             Err(err) => match err {
                 NatureError::Break => return,
                 e => {
