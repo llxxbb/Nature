@@ -11,7 +11,6 @@ pub struct ControllerImpl {
     pub task_svc: Rc<TaskServiceTrait>,
     pub batch_serial_svc: Rc<SequentialTrait>,
     pub batch_parallel_svc: Rc<ParallelServiceTrait>,
-    pub plan_svc: Rc<PlanServiceTrait>,
 }
 
 impl ControllerImpl {
@@ -35,7 +34,6 @@ impl ControllerImpl {
                 store: svc_store.clone(),
             }),
             task_svc: svc_task.clone(),
-            plan_svc: Rc::new(PlanServiceImpl { dao: Rc::new(StorePlanDaoImpl {}) }),
         }
     }
 }

@@ -1,7 +1,10 @@
 # plan
 
 - OOP -> OFP
+  plan
+  store
   parellel unfinished
+  serial
  rpc
 
 

@@ -1,22 +1,14 @@
-use std::rc::Rc;
+use nature_common::{Instance, NatureError, Result};
+use nature_db::{PlanInfo, RawPlanInfo};
 
-use nature_common::*;
-
-use super::*;
 use crate::flow::ConverterInfo;
 
-pub trait PlanServiceTrait {
-    #[allow(clippy::ptr_arg)]
-    fn save_plan(&self, converter_info: &ConverterInfo, instances: &Vec<Instance>) -> Result<PlanInfo>;
-}
+pub struct PlanInfoSvc;
 
-pub struct PlanServiceImpl {
-    pub dao: Rc<StorePlanDaoTrait>
-}
-
-impl PlanServiceTrait for PlanServiceImpl {
-    #[allow(clippy::ptr_arg)]
-    fn save_plan(&self, converter_info: &ConverterInfo, instances: &Vec<Instance>) -> Result<PlanInfo> {
+impl PlanInfoSvc {
+    pub fn save<FI, FG>(converter_info: &ConverterInfo, instances: &Vec<Instance>, dao_insert: FI, dao_get: FG) -> Result<PlanInfo>
+        where FI: Fn(&RawPlanInfo) -> Result<()>, FG: Fn(&str) -> Result<Option<PlanInfo>>
+    {
         let plan = PlanInfo {
             from_sn: converter_info.from.id,
             from_thing: converter_info.from.thing.clone(),
@@ -27,11 +19,11 @@ impl PlanServiceTrait for PlanServiceImpl {
 
         // reload old plan if exists
         let will_save = RawPlanInfo::new(&plan)?;
-        match self.dao.save(&will_save) {
+        match dao_insert(&will_save) {
             Ok(_) => Ok(plan),
             Err(err) => match err {
                 NatureError::DaoDuplicated(msg) => {
-                    let old = self.dao.get(&will_save.upstream)?;
+                    let old = dao_get(&will_save.upstream)?;
                     match old {
                         Some(o) => {
                             Ok(o)
@@ -44,4 +36,3 @@ impl PlanServiceTrait for PlanServiceImpl {
         }
     }
 }
-
