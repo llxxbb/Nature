@@ -13,14 +13,28 @@ impl IncomeController {
         let _ = instance.check_and_fix_id(ThingDefineCacheImpl::get);
         let task = StoreTaskInfo::gen_task(&instance, OneStepFlowCacheImpl::get, Mission::filter_relations)?;
         let carrier = RawTask::save(&task, &instance.thing.get_full_key(), TaskType::Store as i16, TaskDaoImpl::insert)?;
-        instance.save(InstanceDaoImpl::save)?;
+        let _ = instance.save(InstanceDaoImpl::save)?;
         let _ = task.send(&carrier, &CHANNEL_STORED.sender.lock().unwrap());
         Ok(instance.id)
     }
 
     /// born an instance which is the beginning of the changes.
     pub fn self_route(instance: SelfRouteInstance) -> Result<u128> {
-        SVC_NATURE.store_svc.self_route(instance)
+        if instance.converter.is_empty() {
+            return Err(NatureError::VerifyError("converter must not empty for dynamic convert!".to_string()));
+        }
+        // Convert a Self-Route-Instance to Normal Instance
+        let mut ins = Instance {
+            id: 0,
+            data: instance.instance.data,
+        };
+        ins.data.thing.set_thing_type(ThingType::Dynamic);
+        let uuid = ins.fix_id()?.id;
+        let task = StoreTaskInfo::for_dynamic(&ins, instance.converter)?;
+        // TODO save raw task
+        let carrier = RawTask::new(&task, &ins.thing.get_full_key(), TaskType::Store as i16)?;
+        InnerController::save_instance(task, carrier)?;
+        Ok(uuid)
     }
 
     pub fn callback(delayed: DelayedInstances) -> Result<()> {

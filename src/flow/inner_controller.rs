@@ -13,8 +13,15 @@ impl InnerController {
     }
 
     pub fn channel_store(store: (StoreTaskInfo, RawTask)) {
-        let _ = SVC_NATURE.store_svc.do_task(&store.0, &store.1);
+        let _ = InnerController::save_instance(store.0, store.1);
     }
+
+    pub fn save_instance(task: StoreTaskInfo, carrier: RawTask) -> Result<()> {
+        let _ = task.instance.save(InstanceDaoImpl::save)?;
+        task.send(&carrier, &CHANNEL_STORED.sender.lock().unwrap());
+        Ok(())
+    }
+
     pub fn channel_stored(store: (StoreTaskInfo, RawTask)) {
         match ConverterInfo::generate(&store.0, &store.1,
                                       TaskDaoImpl::delete, ThingDefineCacheImpl::get, InstanceDaoImpl::get_by_id) {
@@ -105,7 +112,7 @@ fn prepare_to_store(carrier: &RawTask, plan: PlanInfo) {
                     }
                 }
             }
-// break process will environment error occurs.
+            // break process will environment error occurs.
             Err(e) => {
                 error!("{}", e);
                 return;

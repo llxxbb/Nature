@@ -2,8 +2,6 @@ use std::rc::Rc;
 
 use nature_db::task_type::TaskType;
 
-use crate::flow::store::StoreServiceTrait;
-
 use super::*;
 
 pub trait ParallelServiceTrait {
@@ -12,7 +10,6 @@ pub trait ParallelServiceTrait {
 
 pub struct ParallelServiceImpl {
     pub task_svc: Rc<TaskServiceTrait>,
-    pub store: Rc<StoreServiceTrait>,
 }
 
 impl ParallelServiceTrait for ParallelServiceImpl {

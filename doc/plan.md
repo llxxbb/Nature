@@ -1,8 +1,9 @@
 # plan
 
 - OOP -> OFP
-  plan
-  store
+  plan(finished)
+  store(finished)
+  self_route
   parellel unfinished
   serial
  rpc

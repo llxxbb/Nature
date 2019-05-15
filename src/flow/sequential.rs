@@ -7,7 +7,6 @@ use serde_json;
 
 use nature_db::task_type::TaskType;
 
-use crate::flow::store::StoreServiceTrait;
 use crate::system::*;
 
 use super::*;
@@ -25,7 +24,6 @@ pub trait SequentialTrait {
 
 pub struct SequentialServiceImpl {
     pub svc_task: Rc<TaskServiceTrait>,
-    pub store: Rc<StoreServiceTrait>,
 }
 
 impl SequentialTrait for SequentialServiceImpl {

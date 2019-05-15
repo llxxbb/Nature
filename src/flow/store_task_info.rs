@@ -1,7 +1,8 @@
 use std::sync::mpsc::Sender;
 
-use nature_common::{Instance, Result, Thing};
+use nature_common::{DynamicConverter, Instance, Result, Thing};
 use nature_db::{Mission, OneStepFlow, RawTask};
+
 use crate::flow::ConverterInfo;
 
 #[derive(Debug, Serialize, Deserialize, Clone, Default)]
@@ -35,5 +36,16 @@ impl StoreTaskInfo {
 
     pub fn send(&self, raw: &RawTask, sender: &Sender<(StoreTaskInfo, RawTask)>) {
         let _ = sender.send((self.to_owned(), raw.to_owned()));
+    }
+
+    pub fn for_dynamic(instance: &Instance, dynamic: Vec<DynamicConverter>) -> Result<StoreTaskInfo> {
+        let target = Mission::for_dynamic(dynamic)?;
+        // save to task to make it can redo
+        let task = StoreTaskInfo {
+            instance: instance.clone(),
+            upstream: None,
+            mission: Some(target),
+        };
+        Ok(task)
     }
 }
