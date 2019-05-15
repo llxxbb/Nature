@@ -66,7 +66,7 @@ impl InnerController {
     }
 
     pub fn channel_converted(task: (ConverterInfo, Converted)) {
-        if let Ok(plan) = PlanInfoSvc::save(&task.0, &task.1.converted, StorePlanDaoImpl::save, StorePlanDaoImpl::get) {
+        if let Ok(plan) = PlanInfo::save(&task.0, &task.1.converted, StorePlanDaoImpl::save, StorePlanDaoImpl::get) {
             prepare_to_store(&task.1.done_task, plan);
         }
     }

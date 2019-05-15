@@ -2,10 +2,14 @@
 extern crate dotenv;
 extern crate uuid;
 
-use crate::channels::start_receive_threads;
-use nature_common::util::setup_logger;
-use self::dotenv::dotenv;
+use std::env;
 use std::thread::JoinHandle;
+
+use nature_common::util::setup_logger;
+
+use crate::channels::start_receive_threads;
+
+use self::dotenv::dotenv;
 
 // for product and mock
 lazy_static! {
@@ -14,7 +18,12 @@ lazy_static! {
 
     // sys context define
     pub static ref CONTEXT_TARGET_INSTANCE_ID : String = "sys.target".to_string();
+
+    pub static ref PLAN_CONTENT_MAX_LENGTH : usize = {
+        env::var("PLAN_CONTENT_MAX_LENGTH").unwrap_or_else(|_| "16777215".to_string()).parse::<usize>().unwrap()
+    };
 }
+
 
 pub fn sys_init() -> Vec<JoinHandle<()>> {
     dotenv().ok();

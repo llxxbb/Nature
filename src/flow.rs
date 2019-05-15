@@ -9,6 +9,7 @@ pub use self::convert::*;
 pub use self::income_controller::*;
 pub use self::inner_controller::*;
 pub use self::parallel::*;
+pub use self::plan::*;
 pub use self::sequential::*;
 pub use self::store::*;
 pub use self::store_task_info::*;
@@ -22,8 +23,4 @@ mod controller;
 mod inner_controller;
 mod income_controller;
 mod store_task_info;
-
-#[cfg(test)]
-mod test;
-
-
+mod plan;
