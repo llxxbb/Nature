@@ -69,7 +69,9 @@ impl IncomeController {
     }
 
     pub fn parallel(batch: ParallelBatchInstance) -> Result<()> {
-        SVC_NATURE.batch_parallel_svc.parallel(batch)
+        let raw = RawTask::save(&batch, &batch.thing.get_full_key(), TaskType::ParallelBatch as i16, TaskDaoImpl::insert)?;
+        let _ = CHANNEL_PARALLEL.sender.lock().unwrap().send((batch, raw));
+        Ok(())
     }
 
     fn send_to_channel<'a, T: Deserialize<'a>>(raw: &'a RawTask, channel: &Channel<(T, RawTask)>) -> Result<()> {

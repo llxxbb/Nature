@@ -8,13 +8,11 @@ pub use self::controller::*;
 pub use self::convert::*;
 pub use self::income_controller::*;
 pub use self::inner_controller::*;
-pub use self::parallel::*;
 pub use self::plan::*;
 pub use self::sequential::*;
 pub use self::store_task_info::*;
 
 mod sequential;
-mod parallel;
 mod convert;
 mod controller;
 

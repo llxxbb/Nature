@@ -8,8 +8,30 @@ impl InnerController {
     }
 
     pub fn channel_parallel(task: (ParallelBatchInstance, RawTask)) {
-        ParallelServiceImpl::save(task.0, task.1,
-                                  TaskDaoImpl::insert, TaskDaoImpl::delete)
+        let mut tuple: Vec<(StoreTaskInfo, RawTask)> = Vec::new();
+        for instance in task.0.instances.iter() {
+            match StoreTaskInfo::gen_task(&instance, OneStepFlowCacheImpl::get, Mission::filter_relations) {
+                Ok(task) => {
+                    match RawTask::save(&task, &instance.thing.get_full_key(), TaskType::Store as i16, TaskDaoImpl::insert) {
+                        Ok(car) => {
+                            tuple.push((task, car))
+                        }
+                        Err(e) => {
+                            error!("{}", e);
+                            return;
+                        }
+                    }
+                }
+                // any error will break the process
+                _ => return
+            }
+        }
+        if TaskDaoImpl::delete(&task.1.task_id).is_err() {
+            return;
+        }
+        for c in tuple {
+            let _ = CHANNEL_STORE.sender.lock().unwrap().send(c);
+        }
     }
 
     pub fn channel_store(store: (StoreTaskInfo, RawTask)) {

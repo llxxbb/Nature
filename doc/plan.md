@@ -4,7 +4,7 @@
   plan(finished)
   store(finished)
   self_route(finished)
-  parellel unfinished
+  parellel(finished)
   serial
  rpc
 
