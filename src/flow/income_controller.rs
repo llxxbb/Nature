@@ -65,7 +65,9 @@ impl IncomeController {
     }
 
     pub fn serial(batch: SerialBatchInstance) -> Result<()> {
-        SVC_NATURE.batch_serial_svc.one_by_one(&batch)
+        let raw = RawTask::save(&batch, &batch.thing.get_full_key(), TaskType::QueueBatch as i16, TaskDaoImpl::insert)?;
+        let _ = CHANNEL_SERIAL.sender.lock().unwrap().send((batch.to_owned(), raw));
+        Ok(())
     }
 
     pub fn parallel(batch: ParallelBatchInstance) -> Result<()> {

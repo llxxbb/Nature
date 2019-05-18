@@ -4,7 +4,30 @@ pub struct InnerController {}
 
 impl InnerController {
     pub fn channel_serial(task: (SerialBatchInstance, RawTask)) {
-        SVC_NATURE.batch_serial_svc.do_serial_task(task.0, &task.1)
+        let (task, carrier) = task;
+        let finish = &task.context_for_finish.clone();
+        let task = SerialBatchInstanceWrapper::from(task);
+        if let Ok(si) = task.save(&ThingDefineCacheImpl::get, InstanceDaoImpl::insert) {
+            match si.to_virtual_instance(finish) {
+                Ok(instance) => {
+                    if let Ok(si) = StoreTaskInfo::gen_task(&instance, OneStepFlowCacheImpl::get, Mission::filter_relations) {
+                        match RawTask::new(&si, &instance.thing.get_full_key(), TaskType::QueueBatch as i16) {
+                            Ok(mut new) => {
+                                if let Ok(_route) = new.finish_old(&carrier, TaskDaoImpl::insert, TaskDaoImpl::delete) {
+                                    let _ = CHANNEL_STORED.sender.lock().unwrap().send((si, new));
+                                }
+                            }
+                            Err(err) => {
+                                let _ = TaskDaoImpl::raw_to_error(&err, &carrier);
+                            }
+                        }
+                    }
+                }
+                Err(err) => {
+                    let _ = TaskDaoImpl::raw_to_error(&err, &carrier);
+                }
+            };
+        }
     }
 
     pub fn channel_parallel(task: (ParallelBatchInstance, RawTask)) {

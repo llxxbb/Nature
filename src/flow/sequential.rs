@@ -1,11 +1,8 @@
 use std::collections::HashMap;
 use std::collections::HashSet;
-use std::rc::Rc;
 
 use chrono::prelude::*;
 use serde_json;
-
-use nature_db::task_type::TaskType;
 
 use crate::system::*;
 
@@ -17,60 +14,9 @@ pub struct SerialFinished {
     pub errors: Vec<String>,
 }
 
-pub trait SequentialTrait {
-    fn one_by_one(&self, batch: &SerialBatchInstance) -> Result<()>;
-    fn do_serial_task(&self, task: SerialBatchInstance, carrier: &RawTask);
-}
-
-pub struct SequentialServiceImpl {
-    pub svc_task: Rc<TaskServiceTrait>,
-}
-
-impl SequentialTrait for SequentialServiceImpl {
-    fn one_by_one(&self, batch: &SerialBatchInstance) -> Result<()> {
-        let raw = RawTask::new(batch, &batch.thing.get_full_key(), TaskType::QueueBatch as i16)?;
-        match TaskDaoImpl::insert(&raw) {
-            Ok(_carrier) => {
-                // to process asynchronous
-                let _ = CHANNEL_SERIAL.sender.lock().unwrap().send((batch.to_owned(), raw));
-                Ok(())
-            }
-            Err(err) => Err(err),
-        }
-    }
-
-    fn do_serial_task(&self, task: SerialBatchInstance, carrier: &RawTask) {
-        let finish = &task.context_for_finish.clone();
-        if let Ok(si) = self.store_batch_items(task) {
-            match Self::new_virtual_instance(finish, si) {
-                Ok(instance) => {
-                    if let Ok(si) = StoreTaskInfo::gen_task(&instance, OneStepFlowCacheImpl::get, Mission::filter_relations) {
-                        match RawTask::new(&si, &instance.thing.get_full_key(), TaskType::QueueBatch as i16) {
-                            Ok(new) => {
-                                let mut new = new;
-                                if let Ok(_route) = self.svc_task.create_and_finish_carrier(carrier, &mut new) {
-                                    let _ = CHANNEL_STORED.sender.lock().unwrap().send((si, new));
-                                }
-                            }
-                            Err(err) => {
-                                let _ = TaskDaoImpl::raw_to_error(&err, &carrier);
-                            }
-                        }
-                    }
-                }
-                Err(err) => {
-                    let _ = TaskDaoImpl::raw_to_error(&err, &carrier);
-                }
-            };
-        }
-        // auto retry if environment error occurs,
-        // item error will not break the process and insert into error list of `SerialFinished`
-    }
-}
-
-impl SequentialServiceImpl {
-    fn new_virtual_instance(context_for_finish: &str, sf: SerialFinished) -> Result<Instance> {
-        let json = serde_json::to_string(&sf)?;
+impl SerialFinished {
+    pub fn to_virtual_instance(&self, context_for_finish: &str) -> Result<Instance> {
+        let json = serde_json::to_string(self)?;
         let mut context: HashMap<String, String> = HashMap::new();
         context.insert(context_for_finish.to_string(), json);
         let time = Local::now().timestamp();
@@ -89,20 +35,34 @@ impl SequentialServiceImpl {
             },
         })
     }
+}
 
-    fn store_batch_items(&self, task: SerialBatchInstance) -> Result<SerialFinished>
+#[derive(Serialize, Deserialize, Debug, Default, Clone)]
+pub struct SerialBatchInstanceWrapper {
+    pub data: SerialBatchInstance
+}
+
+impl From<SerialBatchInstance> for SerialBatchInstanceWrapper {
+    fn from(data: SerialBatchInstance) -> Self {
+        SerialBatchInstanceWrapper { data }
+    }
+}
+
+impl SerialBatchInstanceWrapper {
+    pub fn save<FC, FS>(self, checker: &FC, saver: FS) -> Result<SerialFinished>
+        where FC: Fn(&Thing) -> Result<RawThingDefine>,
+              FS: Fn(&Instance) -> Result<usize>
     {
         let mut errors: Vec<String> = Vec::new();
         let mut succeeded_id: Vec<u128> = Vec::new();
-        for mut instance in task.instances {
-            instance.data.thing.set_thing_type(ThingType::Business);
-            instance.data.thing = task.thing.clone();
-            if let Err(err) = instance.thing.check(ThingDefineCacheImpl::get) {
+        for mut instance in self.data.instances {
+            instance.change_thing_type(ThingType::Business);
+            instance.data.thing = self.data.thing.clone();
+            if let Err(err) = instance.check_and_fix_id(checker) {
                 errors.push(format!("{:?}", err));
                 continue;
             }
-            let _ = instance.fix_id();
-            match InstanceDaoImpl::insert(&instance) {
+            match saver(&instance) {
                 Ok(_) => succeeded_id.push(instance.id),
                 Err(err) => match err {
                     NatureError::DaoEnvironmentError(_) => return Err(err),
@@ -117,3 +77,4 @@ impl SequentialServiceImpl {
         Ok(SerialFinished { succeeded_id, errors })
     }
 }
+

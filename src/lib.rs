@@ -26,5 +26,4 @@ extern crate uuid;
 pub mod system;
 pub mod rpc;
 pub mod flow;
-pub mod support;
 mod channels;
