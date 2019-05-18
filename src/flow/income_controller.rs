@@ -9,7 +9,7 @@ pub struct IncomeController {}
 impl IncomeController {
     /// born an instance which is the beginning of the changes.
     pub fn input(mut instance: Instance) -> Result<u128> {
-        instance.mut_biz(ThingType::Business);
+        instance.change_thing_type(ThingType::Business);
         let _ = instance.check_and_fix_id(ThingDefineCacheImpl::get);
         let task = StoreTaskInfo::gen_task(&instance, OneStepFlowCacheImpl::get, Mission::filter_relations)?;
         let carrier = RawTask::save(&task, &instance.thing.get_full_key(), TaskType::Store as i16, TaskDaoImpl::insert)?;
@@ -20,19 +20,13 @@ impl IncomeController {
 
     /// born an instance which is the beginning of the changes.
     pub fn self_route(instance: SelfRouteInstance) -> Result<u128> {
-        if instance.converter.is_empty() {
-            return Err(NatureError::VerifyError("converter must not empty for dynamic convert!".to_string()));
-        }
+        let _ = instance.verify()?;
         // Convert a Self-Route-Instance to Normal Instance
-        let mut ins = Instance {
-            id: 0,
-            data: instance.instance.data,
-        };
-        ins.data.thing.set_thing_type(ThingType::Dynamic);
+        let mut ins = instance.to_instance();
+        ins.change_thing_type(ThingType::Dynamic);
         let uuid = ins.fix_id()?.id;
         let task = StoreTaskInfo::for_dynamic(&ins, instance.converter)?;
-        // TODO save raw task
-        let carrier = RawTask::new(&task, &ins.thing.get_full_key(), TaskType::Store as i16)?;
+        let carrier = RawTask::save(&task, &ins.thing.get_full_key(), TaskType::Store as i16, TaskDaoImpl::insert)?;
         InnerController::save_instance(task, carrier)?;
         Ok(uuid)
     }

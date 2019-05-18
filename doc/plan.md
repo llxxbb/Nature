@@ -3,7 +3,7 @@
 - OOP -> OFP
   plan(finished)
   store(finished)
-  self_route
+  self_route(finished)
   parellel unfinished
   serial
  rpc

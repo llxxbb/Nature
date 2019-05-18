@@ -1,17 +1,19 @@
 @startuml
 hide footbox
-[->rpc.rocket.server: input(instance)
-rpc.rocket.server -> StoreSvc: input(instance)
-StoreSvc -> TaskSvc: create task for store
-activate StoreSvc
-StoreSvc -> StoreSvc: init to `Business` \nfor `ThingType`
-StoreSvc -> InstanceSvc: verify
+[->IncomeController: input(instance)
+IncomeController -> Task: generateTaskAndSave(instance)
+note right: can redo when failed
+IncomeController -> Instance: save(instance)
+Instance -> TaskSvc: create task for store
+activate Instance
+Instance -> Instance: init to `Business` \nfor `ThingType`
+Instance -> InstanceSvc: verify
 note left: maybe not exists
-StoreSvc -> RouteSvc: get missions
-StoreSvc -> StoreSvc: save instance
-StoreSvc --\\ InnerController: instance stored
+Instance -> RouteSvc: get missions
+Instance -> Instance: save instance
+Instance --\\ InnerController: instance stored
 note right #aqua : async \nno mission will exit
-deactivate StoreSvc
+deactivate Instance
 activate InnerController
 InnerController -> ConverterSvc: generate convert information
 note left: maybe many
@@ -32,13 +34,13 @@ note left #aqua : async
 activate InnerController
 InnerController -> PlanSvc: save
 loop each plan
-    InnerController -> StoreSvc: generate task for store
+    InnerController -> Instance: generate task for store
 end
 InnerController -> TaskSvc: create new tasks and finish prior task
 loop each task
     InnerController -\\ InnerController: to store
     note left #aqua : async
-    InnerController -> StoreSvc: save instance
+    InnerController -> Instance: save instance
 end
 
 
