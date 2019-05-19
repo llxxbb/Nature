@@ -1,11 +1,10 @@
-use std::collections::HashSet;
 use std::str::FromStr;
 
 use nature_common::{Instance, NatureError, Result, Thing, ThingType};
-use nature_db::{LastStatusDemand, Mission, RawTask, RawThingDefine, TaskType};
+use nature_db::{Mission, RawTask, RawThingDefine, TaskType};
 
-use crate::task::TaskForStore;
 use crate::system::CONTEXT_TARGET_INSTANCE_ID;
+use crate::task::TaskForStore;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct ConverterInfo {
@@ -25,7 +24,7 @@ impl Default for ConverterInfo {
 }
 
 impl ConverterInfo {
-   pub fn gen_task<FT, FIG>(task: &TaskForStore, thing_getter: FT, instance_getter: FIG) -> Result<Vec<(ConverterInfo, RawTask)>>
+    pub fn gen_task<FT, FIG>(task: &TaskForStore, thing_getter: FT, instance_getter: FIG) -> Result<Vec<(ConverterInfo, RawTask)>>
         where FT: Fn(&Thing) -> Result<RawThingDefine>, FIG: Fn(u128) -> Result<Option<Instance>>
     {
         let mut new_carriers: Vec<(ConverterInfo, RawTask)> = Vec::new();
@@ -65,7 +64,7 @@ impl ConverterInfo {
         } else { None };
         if let Some(ref last) = last_target {
             if let Some(demand) = &mapping.last_status_demand {
-                Self::check_last(&last.status, demand)?;
+                demand.check(&last.status)?;
             }
         };
         let rtn = ConverterInfo {
@@ -74,20 +73,6 @@ impl ConverterInfo {
             last_status: last_target,
         };
         Ok(rtn)
-    }
-
-    fn check_last(last: &HashSet<String>, demand: &LastStatusDemand) -> Result<()> {
-        for s in &demand.target_status_include {
-            if !last.contains(s) {
-                return Err(NatureError::TargetInstanceNotIncludeStatus(s.clone()));
-            }
-        }
-        for s in &demand.target_status_include {
-            if last.contains(s) {
-                return Err(NatureError::TargetInstanceContainsExcludeStatus(s.clone()));
-            }
-        }
-        Ok(())
     }
 }
 
