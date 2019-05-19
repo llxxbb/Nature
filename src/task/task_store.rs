@@ -3,10 +3,10 @@ use std::sync::mpsc::Sender;
 use nature_common::{DynamicConverter, Instance, Result, Thing};
 use nature_db::{Mission, OneStepFlow, RawTask};
 
-use crate::flow::ConverterInfo;
+use crate::task::ConverterInfo;
 
 #[derive(Debug, Serialize, Deserialize, Clone, Default)]
-pub struct StoreTaskInfo {
+pub struct TaskForStore {
     pub instance: Instance,
     /// save outside has non converter info.
     pub upstream: Option<ConverterInfo>,
@@ -14,7 +14,7 @@ pub struct StoreTaskInfo {
 }
 
 
-impl StoreTaskInfo {
+impl TaskForStore {
     pub fn gen_task<FG, FF>(instance: &Instance, step_getter: FG, mission_filter: FF) -> Result<Self> where
         FG: Fn(&Thing) -> Result<Option<Vec<OneStepFlow>>>,
         FF: FnOnce((&Instance, Vec<OneStepFlow>)) -> Option<Vec<Mission>>
@@ -26,7 +26,7 @@ impl StoreTaskInfo {
             None => None
         };
         Ok(
-            StoreTaskInfo {
+            TaskForStore {
                 instance: instance.clone(),
                 upstream: None,
                 mission: steps,
@@ -34,14 +34,14 @@ impl StoreTaskInfo {
         )
     }
 
-    pub fn send(&self, raw: &RawTask, sender: &Sender<(StoreTaskInfo, RawTask)>) {
+    pub fn send(&self, raw: &RawTask, sender: &Sender<(TaskForStore, RawTask)>) {
         let _ = sender.send((self.to_owned(), raw.to_owned()));
     }
 
-    pub fn for_dynamic(instance: &Instance, dynamic: Vec<DynamicConverter>) -> Result<StoreTaskInfo> {
+    pub fn for_dynamic(instance: &Instance, dynamic: Vec<DynamicConverter>) -> Result<TaskForStore> {
         let target = Mission::for_dynamic(dynamic)?;
         // save to task to make it can redo
-        let task = StoreTaskInfo {
+        let task = TaskForStore {
             instance: instance.clone(),
             upstream: None,
             mission: Some(target),

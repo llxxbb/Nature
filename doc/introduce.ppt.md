@@ -104,8 +104,8 @@ When instance changed, Nature don't update it but version it, so you can have a 
 你缺少的元数据管理
 
 一阴一阳谓之道
-  thing 为因
-  flow 为阳
+  thing 为阴
+  task 为阳
 
 requirement vs control or how to balance between them.
     requirement is the primary target of a system to implement, then the control are following.

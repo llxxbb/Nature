@@ -4,7 +4,7 @@ use std::str::FromStr;
 use nature_common::{Instance, NatureError, Result, Thing, ThingType};
 use nature_db::{LastStatusDemand, Mission, RawTask, RawThingDefine, TaskType};
 
-use crate::flow::StoreTaskInfo;
+use crate::task::TaskForStore;
 use crate::system::CONTEXT_TARGET_INSTANCE_ID;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -25,23 +25,7 @@ impl Default for ConverterInfo {
 }
 
 impl ConverterInfo {
-    pub fn generate<FD, FT, FIG>(store_task: &StoreTaskInfo, raw: &RawTask,
-                                 raw_delete: FD, thing_getter: FT, instance_getter: FIG) -> Result<Vec<(ConverterInfo, RawTask)>>
-        where FD: Fn(&[u8]) -> Result<usize>,
-              FT: Fn(&Thing) -> Result<RawThingDefine>,
-              FIG: Fn(u128) -> Result<Option<Instance>>
-    {
-        debug!("------------------channel_stored------------------------");
-        let biz = store_task.instance.thing.get_full_key();
-        if store_task.mission.is_none() {
-            debug!("no follow data for : {}", biz);
-            let _ = raw_delete(&&raw.task_id);
-            return Err(NatureError::Break);
-        }
-        Self::gen_task(&store_task, thing_getter, instance_getter)
-    }
-
-    fn gen_task<FT, FIG>(task: &StoreTaskInfo, thing_getter: FT, instance_getter: FIG) -> Result<Vec<(ConverterInfo, RawTask)>>
+   pub fn gen_task<FT, FIG>(task: &TaskForStore, thing_getter: FT, instance_getter: FIG) -> Result<Vec<(ConverterInfo, RawTask)>>
         where FT: Fn(&Thing) -> Result<RawThingDefine>, FIG: Fn(u128) -> Result<Option<Instance>>
     {
         let mut new_carriers: Vec<(ConverterInfo, RawTask)> = Vec::new();

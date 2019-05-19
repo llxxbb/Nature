@@ -1,47 +1,40 @@
 @startuml
 hide footbox
+
+
 [->IncomeController: input(instance)
-IncomeController -> Task: generateTaskAndSave(instance)
+activate IncomeController
+IncomeController -> Instance: init to `Business` \nfor `ThingType
+IncomeController -> Instance: check and fix id
+note right: `thing` maybe not exists
+IncomeController -> TaskForStore: gen_task(instance)
+IncomeController -> RawTask: save(task)
 note right: can redo when failed
 IncomeController -> Instance: save(instance)
-Instance -> TaskSvc: create task for store
-activate Instance
-Instance -> Instance: init to `Business` \nfor `ThingType`
-Instance -> InstanceSvc: verify
-note left: maybe not exists
-Instance -> RouteSvc: get missions
-Instance -> Instance: save instance
-Instance --\\ InnerController: instance stored
+IncomeController --\\ InnerController: stored(task)
 note right #aqua : async \nno mission will exit
-deactivate Instance
+deactivate IncomeController
+
+
 activate InnerController
-InnerController -> ConverterSvc: generate convert information
-note left: maybe many
-InnerController -> TaskSvc: create new tasks and finish prior task
+InnerController -> ConverterInfo: gen_task
+InnerController -> RawTask: save_batch
 loop each convert info
-    InnerController --\\ InnerController: convert
+    InnerController --\\ CallOutParaWrapper:gen_and_call_out
     note left #aqua : async: call out to convert
-    activate InnerController
-    InnerController -> ConverterSvc: convert
-    activate ConverterSvc
-    deactivate InnerController
-end
-deactivate InnerController
-ConverterSvc -> InstanceSvc: verify
-ConverterSvc -\\ InnerController: converted
-deactivate ConverterSvc
-note left #aqua : async
-activate InnerController
-InnerController -> PlanSvc: save
-loop each plan
-    InnerController -> Instance: generate task for store
-end
-InnerController -> TaskSvc: create new tasks and finish prior task
-loop each task
-    InnerController -\\ InnerController: to store
-    note left #aqua : async
-    InnerController -> Instance: save instance
+    InnerController -> Converted :gen
+    InnerController -> PlanInfo : save
 end
 
+loop each plan
+    InnerController --\\ TaskForStore: gen_task(instance)
+    InnerController --\\ RawTask: new(task)
+end
+InnerController -> RawTask: save_batch
+
+loop each instance
+InnerController -> Instance: save(instance)
+end
+deactivate InnerController
 
 @enduml

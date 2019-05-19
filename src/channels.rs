@@ -3,17 +3,17 @@ use std::sync::Mutex;
 use std::thread;
 use std::thread::JoinHandle;
 
-use crate::flow::*;
 use nature_common::*;
 use nature_db::*;
+
+use crate::task::*;
 
 #[allow(unused_doc_comments)]
 /// `CHANNEL_PARALLEL` & `CHANNEL_SERIAL` are used to short caller response time
 lazy_static! {
-    pub static ref CHANNEL_STORE : Channel<(StoreTaskInfo,RawTask)> = Channel::new();
-    pub static ref CHANNEL_STORED : Channel<(StoreTaskInfo,RawTask)> = Channel::new();
+    pub static ref CHANNEL_STORE : Channel<(TaskForStore,RawTask)> = Channel::new();
+    pub static ref CHANNEL_STORED : Channel<(TaskForStore,RawTask)> = Channel::new();
     pub static ref CHANNEL_CONVERT : Channel<(ConverterInfo,RawTask)> = Channel::new();
-    pub static ref CHANNEL_CONVERTED : Channel<(ConverterInfo,Converted)> = Channel::new();
     pub static ref CHANNEL_PARALLEL : Channel<(ParallelBatchInstance,RawTask)> = Channel::new();
     pub static ref CHANNEL_SERIAL : Channel<(SerialBatchInstance,RawTask)> = Channel::new();
 }
@@ -24,7 +24,6 @@ pub fn start_receive_threads() -> Vec<JoinHandle<()>> {
     threads.push(start_thread(&CHANNEL_STORE.receiver, InnerController::channel_store));
     threads.push(start_thread(&CHANNEL_STORED.receiver, InnerController::channel_stored));
     threads.push(start_thread(&CHANNEL_CONVERT.receiver, InnerController::channel_convert));
-    threads.push(start_thread(&CHANNEL_CONVERTED.receiver, InnerController::channel_converted));
     // used to improve caller response time
     threads.push(start_thread(&CHANNEL_SERIAL.receiver, InnerController::channel_serial));
     threads.push(start_thread(&CHANNEL_PARALLEL.receiver, InnerController::channel_parallel));

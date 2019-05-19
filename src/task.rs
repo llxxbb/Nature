@@ -8,12 +8,12 @@ pub use self::income_controller::*;
 pub use self::inner_controller::*;
 pub use self::plan::*;
 pub use self::sequential::*;
-pub use self::store_task_info::*;
+pub use self::task_store::*;
 
 mod sequential;
 mod convert;
 
 mod inner_controller;
 mod income_controller;
-mod store_task_info;
+mod task_store;
 mod plan;

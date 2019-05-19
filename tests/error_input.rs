@@ -4,7 +4,7 @@ extern crate nature_common;
 extern crate rocket;
 extern crate serde_json;
 
-use nature::flow::*;
+use nature::task::*;
 use nature_common::*;
 
 mod common;

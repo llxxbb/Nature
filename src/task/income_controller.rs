@@ -11,7 +11,7 @@ impl IncomeController {
     pub fn input(mut instance: Instance) -> Result<u128> {
         instance.change_thing_type(ThingType::Business);
         let _ = instance.check_and_fix_id(ThingDefineCacheImpl::get);
-        let task = StoreTaskInfo::gen_task(&instance, OneStepFlowCacheImpl::get, Mission::filter_relations)?;
+        let task = TaskForStore::gen_task(&instance, OneStepFlowCacheImpl::get, Mission::filter_relations)?;
         let carrier = RawTask::save(&task, &instance.thing.get_full_key(), TaskType::Store as i16, TaskDaoImpl::insert)?;
         let _ = instance.save(InstanceDaoImpl::save)?;
         let _ = task.send(&carrier, &CHANNEL_STORED.sender.lock().unwrap());
@@ -25,7 +25,7 @@ impl IncomeController {
         let mut ins = instance.to_instance();
         ins.change_thing_type(ThingType::Dynamic);
         let uuid = ins.fix_id()?.id;
-        let task = StoreTaskInfo::for_dynamic(&ins, instance.converter)?;
+        let task = TaskForStore::for_dynamic(&ins, instance.converter)?;
         let carrier = RawTask::save(&task, &ins.thing.get_full_key(), TaskType::Store as i16, TaskDaoImpl::insert)?;
         InnerController::save_instance(task, carrier)?;
         Ok(uuid)
@@ -56,7 +56,7 @@ impl IncomeController {
     pub fn redo_task(raw: RawTask) -> Result<()> {
         // TODO check busy first
         match TaskType::try_from(raw.data_type)? {
-            TaskType::Store => Self::send_to_channel::<StoreTaskInfo>(&raw, &CHANNEL_STORED)?,
+            TaskType::Store => Self::send_to_channel::<TaskForStore>(&raw, &CHANNEL_STORED)?,
             TaskType::Convert => Self::send_to_channel::<ConverterInfo>(&raw, &CHANNEL_CONVERT)?,
             TaskType::ParallelBatch => Self::send_to_channel::<ParallelBatchInstance>(&raw, &CHANNEL_PARALLEL)?,
             TaskType::QueueBatch => Self::send_to_channel::<SerialBatchInstance>(&raw, &CHANNEL_SERIAL)?,

@@ -1,7 +1,7 @@
 use nature_common::*;
 use nature_db::*;
 
-use crate::flow::{HttpExecutorImpl, LocalExecutorImpl};
+use crate::task::{HttpExecutorImpl, LocalExecutorImpl};
 
 pub trait ExecutorTrait: Sync {
     fn execute(&self, executor: &str, para: &CallOutParameter) -> ConverterReturned;

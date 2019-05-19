@@ -5,7 +5,7 @@ use chrono::Local;
 use nature_common::*;
 use nature_db::RawPlanInfo;
 
-use crate::flow::ConverterInfo;
+use crate::task::ConverterInfo;
 use crate::lazy_static::__Deref;
 use crate::system::PLAN_CONTENT_MAX_LENGTH;
 

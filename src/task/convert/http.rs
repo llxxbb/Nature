@@ -2,7 +2,7 @@ use reqwest::Client;
 
 use nature_common::{CallOutParameter, ConverterReturned, Instance};
 
-use crate::flow::convert::caller::ExecutorTrait;
+use crate::task::convert::caller::ExecutorTrait;
 
 lazy_static! {
     static ref CLIENT : Client = Client::new();
@@ -39,8 +39,8 @@ mod test {
 
     use nature_common::{CallOutParameter, ConverterReturned, Instance};
 
-    use crate::flow::convert::caller::ExecutorTrait;
-    use crate::flow::HttpExecutorImpl;
+    use crate::task::convert::caller::ExecutorTrait;
+    use crate::task::HttpExecutorImpl;
 
     fn index(_req: &HttpRequest) -> Result<Json<Vec<Instance>>> {
         Ok(Json(vec!(Instance::default())))

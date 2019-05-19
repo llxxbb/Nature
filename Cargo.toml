@@ -34,11 +34,6 @@ actix-web = "0.7"
 nature_common = {path = "../Nature-Common"}
 nature_db = {path = "../Nature-DB", features = ["sqlite"]}
 
-# test
-[dev-dependencies]
-mockers_derive = "0.13"
-mockers = "0.13"
-
 [workspace]
 members = ["../Nature-Common",
 "../Nature-DB",

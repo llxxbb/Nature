@@ -38,26 +38,18 @@ impl SerialFinished {
 }
 
 #[derive(Serialize, Deserialize, Debug, Default, Clone)]
-pub struct SerialBatchInstanceWrapper {
-    pub data: SerialBatchInstance
-}
-
-impl From<SerialBatchInstance> for SerialBatchInstanceWrapper {
-    fn from(data: SerialBatchInstance) -> Self {
-        SerialBatchInstanceWrapper { data }
-    }
-}
+pub struct SerialBatchInstanceWrapper;
 
 impl SerialBatchInstanceWrapper {
-    pub fn save<FC, FS>(self, checker: &FC, saver: FS) -> Result<SerialFinished>
+    pub fn save<FC, FS>(serial: SerialBatchInstance, checker: &FC, saver: FS) -> Result<SerialFinished>
         where FC: Fn(&Thing) -> Result<RawThingDefine>,
               FS: Fn(&Instance) -> Result<usize>
     {
         let mut errors: Vec<String> = Vec::new();
         let mut succeeded_id: Vec<u128> = Vec::new();
-        for mut instance in self.data.instances {
+        for mut instance in serial.instances {
             instance.change_thing_type(ThingType::Business);
-            instance.data.thing = self.data.thing.clone();
+            instance.data.thing = serial.thing.clone();
             if let Err(err) = instance.check_and_fix_id(checker) {
                 errors.push(format!("{:?}", err));
                 continue;
