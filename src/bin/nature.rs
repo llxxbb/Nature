@@ -1,12 +1,18 @@
 extern crate nature;
 
-use nature::rpc::*;
-use nature::system::*;
+use dotenv::dotenv;
+
+use nature::rpc::actix::actix_start;
 
 fn main() {
-    sys_init();
-    let _ = rocket_server().launch();
+    dotenv().ok();
+    actix_start();
 }
+
+//fn main() {
+//    sys_init();
+//    let _ = rocket_server().launch();
+//}
 
 
 

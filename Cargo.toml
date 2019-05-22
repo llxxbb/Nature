@@ -25,10 +25,9 @@ fern = "0.5"        # Simple, efficient logging
 dotenv = "0.11"
 
 # webup
-rocket = "0.4"
-rocket_contrib = "0.4"
 reqwest = "0.9"
 actix-web = "0.7"
+actix = "0.7"
 
 # self project group
 nature_common = {path = "../Nature-Common"}

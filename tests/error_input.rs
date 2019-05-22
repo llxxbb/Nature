@@ -1,7 +1,6 @@
 extern crate dotenv;
 extern crate nature;
 extern crate nature_common;
-extern crate rocket;
 extern crate serde_json;
 
 use nature::task::*;
