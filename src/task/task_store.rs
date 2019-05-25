@@ -3,13 +3,13 @@ use std::sync::mpsc::Sender;
 use nature_common::{DynamicConverter, Instance, Result, Thing};
 use nature_db::{Mission, OneStepFlow, RawTask};
 
-use crate::task::ConverterInfo;
+use crate::task::TaskForConvert;
 
 #[derive(Debug, Serialize, Deserialize, Clone, Default)]
 pub struct TaskForStore {
     pub instance: Instance,
     /// save outside has non converter info.
-    pub upstream: Option<ConverterInfo>,
+    pub upstream: Option<TaskForConvert>,
     pub mission: Option<Vec<Mission>>,
 }
 

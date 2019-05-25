@@ -5,7 +5,7 @@ use chrono::Local;
 use nature_common::*;
 use nature_db::RawPlanInfo;
 
-use crate::task::ConverterInfo;
+use crate::task::TaskForConvert;
 use crate::lazy_static::__Deref;
 use crate::system::PLAN_CONTENT_MAX_LENGTH;
 
@@ -22,7 +22,7 @@ pub struct PlanInfo {
 }
 
 impl PlanInfo {
-    pub fn save<FI, FG>(converter_info: &ConverterInfo, instances: &Vec<Instance>, dao_insert: FI, dao_get: FG) -> Result<PlanInfo>
+    pub fn save<FI, FG>(converter_info: &TaskForConvert, instances: &Vec<Instance>, dao_insert: FI, dao_get: FG) -> Result<PlanInfo>
         where FI: Fn(&RawPlanInfo) -> Result<()>, FG: Fn(&str) -> Result<Option<RawPlanInfo>>
     {
         let plan = PlanInfo {

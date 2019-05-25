@@ -1,23 +1,9 @@
-use actix::System;
-use actix_web::{App, http, HttpResponse, Json, server};
-use serde_derive::{Deserialize, Serialize};
+use actix_web::{App, http, HttpResponse, Json};
 
-use nature_common::{Instance, ParallelBatchInstance, SelfRouteInstance, SerialBatchInstance};
+use nature_common::*;
 use nature_db::{DelayedInstances, RawTask};
 
 use crate::task::IncomeController;
-
-#[derive(Debug, Serialize, Deserialize)]
-struct MyObj {
-    name: String,
-    number: i32,
-}
-
-/// This handler uses json extractor
-fn index(item: Json<MyObj>) -> HttpResponse {
-    println!("model: {:?}", &item);
-    HttpResponse::Ok().json(item.0)
-}
 
 /// **Note** This do not receive System `Thing`'s instances
 fn input(instance: Json<Instance>) -> HttpResponse {
@@ -36,12 +22,12 @@ fn callback(delayed: Json<DelayedInstances>) -> HttpResponse {
     HttpResponse::Ok().json(x)
 }
 
-fn batch_for_serial(serial_batch: Json<SerialBatchInstance>) -> HttpResponse {
+fn batch_for_serial(serial_batch: Json<TaskForSerial>) -> HttpResponse {
     let x = IncomeController::serial(serial_batch.0);
     HttpResponse::Ok().json(x)
 }
 
-fn batch_for_parallel(parallel_batch: Json<ParallelBatchInstance>) -> HttpResponse {
+fn batch_for_parallel(parallel_batch: Json<TaskForParallel>) -> HttpResponse {
     let x = IncomeController::parallel(parallel_batch.0);
     HttpResponse::Ok().json(x)
 }
@@ -51,20 +37,8 @@ fn redo_task(task: Json<RawTask>) -> HttpResponse {
     HttpResponse::Ok().json(x)
 }
 
-pub fn actix_start() {
-    let sys = System::new("http-server");
-
-    let server = server::new(|| generate_app())
-        .bind("127.0.0.1:8088")
-        .unwrap();
-    server.start();
-    sys.run();
-}
-
-
-fn generate_app() -> App<()> {
+pub fn web_app() -> App<()> {
     App::new()
-        .resource("/", |r| r.method(http::Method::POST).with(index))
         .resource("/input", |r| r.method(http::Method::POST).with(input))
         .resource("/self_route", |r| r.method(http::Method::POST).with(self_route))
         .resource("/callback", |r| r.method(http::Method::POST).with(callback))

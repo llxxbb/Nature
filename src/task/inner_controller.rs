@@ -19,7 +19,7 @@ impl InnerController {
             let _ = TaskDaoImpl::delete(&&store.1.task_id);
             return;
         }
-        match ConverterInfo::gen_task(&store.0, ThingDefineCacheImpl::get, InstanceDaoImpl::get_by_id) {
+        match TaskForConvert::gen_task(&store.0, ThingDefineCacheImpl::get, InstanceDaoImpl::get_by_id) {
             Err(err) => {
                 let _ = TaskDaoImpl::raw_to_error(&err, &store.1);
                 return;
@@ -37,7 +37,7 @@ impl InnerController {
         }
     }
 
-    pub fn channel_convert(task: (ConverterInfo, RawTask)) {
+    pub fn channel_convert(task: (TaskForConvert, RawTask)) {
         match CallOutParaWrapper::gen_and_call_out(&task.0, task.1.task_id.clone(), &task.0.target) {
             Err(err) => match err {
                 // only **Environment Error** will be retry
@@ -63,13 +63,13 @@ impl InnerController {
         };
     }
 
-    pub fn channel_converted(task: (ConverterInfo, Converted)) {
+    pub fn channel_converted(task: (TaskForConvert, Converted)) {
         if let Ok(plan) = PlanInfo::save(&task.0, &task.1.converted, StorePlanDaoImpl::save, StorePlanDaoImpl::get) {
             prepare_to_store(&task.1.done_task, plan);
         }
     }
 
-    pub fn received_instance(task: &ConverterInfo, raw: &RawTask, mut instances: &mut Vec<Instance>) -> Result<()> {
+    pub fn received_instance(task: &TaskForConvert, raw: &RawTask, mut instances: &mut Vec<Instance>) -> Result<()> {
         debug!("converted {} instances for `Thing`: {:?}", instances.len(), &task.target.to);
         match Converted::gen(&task, &raw, &mut instances, ThingDefineCacheImpl::get) {
             Ok(rtn) => {
@@ -83,10 +83,10 @@ impl InnerController {
         }
     }
 
-    pub fn channel_serial(task: (SerialBatchInstance, RawTask)) {
+    pub fn channel_serial(task: (TaskForSerial, RawTask)) {
         let (task, carrier) = task;
         let finish = &task.context_for_finish.clone();
-        if let Ok(si) = SerialBatchInstanceWrapper::save(task, &ThingDefineCacheImpl::get, InstanceDaoImpl::insert) {
+        if let Ok(si) = TaskForSerialWrapper::save(task, &ThingDefineCacheImpl::get, InstanceDaoImpl::insert) {
             match si.to_virtual_instance(finish) {
                 Ok(instance) => {
                     if let Ok(si) = TaskForStore::gen_task(&instance, OneStepFlowCacheImpl::get, Mission::filter_relations) {
@@ -109,7 +109,7 @@ impl InnerController {
         }
     }
 
-    pub fn channel_parallel(task: (ParallelBatchInstance, RawTask)) {
+    pub fn channel_parallel(task: (TaskForParallel, RawTask)) {
         let mut tuple: Vec<(TaskForStore, RawTask)> = Vec::new();
         for instance in task.0.instances.iter() {
             match TaskForStore::gen_task(&instance, OneStepFlowCacheImpl::get, Mission::filter_relations) {

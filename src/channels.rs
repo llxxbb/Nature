@@ -13,9 +13,9 @@ use crate::task::*;
 lazy_static! {
     pub static ref CHANNEL_STORE : Channel<(TaskForStore,RawTask)> = Channel::new();
     pub static ref CHANNEL_STORED : Channel<(TaskForStore,RawTask)> = Channel::new();
-    pub static ref CHANNEL_CONVERT : Channel<(ConverterInfo,RawTask)> = Channel::new();
-    pub static ref CHANNEL_PARALLEL : Channel<(ParallelBatchInstance,RawTask)> = Channel::new();
-    pub static ref CHANNEL_SERIAL : Channel<(SerialBatchInstance,RawTask)> = Channel::new();
+    pub static ref CHANNEL_CONVERT : Channel<(TaskForConvert,RawTask)> = Channel::new();
+    pub static ref CHANNEL_PARALLEL : Channel<(TaskForParallel,RawTask)> = Channel::new();
+    pub static ref CHANNEL_SERIAL : Channel<(TaskForSerial,RawTask)> = Channel::new();
 }
 
 pub fn start_receive_threads() -> Vec<JoinHandle<()>> {

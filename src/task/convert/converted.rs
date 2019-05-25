@@ -6,7 +6,7 @@ pub struct Converted {
 }
 
 impl Converted {
-    pub fn gen<FT>(task: &ConverterInfo, carrier: &RawTask, instances: &mut Vec<Instance>, thing_getter: FT) -> Result<Converted>
+    pub fn gen<FT>(task: &TaskForConvert, carrier: &RawTask, instances: &mut Vec<Instance>, thing_getter: FT) -> Result<Converted>
         where FT: Fn(&Thing) -> Result<RawThingDefine>
     {
         // check `ThingType` for Null

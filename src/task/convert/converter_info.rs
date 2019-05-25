@@ -7,15 +7,15 @@ use crate::system::CONTEXT_TARGET_INSTANCE_ID;
 use crate::task::TaskForStore;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct ConverterInfo {
+pub struct TaskForConvert {
     pub from: Instance,
     pub target: Mission,
     pub last_status: Option<Instance>,
 }
 
-impl Default for ConverterInfo {
+impl Default for TaskForConvert {
     fn default() -> Self {
-        ConverterInfo {
+        TaskForConvert {
             from: Instance::default(),
             target: Mission::default(),
             last_status: None,
@@ -23,11 +23,11 @@ impl Default for ConverterInfo {
     }
 }
 
-impl ConverterInfo {
-    pub fn gen_task<FT, FIG>(task: &TaskForStore, thing_getter: FT, instance_getter: FIG) -> Result<Vec<(ConverterInfo, RawTask)>>
+impl TaskForConvert {
+    pub fn gen_task<FT, FIG>(task: &TaskForStore, thing_getter: FT, instance_getter: FIG) -> Result<Vec<(TaskForConvert, RawTask)>>
         where FT: Fn(&Thing) -> Result<RawThingDefine>, FIG: Fn(u128) -> Result<Option<Instance>>
     {
-        let mut new_carriers: Vec<(ConverterInfo, RawTask)> = Vec::new();
+        let mut new_carriers: Vec<(TaskForConvert, RawTask)> = Vec::new();
         let missions = task.mission.clone().unwrap();
         for c in missions {
             match Self::new_one(&task.instance, &c, &thing_getter, &instance_getter) {
@@ -41,7 +41,7 @@ impl ConverterInfo {
         Ok(new_carriers)
     }
 
-    fn new_one<FT, FIG>(instance: &Instance, mapping: &Mission, thing_getter: &FT, instance_getter: &FIG) -> Result<ConverterInfo>
+    fn new_one<FT, FIG>(instance: &Instance, mapping: &Mission, thing_getter: &FT, instance_getter: &FIG) -> Result<TaskForConvert>
         where FT: Fn(&Thing) -> Result<RawThingDefine>,
               FIG: Fn(u128) -> Result<Option<Instance>>
     {
@@ -67,7 +67,7 @@ impl ConverterInfo {
                 demand.check(&last.status)?;
             }
         };
-        let rtn = ConverterInfo {
+        let rtn = TaskForConvert {
             from: instance.clone(),
             target: mapping.clone(),
             last_status: last_target,

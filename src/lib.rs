@@ -1,8 +1,9 @@
 #![feature(plugin)]
 #![feature(trace_macros)]
 #![feature(box_patterns)]
-#![feature(proc_macro_hygiene, decl_macro)] // rocket
 
+extern crate actix;
+extern crate actix_web;
 extern crate chrono;
 #[macro_use]
 extern crate lazy_static;
@@ -16,10 +17,9 @@ extern crate serde;
 extern crate serde_derive;
 extern crate serde_json;
 extern crate uuid;
-extern crate actix_web;
-extern crate actix;
 
 pub mod system;
 pub mod rpc;
 pub mod task;
 mod channels;
+pub mod actor;

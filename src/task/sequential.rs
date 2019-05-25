@@ -38,10 +38,10 @@ impl SerialFinished {
 }
 
 #[derive(Serialize, Deserialize, Debug, Default, Clone)]
-pub struct SerialBatchInstanceWrapper;
+pub struct TaskForSerialWrapper;
 
-impl SerialBatchInstanceWrapper {
-    pub fn save<FC, FS>(serial: SerialBatchInstance, checker: &FC, saver: FS) -> Result<SerialFinished>
+impl TaskForSerialWrapper {
+    pub fn save<FC, FS>(serial: TaskForSerial, checker: &FC, saver: FS) -> Result<SerialFinished>
         where FC: Fn(&Thing) -> Result<RawThingDefine>,
               FS: Fn(&Instance) -> Result<usize>
     {

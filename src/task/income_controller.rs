@@ -43,7 +43,7 @@ impl IncomeController {
                             Ok(())
                         }
                         CallbackResult::Instances(mut ins) => {
-                            let task: ConverterInfo = serde_json::from_str(&carrier.data)?;
+                            let task: TaskForConvert = serde_json::from_str(&carrier.data)?;
                             InnerController::received_instance(&task, &carrier, &mut ins)
                         }
                     }
@@ -57,20 +57,20 @@ impl IncomeController {
         // TODO check busy first
         match TaskType::try_from(raw.data_type)? {
             TaskType::Store => Self::send_to_channel::<TaskForStore>(&raw, &CHANNEL_STORED)?,
-            TaskType::Convert => Self::send_to_channel::<ConverterInfo>(&raw, &CHANNEL_CONVERT)?,
-            TaskType::ParallelBatch => Self::send_to_channel::<ParallelBatchInstance>(&raw, &CHANNEL_PARALLEL)?,
-            TaskType::QueueBatch => Self::send_to_channel::<SerialBatchInstance>(&raw, &CHANNEL_SERIAL)?,
+            TaskType::Convert => Self::send_to_channel::<TaskForConvert>(&raw, &CHANNEL_CONVERT)?,
+            TaskType::ParallelBatch => Self::send_to_channel::<TaskForParallel>(&raw, &CHANNEL_PARALLEL)?,
+            TaskType::QueueBatch => Self::send_to_channel::<TaskForSerial>(&raw, &CHANNEL_SERIAL)?,
         }
         Ok(())
     }
 
-    pub fn serial(batch: SerialBatchInstance) -> Result<()> {
+    pub fn serial(batch: TaskForSerial) -> Result<()> {
         let raw = RawTask::save(&batch, &batch.thing.get_full_key(), TaskType::QueueBatch as i16, TaskDaoImpl::insert)?;
         let _ = CHANNEL_SERIAL.sender.lock().unwrap().send((batch.to_owned(), raw));
         Ok(())
     }
 
-    pub fn parallel(batch: ParallelBatchInstance) -> Result<()> {
+    pub fn parallel(batch: TaskForParallel) -> Result<()> {
         let raw = RawTask::save(&batch, &batch.thing.get_full_key(), TaskType::ParallelBatch as i16, TaskDaoImpl::insert)?;
         let _ = CHANNEL_PARALLEL.sender.lock().unwrap().send((batch, raw));
         Ok(())
