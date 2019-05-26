@@ -13,6 +13,7 @@ serde_derive = "1.0"
 lazy_static = "1.0"
 uuid = { version = "0.7", features = ["v3"] }
 lru_time_cache = "0.8"
+futures = "0.1"
 
 # for local converter implement
 libloading = "0.5.0"

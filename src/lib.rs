@@ -22,4 +22,5 @@ pub mod system;
 pub mod rpc;
 pub mod task;
 mod channels;
+pub mod status;
 pub mod actor;

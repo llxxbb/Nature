@@ -2,7 +2,7 @@ use actix::prelude::*;
 use crate::task::{TaskForStore, InnerController};
 use nature_db::RawTask;
 
-pub struct MsgForStore(TaskForStore, RawTask);
+pub struct MsgForStore(pub TaskForStore, pub RawTask);
 
 impl Message for MsgForStore{
     type Result = ();
@@ -11,7 +11,7 @@ impl Message for MsgForStore{
 pub struct StoreActor;
 
 impl Actor for StoreActor {
-    type Context = Context<Self>;
+    type Context = SyncContext<Self>;
 }
 
 impl Handler<MsgForStore> for StoreActor{

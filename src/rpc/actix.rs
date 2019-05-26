@@ -1,14 +1,18 @@
-use actix_web::{App, http, HttpResponse, Json};
+use actix_web::{App, Error, http, HttpMessage, HttpRequest, HttpResponse, Json};
+use futures::future::Future;
 
 use nature_common::*;
 use nature_db::{DelayedInstances, RawTask};
 
+use crate::status::State;
 use crate::task::IncomeController;
 
 /// **Note** This do not receive System `Thing`'s instances
-fn input(instance: Json<Instance>) -> HttpResponse {
-    let x = IncomeController::input(instance.0);
-    HttpResponse::Ok().json(x)
+fn input(req: &HttpRequest<State>) -> HttpResponse {
+    req.json().from_err().and_then(|r: Instance| {
+        let x = IncomeController::input(r, req.state());
+        HttpResponse::Ok().json(x)
+    }).responder()
 }
 
 /// Instance with route info
@@ -38,7 +42,7 @@ fn redo_task(task: Json<RawTask>) -> HttpResponse {
 }
 
 pub fn web_app() -> App<()> {
-    App::new()
+    App::with_state(State::new())
         .resource("/input", |r| r.method(http::Method::POST).with(input))
         .resource("/self_route", |r| r.method(http::Method::POST).with(self_route))
         .resource("/callback", |r| r.method(http::Method::POST).with(callback))

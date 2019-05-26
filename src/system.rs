@@ -22,6 +22,10 @@ lazy_static! {
     pub static ref PLAN_CONTENT_MAX_LENGTH : usize = {
         env::var("PLAN_CONTENT_MAX_LENGTH").unwrap_or_else(|_| "16777215".to_string()).parse::<usize>().unwrap()
     };
+
+    pub static ref THREAD_NUM_FOR_STORE_ACTOR : usize = {
+        env::var("THREAD_NUM_FOR_STORE_ACTOR").unwrap_or_else(|_| "3".to_string()).parse::<usize>().unwrap()
+    };
 }
 
 

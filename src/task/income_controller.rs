@@ -2,19 +2,22 @@ use std::convert::TryFrom;
 
 use serde::Deserialize;
 
+use crate::status::State;
+
 use super::*;
+use crate::actor::store_actor::MsgForStore;
 
 pub struct IncomeController {}
 
 impl IncomeController {
     /// born an instance which is the beginning of the changes.
-    pub fn input(mut instance: Instance) -> Result<u128> {
+    pub fn input(mut instance: Instance, state: &State) -> Result<u128> {
         instance.change_thing_type(ThingType::Business);
         let _ = instance.check_and_fix_id(ThingDefineCacheImpl::get);
         let task = TaskForStore::gen_task(&instance, OneStepFlowCacheImpl::get, Mission::filter_relations)?;
         let carrier = RawTask::save(&task, &instance.thing.get_full_key(), TaskType::Store as i16, TaskDaoImpl::insert)?;
         let _ = instance.save(InstanceDaoImpl::save)?;
-        let _ = task.send(&carrier, &CHANNEL_STORED.sender.lock().unwrap());
+        state.act_store.try_send(MsgForStore(task, carrier))?;
         Ok(instance.id)
     }
 
