@@ -1,17 +1,18 @@
 use std::convert::TryFrom;
+use std::rc::Rc;
 
 use serde::Deserialize;
 
+use crate::actor::store_actor::MsgForStore;
 use crate::status::State;
 
 use super::*;
-use crate::actor::store_actor::MsgForStore;
 
 pub struct IncomeController {}
 
 impl IncomeController {
     /// born an instance which is the beginning of the changes.
-    pub fn input(mut instance: Instance, state: &State) -> Result<u128> {
+    pub fn input(mut instance: Instance, state: Rc<State>) -> Result<u128> {
         instance.change_thing_type(ThingType::Business);
         let _ = instance.check_and_fix_id(ThingDefineCacheImpl::get);
         let task = TaskForStore::gen_task(&instance, OneStepFlowCacheImpl::get, Mission::filter_relations)?;
