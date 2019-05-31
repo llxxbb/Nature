@@ -26,6 +26,10 @@ lazy_static! {
     pub static ref THREAD_NUM_FOR_STORE_ACTOR : usize = {
         env::var("THREAD_NUM_FOR_STORE_ACTOR").unwrap_or_else(|_| "3".to_string()).parse::<usize>().unwrap()
     };
+
+    pub static ref THREAD_NUM_FOR_STORED_ACTOR : usize = {
+        env::var("THREAD_NUM_FOR_STORED_ACTOR").unwrap_or_else(|_| "3".to_string()).parse::<usize>().unwrap()
+    };
 }
 
 

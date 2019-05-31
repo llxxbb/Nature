@@ -3,7 +3,7 @@ use std::rc::Rc;
 
 use serde::Deserialize;
 
-use crate::actor::store_actor::MsgForStore;
+use crate::actor::store::MsgForStore;
 use crate::status::State;
 
 use super::*;
@@ -18,12 +18,12 @@ impl IncomeController {
         let task = TaskForStore::gen_task(&instance, OneStepFlowCacheImpl::get, Mission::filter_relations)?;
         let carrier = RawTask::save(&task, &instance.thing.get_full_key(), TaskType::Store as i16, TaskDaoImpl::insert)?;
         let _ = instance.save(InstanceDaoImpl::save)?;
-        state.act_store.try_send(MsgForStore(task, carrier))?;
+        state.act_stored.try_send(MsgForStore(task, carrier))?;
         Ok(instance.id)
     }
 
     /// born an instance which is the beginning of the changes.
-    pub fn self_route(instance: SelfRouteInstance) -> Result<u128> {
+    pub fn self_route(instance: SelfRouteInstance, state: Rc<State>) -> Result<u128> {
         let _ = instance.verify()?;
         // Convert a Self-Route-Instance to Normal Instance
         let mut ins = instance.to_instance();

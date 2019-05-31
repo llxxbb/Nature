@@ -9,5 +9,5 @@ pub struct MsgForParallel(TaskForParallel, RawTask);
 
 pub struct MsgForSerial(TaskForSerial, RawTask);
 
-pub mod store_actor;
+pub mod store;
 

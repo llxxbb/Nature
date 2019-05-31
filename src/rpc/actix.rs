@@ -19,10 +19,19 @@ fn input(req: &HttpRequest<Rc<State>>) -> Box<Future<Item=HttpResponse, Error=Er
 }
 
 /// Instance with route info
-fn self_route(instance: Json<SelfRouteInstance>) -> HttpResponse {
-    let x = IncomeController::self_route(instance.0);
-    HttpResponse::Ok().json(x)
+fn self_route(req: &HttpRequest<Rc<State>>) -> Box<Future<Item=HttpResponse, Error=Error>>  {
+    let state = req.state().clone();
+    req.json().from_err().and_then(|r: SelfRouteInstance| {
+        let x = IncomeController::self_route(r, state);
+        Ok(HttpResponse::Ok().json(x))
+    }).responder()
 }
+
+///// Instance with route info
+//fn self_route(instance: Json<SelfRouteInstance>) -> HttpResponse {
+//    let x = IncomeController::self_route(instance.0);
+//    HttpResponse::Ok().json(x)
+//}
 
 fn callback(delayed: Json<DelayedInstances>) -> HttpResponse {
     let x = IncomeController::callback(delayed.0);
@@ -47,7 +56,7 @@ fn redo_task(task: Json<RawTask>) -> HttpResponse {
 pub fn web_app() -> App<Rc<State>> {
     App::with_state(Rc::new(State::new()))
         .resource("/input", |r| r.method(http::Method::POST).f(input))
-        .resource("/self_route", |r| r.method(http::Method::POST).with(self_route))
+        .resource("/self_route", |r| r.method(http::Method::POST).f(self_route))
         .resource("/callback", |r| r.method(http::Method::POST).with(callback))
         .resource("/serial_batch", |r| r.method(http::Method::POST).with(batch_for_serial))
         .resource("/parallel_batch", |r| r.method(http::Method::POST).with(batch_for_parallel))
