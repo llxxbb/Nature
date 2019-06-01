@@ -1,10 +1,6 @@
 use std::convert::TryFrom;
-use std::rc::Rc;
 
 use serde::Deserialize;
-
-use crate::actor::store::MsgForStore;
-use crate::status::State;
 
 use super::*;
 
@@ -12,18 +8,17 @@ pub struct IncomeController {}
 
 impl IncomeController {
     /// born an instance which is the beginning of the changes.
-    pub fn input(mut instance: Instance, state: Rc<State>) -> Result<u128> {
+    pub fn input(mut instance: Instance) -> Result<u128> {
         instance.change_thing_type(ThingType::Business);
         let _ = instance.check_and_fix_id(ThingDefineCacheImpl::get);
         let task = TaskForStore::gen_task(&instance, OneStepFlowCacheImpl::get, Mission::filter_relations)?;
         let carrier = RawTask::save(&task, &instance.thing.get_full_key(), TaskType::Store as i16, TaskDaoImpl::insert)?;
-        let _ = instance.save(InstanceDaoImpl::save)?;
-        state.act_stored.try_send(MsgForStore(task, carrier))?;
+        InnerController::save_instance(task, carrier)?;
         Ok(instance.id)
     }
 
     /// born an instance which is the beginning of the changes.
-    pub fn self_route(instance: SelfRouteInstance, state: Rc<State>) -> Result<u128> {
+    pub fn self_route(instance: SelfRouteInstance) -> Result<u128> {
         let _ = instance.verify()?;
         // Convert a Self-Route-Instance to Normal Instance
         let mut ins = instance.to_instance();

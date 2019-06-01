@@ -21,6 +21,5 @@ extern crate uuid;
 pub mod system;
 pub mod rpc;
 pub mod task;
-mod channels;
-pub mod status;
+pub mod channels;
 pub mod actor;

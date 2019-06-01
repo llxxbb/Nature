@@ -1,3 +1,6 @@
+use crate::actor::*;
+use crate::actor::store::MsgForStore;
+
 use super::*;
 
 pub struct InnerController {}
@@ -9,7 +12,7 @@ impl InnerController {
 
     pub fn save_instance(task: TaskForStore, carrier: RawTask) -> Result<()> {
         let _ = task.instance.save(InstanceDaoImpl::save)?;
-        task.send(&carrier, &CHANNEL_STORED.sender.lock().unwrap());
+        ACT_STORED.try_send(MsgForStore(task, carrier))?;
         Ok(())
     }
 
