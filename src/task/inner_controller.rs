@@ -1,5 +1,4 @@
 use crate::actor::*;
-use crate::actor::store::MsgForStore;
 
 use super::*;
 
@@ -16,49 +15,50 @@ impl InnerController {
         Ok(())
     }
 
-    pub fn channel_stored(store: (TaskForStore, RawTask)) {
-        if store.0.mission.is_none() {
-            debug!("no follow data for : {}", &store.0.instance.thing.get_full_key());
-            let _ = TaskDaoImpl::delete(&&store.1.task_id);
+    pub fn channel_stored(task: TaskForStore, raw: RawTask) {
+        if task.mission.is_none() {
+            debug!("no follow data for : {}", &task.instance.thing.get_full_key());
+            let _ = TaskDaoImpl::delete(&&raw.task_id);
             return;
         }
-        match TaskForConvert::gen_task(&store.0, ThingDefineCacheImpl::get, InstanceDaoImpl::get_by_id) {
+        match TaskForConvert::gen_task(&task, ThingDefineCacheImpl::get, InstanceDaoImpl::get_by_id) {
             Err(err) => {
-                let _ = TaskDaoImpl::raw_to_error(&err, &store.1);
+                let _ = TaskDaoImpl::raw_to_error(&err, &raw);
                 return;
             }
             Ok(converters) => {
                 let raws: Vec<RawTask> = converters.iter().map(|x| x.1.clone()).collect();
-                if RawTask::save_batch(&raws, &store.1.task_id, TaskDaoImpl::insert, TaskDaoImpl::delete).is_err() {
+                if RawTask::save_batch(&raws, &raw.task_id, TaskDaoImpl::insert, TaskDaoImpl::delete).is_err() {
                     return;
                 }
-                debug!("will dispatch {} convert tasks for `Thing` : {:?}", converters.len(), store.0.instance.thing.get_full_key());
-                for task in converters {
-                    let _ = &CHANNEL_CONVERT.sender.lock().unwrap().send(task);
+                debug!("will dispatch {} convert tasks for `Thing` : {:?}", converters.len(), task.instance.thing.get_full_key());
+                for t in converters {
+                    let _ = ACT_CONVERT.try_send(MsgForConvert(t.0, t.1));
                 }
             }
         }
     }
 
-    pub fn channel_convert(task: (TaskForConvert, RawTask)) {
-        match CallOutParaWrapper::gen_and_call_out(&task.0, task.1.task_id.clone(), &task.0.target) {
+    pub fn channel_convert(task: TaskForConvert, raw: RawTask) {
+        debug!("convert for {:?}", &task.target.to);
+        match CallOutParaWrapper::gen_and_call_out(&task, raw.task_id.clone(), &task.target) {
             Err(err) => match err {
                 // only **Environment Error** will be retry
                 NatureError::ConverterEnvironmentError(_) => (),
                 // other error will drop into error
                 _ => {
-                    let _ = TaskDaoImpl::raw_to_error(&err, &task.1);
+                    let _ = TaskDaoImpl::raw_to_error(&err, &raw);
                 }
             }
             Ok(returned) => match returned {
-                ConverterReturned::Instances(mut instances) => {
-                    let _ = Self::received_instance(&task.0, &task.1, &mut instances);
+                ConverterReturned::Instances(instances) => {
+                    let _ = Self::received_instance(&task, &raw, instances);
                 }
                 ConverterReturned::Delay(delay) => {
-                    let _ = TaskDaoImpl::update_execute_time(&task.1.task_id, i64::from(delay));
+                    let _ = TaskDaoImpl::update_execute_time(&raw.task_id, i64::from(delay));
                 }
                 ConverterReturned::LogicalError(ss) => {
-                    let _ = TaskDaoImpl::raw_to_error(&NatureError::ConverterLogicalError(ss), &task.1);
+                    let _ = TaskDaoImpl::raw_to_error(&NatureError::ConverterLogicalError(ss), &raw);
                 }
                 ConverterReturned::EnvError => (),
                 ConverterReturned::None => (),
@@ -66,15 +66,15 @@ impl InnerController {
         };
     }
 
-    pub fn channel_converted(task: (TaskForConvert, Converted)) {
-        if let Ok(plan) = PlanInfo::save(&task.0, &task.1.converted, StorePlanDaoImpl::save, StorePlanDaoImpl::get) {
-            prepare_to_store(&task.1.done_task, plan);
-        }
-    }
+//    pub fn channel_converted(task: (TaskForConvert, Converted)) {
+//        if let Ok(plan) = PlanInfo::save(&task.0, &task.1.converted, StorePlanDaoImpl::save, StorePlanDaoImpl::get) {
+//            prepare_to_store(&task.1.done_task, plan);
+//        }
+//    }
 
-    pub fn received_instance(task: &TaskForConvert, raw: &RawTask, mut instances: &mut Vec<Instance>) -> Result<()> {
+    pub fn received_instance(task: &TaskForConvert, raw: &RawTask, instances: Vec<Instance>) -> Result<()> {
         debug!("converted {} instances for `Thing`: {:?}", instances.len(), &task.target.to);
-        match Converted::gen(&task, &raw, &mut instances, ThingDefineCacheImpl::get) {
+        match Converted::gen(&task, &raw, instances, ThingDefineCacheImpl::get) {
             Ok(rtn) => {
                 let plan = PlanInfo::save(&task, &rtn.converted, StorePlanDaoImpl::save, StorePlanDaoImpl::get)?;
                 Ok(prepare_to_store(&rtn.done_task, plan))
@@ -96,7 +96,7 @@ impl InnerController {
                         match RawTask::new(&si, &instance.thing.get_full_key(), TaskType::QueueBatch as i16) {
                             Ok(mut new) => {
                                 if let Ok(_route) = new.finish_old(&carrier, TaskDaoImpl::insert, TaskDaoImpl::delete) {
-                                    let _ = CHANNEL_STORED.sender.lock().unwrap().send((si, new));
+                                    let _ = ACT_STORED.try_send(MsgForStore(si, new));
                                 }
                             }
                             Err(err) => {

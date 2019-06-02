@@ -2,6 +2,8 @@ use std::convert::TryFrom;
 
 use serde::Deserialize;
 
+use crate::actor::*;
+
 use super::*;
 
 pub struct IncomeController {}
@@ -41,9 +43,9 @@ impl IncomeController {
                             let _ = TaskDaoImpl::raw_to_error(&err, &carrier);
                             Ok(())
                         }
-                        CallbackResult::Instances(mut ins) => {
+                        CallbackResult::Instances(ins) => {
                             let task: TaskForConvert = serde_json::from_str(&carrier.data)?;
-                            InnerController::received_instance(&task, &carrier, &mut ins)
+                            InnerController::received_instance(&task, &carrier, ins)
                         }
                     }
                 }
@@ -55,8 +57,14 @@ impl IncomeController {
     pub fn redo_task(raw: RawTask) -> Result<()> {
         // TODO check busy first
         match TaskType::try_from(raw.data_type)? {
-            TaskType::Store => Self::send_to_channel::<TaskForStore>(&raw, &CHANNEL_STORED)?,
-            TaskType::Convert => Self::send_to_channel::<TaskForConvert>(&raw, &CHANNEL_CONVERT)?,
+            TaskType::Store => {
+                let rtn = serde_json::from_str(&raw.data)?;
+                ACT_STORED.try_send(MsgForStore(rtn, raw))?;
+            }
+            TaskType::Convert => {
+                let rtn = serde_json::from_str(&raw.data)?;
+                ACT_CONVERT.try_send(MsgForConvert(rtn, raw))?;
+            }
             TaskType::ParallelBatch => Self::send_to_channel::<TaskForParallel>(&raw, &CHANNEL_PARALLEL)?,
             TaskType::QueueBatch => Self::send_to_channel::<TaskForSerial>(&raw, &CHANNEL_SERIAL)?,
         }

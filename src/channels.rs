@@ -12,8 +12,6 @@ use crate::task::*;
 /// `CHANNEL_PARALLEL` & `CHANNEL_SERIAL` are used to short caller response time
 lazy_static! {
     pub static ref CHANNEL_STORE : Channel<(TaskForStore,RawTask)> = Channel::new();
-    pub static ref CHANNEL_STORED : Channel<(TaskForStore,RawTask)> = Channel::new();
-    pub static ref CHANNEL_CONVERT : Channel<(TaskForConvert,RawTask)> = Channel::new();
     pub static ref CHANNEL_PARALLEL : Channel<(TaskForParallel,RawTask)> = Channel::new();
     pub static ref CHANNEL_SERIAL : Channel<(TaskForSerial,RawTask)> = Channel::new();
 }
@@ -21,8 +19,6 @@ lazy_static! {
 pub fn start_receive_threads() -> Vec<JoinHandle<()>> {
     let mut threads: Vec<JoinHandle<()>> = Vec::new();
     threads.push(start_thread(&CHANNEL_STORE.receiver, InnerController::channel_store));
-    threads.push(start_thread(&CHANNEL_STORED.receiver, InnerController::channel_stored));
-    threads.push(start_thread(&CHANNEL_CONVERT.receiver, InnerController::channel_convert));
     // used to improve caller response time
     threads.push(start_thread(&CHANNEL_SERIAL.receiver, InnerController::channel_serial));
     threads.push(start_thread(&CHANNEL_PARALLEL.receiver, InnerController::channel_parallel));

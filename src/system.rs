@@ -7,13 +7,13 @@ use std::thread::JoinHandle;
 
 use actix::System;
 use actix_web::server;
+use dotenv::dotenv;
 
 use nature_common::util::setup_logger;
 
+use crate::actor::*;
 use crate::channels::start_receive_threads;
 use crate::rpc::actix::web_app;
-
-use dotenv::dotenv;
 
 // for product and mock
 lazy_static! {
@@ -39,6 +39,10 @@ lazy_static! {
         env::var("THREAD_NUM_FOR_STORED_ACTOR").unwrap_or_else(|_| "3".to_string()).parse::<usize>().unwrap()
     };
 
+    pub static ref THREAD_NUM_FOR_CONVERT_ACTOR : usize = {
+        env::var("THREAD_NUM_FOR_CONVERT_ACTOR").unwrap_or_else(|_| "3".to_string()).parse::<usize>().unwrap()
+    };
+
 }
 
 
@@ -52,11 +56,14 @@ pub fn sys_init() {
 }
 
 fn start_actor() {
+    init_actors();
     let sys = System::new("http-server");
+    // web actor
     server::new(|| web_app())
         .bind("127.0.0.1:".to_owned() + &SERVER_PORT)
         .unwrap()
         .start();
+
     sys.run();
 }
 

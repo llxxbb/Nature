@@ -77,7 +77,9 @@ cargo install diesel_cli --no-default-features --features sqlite,mysql
 
 [ghostwriter](https://github-production-release-asset-2e65be.s3.amazonaws.com/153566966/4ca08800-fc12-11e8-9dcd-05dbd0fd627d?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIWNJYAX4CSVEH53A%2F20190418%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20190418T092952Z&X-Amz-Expires=300&X-Amz-Signature=f19ce5ab65a917d911512697b68708c0f09e683326108fabe603bb34ccde1dbe&X-Amz-SignedHeaders=host&actor_id=22697285&response-content-disposition=attachment%3B%20filename%3Dghostwriter_x64_installer.exe&response-content-type=application%2Foctet-stream)
 
+## Actix
 
+all actors must be started between `System::new` and `System.run` . Otherwise the actor can't not handle the message.
 
 
 

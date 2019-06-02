@@ -6,7 +6,7 @@ pub struct Converted {
 }
 
 impl Converted {
-    pub fn gen<FT>(task: &TaskForConvert, carrier: &RawTask, instances: &mut Vec<Instance>, thing_getter: FT) -> Result<Converted>
+    pub fn gen<FT>(task: &TaskForConvert, carrier: &RawTask, instances: Vec<Instance>, thing_getter: FT) -> Result<Converted>
         where FT: Fn(&Thing) -> Result<RawThingDefine>
     {
         // check `ThingType` for Null
@@ -18,16 +18,23 @@ impl Converted {
             return Ok(rtn);
         }
         // check status version to avoid loop
-        let _ = instances.iter_mut().map(|one: &mut Instance| {
-            one.data.thing = task.target.to.clone();
-            let _ = one.fix_id();
-            one
-        }).collect::<Vec<_>>();
-        let instances = Self::verify(&task.target.to, &instances, thing_getter)?;
+        let mut fixxed_ins: Vec<Instance> = Vec::new();
+        for one in instances {
+            debug!("------------debug here 1-------------");
+            let mut n = one.clone();
+            debug!("------------debug here 2-------------");
+            n.data.thing = task.target.to.clone();
+            let _ = n.fix_id();
+            fixxed_ins.push(n)
+        }
+        debug!("------------debug here 3-------------");
+        let instances = Self::verify(&task.target.to, &fixxed_ins, thing_getter)?;
+        debug!("------------debug here 4-------------");
         let rtn = Converted {
             done_task: carrier.to_owned(),
             converted: instances,
         };
+        debug!("------------debug here 5-------------");
         Ok(rtn)
     }
 

@@ -14,6 +14,10 @@ pub struct StoreActor;
 
 impl Actor for StoreActor {
     type Context = SyncContext<Self>;
+
+    fn started(&mut self, _ctx: &mut Self::Context) {
+        println!("StoreActor is started");
+    }
 }
 
 impl Handler<MsgForStore> for StoreActor {
@@ -29,12 +33,16 @@ pub struct StoredActor;
 
 impl Actor for StoredActor {
     type Context = SyncContext<Self>;
+    fn started(&mut self, _ctx: &mut Self::Context) {
+        println!("StoredActor is started");
+    }
+
 }
 
 impl Handler<MsgForStore> for StoredActor {
     type Result = ();
 
     fn handle(&mut self, msg: MsgForStore, _ctx: &mut Self::Context) -> Self::Result {
-        InnerController::channel_stored((msg.0, msg.1))
+        InnerController::channel_stored(msg.0, msg.1)
     }
 }
