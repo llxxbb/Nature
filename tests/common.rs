@@ -11,6 +11,7 @@ use nature::actor::*;
 use nature::channels::start_receive_threads;
 use nature::rpc::actix::web_app;
 use nature_common::setup_logger;
+use actix_web::App;
 
 pub fn test_init() -> TestServer {
     dotenv().ok();
@@ -21,11 +22,14 @@ pub fn test_init() -> TestServer {
 
     start_receive_threads();
 
-    init_actors();
-
-    TestServer::with_factory(web_app)
+    TestServer::with_factory(init_all_actor)
 }
 
 #[allow(dead_code)]
 //pub static CONN_STR : &str = "mysql://root@localhost/nature";
 pub static CONN_STR: &str = "nature.sqlite";
+
+fn init_all_actor()->App<()>{
+    init_actors();
+    web_app()
+}

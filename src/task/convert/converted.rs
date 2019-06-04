@@ -20,21 +20,16 @@ impl Converted {
         // check status version to avoid loop
         let mut fixxed_ins: Vec<Instance> = Vec::new();
         for one in instances {
-            debug!("------------debug here 1-------------");
             let mut n = one.clone();
-            debug!("------------debug here 2-------------");
             n.data.thing = task.target.to.clone();
             let _ = n.fix_id();
             fixxed_ins.push(n)
         }
-        debug!("------------debug here 3-------------");
         let instances = Self::verify(&task.target.to, &fixxed_ins, thing_getter)?;
-        debug!("------------debug here 4-------------");
         let rtn = Converted {
             done_task: carrier.to_owned(),
             converted: instances,
         };
-        debug!("------------debug here 5-------------");
         Ok(rtn)
     }
 

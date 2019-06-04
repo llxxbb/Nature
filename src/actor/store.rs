@@ -13,7 +13,7 @@ impl Message for MsgForStore {
 pub struct StoreActor;
 
 impl Actor for StoreActor {
-    type Context = SyncContext<Self>;
+    type Context = Context<Self>;
 
     fn started(&mut self, _ctx: &mut Self::Context) {
         println!("StoreActor is started");
@@ -32,11 +32,10 @@ impl Handler<MsgForStore> for StoreActor {
 pub struct StoredActor;
 
 impl Actor for StoredActor {
-    type Context = SyncContext<Self>;
+    type Context = Context<Self>;
     fn started(&mut self, _ctx: &mut Self::Context) {
         println!("StoredActor is started");
     }
-
 }
 
 impl Handler<MsgForStore> for StoredActor {

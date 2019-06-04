@@ -13,7 +13,7 @@ impl Message for MsgForConvert {
 pub struct ConvertActor;
 
 impl Actor for ConvertActor {
-    type Context = SyncContext<Self>;
+    type Context = Context<Self>;
 
     fn started(&mut self, _ctx: &mut Self::Context) {
         println!("ConvertActor is started");

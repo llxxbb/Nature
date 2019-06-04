@@ -81,5 +81,8 @@ cargo install diesel_cli --no-default-features --features sqlite,mysql
 
 all actors must be started between `System::new` and `System.run` . Otherwise the actor can't not handle the message.
 
+version 0.7 problem :
+use SyncArbiter can cause memory allocation error, it's queer.
+
 
 

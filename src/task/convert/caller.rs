@@ -11,8 +11,8 @@ trait CallOutTrait {
     fn convert(&self, mission: &Mission, para: &CallOutParameter) -> Result<ConverterReturned>;
 }
 
-static HTTP_CALLER: &ExecutorTrait = &HttpExecutorImpl;
-static LOCAL_RUST_CALLER: &ExecutorTrait = &LocalExecutorImpl;
+static HTTP_CALLER: &dyn ExecutorTrait = &HttpExecutorImpl;
+static LOCAL_RUST_CALLER: &dyn ExecutorTrait = &LocalExecutorImpl;
 
 pub struct CallerService;
 
@@ -22,7 +22,7 @@ impl CallerService {
         Ok(executer.execute(&mission.executor.url, para))
     }
 
-    fn get_executer(protocol: &Protocol) -> Result<&'static ExecutorTrait> {
+    fn get_executer(protocol: &Protocol) -> Result<&'static dyn ExecutorTrait> {
         match protocol {
             Protocol::Http => Ok(HTTP_CALLER),
             Protocol::LocalRust => Ok(LOCAL_RUST_CALLER),

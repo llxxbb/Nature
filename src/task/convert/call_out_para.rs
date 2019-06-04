@@ -3,8 +3,8 @@ use nature_db::Mission;
 
 use crate::task::{TaskForConvert, ExecutorTrait, HttpExecutorImpl, LocalExecutorImpl};
 
-static HTTP_CALLER: &ExecutorTrait = &HttpExecutorImpl;
-static LOCAL_RUST_CALLER: &ExecutorTrait = &LocalExecutorImpl;
+static HTTP_CALLER: &dyn ExecutorTrait = &HttpExecutorImpl;
+static LOCAL_RUST_CALLER: &dyn ExecutorTrait = &LocalExecutorImpl;
 
 
 pub struct CallOutParaWrapper;
@@ -20,7 +20,7 @@ impl CallOutParaWrapper {
         Ok(executer.execute(&mission.executor.url, &para))
     }
 
-    fn get_executer(protocol: &Protocol) -> Result<&'static ExecutorTrait> {
+    fn get_executer(protocol: &Protocol) -> Result<&'static dyn ExecutorTrait> {
         match protocol {
             Protocol::Http => Ok(HTTP_CALLER),
             Protocol::LocalRust => Ok(LOCAL_RUST_CALLER),

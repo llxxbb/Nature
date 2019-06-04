@@ -56,8 +56,9 @@ pub fn sys_init() {
 }
 
 fn start_actor() {
-    init_actors();
     let sys = System::new("http-server");
+
+    init_actors();
     // web actor
     server::new(|| web_app())
         .bind("127.0.0.1:".to_owned() + &SERVER_PORT)

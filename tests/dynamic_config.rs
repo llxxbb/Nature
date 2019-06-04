@@ -64,7 +64,7 @@ fn write_one_target_to_db() {
         instance,
         converter: vec![DynamicConverter {
             to: Some("/dynamic/one_target".to_string()),
-            fun: Executor::for_local(r#"../../../Nature-integrate-test-converter/target/debug/nature_integrate_test_converter.dll:rtn_one"#),
+            fun: Executor::for_local(r#"../nature_integrate_test_converter.dll:rtn_one"#),
         }],
     };
     let rtn = query(&mut svc, instance);
@@ -86,11 +86,11 @@ fn write_two_target_to_db() {
         converter: vec![
             DynamicConverter {
                 to: Some("/dynamic/two_of_1".to_string()),
-                fun: Executor::for_local(r#"../../../Nature-integrate-test-converter/target/debug/nature_integrate_test_converter.dll:rtn_one"#),
+                fun: Executor::for_local(r#"../nature_integrate_test_converter.dll:rtn_one"#),
             },
             DynamicConverter {
                 to: Some("/dynamic/two_of_2".to_string()),
-                fun: Executor::for_local(r#"../../../Nature-integrate-test-converter/target/debug/nature_integrate_test_converter.dll:rtn_one"#),
+                fun: Executor::for_local(r#"../nature_integrate_test_converter.dll:rtn_one"#),
             }],
     };
     let rtn = query(&mut svc, instance);
