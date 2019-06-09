@@ -16,7 +16,7 @@ impl Actor for ConvertActor {
     type Context = Context<Self>;
 
     fn started(&mut self, _ctx: &mut Self::Context) {
-        println!("ConvertActor is started");
+        info!("ConvertActor is started");
     }
 }
 

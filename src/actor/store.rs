@@ -16,7 +16,7 @@ impl Actor for StoreActor {
     type Context = Context<Self>;
 
     fn started(&mut self, _ctx: &mut Self::Context) {
-        println!("StoreActor is started");
+        info!("StoreActor is started");
     }
 }
 
@@ -34,7 +34,7 @@ pub struct StoredActor;
 impl Actor for StoredActor {
     type Context = Context<Self>;
     fn started(&mut self, _ctx: &mut Self::Context) {
-        println!("StoredActor is started");
+        info!("StoredActor is started");
     }
 }
 

@@ -1,4 +1,5 @@
-use actix_web::{App, http, HttpResponse, Json};
+use actix_web::{HttpResponse, web};
+use actix_web::web::Json;
 
 use nature_common::*;
 use nature_db::{DelayedInstances, RawTask};
@@ -37,12 +38,12 @@ fn redo_task(task: Json<RawTask>) -> HttpResponse {
     HttpResponse::Ok().json(x)
 }
 
-pub fn web_app() -> App<()> {
-    App::new()
-        .resource("/input", |r| r.method(http::Method::POST).with(input))
-        .resource("/self_route", |r| r.method(http::Method::POST).with(self_route))
-        .resource("/callback", |r| r.method(http::Method::POST).with(callback))
-        .resource("/serial_batch", |r| r.method(http::Method::POST).with(batch_for_serial))
-        .resource("/parallel_batch", |r| r.method(http::Method::POST).with(batch_for_parallel))
-        .resource("/redo_task", |r| r.method(http::Method::POST).with(redo_task))
+pub fn web_config(cfg: &mut web::ServiceConfig) {
+    cfg
+        .service(web::resource("/input").route(web::post().to(input)))
+        .service(web::resource("/self_route").route(web::post().to(self_route)))
+        .service(web::resource("/callback").route(web::post().to(callback)))
+        .service(web::resource("/serial_batch").route(web::post().to(batch_for_serial)))
+        .service(web::resource("/parallel_batch").route(web::post().to(batch_for_parallel)))
+        .service(web::resource("/redo_task").route(web::post().to(redo_task)));
 }

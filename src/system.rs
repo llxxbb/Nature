@@ -5,15 +5,14 @@ extern crate uuid;
 use std::env;
 use std::thread::JoinHandle;
 
-use actix::System;
-use actix_web::server;
+use actix_web::{App, HttpServer};
 use dotenv::dotenv;
 
 use nature_common::util::setup_logger;
 
 use crate::actor::*;
 use crate::channels::start_receive_threads;
-use crate::rpc::actix::web_app;
+use crate::rpc::actix::*;
 
 // for product and mock
 lazy_static! {
@@ -56,16 +55,13 @@ pub fn sys_init() {
 }
 
 fn start_actor() {
-    let sys = System::new("http-server");
-
     init_actors();
     // web actor
-    server::new(|| web_app())
+    HttpServer::new(|| App::new().configure(web_config))
         .bind("127.0.0.1:".to_owned() + &SERVER_PORT)
         .unwrap()
-        .start();
-
-    sys.run();
+        .run()
+        .unwrap();
 }
 
 pub fn finish_threads<T>(threads: Vec<JoinHandle<T>>) {
