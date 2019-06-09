@@ -1,14 +1,7 @@
 use actix::prelude::*;
 
-use nature_db::RawTask;
-
+use crate::actor::MsgForTask;
 use crate::task::{InnerController, TaskForStore};
-
-pub struct MsgForStore(pub TaskForStore, pub RawTask);
-
-impl Message for MsgForStore {
-    type Result = ();
-}
 
 pub struct StoreActor;
 
@@ -20,10 +13,10 @@ impl Actor for StoreActor {
     }
 }
 
-impl Handler<MsgForStore> for StoreActor {
+impl Handler<MsgForTask<TaskForStore>> for StoreActor {
     type Result = ();
 
-    fn handle(&mut self, msg: MsgForStore, _ctx: &mut Self::Context) -> Self::Result {
+    fn handle(&mut self, msg: MsgForTask<TaskForStore>, _ctx: &mut Self::Context) -> Self::Result {
         let _ = InnerController::save_instance(msg.0, msg.1);
     }
 }
@@ -38,10 +31,10 @@ impl Actor for StoredActor {
     }
 }
 
-impl Handler<MsgForStore> for StoredActor {
+impl Handler<MsgForTask<TaskForStore>> for StoredActor {
     type Result = ();
 
-    fn handle(&mut self, msg: MsgForStore, _ctx: &mut Self::Context) -> Self::Result {
+    fn handle(&mut self, msg: MsgForTask<TaskForStore>, _ctx: &mut Self::Context) -> Self::Result {
         InnerController::channel_stored(msg.0, msg.1)
     }
 }

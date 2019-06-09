@@ -1,14 +1,7 @@
 use actix::prelude::*;
 
-use nature_db::RawTask;
-
+use crate::actor::MsgForTask;
 use crate::task::{InnerController, TaskForConvert};
-
-pub struct MsgForConvert(pub TaskForConvert, pub RawTask);
-
-impl Message for MsgForConvert {
-    type Result = ();
-}
 
 pub struct ConvertActor;
 
@@ -20,10 +13,10 @@ impl Actor for ConvertActor {
     }
 }
 
-impl Handler<MsgForConvert> for ConvertActor {
+impl Handler<MsgForTask<TaskForConvert>> for ConvertActor {
     type Result = ();
 
-    fn handle(&mut self, msg: MsgForConvert, _ctx: &mut Self::Context) -> Self::Result {
+    fn handle(&mut self, msg: MsgForTask<TaskForConvert>, _ctx: &mut Self::Context) -> Self::Result {
         let _ = InnerController::channel_convert(msg.0, msg.1);
     }
 }

@@ -11,7 +11,7 @@ impl InnerController {
 
     pub fn save_instance(task: TaskForStore, carrier: RawTask) -> Result<()> {
         let _ = task.instance.save(InstanceDaoImpl::save)?;
-        ACT_STORED.try_send(MsgForStore(task, carrier))?;
+        ACT_STORED.try_send(MsgForTask(task, carrier))?;
         Ok(())
     }
 
@@ -33,7 +33,7 @@ impl InnerController {
                 }
                 debug!("will dispatch {} convert tasks for `Thing` : {:?}", converters.len(), task.instance.thing.get_full_key());
                 for t in converters {
-                    let _ = ACT_CONVERT.try_send(MsgForConvert(t.0, t.1));
+                    let _ = ACT_CONVERT.try_send(MsgForTask(t.0, t.1));
                 }
             }
         }
@@ -66,12 +66,6 @@ impl InnerController {
         };
     }
 
-//    pub fn channel_converted(task: (TaskForConvert, Converted)) {
-//        if let Ok(plan) = PlanInfo::save(&task.0, &task.1.converted, StorePlanDaoImpl::save, StorePlanDaoImpl::get) {
-//            prepare_to_store(&task.1.done_task, plan);
-//        }
-//    }
-
     pub fn received_instance(task: &TaskForConvert, raw: &RawTask, instances: Vec<Instance>) -> Result<()> {
         debug!("converted {} instances for `Thing`: {:?}", instances.len(), &task.target.to);
         match Converted::gen(&task, &raw, instances, ThingDefineCacheImpl::get) {
@@ -86,8 +80,8 @@ impl InnerController {
         }
     }
 
-    pub fn channel_serial(task: (TaskForSerial, RawTask)) {
-        let (task, carrier) = task;
+    pub fn channel_serial(task: MsgForTask<TaskForSerial>) {
+        let (task, carrier) = (task.0, task.1);
         let finish = &task.context_for_finish.clone();
         if let Ok(si) = TaskForSerialWrapper::save(task, &ThingDefineCacheImpl::get, InstanceDaoImpl::insert) {
             match si.to_virtual_instance(finish) {
@@ -96,7 +90,7 @@ impl InnerController {
                         match RawTask::new(&si, &instance.thing.get_full_key(), TaskType::QueueBatch as i16) {
                             Ok(mut new) => {
                                 if let Ok(_route) = new.finish_old(&carrier, TaskDaoImpl::insert, TaskDaoImpl::delete) {
-                                    let _ = ACT_STORED.try_send(MsgForStore(si, new));
+                                    let _ = ACT_STORED.try_send(MsgForTask(si, new));
                                 }
                             }
                             Err(err) => {
@@ -112,7 +106,7 @@ impl InnerController {
         }
     }
 
-    pub fn channel_parallel(task: (TaskForParallel, RawTask)) {
+    pub fn channel_parallel(task: MsgForTask<TaskForParallel>) {
         let mut tuple: Vec<(TaskForStore, RawTask)> = Vec::new();
         for instance in task.0.instances.iter() {
             match TaskForStore::gen_task(&instance, OneStepFlowCacheImpl::get, Mission::filter_relations) {
@@ -135,7 +129,7 @@ impl InnerController {
             return;
         }
         for c in tuple {
-            let _ = CHANNEL_STORE.sender.lock().unwrap().send(c);
+            ACT_STORE.do_send(MsgForTask(c.0, c.1));
         }
     }
 }
@@ -168,7 +162,7 @@ fn prepare_to_store(carrier: &RawTask, plan: PlanInfo) {
     }
     if RawTask::save_batch(&store_infos, &carrier.task_id, TaskDaoImpl::insert, TaskDaoImpl::delete).is_ok() {
         for task in t_d {
-            let _ = CHANNEL_STORE.sender.lock().unwrap().send(task);
+            ACT_STORE.do_send(MsgForTask(task.0, task.1));
         }
     }
 }

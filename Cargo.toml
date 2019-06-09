@@ -29,7 +29,6 @@ dotenv = "0.11"
 reqwest = "0.9"
 actix-web = "1.0"
 actix = "0.7"
-actix-rt = "0.2"
 
 # self project group
 nature_common = {path = "../Nature-Common"}

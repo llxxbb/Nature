@@ -11,7 +11,6 @@ use dotenv::dotenv;
 use nature_common::util::setup_logger;
 
 use crate::actor::*;
-use crate::channels::start_receive_threads;
 use crate::rpc::actix::*;
 
 // for product and mock
@@ -48,9 +47,6 @@ lazy_static! {
 pub fn sys_init() {
     dotenv().ok();
     let _ = setup_logger();
-
-    start_receive_threads();
-
     start_actor();
 }
 
