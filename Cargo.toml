@@ -3,6 +3,11 @@ name = "nature"
 version = "0.0.1"
 authors = ["XueBin Li"]
 edition = "2018"
+description = "A FaaS platform implement"
+repository = "https://github.com/llxxbb/Nature"
+readme = "README.md"
+license = "MIT"
+keywords = ["FaaS", "MQ", "BPM", "Gateway", "Workflow"]
 
 [dependencies]
 # normal
@@ -31,8 +36,8 @@ actix-web = "1.0"
 actix = "0.7"
 
 # self project group
-nature_common = {path = "../Nature-Common"}
-nature_db = {path = "../Nature-DB", features = ["sqlite"]}
+nature_common = {path = "../Nature-Common", version = "0.0.1"}
+nature_db = {path = "../Nature-DB", features = ["sqlite"], version = "0.0.1"}
 
 [workspace]
 members = ["../Nature-Common",
