@@ -1,6 +1,6 @@
 [package]
 name = "nature"
-version = "0.0.1"
+version = "0.0.2"
 authors = ["XueBin Li"]
 edition = "2018"
 
@@ -31,8 +31,8 @@ actix-web = "1.0"
 actix = "0.7"
 
 # self project group
-nature_common = {path = "../Nature-Common"}
-nature_db = {path = "../Nature-DB", features = ["sqlite"]}
+nature_common = {path = "../Nature-Common", version = "0.0.2"}
+nature_db = {path = "../Nature-DB", features = ["sqlite"], version = "0.0.2"}
 
 [workspace]
 members = ["../Nature-Common",

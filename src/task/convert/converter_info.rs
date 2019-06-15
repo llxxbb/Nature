@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-use nature_common::{Instance, NatureError, Result, Thing, ThingType};
+use nature_common::{Instance, NatureError, Result, BizMeta, ThingType};
 use nature_db::{Mission, RawTask, RawThingDefine, TaskType};
 
 use crate::system::CONTEXT_TARGET_INSTANCE_ID;
@@ -25,7 +25,7 @@ impl Default for TaskForConvert {
 
 impl TaskForConvert {
     pub fn gen_task<FT, FIG>(task: &TaskForStore, thing_getter: FT, instance_getter: FIG) -> Result<Vec<(TaskForConvert, RawTask)>>
-        where FT: Fn(&Thing) -> Result<RawThingDefine>, FIG: Fn(u128) -> Result<Option<Instance>>
+        where FT: Fn(&BizMeta) -> Result<RawThingDefine>, FIG: Fn(u128) -> Result<Option<Instance>>
     {
         let mut new_carriers: Vec<(TaskForConvert, RawTask)> = Vec::new();
         let missions = task.mission.clone().unwrap();
@@ -42,7 +42,7 @@ impl TaskForConvert {
     }
 
     fn new_one<FT, FIG>(instance: &Instance, mapping: &Mission, thing_getter: &FT, instance_getter: &FIG) -> Result<TaskForConvert>
-        where FT: Fn(&Thing) -> Result<RawThingDefine>,
+        where FT: Fn(&BizMeta) -> Result<RawThingDefine>,
               FIG: Fn(u128) -> Result<Option<Instance>>
     {
         let define = match mapping.to.get_thing_type() {

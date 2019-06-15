@@ -4,7 +4,7 @@ Nature Help you to manage your data from a __High Perspective__.  All your **Bus
 
 Nature isolate **Business-Goals** from execution clearly, that will make you system adjust quickly and make your team more **effectively**. This is the most import thing to design for this project, unlike `Service`, which bind goals and implements together. Commonly, it's hard to change when a lots of clients connected to a service in using.
 
-Nature is `FaaS`(Function as a Service) platform technically, but I don't like to use it. I don't want to hype a concept, `FaaS` is not the primary goal for this project. Nonetheless `FaaS` is the key point to make it working. Nature break meta-relations into pieces(a function) for developer to implement, and then put them together at runtime.
+Nature is `FaaS`(Function as a Service) platform technically. But I don't like to use this concept, because I don't want to hype a concept or a fan of it, `FaaS` is not the primary goal for this project. Nonetheless `FaaS` is the key point to make it working. Nature break meta-relations into pieces(a function) for developer to implement, and then put them together at runtime.
 
 Sorry for the  __Nature__ word that named for this project.  Nature means all things,  surely this it can not do that, but I could not think out a suitable word for it. It can do all the topic's (__Workflow__, __Message Queue__, __Stream__, __BPM__, __Map Reduce__, __Gateway__, __Distributed_System__ and __Database__) words which I listed for this project.
 
@@ -28,7 +28,7 @@ Nature let you plan your __goals__ (data), it's clearly in there  for you to gui
 
 __Gateway__, __Distributed_System__ and __Database__ are __bottom-up management__. They are technology oriented, there manage their own affairs in their own way. Because they are different things, so it's hard to unify and simplify the management.
 
-Nature let you declare **business-goals** (not technical things) and **relation** between them and **who** can do transfer between the goals(execute the goals), this is all you need to manage, Nature and developers will take care **How** to execute.
+Nature let you declare **business-goals** (not technical things) and **relation** between them and **who** can do transfer between the goals(execute the goals), this is all you need to manage, Nature and developers will take care **How** to execute the goals. This is a **top-down** manner of management, it's simple, directly and effectively.  From the **top** we can glue multiple elements together and make it 1 + 1 > 2.
 
 - Nature like a __gateway__: Nature will manage routing between goals.
 - Nature like a __distributed system__: you needn't care about data availability and consistently.

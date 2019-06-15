@@ -1,8 +1,22 @@
 # Concepts
 
-Data is a  technology word, `Thing` is a business word, so I use `Thing` to represent data.
+The Nature System focus on data and relations between them. 
 
-## Concepts
+There are two kind of data: `meta` and `instance`. 
+
+## Business Metadata
+
+Business-Metadata is used to represent what the business is and how to used it.
+
+## Business Instances
+
+## Relation
+
+
+
+
+
+
 
 ![Alt text](../img/%E5%B9%BB%E7%81%AF%E7%89%878.jpg)
 Like 7 Layers of the OSI Model, we must put a problem into a layer, 

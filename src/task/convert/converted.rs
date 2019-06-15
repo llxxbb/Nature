@@ -7,7 +7,7 @@ pub struct Converted {
 
 impl Converted {
     pub fn gen<FT>(task: &TaskForConvert, carrier: &RawTask, instances: Vec<Instance>, thing_getter: FT) -> Result<Converted>
-        where FT: Fn(&Thing) -> Result<RawThingDefine>
+        where FT: Fn(&BizMeta) -> Result<RawThingDefine>
     {
         // check `ThingType` for Null
         if task.target.to.get_thing_type() == ThingType::Null {
@@ -33,8 +33,8 @@ impl Converted {
         Ok(rtn)
     }
 
-    fn verify<FT>(to: &Thing, instances: &[Instance], thing_getter: FT) -> Result<Vec<Instance>>
-        where FT: Fn(&Thing) -> Result<RawThingDefine>,
+    fn verify<FT>(to: &BizMeta, instances: &[Instance], thing_getter: FT) -> Result<Vec<Instance>>
+        where FT: Fn(&BizMeta) -> Result<RawThingDefine>,
     {
         let mut rtn: Vec<Instance> = Vec::new();
         // only one status instance should return
