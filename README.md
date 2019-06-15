@@ -6,7 +6,7 @@ Sorry for the  __Nature__ word that named for this project.  Nature means all th
 
 Please do not think it too complicated. there are only few things be introduced in this project: __data__ and __relation__ between data. Just like atoms and there relations make up the complex world, in this project, __data__ make up all your business. So I like the name __Nature__. 
 
-__Important__:  this project is in a very early stage, it is far to mature.
+__Important__:  this project is in a very earlier stage, it is far to mature.
 
 ## A big question
 
