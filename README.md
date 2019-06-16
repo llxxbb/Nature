@@ -30,7 +30,7 @@ __Gateway__, __Distributed_System__ and __Database__ are __bottom-up management_
 
 Nature let you declare **business-goals** (not technical things) and **relation** between them and **who** can do transfer between the goals(execute the goals), this is all you need to manage, Nature and developers will take care **How** to execute the goals. This is a **top-down** manner of management, it's simple, directly and effectively.  From the **top** we can glue multiple elements together and make it 1 + 1 > 2.
 
-- Nature like a __gateway__: Nature will manage routing between goals.
+- Nature like a __gateway__: Nature can control and route all you business request.
 - Nature like a __distributed system__: you needn't care about data availability and consistently.
 - Nature like a __KV-database__:  you can query data you putted in and  Nature itself transferred, and your data will __never be lost and changed__ when they are written down.
 
@@ -59,7 +59,7 @@ Backend data process, that is __asynchronized__. I have a plan to handle data __
 
 [A concrete example](doc\help\demo\demo.md)
 
-[Concept](doc\help\concept.md)
+[Concepts](doc\help\concepts.md)
 
 [Architecture](doc\help\architecture.md)
 

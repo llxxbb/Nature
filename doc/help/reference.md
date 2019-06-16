@@ -1,6 +1,18 @@
 # Reference
 
-## Thing define
+## Meta
+
+each `meta` has a `key` used to identify it.
+
+- hierarchy
+
+Like 7 Layers of the OSI Model, we must put a problem into a layer, 
+
+It let you to shrink it's range and make it easy to study, this is why I call it `Thing` but not layer.
+
+data 's status
+
+context
 
 `Thing` is your business goal. 
 

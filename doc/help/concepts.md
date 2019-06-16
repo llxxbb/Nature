@@ -1,16 +1,34 @@
 # Concepts
 
-The Nature System focus on data and relations between them. 
+The Nature System focus on **data** and **relations** between data.  Data are the  **business goals**, so relations can let you achieve goal one by one.  This is a little like workflow or BP,  but they are two very different things. The last tell us to **do something**, yet the first tell us we **need something**. How-to-do is very complex. and what-your-need is simple.  So Nature give a clear interface between leaders and followers, leaders give out the goals and the followers to achieve the goals.
+
+The more important thing is Nature give out a clear interface between leader and followers, **no distortion**, **full restraint**. Nature will simplify design progress greatly, so you can reduce the need of *senior programmer*s and then reduce the cost.
+
+## Data
+
+Data are immutable, when they are created you can't modify or delete it.
 
 There are two kind of data: `meta` and `instance`. 
 
-## Business Metadata
+### meta
 
-Business-Metadata is used to represent what the business is and how to used it.
+`meta` tell us what the business is and how to used it. It is like program language's `Class`.
 
-## Business Instances
+`meta` use `key` property to identify each of them. It's a string type, so you can give any value you like to it. But there is an advice: use large-small separated domain as its value, for example "/sale/order".
 
-## Relation
+### instance
+
+Instance is meta's runtime's form. It's like program language's `Object`
+
+So a meta can have any number of it's instances.
+
+
+
+## Relations
+
+
+
+## unfinished
 
 
 
