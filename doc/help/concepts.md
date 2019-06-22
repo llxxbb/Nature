@@ -1,8 +1,6 @@
 # Concepts
 
-The Nature System focus on **data** and **relations** between data.  Data are the  **business goals**, so relations can let you achieve goal one by one.  This is a little like workflow or BP,  but they are two very different things. The last tell us to **do something**, yet the first tell us we **need something**. How-to-do is very complex. and what-your-need is simple.  So Nature give a clear interface between leaders and followers, leaders give out the goals and the followers to achieve the goals.
-
-The more important thing is Nature give out a clear interface between leader and followers, **no distortion**, **full restraint**. Nature will simplify design progress greatly, so you can reduce the need of *senior programmer*s and then reduce the cost.
+The Nature System focus on **data** and **relations** between data.  Data are the  **business goals**, so relations can let you achieve goal one by one.  This is little like workflow or BPMN,  but they are two very different things. The last tell us to **do something**, yet the first tell us we **need something**. How-to-do is very complex. and what-your-need is simple and more important.  Nature let you focus on important things and let you manage them easily.
 
 ## Data
 
@@ -18,13 +16,26 @@ There are two kind of data: `meta` and `instance`.
 
 ### instance
 
-Instance is meta's runtime's form. It's like program language's `Object`
+Instance is `meta`'s runtime's form. It's like program language's `Object`
 
 So a meta can have any number of it's instances.
 
+## Relation
 
+A relation will connect tow and only two `meta`s.  but one `meta` can connect to many other `mets`s by many relations.
 
-## Relations
+A relation has direction, begin from **from**-`meta` end to **to**-`meta`.
+
+A relation defined a `converter` to convert from **from**-`meta`'s instance' to **to**-`meta`'s instance.
+
+### converter
+
+Converter is a logical outside of Nature. is can be implemented in many forms.  up to now Nature support the following forms
+
+- http | https
+- local rust
+
+Nature use converters to glue all logical together, and make them loose coupling and powerful
 
 
 
@@ -36,29 +47,10 @@ So a meta can have any number of it's instances.
 
 
 
-![Alt text](../img/%E5%B9%BB%E7%81%AF%E7%89%878.jpg)
-Like 7 Layers of the OSI Model, we must put a problem into a layer, 
-I named it here `Thing`.
-It let you to shrink it's range and make it easy to study, this is why I call it `Thing` but not layer.
-A `Thing` may have many points and `Relation` may exits between points.
-The `Thing` and point are __Static__, once they are created they can't be changed.
 
-Relative to `Thing` and point, `Relation` is __Instantaneous__, either it happened or it has not.
-so relationships are very time-dependent，`Relation`'s can change over time.
-Maybe __Event__ is a good word to express the meaning. but event has a random meaning,
-yet relationships emphasize specific behaviors of specific participants,
-so I choice `Relation`
 
-![Alt text](../img/%E5%B9%BB%E7%81%AF%E7%89%879.jpg)
-Let me say more about `Thing` and point. 
-A `Thing`may have points, and points maybe another `Thing` for sublayer points.
-So point and `Thing` are conceptually equivalent.
-I think `Thing` feel more meaningful than point. so I use `Thing` to express `Thing` and or point.
 
-An amazing thing is that `Thing` contains __Hierarchy__. 
-The benefit of this is simplify Nature and give freedom management ability to human. 
-`Nature` don't care of __Hierarchy__ but need to identify every `Thing`, 
-this is a easy way to satisfy `Nature` and human management simultaneously.
+
 
 ![Alt text](../img/%E5%B9%BB%E7%81%AF%E7%89%8710.jpg)
 `Thing` is only a define, at run-time you must bind an `Instance` to `Thing`.

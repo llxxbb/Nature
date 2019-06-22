@@ -23,7 +23,7 @@ impl SerialFinished {
         Ok(Instance {
             id: 0,
             data: InstanceNoID {
-                thing: BizMeta::new_with_type(&SYS_KEY_SERIAL, ThingType::System)?,
+                thing: Meta::new_with_type(&SYS_KEY_SERIAL, ThingType::System)?,
                 event_time: time,
                 execute_time: time,
                 create_time: time,
@@ -42,7 +42,7 @@ pub struct TaskForSerialWrapper;
 
 impl TaskForSerialWrapper {
     pub fn save<FC, FS>(serial: TaskForSerial, checker: &FC, saver: FS) -> Result<SerialFinished>
-        where FC: Fn(&BizMeta) -> Result<RawThingDefine>,
+        where FC: Fn(&Meta) -> Result<RawThingDefine>,
               FS: Fn(&Instance) -> Result<usize>
     {
         let mut errors: Vec<String> = Vec::new();

@@ -14,10 +14,10 @@ use crate::system::PLAN_CONTENT_MAX_LENGTH;
 /// * from_thing
 #[derive(Debug, Clone)]
 pub struct PlanInfo {
-    pub from_thing: BizMeta,
+    pub from_thing: Meta,
     pub from_sn: u128,
     pub from_sta_ver: i32,
-    pub to: BizMeta,
+    pub to: Meta,
     pub plan: Vec<Instance>,
 }
 
@@ -60,10 +60,10 @@ impl TryFrom<RawPlanInfo> for PlanInfo {
             return Err(NatureError::VerifyError("format error : ".to_owned() + &value.upstream));
         }
         Ok(PlanInfo {
-            from_thing: BizMeta::from_full_key(x[0], x[1].parse()?)?,
+            from_thing: Meta::from_full_key(x[0], x[1].parse()?)?,
             from_sn: x[2].parse()?,
             from_sta_ver: x[3].parse()?,
-            to: BizMeta::from_full_key(&value.to_biz, value.to_version)?,
+            to: Meta::from_full_key(&value.to_biz, value.to_version)?,
             plan: serde_json::from_str(&value.content)?,
         })
     }

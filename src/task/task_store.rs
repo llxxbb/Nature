@@ -1,6 +1,6 @@
 use std::sync::mpsc::Sender;
 
-use nature_common::{BizMeta, DynamicConverter, Instance, Result};
+use nature_common::{Meta, DynamicConverter, Instance, Result};
 use nature_db::{Mission, OneStepFlow, RawTask};
 
 use crate::task::TaskForConvert;
@@ -16,7 +16,7 @@ pub struct TaskForStore {
 
 impl TaskForStore {
     pub fn gen_task<FG, FF>(instance: &Instance, step_getter: FG, mission_filter: FF) -> Result<Self> where
-        FG: Fn(&BizMeta) -> Result<Option<Vec<OneStepFlow>>>,
+        FG: Fn(&Meta) -> Result<Option<Vec<OneStepFlow>>>,
         FF: FnOnce((&Instance, Vec<OneStepFlow>)) -> Option<Vec<Mission>>
     {
         let steps = match step_getter(&instance.thing)? {
