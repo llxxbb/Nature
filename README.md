@@ -1,6 +1,6 @@
 # Nature
 
-Nature Help you to manage your data from a __High Perspective__.  All your **Business-Metadata** can be viewed and be managed globally; and more, all the **relations** between metadata can be choreographed globally also. Just like a tellurion, all things on it. 
+Nature Help you to manage your data from a __High Perspective__.  All your **Business-Meta-Data** can be viewed and be managed globally; and more, all the **relations** between Meta-Data can be choreographed globally also. Just like a globe, all things on it. 
 
 Nature isolate **Business-Goals** from execution clearly, that will make you system adjust quickly and make your team more **effectively**. This is the most import thing to design for this project, unlike a `Service`, which bind goals and implements together. Commonly, it's hard to change when a lots of clients connected to it.
 
@@ -10,7 +10,7 @@ __Important__:  this project is in a very earlier stage, it is far to mature.
 
 ## A big question
 
-This project covered a lot of  fields (__Workflow__, __Message Queue__, __Stream__, __BPMN__, __Gateway__, __Distributed_System__ and __Database__) , and each field have their own mature and good projects. why do I provide a new one? 
+This project covered a lot of  fields (__Work-Flow__, __Message Queue__, __Stream__, __BPMN__, __Gateway__, __Distributed_System__ and __Database__) , and each field have their own mature and good projects. why do I provide a new one? 
 
 I have no intention of competing with other fields.  it's just involves these field. Sorry for the  __Nature__ name for this project.  Nature means all things,  surely this it can not do that. But I could not think out a suitable name for it. 
 
@@ -18,11 +18,11 @@ Please do not think it too complicated. there are only few things be introduced 
 
 ### Functions vs goals
 
-Workflow and BPMN are __function__ oriented solutions, it may let business run, but when business growing too large, you may __lost in functions__, they call tell you how-to-do, but do-for-what is uneasy  to describe. because function can __hide goals(data) inadvertently__, then the business system is hard to understand, and you will find it is difficult to find out what your really want.
+Work-Flow and BPMN are __function__ oriented solutions, it may let business run, but when business growing too large, you may __lost in functions__, they call tell you how-to-do, but do-for-what is uneasy  to describe. because function can __hide goals(data) inadvertently__, then the business system is hard to understand, and you will find it is difficult to find out what your really want.
 
-Message-Queue and Stream face to connection more than data: a connector between functions. Nevertheless I think they are better then workflow and BPMN, because they rise the data's value. But I do not think it is enough yet, it let developers are both a player and a referee. 
+Message-Queue and Stream face to connection more than data: a connector between functions. Nevertheless I think they are better then Work-Flow and BPMN, because they rise the data's value. But I do not think it is enough yet, it let developers are both a player and a referee. 
 
-Nature make data(__goals__) clearly and isolate data from functions and hide functions backend. **data are pure energy** for system running. , so you can get a agiler and powerful business system based on Nature,.
+Nature make data(__goals__) clearly and isolate data from functions and hide functions back-end. **data are pure energy** for system running. , so you can get a agiler and powerful business system based on Nature,.
 
 ### Bottom-up management vs top-down management
 

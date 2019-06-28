@@ -6,11 +6,15 @@ Before to read this, I suppose you have read the [concepts](concepts.md) of the 
 
 Nature can be divided in tow part space and time.
 
-Space is structures is your `meta`s and `relation`s between them. they are **spatial relevance**.  You can use them to **express everything in the world**, like a photo to show the world, it's **static** also.
+Space is structures is your `meta`s and `relation`s between them. they are **spatial relevance**.  You can use them to **express everything in the world**, like a photo to show the world, it's **static** also. 
 
 Time is you `instance`s, new instances will be generated along the time line. `Nature` make `instance`s flow by rules(relations),  like a train can only run on tracks, and record changes and the branches they had taken. These instances are time-dependent. like music or movies,  they are **dynamic** also. 
 
-You can see that `meta` and `relation`s control the whole thing.  Nature abstract all kinds of things to **Space**, and can only generate one thing at runtime: `intance`, it's the soul of Nature. This abstract **decouple business logic into components**, and greatly **unify  the runtime technical logics**, such as concurrent, idempotent and retry etcetera, so you can get free from them, and focus on your business logics.
+You can see that `meta` and `relation`s control the whole thing.  Nature abstract all kinds of things to **Space**, and can only generate one thing at runtime: `intance`, it's the soul of Nature. This like DNA and proteins in biology, `meta`-and-`relation`  is DNA to control the protein generation, and `instance` is the protein. This abstract **decouple business logic into components**, and greatly **unify  the runtime technical logics**, such as concurrent, idempotent and retry etcetera, so you can get free from them, and focus on your business logics.
+
+## Function
+
+Function has many meanings. here I just want to say the  program's  function. 
 
 
 
