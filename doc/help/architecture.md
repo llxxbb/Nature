@@ -12,15 +12,27 @@ Time is you `instance`s, new instances will be generated along the time line. `N
 
 You can see that `meta` and `relation`s control the whole thing.  Nature abstract all kinds of things to **Space**, and can only generate one thing at runtime: `intance`, it's the soul of Nature. This like DNA and proteins in biology, `meta`-and-`relation`  is DNA to control the protein generation, and `instance` is the protein. This abstract **decouple business logic into components**, and greatly **unify  the runtime technical logics**, such as concurrent, idempotent and retry etcetera, so you can get free from them, and focus on your business logics.
 
-## Function
+## y=f(x)
 
-Function has many meanings. here I just want to say the  program's  function. 
+Developers use functions to describe the complex world in the computer program field. There are great different between functions,  **a great diversity of** input-parameter, output-parameter and logic body, so it's very hard to read someone's code, so there are many "bad" history project running now yet, though there are "good" specifications to constrain development. 
 
+Function's free style is the main cause of the problem.  Function's process is far more important than its result. so there are huge workload put on to the process management, this is determined by function's nature property. Nature focus on goals but not process, Nature break the process of a function into pieces(little goals), and make these pieces easy to implement: some simplified functions, Nature call these `converter`s. 
 
+`converter` only receive one input-parameter and one output-parameter, and `converter` is a property of a `relation`. You see, Nature give a great limit to function's style, and more Nature try to hide function to be seen too. That will make it easy to management, but how does it work?
+
+All diversity of input-parameter and output-parameter call be expressed to a `JSON` object. so all `converter`'s style is **y=f(x)**,  a linear equation with one variable.  Because a long process will be divide into many `converter` to implement, the **black-box** to manager than will be broken too, so this can reduce the cost of the process management.
 
 ## unfinished
 
+select vs command
 
+
+
+
+
+
+
+## 
 
 status data have versions to remark every change. all data history could be __traced__, and all data unchanged, even it is a status data.
 
