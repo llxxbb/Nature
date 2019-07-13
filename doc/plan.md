@@ -1,5 +1,7 @@
 # plan
 
+refine architecture of doc
+
 add synchronous call for outer( the main part of the gateway)
 
 root
