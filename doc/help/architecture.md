@@ -22,11 +22,11 @@ Function's free style is the main cause of the problem.  Function's process is f
 
 All diversity of input-parameter and output-parameter call be expressed to a `JSON` object, so Nature unified the form of the functions, and all `converter`s's style are **y=f(x)**,  a linear equation with one variable. This unify is of great significance, Nature can care of the **x** and **y** but not the `converter,` that is to say function can not to define input-parameter and output-parameter, that is to say  developer can not determine the data but manager can. This is the theory of rising the efficiency of management.
 
-## 
+## unfinished
 
-unfinished
+## Choose My Life
 
-
+each `relation` is determined by downstream but not upstream. That is to say 
 
 ## One-Step-Process
 

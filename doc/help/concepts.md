@@ -44,28 +44,8 @@ Nature use converters to glue all logical together, and make them loose coupling
 
 
 
+​    
 
-
-
-
-
-
-
-
-![Alt text](../img/%E5%B9%BB%E7%81%AF%E7%89%8710.jpg)
-`Thing` is only a define, at run-time you must bind an `Instance` to `Thing`.
-If a `Relation` exists between two `Thing`'s, 
-`Nature` will give upstream `Instasnce` to a converter which is binding to the certain `Relation` and it is at anywhere outside the `Nature`.
-Then the converter generate new `Instance`s for the downstream `Thing`.
-    
-Here the `Relation` made a great job: It locked the __Geographic and Time Coordinates__, 
-they are important for `Natrue` to retry when failed the execution. 
-
-![Alt text](../img/%E5%B9%BB%E7%81%AF%E7%89%8711.jpg)
-
-Converter is just one simple function, and the converter achieve __only one__ goal for the `Nature`.
-Converter do no need to know all the other goals in `Nature`,
-`Nature` will take care of them by call the converters recursively.
 
 ![Alt text](../img/%E5%B9%BB%E7%81%AF%E7%89%8712.jpg)
 It is very easy to organize the goals in `Nature`.
