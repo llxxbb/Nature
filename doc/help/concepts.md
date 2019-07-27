@@ -43,23 +43,6 @@ Nature use converters to glue all logical together, and make them loose coupling
 
 
 
-
-​    
-
-
-![Alt text](../img/%E5%B9%BB%E7%81%AF%E7%89%8712.jpg)
-It is very easy to organize the goals in `Nature`.
-There is no __Flow Control__, so there is no  __loop__, no __if__ to use to do __Business Process orchestration__ in `Nature`.
-
-down-thing to __select__ upper-thing but not upper-thing to __control__ down-things.
-because direct upper-things are more less down-things and __control__ will more complex than __select__..
-This mechanism greatly simplifies the process.
-
-Another key point is `Instance` bind to `Relation` but not to a __technical__ `Interface`.
-It's purl business dependence,it has nothing to do with technology.
-Then `Relation` made a __very short process__, only one step,
-but the __simple relation__ can form any complex and large network.
-
 There are good news for developers too, __short process__ will be easy to develop, 
 and `Nature` try to run the __short process__ in parallel.
 
