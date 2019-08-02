@@ -35,17 +35,28 @@ The `relation` between data is important,  but the more relationships, the more 
 
 Thank to the unify of **y=f(x)**, Nature can make pure **data-flow**, and this make it easy to organize the business logic. The downstream know what upstream he wanted, so he can **select** a **x** as his input and don't care about how many downstream after him. so there is no **control-flow** in `relation`.  no such **branch, loop** complicated will be seen in Nature, and this simplify the develop process greatly, because control means to-many, when one of the downstream changed, the upstream might need to be modify.  but **select** only affects itself.
 
-Though you can't see control-flow in Nature, but the control-flow just in there. Same upstream different downstream will make branch; different upstream same downstream will make confluence. All control logic are formed naturally, that is to say control-flow is not designed by you but it **spring up** itself. Furthermore, `relation` is the **one-step** of the data-flow.  all `relation`s can connected together to form a large business web and you can modify the web anywhere freely and easily, I think this is difficulty for **hard control logic** used by normal business system implement. 
+Though you can't see control-flow in Nature, but the control-flow just in there. Same upstream different downstream will make branch; different upstream same downstream will make confluence. All control logic are formed naturally, that is to say control-flow is not designed by you but it **spring up** itself. Furthermore, `relation` is the **one-step** of the data-flow.  all `relation`s can connected together to form a large business web and you can modify the web anywhere freely and easily, this is difficulty for **hard control logic** for normal business system implement. 
 
 ## unfinished
 
- One-Step
+## Constant `instance`
+
+It is hard to make data consistent in a complex network environment in normal business system. Nature encapsulate those complexity for you,. To do that Nature 
+
+Though the **control-flow**  spring up itself, Nature give a deep control under your choice, such dispatch tasks, retry tasks and store `instance`s generated, includes `instance`s input from out of Nature.  
+
+### Eliminate Uncertainty 
+
+Nature 
+
+### Status `instance`
+
+
 
 
 
 ## 
 
-## Eliminate Uncertainty 
 
 消除下一步操作中的“不确定的数据”，如，提前确定下一步要用的 `task.id`，这样在重新执行任务时就不会产生多余的副本。
 
