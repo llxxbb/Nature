@@ -39,23 +39,26 @@ Though you can't see control-flow in Nature, but the control-flow just in there.
 
 ## unfinished
 
-## Constant `instance`
+## Consistency
 
-It is hard to make data consistent in a complex network environment in normal business system. Nature encapsulate those complexity for you,. To do that Nature 
+Though the **control-flow**  spring up itself, Nature give a deep control under your choice, such as dispatch tasks, retry tasks and store `instance`s generated, includes `instance`s inputted from out of Nature. It is hard to make data consistent in a complex network environment in normal business system, but Nature encapsulate those complexity for you. 
 
-Though the **control-flow**  spring up itself, Nature give a deep control under your choice, such dispatch tasks, retry tasks and store `instance`s generated, includes `instance`s input from out of Nature.  
+### Idempotent
 
-### Eliminate Uncertainty 
+Idempotent is important and obligatory when retry exists, there are some cases for retries
 
-Nature 
+- `instance` inputted from outside
 
-### Status `instance`
+- dispatch tasks to `converter`s
+
+- `instance` converted by `converter`
+
+  The first case is easy to handle, but the second and the third case we need to make more explain. Let's to see the dispatch-task. A example : One upstream may have tow downstream,  and Nature failed for the  first downstream and succeed for the second downstream.  At that time we change the `relation`s,  the first downstream was removed.  And then the Nature retry the the failed the first downstream. Boom!
+
+  
+## Eliminate Uncertainty 
 
 
-
-
-
-## 
 
 
 消除下一步操作中的“不确定的数据”，如，提前确定下一步要用的 `task.id`，这样在重新执行任务时就不会产生多余的副本。
