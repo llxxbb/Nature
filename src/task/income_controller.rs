@@ -9,10 +9,10 @@ pub struct IncomeController {}
 impl IncomeController {
     /// born an instance which is the beginning of the changes.
     pub fn input(mut instance: Instance) -> Result<u128> {
-        instance.change_thing_type(ThingType::Business);
+        instance.change_meta_type(ThingType::Business);
         let _ = instance.check_and_fix_id(ThingDefineCacheImpl::get);
         let task = TaskForStore::gen_task(&instance, OneStepFlowCacheImpl::get, Mission::filter_relations)?;
-        let carrier = RawTask::save(&task, &instance.thing.get_full_key(), TaskType::Store as i16, TaskDaoImpl::insert)?;
+        let carrier = RawTask::save(&task, &instance.meta.get_full_key(), TaskType::Store as i16, TaskDaoImpl::insert)?;
         InnerController::save_instance(task, carrier)?;
         Ok(instance.id)
     }
@@ -22,10 +22,10 @@ impl IncomeController {
         let _ = instance.verify()?;
         // Convert a Self-Route-Instance to Normal Instance
         let mut ins = instance.to_instance();
-        ins.change_thing_type(ThingType::Dynamic);
+        ins.change_meta_type(ThingType::Dynamic);
         let uuid = ins.fix_id()?.id;
         let task = TaskForStore::for_dynamic(&ins, instance.converter)?;
-        let carrier = RawTask::save(&task, &ins.thing.get_full_key(), TaskType::Store as i16, TaskDaoImpl::insert)?;
+        let carrier = RawTask::save(&task, &ins.meta.get_full_key(), TaskType::Store as i16, TaskDaoImpl::insert)?;
         InnerController::save_instance(task, carrier)?;
         Ok(uuid)
     }
@@ -76,13 +76,13 @@ impl IncomeController {
     }
 
     pub fn serial(batch: TaskForSerial) -> Result<()> {
-        let raw = RawTask::save(&batch, &batch.thing.get_full_key(), TaskType::QueueBatch as i16, TaskDaoImpl::insert)?;
+        let raw = RawTask::save(&batch, &batch.meta.get_full_key(), TaskType::QueueBatch as i16, TaskDaoImpl::insert)?;
         let _ = ACT_SERIAL.try_send(MsgForTask(batch.to_owned(), raw));
         Ok(())
     }
 
     pub fn parallel(batch: TaskForParallel) -> Result<()> {
-        let raw = RawTask::save(&batch, &batch.thing.get_full_key(), TaskType::ParallelBatch as i16, TaskDaoImpl::insert)?;
+        let raw = RawTask::save(&batch, &batch.meta.get_full_key(), TaskType::ParallelBatch as i16, TaskDaoImpl::insert)?;
         let _ = ACT_PARALLEL.try_send(MsgForTask(batch, raw));
         Ok(())
     }

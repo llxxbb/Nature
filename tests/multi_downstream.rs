@@ -25,7 +25,7 @@
 fn multi_downstream() {
     // TODO
 //    let _ = sys_init();
-//    println!("------------------ insert thing define -----------------");
+//    println!("------------------ insert meta define -----------------");
 //    let from = "/multi_downstream/from";
 //    let to_a = "/multi_downstream/toA";
 //    let to_b = "/multi_downstream/toB";
@@ -38,7 +38,7 @@ fn multi_downstream() {
 //    println!("------------------ prepare instance to submit -----------------");
 //    // prepare input para
 //    let mut instance = Instance::default();
-//    instance.data.thing= Thing::new(from).unwrap();
+//    instance.data.meta= Thing::new(from).unwrap();
 //    println!("------------------ remove existed instance -----------------");
 //    // remove if instance exists
 //    let will_del = instance.clone();

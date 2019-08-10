@@ -16,12 +16,12 @@ context
 
 `Thing` is your business goal. 
 
-Nature can accept a `Thing` and it's `Instance`s when they are registered to table `thing_defines`, except one `Thing Type`: __Dynamic__. and there are four `Thing Type`s.
+Nature can accept a `Thing` and it's `Instance`s when they are registered to table `meta`, except one `Thing Type`: __Dynamic__. and there are four `Thing Type`s.
 
 For example, if we would register an __Order__, the sql  will be :
 
 ```sqlite
-INSERT INTO thing_defines ("full_key",description,version,states,fields) VALUES (
+INSERT INTO meta ("full_key",description,version,states,fields) VALUES (
 '/B/Order',NULL,1,NULL,NULL);
 ```
 
@@ -37,9 +37,9 @@ Nature support four `Thing Type`:
 
 | Type     | Prefix | Description                                                  |
 | -------- | ------ | ------------------------------------------------------------ |
-| Business | /B     | Used by you, but need to register to `thing_defines` table before to be used. |
+| Business | /B     | Used by you, but need to register to `meta` table before to be used. |
 | System   | /S     | Used by Nature itself                                        |
-| Dynamic  | /D     | Used by you, need not to register to `thing_defines` table, it's used for define workflow as `runtime` |
+| Dynamic  | /D     | Used by you, need not to register to `meta` table, it's used for define workflow as `runtime` |
 | Null     | /N     | The terminate `Thing` for the end of the workflow.           |
 
 ## Convert configuration

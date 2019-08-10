@@ -14,7 +14,7 @@
 //    dotenv::dotenv().ok();
 //    // prepare input para
 //    let mut instance = Instance::default();
-//    instance.data.thing = Thing::new("/key/undefined").unwrap();
+//    instance.data.meta = Thing::new("/key/undefined").unwrap();
 //    let rtn = IncomeController::input(instance);
 //    match rtn.err().unwrap() {
 //        NatureError::ThingNotDefined(ss) => assert_eq!(ss, "/B/key/undefined not defined"),

@@ -7,21 +7,21 @@
 //    use super::*;
 //
 //    #[test]
-//    fn input_thing_type_must_be_business() {
+//    fn input_meta_type_must_be_business() {
 //        // prepare
 //        let mocks = MyMocks::new();
 //        let store_svc = init_store_svc(&mocks);
 //        // expect
-//        mocks.s.expect(mocks.s_instance.verify_call(check(|x: &&mut Instance| x.thing.get_thing_type() == ThingType::Business))
+//        mocks.s.expect(mocks.s_instance.verify_call(check(|x: &&mut Instance| x.meta.get_meta_type() == ThingType::Business))
 //            .and_return(Err(NatureError::VerifyError("deliberate".to_string()))));
 //        let mut instance = Instance::default();
-//        instance.data.thing.set_thing_type(ThingType::Dynamic);
+//        instance.data.meta.set_meta_type(ThingType::Dynamic);
 //        // run
 //        let _rtn = store_svc.input(instance);
 //    }
 //
 //    #[test]
-//    fn thing_must_be_defined() {
+//    fn meta_must_be_defined() {
 //        // prepare
 //        let mocks = MyMocks::new();
 //        let store_svc = init_store_svc(&mocks);
@@ -29,7 +29,7 @@
 //        mocks.s.expect(mocks.s_instance.verify_call(ANY)
 //            .and_return(Err(NatureError::VerifyError("Thing must be defined".to_string()))));
 //        let mut instance = Instance::default();
-//        instance.data.thing.set_thing_type(ThingType::Dynamic);
+//        instance.data.meta.set_meta_type(ThingType::Dynamic);
 //        // run
 //        let rtn = store_svc.input(instance);
 //        assert_eq!(rtn.err().unwrap(), NatureError::VerifyError("Thing must be defined".to_string()))
@@ -44,7 +44,7 @@
 //        let instance = Instance::new("123").unwrap();
 //        mocks.s.expect(mocks.s_instance.verify_call(ANY)
 //            .and_return(generate_id(&instance)));
-//        mocks.s.expect(mocks.s_route.get_mission_call(check(|x: &&Instance| x.thing.get_full_key() == "/B/123"))
+//        mocks.s.expect(mocks.s_route.get_mission_call(check(|x: &&Instance| x.meta.get_full_key() == "/B/123"))
 //            .and_return(Err(NatureError::VerifyError("get task error".to_string()))));
 //        // run
 //        let rtn = store_svc.input(instance);
@@ -62,7 +62,7 @@
 //            .and_return(generate_id(&instance)));
 //        mocks.s.expect(mocks.s_route.get_mission_call(ANY)
 //            .and_return(Ok(Some(vec![Mission::default()]))));
-//        mocks.s.expect(mocks.d_task.insert_call(check(|x: &&RawTask| x.thing == "/B/123"))
+//        mocks.s.expect(mocks.d_task.insert_call(check(|x: &&RawTask| x.meta == "/B/123"))
 //            .and_return(Err(NatureError::VerifyError("insert task error".to_string()))));
 //        // run
 //        let rtn = store_svc.input(instance);
@@ -82,9 +82,9 @@
 //            .and_return(Ok(Some(vec![Mission::default()]))));
 //        mocks.s.expect(mocks.d_task.insert_call(ANY)
 //            .and_return(Ok(1)));
-//        mocks.s.expect(mocks.d_instance.insert_call(check(|x: &&Instance| x.thing.get_full_key() == "/B/123"))
+//        mocks.s.expect(mocks.d_instance.insert_call(check(|x: &&Instance| x.meta.get_full_key() == "/B/123"))
 //            .and_return(Err(NatureError::VerifyError("insert instance error".to_string()))));
-//        mocks.s.expect(mocks.d_task.raw_to_error_call(ANY, check(|x: &&RawTask| x.thing == "/B/123"))
+//        mocks.s.expect(mocks.d_task.raw_to_error_call(ANY, check(|x: &&RawTask| x.meta == "/B/123"))
 //            .and_return(Ok(1)));
 //        // run
 //        let rtn = store_svc.input(instance);
@@ -104,7 +104,7 @@
 //            .and_return(Ok(Some(vec![Mission::default()]))));
 //        mocks.s.expect(mocks.d_task.insert_call(ANY)
 //            .and_return(Ok(1)));
-//        mocks.s.expect(mocks.d_instance.insert_call(check(|x: &&Instance| x.thing.get_full_key() == "/B/123"))
+//        mocks.s.expect(mocks.d_instance.insert_call(check(|x: &&Instance| x.meta.get_full_key() == "/B/123"))
 //            .and_return(Ok(1)));
 //        // run
 //        let rtn = store_svc.input(instance);

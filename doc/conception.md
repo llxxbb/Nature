@@ -56,4 +56,4 @@ Converter Configuration must be added to `one_step_flow` table, so that it can b
 
 You can dispatch you task at runtime for any target undefined.
     
-__Notice__ dynamic-thing can only use dynamic-converter and only can generate dynamic-thing.
+__Notice__ dynamic-meta can only use dynamic-converter and only can generate dynamic-meta.

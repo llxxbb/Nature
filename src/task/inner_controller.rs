@@ -17,7 +17,7 @@ impl InnerController {
 
     pub fn channel_stored(task: TaskForStore, raw: RawTask) {
         if task.mission.is_none() {
-            debug!("no follow data for : {}", &task.instance.thing.get_full_key());
+            debug!("no follow data for : {}", &task.instance.meta.get_full_key());
             let _ = TaskDaoImpl::delete(&&raw.task_id);
             return;
         }
@@ -31,7 +31,7 @@ impl InnerController {
                 if RawTask::save_batch(&raws, &raw.task_id, TaskDaoImpl::insert, TaskDaoImpl::delete).is_err() {
                     return;
                 }
-                debug!("will dispatch {} convert tasks for `Thing` : {:?}", converters.len(), task.instance.thing.get_full_key());
+                debug!("will dispatch {} convert tasks for `Thing` : {:?}", converters.len(), task.instance.meta.get_full_key());
                 for t in converters {
                     let _ = ACT_CONVERT.try_send(MsgForTask(t.0, t.1));
                 }
@@ -87,7 +87,7 @@ impl InnerController {
             match si.to_virtual_instance(finish) {
                 Ok(instance) => {
                     if let Ok(si) = TaskForStore::gen_task(&instance, OneStepFlowCacheImpl::get, Mission::filter_relations) {
-                        match RawTask::new(&si, &instance.thing.get_full_key(), TaskType::QueueBatch as i16) {
+                        match RawTask::new(&si, &instance.meta.get_full_key(), TaskType::QueueBatch as i16) {
                             Ok(mut new) => {
                                 if let Ok(_route) = new.finish_old(&carrier, TaskDaoImpl::insert, TaskDaoImpl::delete) {
                                     let _ = ACT_STORED.try_send(MsgForTask(si, new));
@@ -111,7 +111,7 @@ impl InnerController {
         for instance in task.0.instances.iter() {
             match TaskForStore::gen_task(&instance, OneStepFlowCacheImpl::get, Mission::filter_relations) {
                 Ok(task) => {
-                    match RawTask::save(&task, &instance.thing.get_full_key(), TaskType::Store as i16, TaskDaoImpl::insert) {
+                    match RawTask::save(&task, &instance.meta.get_full_key(), TaskType::Store as i16, TaskDaoImpl::insert) {
                         Ok(car) => {
                             tuple.push((task, car))
                         }

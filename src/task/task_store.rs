@@ -19,7 +19,7 @@ impl TaskForStore {
         FG: Fn(&Meta) -> Result<Option<Vec<OneStepFlow>>>,
         FF: FnOnce((&Instance, Vec<OneStepFlow>)) -> Option<Vec<Mission>>
     {
-        let steps = match step_getter(&instance.thing)? {
+        let steps = match step_getter(&instance.meta)? {
             Some(steps) => {
                 mission_filter((&instance, steps))
             }

@@ -25,7 +25,7 @@
 fn local_converter() {
     // TODO
 //    let _ = sys_init();
-//    println!("------------------ insert thing define -----------------");
+//    println!("------------------ insert meta define -----------------");
 //    let from = "/local_converter/from";
 //    let to = "/local_converter/to";
 //    let _ = ThingDefineDaoImpl::new_by_key(from);
@@ -36,7 +36,7 @@ fn local_converter() {
 //    println!("------------------ prepare instance to submit -----------------");
 //    // prepare input para
 //    let mut instance = Instance::default();
-//    instance.data.thing = Thing::new(from).unwrap();
+//    instance.data.meta = Thing::new(from).unwrap();
 //    println!("------------------ remove existed instance -----------------");
 //    // remove if instance exists
 //    let will_del = instance.clone();

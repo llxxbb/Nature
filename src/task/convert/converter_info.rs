@@ -24,13 +24,13 @@ impl Default for TaskForConvert {
 }
 
 impl TaskForConvert {
-    pub fn gen_task<FT, FIG>(task: &TaskForStore, thing_getter: FT, instance_getter: FIG) -> Result<Vec<(TaskForConvert, RawTask)>>
+    pub fn gen_task<FT, FIG>(task: &TaskForStore, meta_getter: FT, instance_getter: FIG) -> Result<Vec<(TaskForConvert, RawTask)>>
         where FT: Fn(&Meta) -> Result<RawThingDefine>, FIG: Fn(u128) -> Result<Option<Instance>>
     {
         let mut new_carriers: Vec<(TaskForConvert, RawTask)> = Vec::new();
         let missions = task.mission.clone().unwrap();
         for c in missions {
-            match Self::new_one(&task.instance, &c, &thing_getter, &instance_getter) {
+            match Self::new_one(&task.instance, &c, &meta_getter, &instance_getter) {
                 Err(err) => return Err(err),
                 Ok(x) => {
                     let car = RawTask::new(&x, &c.to.get_full_key(), TaskType::Convert as i16)?;
@@ -41,13 +41,13 @@ impl TaskForConvert {
         Ok(new_carriers)
     }
 
-    fn new_one<FT, FIG>(instance: &Instance, mapping: &Mission, thing_getter: &FT, instance_getter: &FIG) -> Result<TaskForConvert>
+    fn new_one<FT, FIG>(instance: &Instance, mapping: &Mission, meta_getter: &FT, instance_getter: &FIG) -> Result<TaskForConvert>
         where FT: Fn(&Meta) -> Result<RawThingDefine>,
               FIG: Fn(u128) -> Result<Option<Instance>>
     {
-        let define = match mapping.to.get_thing_type() {
+        let define = match mapping.to.get_meta_type() {
             ThingType::Dynamic => RawThingDefine::default(),
-            _ => thing_getter(&mapping.to)?
+            _ => meta_getter(&mapping.to)?
         };
         let last_target = if define.is_status() {
             match instance.context.get(&*CONTEXT_TARGET_INSTANCE_ID) {
@@ -98,7 +98,7 @@ mod test {
 //        ConvertServiceImpl {
 //            svc_task: mockers.s_task.clone(),
 //            caller: mockers.call_out.clone(),
-//            svc_define: mockers.s_thing_define_cache.clone(),
+//            svc_define: mockers.s_tmeta_cache.clone(),
 //        }
 //    }
 }

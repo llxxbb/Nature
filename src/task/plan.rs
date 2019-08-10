@@ -11,10 +11,10 @@ use crate::system::PLAN_CONTENT_MAX_LENGTH;
 
 /// **unique key**
 /// * from_id
-/// * from_thing
+/// * from_meta
 #[derive(Debug, Clone)]
 pub struct PlanInfo {
-    pub from_thing: Meta,
+    pub from_meta: Meta,
     pub from_sn: u128,
     pub from_sta_ver: i32,
     pub to: Meta,
@@ -27,7 +27,7 @@ impl PlanInfo {
     {
         let plan = PlanInfo {
             from_sn: converter_info.from.id,
-            from_thing: converter_info.from.thing.clone(),
+            from_meta: converter_info.from.meta.clone(),
             from_sta_ver: converter_info.from.status_version,
             to: converter_info.target.to.clone(),
             plan: instances.clone(),
@@ -60,7 +60,7 @@ impl TryFrom<RawPlanInfo> for PlanInfo {
             return Err(NatureError::VerifyError("format error : ".to_owned() + &value.upstream));
         }
         Ok(PlanInfo {
-            from_thing: Meta::from_full_key(x[0], x[1].parse()?)?,
+            from_meta: Meta::from_full_key(x[0], x[1].parse()?)?,
             from_sn: x[2].parse()?,
             from_sta_ver: x[3].parse()?,
             to: Meta::from_full_key(&value.to_biz, value.to_version)?,
@@ -73,7 +73,7 @@ impl TryInto<RawPlanInfo> for PlanInfo {
     type Error = NatureError;
 
     fn try_into(self) -> Result<RawPlanInfo> {
-        let upstream = format!("{}:{}:{}:{}", self.from_thing.get_full_key(), self.from_thing.version, self.from_sn, self.from_sta_ver);
+        let upstream = format!("{}:{}:{}:{}", self.from_meta.get_full_key(), self.from_meta.version, self.from_sn, self.from_sta_ver);
         Ok(RawPlanInfo {
             upstream,
             to_biz: self.to.get_full_key(),

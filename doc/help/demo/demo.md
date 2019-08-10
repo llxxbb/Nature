@@ -11,10 +11,10 @@ This is the first step for manager, Let list what data we wanted.
 
 ![plan goals](plan_goals.png)
 
-All this must defined in Nature. otherwise Nature will refuse to accept it. Don't be afraid of the class diagram, you need not to write any code, just fill these goals to Nature DB's table: `thing_defines`.  I had written the sql for you
+All this must defined in Nature. otherwise Nature will refuse to accept it. Don't be afraid of the class diagram, you need not to write any code, just fill these goals to Nature DB's table: `meta`.  I had written the sql for you
 
 ```sqlite
-INSERT INTO thing_defines ("full_key",description,version,states,fields) VALUES
+INSERT INTO meta ("full_key",description,version,states,fields) VALUES
 ('/B/Sale/Order',NULL,1,NULL,NULL),
 ('/B/Sale/OrderStatus',NULL,1,'new,payed,stock removing,shipping,finished',NULL),
 ('/B/Finance/Order/Payment',NULL,1,NULL,NULL),
@@ -38,14 +38,14 @@ I drew the picture intent to make you understand easily. in actually the data ma
 
 ```sqlite
 INSERT INTO one_step_flow
-(from_thing, from_version, to_thing, to_version, settings)
+(from_meta, from_version, to_meta, to_version, settings)
 VALUES('/B/Sale/Order', 1, '/B/Sale/OrderStatus', 1, '{"executor":[{"protocol":"Http","url":"http://onlineShop:7602","proportion":1}]}'),
 ('/B/multi_downstream/from', 1, '/B/multi_downstream/toA', 1, '{"executor":[{"protocol":"LocalRust","url":"local://multi_downstream","proportion":1}]}'),
 ('/B/multi_downstream/from', 1, '/B/multi_downstream/toB', 1, '{"executor":[{"protocol":"LocalRust","url":"local://multi_downstream","proportion":1}]}');
 
 ```
 
-The `from_thing`, `from_version`, `to_thing`, `to_version` represent the arrow's direction on the picture. The settings is little complex. It's a [JSON object](../reference.md#settings)
+The `from_meta`, `from_version`, `to_meta`, `to_version` represent the arrow's direction on the picture. The settings is little complex. It's a [JSON object](../reference.md#settings)
 
 
 
@@ -65,9 +65,7 @@ Just like the table name, each row only flow one step. and we can connect the ro
 
 When there is a `Order` we want to generate an `OrderStatus` and marked with `new`
 
-
-
-
+use parametric to query user's order
 
 
 
