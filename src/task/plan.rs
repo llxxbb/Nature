@@ -5,9 +5,9 @@ use chrono::Local;
 use nature_common::*;
 use nature_db::RawPlanInfo;
 
-use crate::task::TaskForConvert;
 use crate::lazy_static::__Deref;
 use crate::system::PLAN_CONTENT_MAX_LENGTH;
+use crate::task::TaskForConvert;
 
 /// **unique key**
 /// * from_id
@@ -63,7 +63,7 @@ impl TryFrom<RawPlanInfo> for PlanInfo {
             from_meta: Meta::from_full_key(x[0], x[1].parse()?)?,
             from_sn: x[2].parse()?,
             from_sta_ver: x[3].parse()?,
-            to: Meta::from_full_key(&value.to_biz, value.to_version)?,
+            to: Meta::from_string(&value.downstream)?,
             plan: serde_json::from_str(&value.content)?,
         })
     }
@@ -76,8 +76,7 @@ impl TryInto<RawPlanInfo> for PlanInfo {
         let upstream = format!("{}:{}:{}:{}", self.from_meta.get_full_key(), self.from_meta.version, self.from_sn, self.from_sta_ver);
         Ok(RawPlanInfo {
             upstream,
-            to_biz: self.to.get_full_key(),
-            to_version: self.to.version,
+            downstream: self.to.get_full_key(),
             content: {
                 let json = serde_json::to_string(&self.plan)?;
                 if json.len() > *PLAN_CONTENT_MAX_LENGTH.deref() {
