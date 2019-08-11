@@ -52,7 +52,7 @@ Complex business system like web store.
 
 ## Want to know more?
 
-[A concrete example](doc\help\demo\demo.md)
+[A concrete example](https://github.com/llxxbb/Nature-Demo)
 
 [Concepts](doc\help\concepts.md)
 

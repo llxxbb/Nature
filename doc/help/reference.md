@@ -2,19 +2,11 @@
 
 ## Meta
 
-each `meta` has a `key` used to identify it.
-
-- hierarchy
-
-Like 7 Layers of the OSI Model, we must put a problem into a layer, 
-
-It let you to shrink it's range and make it easy to study, this is why I call it `Thing` but not layer.
+each `meta` has a `key` used to identify it. The `key` is separated by "/",  this like a file system's directory structure. Nature let you to organize your `meta`s in this way.
 
 data 's status
 
 context
-
-`Thing` is your business goal. 
 
 Nature can accept a `Thing` and it's `Instance`s when they are registered to table `meta`, except one `Thing Type`: __Dynamic__. and there are four `Thing Type`s.
 
@@ -30,17 +22,6 @@ __Notice__:  `full_key` is separated by __/__,  you can use it to organize you b
 __Notice: __ `/B` of the '/B/Order' `full_key` is to state a `Thing Type`. The `Thing Type` must be included in the `full_key`, and first letter must be __/__ and the second letter is what the `Thing Type`  is for this `Thing Define`.
 
 __Notice:__ the `version` field indicate the `Thing`'s  changelog. when `Thing` need to be changed, add a new version is ok,  it can be coexists with the old one.  this is very useful for gray deployment.
-
-### Thing type
-
-Nature support four `Thing Type`:
-
-| Type     | Prefix | Description                                                  |
-| -------- | ------ | ------------------------------------------------------------ |
-| Business | /B     | Used by you, but need to register to `meta` table before to be used. |
-| System   | /S     | Used by Nature itself                                        |
-| Dynamic  | /D     | Used by you, need not to register to `meta` table, it's used for define workflow as `runtime` |
-| Null     | /N     | The terminate `Thing` for the end of the workflow.           |
 
 ## Convert configuration
 

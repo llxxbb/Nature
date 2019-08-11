@@ -1,7 +1,7 @@
 # plan
 
-
-refine architecture of doc
+## demo
+    generate order
 
 `instance` parametrization (pending)
     可以用于条件查询，如 订单-> 用户订单 关系中，订单不能按用户维度检索订单，
@@ -11,17 +11,13 @@ refine architecture of doc
         - demo dock
         - implement
 
-convention
-    `meta` define: /B /S /NULL /D
-    
+## add synchronous call for outer( the main part of the gateway)
 
-add synchronous call for outer( the main part of the gateway)
+## instance lifetime
+    different meta different lifetime and different strategy.
 
-root
+## distribute deploy retry system
 
-distribute deploy retry system
-
-- Implement a demo
-
-
+## demo
+    shopping cart(add, remove, clear, submit)
 

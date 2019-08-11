@@ -8,11 +8,22 @@ Data are immutable, when they are created you can't modify or delete it.
 
 There are two kind of data: `meta` and `instance`. 
 
-### meta
+### Meta
 
-`meta` tell us what the business is and how to used it. It is like program language's `Class`.
+`Meta` tell us what the business is and how to used it. It is like program language's `Class`.
 
-`meta` use `key` property to identify each of them. It's a string type, so you can give any value you like to it. But there is an advice: use large-small separated domain as its value, for example "/sale/order".
+`Meta` use `key` property to identify each of them. It's a string type, so you can give any value you like to it. But for convention, you should use "/" to separate you large-small domain as its value, for example "/sale/order".
+
+`Meta` have types called `MetaType`, all types list here:
+
+| Type     | Prefix | Description                                                  |
+| -------- | ------ | ------------------------------------------------------------ |
+| Business | /B     | Used by business, but need to register to `meta` table before to be used. |
+| System   | /S     | Used by Nature itself                                        |
+| Dynamic  | /D     | Used by business, need not to register to `meta` table, it's used for defining workflow as `runtime` |
+| Null     | /N     | The terminate for the end of the workflow.                   |
+
+`Meta` use `MetaType` prefix property as `Meta#full_key`'s prefix.  if the key is "/sale/order" the `Meta#full_key` should be "/B/sale/order".
 
 ### instance
 
