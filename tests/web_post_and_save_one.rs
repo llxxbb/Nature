@@ -25,11 +25,11 @@ fn web_post_and_save_one() {
 //    println!("created threads: {:?}", threads);
 //    println!("------------------ insert meta define -----------------");
 //    let key = "/save_one".to_string();
-//    let _ = ThingDefineDaoImpl::new_by_key(&key);
+//    let _ = MetaDaoImpl::new_by_key(&key);
 //    println!("------------------ prepare instance to submit -----------------");
 //    // prepare input para
 //    let mut instance = Instance::default();
-//    instance.data.meta = Thing::new(&key).unwrap();
+//    instance.data.meta = Meta::new(&key).unwrap();
 //    let json = serde_json::to_string(&(
 //        instance)).unwrap();
 //    println!("------------------ remove existed instance -----------------");

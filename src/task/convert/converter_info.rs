@@ -1,7 +1,7 @@
 use std::str::FromStr;
 
-use nature_common::{Instance, NatureError, Result, Meta, ThingType};
-use nature_db::{Mission, RawTask, RawThingDefine, TaskType};
+use nature_common::{Instance, NatureError, Result, Meta, MetaType};
+use nature_db::{Mission, RawTask, RawMeta, TaskType};
 
 use crate::system::CONTEXT_TARGET_INSTANCE_ID;
 use crate::task::TaskForStore;
@@ -25,7 +25,7 @@ impl Default for TaskForConvert {
 
 impl TaskForConvert {
     pub fn gen_task<FT, FIG>(task: &TaskForStore, meta_getter: FT, instance_getter: FIG) -> Result<Vec<(TaskForConvert, RawTask)>>
-        where FT: Fn(&Meta) -> Result<RawThingDefine>, FIG: Fn(u128) -> Result<Option<Instance>>
+        where FT: Fn(&Meta) -> Result<RawMeta>, FIG: Fn(u128) -> Result<Option<Instance>>
     {
         let mut new_carriers: Vec<(TaskForConvert, RawTask)> = Vec::new();
         let missions = task.mission.clone().unwrap();
@@ -42,11 +42,11 @@ impl TaskForConvert {
     }
 
     fn new_one<FT, FIG>(instance: &Instance, mapping: &Mission, meta_getter: &FT, instance_getter: &FIG) -> Result<TaskForConvert>
-        where FT: Fn(&Meta) -> Result<RawThingDefine>,
+        where FT: Fn(&Meta) -> Result<RawMeta>,
               FIG: Fn(u128) -> Result<Option<Instance>>
     {
         let define = match mapping.to.get_meta_type() {
-            ThingType::Dynamic => RawThingDefine::default(),
+            MetaType::Dynamic => RawMeta::default(),
             _ => meta_getter(&mapping.to)?
         };
         let last_target = if define.is_status() {

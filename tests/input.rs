@@ -12,10 +12,10 @@
 //        let mocks = MyMocks::new();
 //        let store_svc = init_store_svc(&mocks);
 //        // expect
-//        mocks.s.expect(mocks.s_instance.verify_call(check(|x: &&mut Instance| x.meta.get_meta_type() == ThingType::Business))
+//        mocks.s.expect(mocks.s_instance.verify_call(check(|x: &&mut Instance| x.meta.get_meta_type() == MetaType::Business))
 //            .and_return(Err(NatureError::VerifyError("deliberate".to_string()))));
 //        let mut instance = Instance::default();
-//        instance.data.meta.set_meta_type(ThingType::Dynamic);
+//        instance.data.meta.set_meta_type(MetaType::Dynamic);
 //        // run
 //        let _rtn = store_svc.input(instance);
 //    }
@@ -27,12 +27,12 @@
 //        let store_svc = init_store_svc(&mocks);
 //        // expect
 //        mocks.s.expect(mocks.s_instance.verify_call(ANY)
-//            .and_return(Err(NatureError::VerifyError("Thing must be defined".to_string()))));
+//            .and_return(Err(NatureError::VerifyError("Meta must be defined".to_string()))));
 //        let mut instance = Instance::default();
-//        instance.data.meta.set_meta_type(ThingType::Dynamic);
+//        instance.data.meta.set_meta_type(MetaType::Dynamic);
 //        // run
 //        let rtn = store_svc.input(instance);
-//        assert_eq!(rtn.err().unwrap(), NatureError::VerifyError("Thing must be defined".to_string()))
+//        assert_eq!(rtn.err().unwrap(), NatureError::VerifyError("Meta must be defined".to_string()))
 //    }
 //
 //    #[test]

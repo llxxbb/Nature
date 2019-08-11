@@ -6,7 +6,7 @@ use nature_db::{DelayedInstances, RawTask};
 
 use crate::task::IncomeController;
 
-/// **Note** This do not receive System `Thing`'s instances
+/// **Note** This do not receive System `Meta`'s instances
 fn input(instance: Json<Instance>) -> HttpResponse {
     let x = IncomeController::input(instance.0);
     HttpResponse::Ok().json(x)

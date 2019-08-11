@@ -7,10 +7,10 @@ pub struct Converted {
 
 impl Converted {
     pub fn gen<FT>(task: &TaskForConvert, carrier: &RawTask, instances: Vec<Instance>, meta_getter: FT) -> Result<Converted>
-        where FT: Fn(&Meta) -> Result<RawThingDefine>
+        where FT: Fn(&Meta) -> Result<RawMeta>
     {
-        // check `ThingType` for Null
-        if task.target.to.get_meta_type() == ThingType::Null {
+        // check `MetaType` for Null
+        if task.target.to.get_meta_type() == MetaType::Null {
             let rtn = Converted {
                 done_task: carrier.to_owned(),
                 converted: Vec::new(),
@@ -34,12 +34,12 @@ impl Converted {
     }
 
     fn verify<FT>(to: &Meta, instances: &[Instance], meta_getter: FT) -> Result<Vec<Instance>>
-        where FT: Fn(&Meta) -> Result<RawThingDefine>,
+        where FT: Fn(&Meta) -> Result<RawMeta>,
     {
         let mut rtn: Vec<Instance> = Vec::new();
         // only one status instance should return
         let define = match to.get_meta_type() {
-            ThingType::Dynamic => RawThingDefine::default(),
+            MetaType::Dynamic => RawMeta::default(),
             // TODO need be replaced
             _ => meta_getter(to)?
         };

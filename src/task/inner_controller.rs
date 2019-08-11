@@ -21,7 +21,7 @@ impl InnerController {
             let _ = TaskDaoImpl::delete(&&raw.task_id);
             return;
         }
-        match TaskForConvert::gen_task(&task, ThingDefineCacheImpl::get, InstanceDaoImpl::get_by_id) {
+        match TaskForConvert::gen_task(&task, MetaCacheImpl::get, InstanceDaoImpl::get_by_id) {
             Err(err) => {
                 let _ = TaskDaoImpl::raw_to_error(&err, &raw);
                 return;
@@ -31,7 +31,7 @@ impl InnerController {
                 if RawTask::save_batch(&raws, &raw.task_id, TaskDaoImpl::insert, TaskDaoImpl::delete).is_err() {
                     return;
                 }
-                debug!("will dispatch {} convert tasks for `Thing` : {:?}", converters.len(), task.instance.meta.get_full_key());
+                debug!("will dispatch {} convert tasks for `Meta` : {:?}", converters.len(), task.instance.meta.get_full_key());
                 for t in converters {
                     let _ = ACT_CONVERT.try_send(MsgForTask(t.0, t.1));
                 }
@@ -67,8 +67,8 @@ impl InnerController {
     }
 
     pub fn received_instance(task: &TaskForConvert, raw: &RawTask, instances: Vec<Instance>) -> Result<()> {
-        debug!("converted {} instances for `Thing`: {:?}", instances.len(), &task.target.to);
-        match Converted::gen(&task, &raw, instances, ThingDefineCacheImpl::get) {
+        debug!("converted {} instances for `Meta`: {:?}", instances.len(), &task.target.to);
+        match Converted::gen(&task, &raw, instances, MetaCacheImpl::get) {
             Ok(rtn) => {
                 let plan = PlanInfo::save(&task, &rtn.converted, StorePlanDaoImpl::save, StorePlanDaoImpl::get)?;
                 Ok(prepare_to_store(&rtn.done_task, plan))
@@ -83,7 +83,7 @@ impl InnerController {
     pub fn channel_serial(task: MsgForTask<TaskForSerial>) {
         let (task, carrier) = (task.0, task.1);
         let finish = &task.context_for_finish.clone();
-        if let Ok(si) = TaskForSerialWrapper::save(task, &ThingDefineCacheImpl::get, InstanceDaoImpl::insert) {
+        if let Ok(si) = TaskForSerialWrapper::save(task, &MetaCacheImpl::get, InstanceDaoImpl::insert) {
             match si.to_virtual_instance(finish) {
                 Ok(instance) => {
                     if let Ok(si) = TaskForStore::gen_task(&instance, OneStepFlowCacheImpl::get, Mission::filter_relations) {

@@ -24,7 +24,7 @@ lazy_static! {
 fn convert_is_empty() {
     env::set_var("DATABASE_URL", CONN_STR);
     // prepare input para
-    let instance = Instance::new_with_type("/dynamic/converter/is/empty", ThingType::Dynamic).unwrap();
+    let instance = Instance::new_with_type("/dynamic/converter/is/empty", MetaType::Dynamic).unwrap();
     let instance = SelfRouteInstance {
         instance,
         converter: vec![],
@@ -37,7 +37,7 @@ fn convert_is_empty() {
 fn target_is_null() {
     test_init();
     // prepare input para
-    let instance = Instance::new_with_type("/dynamic/target/is/null", ThingType::Dynamic).unwrap();
+    let instance = Instance::new_with_type("/dynamic/target/is/null", MetaType::Dynamic).unwrap();
     let instance = SelfRouteInstance {
         instance,
         converter: vec![DynamicConverter {
@@ -58,7 +58,7 @@ fn target_is_null() {
 fn write_one_target_to_db() {
     test_init();
     // prepare input para
-    let instance = Instance::new_with_type("/dynamic/write/one", ThingType::Dynamic).unwrap();
+    let instance = Instance::new_with_type("/dynamic/write/one", MetaType::Dynamic).unwrap();
     let instance = SelfRouteInstance {
         instance,
         converter: vec![DynamicConverter {
@@ -80,7 +80,7 @@ fn write_one_target_to_db() {
 fn write_two_target_to_db() {
     test_init();
     // prepare input para
-    let instance = Instance::new_with_type("/dynamic/write/two", ThingType::Dynamic).unwrap();
+    let instance = Instance::new_with_type("/dynamic/write/two", MetaType::Dynamic).unwrap();
     let instance = SelfRouteInstance {
         instance,
         converter: vec![
