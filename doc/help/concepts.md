@@ -14,6 +14,8 @@ There are two kind of data: `meta` and `instance`.
 
 `Meta` use `key` property to identify each of them. It's a string type, so you can give any value you like to it. But for convention, you should use "/" to separate you large-small domain as its value, for example "/sale/order".
 
+#### MetaType
+
 `Meta` have types called `MetaType`, all types list here:
 
 | Type     | Prefix | Description                                                  |
@@ -24,6 +26,24 @@ There are two kind of data: `meta` and `instance`.
 | Null     | /N     | The terminate for the end of the workflow.                   |
 
 `Meta` use `MetaType` prefix property as `Meta#full_key`'s prefix.  if the key is "/sale/order" the `Meta#full_key` should be "/B/sale/order".
+
+#### State
+
+Some `Meta` has states, for example, a order can new, paid, picked, outbound, delivering states etcetera.  State can includes sub states,  and states can be mutually exclusive. you can use the following symbols to form a `Meta`'s state property.
+
+| symbol | description                                                  |
+| ------ | ------------------------------------------------------------ |
+| ,      | **used to separate between states**                          |
+| []     | express a sub-states list                                    |
+| \|     | states connected with "\|" that only one can be used for `instance`. |
+
+A example：
+
+Suppose we have s1,s2,s3,s4 four states, s1 has s1-1, s1-2, s1-3, s1-4 four sub-states, s1-3 and s1-4 are mutexes, s3 and s4 are mutexes too, this `meta`'s  state would be:
+
+```
+s1[s1-1,s1-2,s1-3|s1-4],s2,s3|s4
+```
 
 ### instance
 

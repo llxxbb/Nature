@@ -1,14 +1,13 @@
 # plan
 
 ## Underway
-    add flag field to enable or disable the meta.
-        mata and onestep flag update support
-        unit test for flag
-
-## meta
-    add flag field to enable or disable the meta.
+    meta support state
+    instance support state
+    status:
+        can include sub status
+        satus can mutex each other
         
-    meta support status
+## meta
     status field is empty but the meta is status.
 ## demo
     generate order

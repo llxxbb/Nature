@@ -30,7 +30,7 @@ impl TaskForConvert {
         let mut new_carriers: Vec<(TaskForConvert, RawTask)> = Vec::new();
         let missions = task.mission.clone().unwrap();
         for c in missions {
-            match Self::new_one(&task.instance, &c, &meta_getter, &instance_getter) {
+            match Self::new_one_task(&task.instance, &c, &meta_getter, &instance_getter) {
                 Err(err) => return Err(err),
                 Ok(x) => {
                     let car = RawTask::new(&x, &c.to.get_full_key(), TaskType::Convert as i16)?;
@@ -41,7 +41,7 @@ impl TaskForConvert {
         Ok(new_carriers)
     }
 
-    fn new_one<FT, FIG>(instance: &Instance, mapping: &Mission, meta_getter: &FT, instance_getter: &FIG) -> Result<TaskForConvert>
+    fn new_one_task<FT, FIG>(instance: &Instance, mapping: &Mission, meta_getter: &FT, instance_getter: &FIG) -> Result<TaskForConvert>
         where FT: Fn(&Meta) -> Result<RawMeta>,
               FIG: Fn(u128) -> Result<Option<Instance>>
     {
@@ -49,12 +49,12 @@ impl TaskForConvert {
             MetaType::Dynamic => RawMeta::default(),
             _ => meta_getter(&mapping.to)?
         };
-        let last_target = if define.is_status() {
+        let last_target = if define.has_states() {
             match instance.context.get(&*CONTEXT_TARGET_INSTANCE_ID) {
                 // context have target id
-                Some(status_id) => {
-                    let status_id = u128::from_str(status_id)?;
-                    match instance_getter(status_id) {
+                Some(state_id) => {
+                    let state_id = u128::from_str(state_id)?;
+                    match instance_getter(state_id) {
                         Ok(ins) => ins,
                         Err(_) => return Err(NatureError::Break)
                     }

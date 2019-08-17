@@ -43,7 +43,7 @@ impl Converted {
             // TODO need be replaced
             _ => meta_getter(to)?
         };
-        if define.is_status() {
+        if define.has_states() {
             if instances.len() > 1 {
                 return Err(NatureError::ConverterLogicalError("[status meta] must return less 2 instances!".to_string()));
             }
