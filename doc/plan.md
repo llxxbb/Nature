@@ -1,5 +1,15 @@
 # plan
 
+## Underway
+    add flag field to enable or disable the meta.
+        mata and onestep flag update support
+        unit test for flag
+
+## meta
+    add flag field to enable or disable the meta.
+        
+    meta support status
+    status field is empty but the meta is status.
 ## demo
     generate order
 
