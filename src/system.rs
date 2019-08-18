@@ -8,10 +8,9 @@ use std::thread::JoinHandle;
 use actix_web::{App, HttpServer};
 use dotenv::dotenv;
 
-use nature_common::util::setup_logger;
-
 use crate::actor::*;
 use crate::rpc::actix::*;
+use nature_common::setup_logger;
 
 // for product and mock
 lazy_static! {

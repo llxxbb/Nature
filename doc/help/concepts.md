@@ -34,7 +34,7 @@ Some `Meta` has states, for example, a order can new, paid, picked, outbound, de
 | symbol | description                                                  |
 | ------ | ------------------------------------------------------------ |
 | ,      | **used to separate between states**                          |
-| []     | express a sub-states list                                    |
+| [,]    | express a sub-states list, items are separated by ","        |
 | \|     | states connected with "\|" that only one can be used for `instance`. |
 
 A example：
