@@ -41,7 +41,7 @@ impl SerialFinished {
 pub struct TaskForSerialWrapper;
 
 impl TaskForSerialWrapper {
-    pub fn save<FC, FS>(serial: TaskForSerial, checker: &FC, saver: FS) -> Result<SerialFinished>
+    pub fn save<FC, FS>(serial: TaskForSerial, meta_getter: &FC, saver: FS) -> Result<SerialFinished>
         where FC: Fn(&Meta) -> Result<RawMeta>,
               FS: Fn(&Instance) -> Result<usize>
     {
@@ -50,7 +50,7 @@ impl TaskForSerialWrapper {
         for mut instance in serial.instances {
             instance.change_meta_type(MetaType::Business);
             instance.data.meta = serial.meta.clone();
-            if let Err(err) = instance.check_and_fix_id(checker) {
+            if let Err(err) = instance.check_and_fix_id(meta_getter) {
                 errors.push(format!("{:?}", err));
                 continue;
             }
