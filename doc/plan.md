@@ -1,6 +1,10 @@
 # plan
 
 ## Underway
+    Relation: add `is_main` property, to indicate which upstream's id will be used.
+
+    generate order
+    
     meta support state
     instance support state
     status:
@@ -9,8 +13,6 @@
         
 ## meta
     status field is empty but the meta is status.
-## demo
-    generate order
 
 `instance` parametrization (pending)
     可以用于条件查询，如 订单-> 用户订单 关系中，订单不能按用户维度检索订单，
