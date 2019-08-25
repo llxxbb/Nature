@@ -2,6 +2,8 @@
 
 ## Underway
     Relation: add `is_main` property, to indicate which upstream's id will be used.
+    DynamicConverter：
+        add use_upstream_id property
 
     generate order
     
