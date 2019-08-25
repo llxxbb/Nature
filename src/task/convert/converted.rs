@@ -47,6 +47,9 @@ impl Converted {
             // TODO need be replaced
             _ => meta_getter(&to)?
         };
+        if task.target.use_upstream_id && instances.len() > 1 {
+            return Err(NatureError::ConverterLogicalError("[use_upstream_id] must return less 2 instances!".to_string()));
+        }
         if define.has_states() {
             if instances.len() > 1 {
                 return Err(NatureError::ConverterLogicalError("[status meta] must return less 2 instances!".to_string()));
@@ -67,6 +70,9 @@ impl Converted {
         // all biz must same to "to" and set id
         for r in instances {
             let mut instance = r.clone();
+            if task.target.use_upstream_id {
+                instance.id = task.from.id;
+            }
             instance.data.meta = to.clone();
             let _ = instance.fix_id();
             rtn.push(instance);
@@ -89,12 +95,11 @@ mod test {
     fn use_upstream_id() {
         let mut from_ins = Instance::default();
         from_ins.id = 567;
-        let mut meta = Meta::new("to").unwrap();
-        meta.state = Some(vec![State::Normal("hello".to_string())]);
-        let task = TaskForConvert {
+        let meta = Meta::new("to").unwrap();
+        let mut task = TaskForConvert {
             from: from_ins,
             target: Mission {
-                to: meta,
+                to: meta.clone(),
                 executor: Default::default(),
                 last_status_demand: None,
                 use_upstream_id: true,
@@ -113,8 +118,17 @@ mod test {
         let mut ins = Instance::default();
         ins.id = 123;
         let ins = vec![ins];
+
+        // for normal
+        let result = Converted::gen(&task, &raw, ins.clone(), mate_to_raw).unwrap();
+        assert_eq!(result.converted[0].id, 567);
+
+        // for state
+        task.target.to.state = Some(vec![State::Normal("hello".to_string())]);
         let result = Converted::gen(&task, &raw, ins, mate_to_raw).unwrap();
         assert_eq!(result.converted[0].id, 567);
+
+
     }
 
     fn mate_to_raw(_: &Meta) -> Result<RawMeta> {
