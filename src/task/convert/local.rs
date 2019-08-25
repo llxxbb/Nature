@@ -6,7 +6,7 @@ use std::time::Duration;
 use lru_time_cache::LruCache;
 
 use nature_common::*;
-use crate::task::convert::caller::ExecutorTrait;
+use crate::task::ExecutorTrait;
 
 type CALLER<'a> = lib::Symbol<'a, fn(&CallOutParameter) -> ConverterReturned>;
 type LIB = Option<lib::Library>;

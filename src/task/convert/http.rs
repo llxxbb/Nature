@@ -2,7 +2,7 @@ use reqwest::Client;
 
 use nature_common::{CallOutParameter, ConverterReturned, Instance};
 
-use crate::task::convert::caller::ExecutorTrait;
+use crate::task::ExecutorTrait;
 
 lazy_static! {
     static ref CLIENT : Client = Client::new();
