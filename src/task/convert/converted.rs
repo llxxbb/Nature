@@ -75,3 +75,58 @@ impl Converted {
         Ok(rtn)
     }
 }
+
+#[cfg(test)]
+mod test {
+    use chrono::Local;
+
+    use nature_common::State;
+    use nature_db::Mission;
+
+    use super::*;
+
+    #[test]
+    fn use_upstream_id() {
+        let mut from_ins = Instance::default();
+        from_ins.id = 567;
+        let mut meta = Meta::new("to").unwrap();
+        meta.state = Some(vec![State::Normal("hello".to_string())]);
+        let task = TaskForConvert {
+            from: from_ins,
+            target: Mission {
+                to: meta,
+                executor: Default::default(),
+                last_status_demand: None,
+                use_upstream_id: true,
+            },
+            last_status: None,
+        };
+        let raw = RawTask {
+            task_id: vec![],
+            meta: "".to_string(),
+            data_type: 0,
+            data: "".to_string(),
+            create_time: Local::now().naive_local(),
+            execute_time: Local::now().naive_local(),
+            retried_times: 0,
+        };
+        let mut ins = Instance::default();
+        ins.id = 123;
+        let ins = vec![ins];
+        let result = Converted::gen(&task, &raw, ins, mate_to_raw).unwrap();
+        assert_eq!(result.converted[0].id, 567);
+    }
+
+    fn mate_to_raw(_: &Meta) -> Result<RawMeta> {
+        Ok(RawMeta {
+            full_key: "".to_string(),
+            description: None,
+            version: 0,
+            states: Some("a,b,c".to_string()),
+            fields: None,
+            config: "".to_string(),
+            flag: 0,
+            create_time: Local::now().naive_local(),
+        })
+    }
+}
