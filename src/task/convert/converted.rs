@@ -1,4 +1,7 @@
-use super::*;
+use nature_common::{Instance, Meta, MetaType, NatureError, Result};
+use nature_db::{RawMeta, RawTask};
+
+use crate::task::TaskForConvert;
 
 pub struct Converted {
     pub done_task: RawTask,
@@ -25,7 +28,7 @@ impl Converted {
             let _ = n.fix_id();
             fixxed_ins.push(n)
         }
-        let instances = Self::verify(&task.target.to, &fixxed_ins, meta_getter)?;
+        let instances = Self::verify(&task, &fixxed_ins, meta_getter)?;
         let rtn = Converted {
             done_task: carrier.to_owned(),
             converted: instances,
@@ -33,15 +36,16 @@ impl Converted {
         Ok(rtn)
     }
 
-    fn verify<FT>(to: &Meta, instances: &[Instance], meta_getter: FT) -> Result<Vec<Instance>>
+    fn verify<FT>(task: &TaskForConvert, instances: &[Instance], meta_getter: FT) -> Result<Vec<Instance>>
         where FT: Fn(&Meta) -> Result<RawMeta>,
     {
         let mut rtn: Vec<Instance> = Vec::new();
         // only one status instance should return
+        let to = task.target.to.clone();
         let define = match to.get_meta_type() {
             MetaType::Dynamic => RawMeta::default(),
             // TODO need be replaced
-            _ => meta_getter(to)?
+            _ => meta_getter(&to)?
         };
         if define.has_states() {
             if instances.len() > 1 {
@@ -50,6 +54,9 @@ impl Converted {
             // status version must equal old + 1
             if instances.len() == 1 {
                 let mut ins = instances[0].clone();
+                if task.target.use_upstream_id {
+                    ins.id = task.from.id;
+                }
                 ins.data.status_version += 1;
                 ins.data.meta = to.clone();
                 rtn.push(ins);

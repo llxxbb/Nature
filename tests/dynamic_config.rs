@@ -43,6 +43,7 @@ fn target_is_null() {
         converter: vec![DynamicConverter {
             to: None,
             fun: Executor::for_local(""),
+            use_upstream_id: false,
         }],
     };
     sleep(3000);
@@ -64,6 +65,7 @@ fn write_one_target_to_db() {
         converter: vec![DynamicConverter {
             to: Some("/dynamic/one_target".to_string()),
             fun: Executor::for_local(r#"nature_integrate_test_converter.dll:rtn_one"#),
+            use_upstream_id: false,
         }],
     };
     sleep(5000);
@@ -87,10 +89,12 @@ fn write_two_target_to_db() {
             DynamicConverter {
                 to: Some("/dynamic/two_of_1".to_string()),
                 fun: Executor::for_local(r#"nature_integrate_test_converter.dll:rtn_one"#),
+                use_upstream_id: false,
             },
             DynamicConverter {
                 to: Some("/dynamic/two_of_2".to_string()),
                 fun: Executor::for_local(r#"nature_integrate_test_converter.dll:rtn_one"#),
+                use_upstream_id: false,
             }],
     };
     sleep(5000);
