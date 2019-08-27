@@ -1,7 +1,7 @@
 use std::str::FromStr;
 
-use nature_common::{Instance, NatureError, Result, Meta, MetaType};
-use nature_db::{Mission, RawTask, RawMeta, TaskType};
+use nature_common::{Instance, Meta, MetaType, NatureError, Result};
+use nature_db::{Mission, RawMeta, RawTask, TaskType};
 
 use crate::system::CONTEXT_TARGET_INSTANCE_ID;
 use crate::task::TaskForStore;
@@ -64,7 +64,7 @@ impl TaskForConvert {
         } else { None };
         if let Some(ref last) = last_target {
             if let Some(demand) = &mapping.last_status_demand {
-                demand.check(&last.status)?;
+                demand.check(&last.states)?;
             }
         };
         let rtn = TaskForConvert {

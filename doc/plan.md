@@ -3,6 +3,10 @@
 ## finished but did not submit
 
 ## Underway
+    
+    rename status to state for 
+        instance
+        RawInstance
        
     generate order
     

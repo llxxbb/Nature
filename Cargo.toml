@@ -39,5 +39,6 @@ members = ["../Nature-Common",
 "../Nature-DB",
 "../Nature-Retry",
 "../Nature-integrate-test-converter",
-"../Nature-Demo"
+"../Nature-Demo",
+"../Nature-Demo-Converter"
 ]

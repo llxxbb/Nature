@@ -29,7 +29,7 @@ impl SerialFinished {
                 create_time: time,
                 content: String::new(),
                 context,
-                status: HashSet::new(),
+                states: HashSet::new(),
                 status_version: 0,
                 from: None,
             },
