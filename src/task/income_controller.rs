@@ -1,7 +1,7 @@
 use std::convert::TryFrom;
 
-use nature_common::{Instance, MetaType, NatureError, Result, SelfRouteInstance, TaskForParallel, TaskForSerial};
-use nature_db::{CallbackResult, DelayedInstances, MetaCacheImpl, Mission, OneStepFlowCacheImpl, RawTask, TaskDaoImpl, TaskType};
+use nature_common::{FetchCondition, Instance, MetaType, NatureError, Result, SelfRouteInstance, TaskForParallel, TaskForSerial};
+use nature_db::{CallbackResult, DelayedInstances, InstanceDaoImpl, MetaCacheImpl, Mission, OneStepFlowCacheImpl, RawTask, TaskDaoImpl, TaskType};
 
 use crate::actor::*;
 use crate::task::{InnerController, TaskForConvert, TaskForStore};
@@ -87,5 +87,12 @@ impl IncomeController {
         let raw = RawTask::save(&batch, &batch.meta.get_full_key(), TaskType::ParallelBatch as i16, TaskDaoImpl::insert)?;
         let _ = ACT_PARALLEL.try_send(MsgForTask(batch, raw));
         Ok(())
+    }
+
+    pub fn fetch(cond: &FetchCondition) -> Result<Option<Vec<Instance>>> {
+        if cond.size as usize > *crate::system::QUERY_SIZE_LIMIT {
+            return Err(NatureError::VerifyError(format!("size can't more than {}.", *crate::system::QUERY_SIZE_LIMIT)));
+        }
+        InstanceDaoImpl::fetch(cond.full_key.clone(), cond.from.clone(), cond.size as i64)
     }
 }

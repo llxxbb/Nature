@@ -38,6 +38,11 @@ fn redo_task(task: Json<RawTask>) -> HttpResponse {
     HttpResponse::Ok().json(x)
 }
 
+fn fetch(cond: Json<FetchCondition>) -> HttpResponse {
+    let x = IncomeController::fetch(&cond);
+    HttpResponse::Ok().json(x)
+}
+
 pub fn web_config(cfg: &mut web::ServiceConfig) {
     cfg
         .service(web::resource("/input").route(web::post().to(input)))
@@ -45,5 +50,6 @@ pub fn web_config(cfg: &mut web::ServiceConfig) {
         .service(web::resource("/callback").route(web::post().to(callback)))
         .service(web::resource("/serial_batch").route(web::post().to(batch_for_serial)))
         .service(web::resource("/parallel_batch").route(web::post().to(batch_for_parallel)))
-        .service(web::resource("/redo_task").route(web::post().to(redo_task)));
+        .service(web::resource("/redo_task").route(web::post().to(redo_task)))
+        .service(web::resource("/fetch").route(web::post().to(fetch)));
 }
