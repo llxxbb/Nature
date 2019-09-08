@@ -28,7 +28,7 @@ dotenv = "0.11"
 # webup
 reqwest = "0.9"
 actix-web = "1.0"
-actix = "0.7"
+actix = "0.8"
 
 # self project group
 nature_common = {path = "../Nature-Common", version = "0.0.2"}
