@@ -12,7 +12,7 @@ impl IncomeController {
     /// born an instance which is the beginning of the changes.
     pub fn input(mut instance: Instance) -> Result<u128> {
         instance.change_meta_type(MetaType::Business);
-        let _ = instance.check_and_fix_id(MetaCacheImpl::get);
+        let _ = instance.check_and_fix_id(MetaCacheImpl::get)?;
         let task = TaskForStore::gen_task(&instance, OneStepFlowCacheImpl::get, Mission::filter_relations)?;
         let carrier = RawTask::save(&task, &instance.meta.get_full_key(), TaskType::Store as i16, TaskDaoImpl::insert)?;
         InnerController::save_instance(task, carrier)?;
