@@ -32,7 +32,6 @@ impl InnerController {
 
     pub fn channel_stored(task: TaskForStore, raw: RawTask) {
         if task.mission.is_none() {
-            debug!("no follow data for : {}", &task.instance.meta.get_full_key());
             let _ = TaskDaoImpl::delete(&&raw.task_id);
             return;
         }
@@ -42,11 +41,9 @@ impl InnerController {
                 if RawTask::save_batch(&raws, &raw.task_id, TaskDaoImpl::insert, TaskDaoImpl::delete).is_err() {
                     return;
                 }
-                let len = converters.len();
                 for t in converters {
                     let _ = ACT_CONVERT.try_send(MsgForTask(t.0, t.1));
                 }
-                debug!("Dispatched {} convert tasks for `Meta` : {:?}", len, task.instance.meta.get_full_key());
             }
             Err(err) => {
                 let _ = TaskDaoImpl::raw_to_error(&err, &raw);
