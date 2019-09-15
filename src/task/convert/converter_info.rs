@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-use nature_common::{Instance, Meta, MetaType, NatureError, Result};
+use nature_common::{Instance, Meta, MetaType, NatureError, ParaForQueryByID, Result};
 use nature_db::{Mission, RawMeta, RawTask, TaskType};
 
 use crate::system::CONTEXT_TARGET_INSTANCE_ID;
@@ -25,7 +25,7 @@ impl Default for TaskForConvert {
 
 impl TaskForConvert {
     pub fn gen_task<FT, FIG>(task: &TaskForStore, meta_getter: FT, instance_getter: FIG) -> Result<Vec<(TaskForConvert, RawTask)>>
-        where FT: Fn(&Meta) -> Result<RawMeta>, FIG: Fn(u128) -> Result<Option<Instance>>
+        where FT: Fn(&Meta) -> Result<RawMeta>, FIG: Fn(&ParaForQueryByID) -> Result<Option<Instance>>
     {
         let mut new_carriers: Vec<(TaskForConvert, RawTask)> = Vec::new();
         let missions = task.mission.clone().unwrap();
@@ -43,7 +43,7 @@ impl TaskForConvert {
 
     fn new_one_task<FT, FIG>(instance: &Instance, mapping: &Mission, meta_getter: &FT, instance_getter: &FIG) -> Result<TaskForConvert>
         where FT: Fn(&Meta) -> Result<RawMeta>,
-              FIG: Fn(u128) -> Result<Option<Instance>>
+              FIG: Fn(&ParaForQueryByID) -> Result<Option<Instance>>
     {
         let define = match mapping.to.get_meta_type() {
             MetaType::Dynamic => RawMeta::default(),
@@ -54,7 +54,7 @@ impl TaskForConvert {
                 // context have target id
                 Some(state_id) => {
                     let state_id = u128::from_str(state_id)?;
-                    match instance_getter(state_id) {
+                    match instance_getter(&ParaForQueryByID{id:state_id,meta:mapping.to.get_full_key()}) {
                         Ok(ins) => ins,
                         Err(_) => return Err(NatureError::Break)
                     }

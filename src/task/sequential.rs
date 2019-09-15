@@ -30,7 +30,7 @@ impl SerialFinished {
                 content: String::new(),
                 context,
                 states: HashSet::new(),
-                status_version: 0,
+                state_version: 0,
                 from: None,
             },
         })

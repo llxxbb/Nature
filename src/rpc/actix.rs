@@ -4,7 +4,7 @@ use actix_web::{HttpResponse, ResponseError, web};
 use actix_web::web::Json;
 use serde::export::fmt::Debug;
 
-use nature_common::{id_tool, Instance, NatureError, SelfRouteInstance, TaskForParallel, TaskForSerial};
+use nature_common::{Instance, NatureError, ParaForQueryByID, SelfRouteInstance, TaskForParallel, TaskForSerial};
 use nature_db::{DelayedInstances, InstanceDaoImpl, RawTask};
 
 use crate::task::IncomeController;
@@ -41,9 +41,8 @@ fn redo_task(task: Json<RawTask>) -> HttpResponse {
     return_result(x)
 }
 
-fn get_by_id(id: String) -> HttpResponse {
-    let id = id_tool::vec_to_u128(&id.as_bytes().to_vec());
-    let x = InstanceDaoImpl::get_by_id(id);
+fn get_by_id(para: Json<ParaForQueryByID>) -> HttpResponse {
+    let x = InstanceDaoImpl::get_by_id(&para.0);
     return_result(x)
 }
 

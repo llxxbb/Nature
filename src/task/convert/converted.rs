@@ -60,7 +60,7 @@ impl Converted {
                 if task.target.use_upstream_id {
                     ins.id = task.from.id;
                 }
-                ins.data.status_version += 1;
+                ins.data.state_version += 1;
                 ins.data.meta = to.clone();
                 rtn.push(ins);
             }
