@@ -14,8 +14,9 @@ impl IncomeController {
         instance.change_meta_type(MetaType::Business);
         let _ = instance.check_and_fix_id(MetaCacheImpl::get)?;
         let task = TaskForStore::gen_task(&instance, OneStepFlowCacheImpl::get, Mission::filter_relations)?;
-        let carrier = RawTask::save(&task, &instance.meta.get_full_key(), TaskType::Store as i16, TaskDaoImpl::insert)?;
-        InnerController::save_instance(task, carrier)?;
+        let raw = RawTask::new(&task, &instance.meta.get_full_key(), TaskType::Store as i16)?;
+        TaskDaoImpl::insert(&raw)?;
+        InnerController::save_instance(task, raw)?;
         Ok(instance.id)
     }
 
@@ -27,8 +28,9 @@ impl IncomeController {
         ins.change_meta_type(MetaType::Dynamic);
         let uuid = ins.fix_id()?.id;
         let task = TaskForStore::for_dynamic(&ins, instance.converter)?;
-        let carrier = RawTask::save(&task, &ins.meta.get_full_key(), TaskType::Store as i16, TaskDaoImpl::insert)?;
-        InnerController::save_instance(task, carrier)?;
+        let raw = RawTask::new(&task, &ins.meta.get_full_key(), TaskType::Store as i16)?;
+        let _ = TaskDaoImpl::insert(&raw)?;
+        InnerController::save_instance(task, raw)?;
         Ok(uuid)
     }
 
@@ -78,13 +80,15 @@ impl IncomeController {
     }
 
     pub fn serial(batch: TaskForSerial) -> Result<()> {
-        let raw = RawTask::save(&batch, &batch.meta.get_full_key(), TaskType::QueueBatch as i16, TaskDaoImpl::insert)?;
+        let raw = RawTask::new(&batch, &batch.meta.get_full_key(), TaskType::QueueBatch as i16)?;
+        let _ = TaskDaoImpl::insert(&raw)?;
         let _ = ACT_SERIAL.try_send(MsgForTask(batch.to_owned(), raw));
         Ok(())
     }
 
     pub fn parallel(batch: TaskForParallel) -> Result<()> {
-        let raw = RawTask::save(&batch, &batch.meta.get_full_key(), TaskType::ParallelBatch as i16, TaskDaoImpl::insert)?;
+        let raw = RawTask::new(&batch, &batch.meta.get_full_key(), TaskType::ParallelBatch as i16)?;
+        let _ = TaskDaoImpl::insert(&raw)?;
         let _ = ACT_PARALLEL.try_send(MsgForTask(batch, raw));
         Ok(())
     }

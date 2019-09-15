@@ -4,7 +4,7 @@ use actix_web::{HttpResponse, ResponseError, web};
 use actix_web::web::Json;
 use serde::export::fmt::Debug;
 
-use nature_common::{Instance, NatureError, SelfRouteInstance, TaskForParallel, TaskForSerial};
+use nature_common::{id_tool, Instance, NatureError, SelfRouteInstance, TaskForParallel, TaskForSerial};
 use nature_db::{DelayedInstances, InstanceDaoImpl, RawTask};
 
 use crate::task::IncomeController;
@@ -41,8 +41,9 @@ fn redo_task(task: Json<RawTask>) -> HttpResponse {
     return_result(x)
 }
 
-fn get_by_id(id: Json<u128>) -> HttpResponse {
-    let x = InstanceDaoImpl::get_by_id(id.0);
+fn get_by_id(id: String) -> HttpResponse {
+    let id = id_tool::vec_to_u128(&id.as_bytes().to_vec());
+    let x = InstanceDaoImpl::get_by_id(id);
     return_result(x)
 }
 
@@ -75,11 +76,5 @@ impl ResponseError for WebError {}
 fn return_result<T>(x: nature_common::Result<T>) -> HttpResponse
     where T: serde::Serialize + Debug
 {
-    debug!("processed result is : {:?}", x);
-//// can't return error, will break this program down.
-//    match x {
-//        Err(e) => HttpResponse::from_error(actix_web::Error::from(WebError { err: e })),
-//        Ok(xx) => HttpResponse::Ok().json(xx)
-//    }
     HttpResponse::Ok().json(x)
 }

@@ -1,6 +1,6 @@
 use std::sync::mpsc::Sender;
 
-use nature_common::{Meta, DynamicConverter, Instance, Result};
+use nature_common::{DynamicConverter, Instance, Meta, Result};
 use nature_db::{Mission, OneStepFlow, RawTask};
 
 use crate::task::TaskForConvert;

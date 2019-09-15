@@ -1,9 +1,10 @@
+use serde::export::From;
+
 use nature_common::{ConverterReturned, Instance, NatureError, Result, TaskForParallel, TaskForSerial};
 use nature_db::{InstanceDaoImpl, MetaCacheImpl, Mission, OneStepFlowCacheImpl, RawTask, StorePlanDaoImpl, TaskDaoImpl, TaskType};
 
 use crate::actor::*;
 use crate::task::{CallOutParaWrapper, Converted, PlanInfo, TaskForConvert, TaskForSerialWrapper, TaskForStore};
-use serde::export::From;
 
 pub struct InnerController {}
 
@@ -13,9 +14,20 @@ impl InnerController {
     }
 
     pub fn save_instance(task: TaskForStore, carrier: RawTask) -> Result<()> {
-        let _ = task.instance.save(InstanceDaoImpl::save)?;
-        ACT_STORED.try_send(MsgForTask(task, carrier))?;
-        Ok(())
+        match InstanceDaoImpl::insert(&task.instance) {
+            Ok(_) => {
+                ACT_STORED.try_send(MsgForTask(task, carrier))?;
+                Ok(())
+            }
+            Err(NatureError::DaoDuplicated(err)) => {
+                warn!("Instance duplicated for id : {}, of `Meta` : {:?}, will delete it's task!", task.instance.id, &task.instance.meta.get_full_key());
+                // Don't worry about the previous task would deleted while in processing!
+                // the task will be duplicated too or an new one for same instance.
+                let _ = TaskDaoImpl::delete(&&carrier.task_id);
+                Err(NatureError::DaoDuplicated(err))
+            }
+            Err(e) => Err(e)
+        }
     }
 
     pub fn channel_stored(task: TaskForStore, raw: RawTask) {
@@ -25,25 +37,25 @@ impl InnerController {
             return;
         }
         match TaskForConvert::gen_task(&task, MetaCacheImpl::get, InstanceDaoImpl::get_by_id) {
-            Err(err) => {
-                let _ = TaskDaoImpl::raw_to_error(&err, &raw);
-                return;
-            }
             Ok(converters) => {
                 let raws: Vec<RawTask> = converters.iter().map(|x| x.1.clone()).collect();
                 if RawTask::save_batch(&raws, &raw.task_id, TaskDaoImpl::insert, TaskDaoImpl::delete).is_err() {
                     return;
                 }
-                debug!("will dispatch {} convert tasks for `Meta` : {:?}", converters.len(), task.instance.meta.get_full_key());
+                let len = converters.len();
                 for t in converters {
                     let _ = ACT_CONVERT.try_send(MsgForTask(t.0, t.1));
                 }
+                debug!("Dispatched {} convert tasks for `Meta` : {:?}", len, task.instance.meta.get_full_key());
+            }
+            Err(err) => {
+                let _ = TaskDaoImpl::raw_to_error(&err, &raw);
+                return;
             }
         }
     }
 
     pub fn channel_convert(task: TaskForConvert, raw: RawTask) {
-        debug!("convert for {:?}", &task.target.to);
         match CallOutParaWrapper::gen_and_call_out(&task, raw.task_id.clone(), &task.target) {
             Err(err) => match err {
                 // only **Environment Error** will be retry
@@ -70,7 +82,7 @@ impl InnerController {
     }
 
     pub fn received_instance(task: &TaskForConvert, raw: &RawTask, instances: Vec<Instance>) -> Result<()> {
-        debug!("converted {} instances for `Meta`: {:?}", instances.len(), &task.target.to);
+        debug!("converted {} instances for `Meta`: {:?}", instances.len(), &task.target.to.get_full_key());
         match Converted::gen(&task, &raw, instances, MetaCacheImpl::get) {
             Ok(rtn) => {
                 let plan = PlanInfo::save(&task, &rtn.converted, StorePlanDaoImpl::save, StorePlanDaoImpl::get)?;
@@ -111,28 +123,45 @@ impl InnerController {
 
     pub fn channel_parallel(task: MsgForTask<TaskForParallel>) {
         let mut tuple: Vec<(TaskForStore, RawTask)> = Vec::new();
+        let mut err: Option<NatureError> = None;
         for instance in task.0.instances.iter() {
             match TaskForStore::gen_task(&instance, OneStepFlowCacheImpl::get, Mission::filter_relations) {
                 Ok(task) => {
-                    match RawTask::save(&task, &instance.meta.get_full_key(), TaskType::Store as i16, TaskDaoImpl::insert) {
-                        Ok(car) => {
-                            tuple.push((task, car))
+                    match RawTask::new(&task, &instance.meta.get_full_key(), TaskType::Store as i16) {
+                        Ok(raw) => {
+                            match TaskDaoImpl::insert(&raw) {
+                                Ok(_) => {
+                                    tuple.push((task, raw))
+                                }
+                                Err(e) => {
+                                    err = Some(e);
+                                    break;
+                                }
+                            }
                         }
                         Err(e) => {
-                            error!("{}", e);
-                            return;
+                            err = Some(e);
+                            break;
                         }
                     }
                 }
-                // any error will break the process
-                _ => return
+                Err(e) => {
+                    err = Some(e);
+                    break;
+                }
             }
         }
-        if TaskDaoImpl::delete(&task.1.task_id).is_err() {
-            return;
-        }
-        for c in tuple {
-            ACT_STORE.do_send(MsgForTask(c.0, c.1));
+        match err {
+            None => {
+                for c in tuple {
+                    ACT_STORE.do_send(MsgForTask(c.0, c.1));
+                }
+                let _ = TaskDaoImpl::delete(&task.1.task_id);
+            }
+            Some(NatureError::DaoLogicalError(s)) => {
+                let _ = TaskDaoImpl::raw_to_error(&NatureError::DaoLogicalError(s), &task.1);
+            }
+            Some(_) => ()
         }
     }
 }
@@ -156,7 +185,7 @@ fn prepare_to_store(carrier: &RawTask, plan: PlanInfo) {
                     }
                 }
             }
-            // break process will environment error occurs.
+// break process will environment error occurs.
             Err(e) => {
                 error!("{}", e);
                 return;
