@@ -3,10 +3,8 @@
 ## finished but did not submit
 
 ## Underway
-    
-    rename status to state for 
-        instance
-        RawInstance
+    check TargetState for converter load
+    converted instance handle TargetState
        
     generate order
     
