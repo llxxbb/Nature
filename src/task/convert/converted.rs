@@ -20,14 +20,16 @@ impl Converted {
             };
             return Ok(rtn);
         }
-        // check status version to avoid loop
+
         let mut fixxed_ins: Vec<Instance> = Vec::new();
+        // fix id and modify the meta
         for one in instances {
             let mut n = one.clone();
             n.data.meta = task.target.to.clone();
             let _ = n.fix_id();
             fixxed_ins.push(n)
         }
+        // verify
         let instances = Self::verify(&task, &fixxed_ins, meta_getter)?;
         let rtn = Converted {
             done_task: carrier.to_owned(),
@@ -44,7 +46,6 @@ impl Converted {
         let to = task.target.to.clone();
         let define = match to.get_meta_type() {
             MetaType::Dynamic => RawMeta::default(),
-            // TODO need be replaced
             _ => meta_getter(&to)?
         };
         if task.target.use_upstream_id && instances.len() > 1 {
@@ -60,7 +61,15 @@ impl Converted {
                 if task.target.use_upstream_id {
                     ins.id = task.from.id;
                 }
-                ins.data.state_version += 1;
+                // TODO add and remove state
+                match &task.last_status {
+                    None => {
+                        ins.state_version = 1
+                    }
+                    Some(x) => {
+                        ins.state_version = x.state_version + 1
+                    }
+                };
                 ins.data.meta = to.clone();
                 rtn.push(ins);
             }
@@ -127,8 +136,6 @@ mod test {
         task.target.to.state = Some(vec![State::Normal("hello".to_string())]);
         let result = Converted::gen(&task, &raw, ins, mate_to_raw).unwrap();
         assert_eq!(result.converted[0].id, 567);
-
-
     }
 
     fn mate_to_raw(_: &Meta) -> Result<RawMeta> {
