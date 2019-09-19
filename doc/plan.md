@@ -3,7 +3,9 @@
 ## finished but did not submit
 
 ## Underway
-    check TargetState for converter load
+    
+    move weight_filter to `OneStepFlow`
+    check TargetState for `OneStepFlow` load
     converted instance handle TargetState
        
     generate order
