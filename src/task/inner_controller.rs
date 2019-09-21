@@ -182,9 +182,9 @@ fn prepare_to_store(carrier: &RawTask, plan: PlanInfo) {
                     }
                 }
             }
-// break process will environment error occurs.
+            // break process when environment error occurs.
             Err(e) => {
-                error!("{}", e);
+                warn!("{}", e);
                 return;
             }
         }

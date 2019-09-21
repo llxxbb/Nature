@@ -1,7 +1,7 @@
 use std::sync::mpsc::Sender;
 
 use nature_common::{DynamicConverter, Instance, Meta, Result};
-use nature_db::{Mission, OneStepFlow, RawTask, RelationGetter, RelationResult};
+use nature_db::{Mission, MissionFilter, RawTask, RelationGetter, RelationResult};
 
 use crate::task::TaskForConvert;
 
@@ -15,12 +15,10 @@ pub struct TaskForStore {
 
 
 impl TaskForStore {
-    pub fn gen_task<FF>(instance: &Instance, step_cache_getter: fn(&Meta, RelationGetter) -> RelationResult, relation_getter: RelationGetter, mission_filter: FF) -> Result<Self> where
-        FF: FnOnce((&Instance, Vec<OneStepFlow>)) -> Option<Vec<Mission>>
-    {
+    pub fn gen_task(instance: &Instance, step_cache_getter: fn(&Meta, RelationGetter) -> RelationResult, relation_getter: RelationGetter, mission_filter: MissionFilter) -> Result<Self> {
         let steps = match step_cache_getter(&instance.meta, relation_getter)? {
             Some(steps) => {
-                mission_filter((&instance, steps))
+                mission_filter(&instance, steps)
             }
             None => None
         };
