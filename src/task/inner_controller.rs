@@ -1,7 +1,7 @@
 use serde::export::From;
 
 use nature_common::{ConverterReturned, Instance, NatureError, Result, TaskForParallel, TaskForSerial};
-use nature_db::{InstanceDaoImpl, MetaCacheImpl, Mission, OneStepFlowCacheImpl, OneStepFlowDaoImpl, RawTask, StorePlanDaoImpl, TaskDaoImpl, TaskType};
+use nature_db::{InstanceDaoImpl, MetaCacheImpl, MetaDaoImpl, Mission, OneStepFlowCacheImpl, OneStepFlowDaoImpl, RawTask, StorePlanDaoImpl, TaskDaoImpl, TaskType};
 
 use crate::actor::*;
 use crate::task::{CallOutParaWrapper, Converted, PlanInfo, TaskForConvert, TaskForSerialWrapper, TaskForStore};
@@ -35,7 +35,7 @@ impl InnerController {
             let _ = TaskDaoImpl::delete(&&raw.task_id);
             return;
         }
-        match TaskForConvert::gen_task(&task, MetaCacheImpl::get, InstanceDaoImpl::get_by_id) {
+        match TaskForConvert::gen_task(&task, MetaCacheImpl::get, MetaDaoImpl::get, InstanceDaoImpl::get_by_id) {
             Ok(converters) => {
                 let raws: Vec<RawTask> = converters.iter().map(|x| x.1.clone()).collect();
                 if RawTask::save_batch(&raws, &raw.task_id, TaskDaoImpl::insert, TaskDaoImpl::delete).is_err() {
@@ -80,7 +80,7 @@ impl InnerController {
 
     pub fn received_instance(task: &TaskForConvert, raw: &RawTask, instances: Vec<Instance>) -> Result<()> {
         debug!("converted {} instances for `Meta`: {:?}", instances.len(), &task.target.to.get_full_key());
-        match Converted::gen(&task, &raw, instances, MetaCacheImpl::get) {
+        match Converted::gen(&task, &raw, instances, MetaCacheImpl::get, MetaDaoImpl::get) {
             Ok(rtn) => {
                 let plan = PlanInfo::save(&task, &rtn.converted, StorePlanDaoImpl::save, StorePlanDaoImpl::get)?;
                 Ok(prepare_to_store(&rtn.done_task, plan))
@@ -95,7 +95,7 @@ impl InnerController {
     pub fn channel_serial(task: MsgForTask<TaskForSerial>) {
         let (task, carrier) = (task.0, task.1);
         let finish = &task.context_for_finish.clone();
-        if let Ok(si) = TaskForSerialWrapper::save(task, &MetaCacheImpl::get, InstanceDaoImpl::insert) {
+        if let Ok(si) = TaskForSerialWrapper::save(task, MetaCacheImpl::get, MetaDaoImpl::get, InstanceDaoImpl::insert) {
             match si.to_virtual_instance(finish) {
                 Ok(instance) => {
                     if let Ok(si) = TaskForStore::gen_task(&instance, OneStepFlowCacheImpl::get, OneStepFlowDaoImpl::get_relations, Mission::filter_relations) {

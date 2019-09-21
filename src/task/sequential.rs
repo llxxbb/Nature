@@ -41,16 +41,15 @@ impl SerialFinished {
 pub struct TaskForSerialWrapper;
 
 impl TaskForSerialWrapper {
-    pub fn save<FC, FS>(serial: TaskForSerial, meta_getter: &FC, saver: FS) -> Result<SerialFinished>
-        where FC: Fn(&Meta) -> Result<RawMeta>,
-              FS: Fn(&Instance) -> Result<usize>
+    pub fn save<FS>(serial: TaskForSerial, meta_cache_getter: fn(&Meta, MetaGetter) -> Result<RawMeta>, meta_getter: MetaGetter, saver: FS) -> Result<SerialFinished>
+        where FS: Fn(&Instance) -> Result<usize>
     {
         let mut errors: Vec<String> = Vec::new();
         let mut succeeded_id: Vec<u128> = Vec::new();
         for mut instance in serial.instances {
             instance.change_meta_type(MetaType::Business);
             instance.data.meta = serial.meta.clone();
-            if let Err(err) = instance.check_and_fix_id(meta_getter) {
+            if let Err(err) = instance.check_and_fix_id(meta_cache_getter, meta_getter) {
                 errors.push(format!("{:?}", err));
                 continue;
             }

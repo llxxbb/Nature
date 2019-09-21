@@ -1,7 +1,7 @@
 use std::convert::TryFrom;
 
 use nature_common::{Instance, MetaType, NatureError, Result, SelfRouteInstance, TaskForParallel, TaskForSerial};
-use nature_db::{CallbackResult, DelayedInstances, MetaCacheImpl, Mission, OneStepFlowCacheImpl, OneStepFlowDaoImpl, RawTask, TaskDaoImpl, TaskType};
+use nature_db::{CallbackResult, DelayedInstances, MetaCacheImpl, MetaDaoImpl, Mission, OneStepFlowCacheImpl, OneStepFlowDaoImpl, RawTask, TaskDaoImpl, TaskType};
 
 use crate::actor::*;
 use crate::task::{InnerController, TaskForConvert, TaskForStore};
@@ -12,7 +12,7 @@ impl IncomeController {
     /// born an instance which is the beginning of the changes.
     pub fn input(mut instance: Instance) -> Result<u128> {
         instance.change_meta_type(MetaType::Business);
-        let _ = instance.check_and_fix_id(MetaCacheImpl::get)?;
+        let _ = instance.check_and_fix_id(MetaCacheImpl::get, MetaDaoImpl::get)?;
         let task = TaskForStore::gen_task(&instance, OneStepFlowCacheImpl::get, OneStepFlowDaoImpl::get_relations, Mission::filter_relations)?;
         let raw = RawTask::new(&task, &instance.meta.get_full_key(), TaskType::Store as i16)?;
         TaskDaoImpl::insert(&raw)?;

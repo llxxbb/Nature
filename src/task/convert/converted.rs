@@ -1,5 +1,5 @@
 use nature_common::{Instance, Meta, MetaType, NatureError, Result};
-use nature_db::{RawMeta, RawTask};
+use nature_db::{MetaGetter, RawMeta, RawTask};
 
 use crate::task::TaskForConvert;
 
@@ -9,9 +9,7 @@ pub struct Converted {
 }
 
 impl Converted {
-    pub fn gen<FT>(task: &TaskForConvert, carrier: &RawTask, instances: Vec<Instance>, meta_getter: FT) -> Result<Converted>
-        where FT: Fn(&Meta) -> Result<RawMeta>
-    {
+    pub fn gen(task: &TaskForConvert, carrier: &RawTask, instances: Vec<Instance>, meta_cache_getter: fn(&Meta, MetaGetter) -> Result<RawMeta>, meta_getter: MetaGetter) -> Result<Converted> {
         // check `MetaType` for Null
         if task.target.to.get_meta_type() == MetaType::Null {
             let rtn = Converted {
@@ -30,7 +28,7 @@ impl Converted {
             fixxed_ins.push(n)
         }
         // verify
-        let instances = Self::verify(&task, &fixxed_ins, meta_getter)?;
+        let instances = Self::verify(&task, &fixxed_ins, meta_cache_getter, meta_getter)?;
         let rtn = Converted {
             done_task: carrier.to_owned(),
             converted: instances,
@@ -38,15 +36,13 @@ impl Converted {
         Ok(rtn)
     }
 
-    fn verify<FT>(task: &TaskForConvert, instances: &[Instance], meta_getter: FT) -> Result<Vec<Instance>>
-        where FT: Fn(&Meta) -> Result<RawMeta>,
-    {
+    fn verify(task: &TaskForConvert, instances: &[Instance], meta_cache_getter: fn(&Meta, MetaGetter) -> Result<RawMeta>, meta_getter: MetaGetter) -> Result<Vec<Instance>> {
         let mut rtn: Vec<Instance> = Vec::new();
         // only one status instance should return
         let to = task.target.to.clone();
         let define = match to.get_meta_type() {
             MetaType::Dynamic => RawMeta::default(),
-            _ => meta_getter(&to)?
+            _ => meta_cache_getter(&to, meta_getter)?
         };
         if task.target.use_upstream_id && instances.len() > 1 {
             return Err(NatureError::ConverterLogicalError("[use_upstream_id] must return less 2 instances!".to_string()));
@@ -96,7 +92,7 @@ mod test {
     use chrono::Local;
 
     use nature_common::State;
-    use nature_db::Mission;
+    use nature_db::{MetaDaoImpl, Mission};
 
     use super::*;
 
@@ -129,16 +125,16 @@ mod test {
         let ins = vec![ins];
 
         // for normal
-        let result = Converted::gen(&task, &raw, ins.clone(), mate_to_raw).unwrap();
+        let result = Converted::gen(&task, &raw, ins.clone(), mate_to_raw, MetaDaoImpl::get).unwrap();
         assert_eq!(result.converted[0].id, 567);
 
         // for state
         task.target.to.state = Some(vec![State::Normal("hello".to_string())]);
-        let result = Converted::gen(&task, &raw, ins, mate_to_raw).unwrap();
+        let result = Converted::gen(&task, &raw, ins, mate_to_raw, MetaDaoImpl::get).unwrap();
         assert_eq!(result.converted[0].id, 567);
     }
 
-    fn mate_to_raw(_: &Meta) -> Result<RawMeta> {
+    fn mate_to_raw(_: &Meta, _: MetaGetter) -> Result<RawMeta> {
         Ok(RawMeta {
             full_key: "".to_string(),
             description: None,
