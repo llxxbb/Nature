@@ -3,9 +3,9 @@
 ## finished but did not submit
 
 ## Underway
-    `Meta`'s get method is queer, remove it
-    state for same name check
+    
     converted instance handle TargetState
+    `Meta`'s get method is queer, remove it
        
     generate order
     
