@@ -41,7 +41,7 @@ impl SerialFinished {
 pub struct TaskForSerialWrapper;
 
 impl TaskForSerialWrapper {
-    pub fn save<FS>(serial: TaskForSerial, meta_cache_getter: fn(&Meta, MetaGetter) -> Result<RawMeta>, meta_getter: MetaGetter, saver: FS) -> Result<SerialFinished>
+    pub fn save<FS>(serial: TaskForSerial, meta_cache_getter: MetaCacheGetter, meta_getter: MetaGetter, saver: FS) -> Result<SerialFinished>
         where FS: Fn(&Instance) -> Result<usize>
     {
         let mut errors: Vec<String> = Vec::new();

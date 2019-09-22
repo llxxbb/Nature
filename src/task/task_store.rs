@@ -1,7 +1,7 @@
 use std::sync::mpsc::Sender;
 
-use nature_common::{DynamicConverter, Instance, Meta, Result};
-use nature_db::{Mission, MissionFilter, RawTask, RelationGetter, RelationResult};
+use nature_common::{DynamicConverter, Instance, Result};
+use nature_db::{MetaCacheGetter, MetaGetter, Mission, MissionFilter, RawTask, RelationCacheGetter, RelationGetter};
 
 use crate::task::TaskForConvert;
 
@@ -15,8 +15,8 @@ pub struct TaskForStore {
 
 
 impl TaskForStore {
-    pub fn gen_task(instance: &Instance, step_cache_getter: fn(&Meta, RelationGetter) -> RelationResult, relation_getter: RelationGetter, mission_filter: MissionFilter) -> Result<Self> {
-        let steps = match step_cache_getter(&instance.meta, relation_getter)? {
+    pub fn gen_task(instance: &Instance, step_cache_getter: RelationCacheGetter, relation_getter: RelationGetter, meta_cache: MetaCacheGetter, meta: MetaGetter, mission_filter: MissionFilter) -> Result<Self> {
+        let steps = match step_cache_getter(&instance.meta, relation_getter, meta_cache, meta)? {
             Some(steps) => {
                 mission_filter(&instance, steps)
             }

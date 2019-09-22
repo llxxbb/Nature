@@ -98,7 +98,7 @@ impl InnerController {
         if let Ok(si) = TaskForSerialWrapper::save(task, MetaCacheImpl::get, MetaDaoImpl::get, InstanceDaoImpl::insert) {
             match si.to_virtual_instance(finish) {
                 Ok(instance) => {
-                    if let Ok(si) = TaskForStore::gen_task(&instance, OneStepFlowCacheImpl::get, OneStepFlowDaoImpl::get_relations, Mission::filter_relations) {
+                    if let Ok(si) = TaskForStore::gen_task(&instance, OneStepFlowCacheImpl::get, OneStepFlowDaoImpl::get_relations, MetaCacheImpl::get, MetaDaoImpl::get, Mission::filter_relations) {
                         match RawTask::new(&si, &instance.meta.get_full_key(), TaskType::QueueBatch as i16) {
                             Ok(mut new) => {
                                 if let Ok(_route) = new.finish_old(&carrier, TaskDaoImpl::insert, TaskDaoImpl::delete) {
@@ -122,7 +122,7 @@ impl InnerController {
         let mut tuple: Vec<(TaskForStore, RawTask)> = Vec::new();
         let mut err: Option<NatureError> = None;
         for instance in task.0.instances.iter() {
-            match TaskForStore::gen_task(&instance, OneStepFlowCacheImpl::get, OneStepFlowDaoImpl::get_relations, Mission::filter_relations) {
+            match TaskForStore::gen_task(&instance, OneStepFlowCacheImpl::get, OneStepFlowDaoImpl::get_relations, MetaCacheImpl::get, MetaDaoImpl::get, Mission::filter_relations) {
                 Ok(task) => {
                     match RawTask::new(&task, &instance.meta.get_full_key(), TaskType::Store as i16) {
                         Ok(raw) => {
@@ -168,7 +168,7 @@ fn prepare_to_store(carrier: &RawTask, plan: PlanInfo) {
     let mut store_infos: Vec<RawTask> = Vec::new();
     let mut t_d: Vec<(TaskForStore, RawTask)> = Vec::new();
     for instance in plan.plan.iter() {
-        match TaskForStore::gen_task(&instance, OneStepFlowCacheImpl::get, OneStepFlowDaoImpl::get_relations, Mission::filter_relations) {
+        match TaskForStore::gen_task(&instance, OneStepFlowCacheImpl::get, OneStepFlowDaoImpl::get_relations, MetaCacheImpl::get, MetaDaoImpl::get, Mission::filter_relations) {
             Ok(task) => {
                 match RawTask::new(&task, &plan.to.get_full_key(), TaskType::Store as i16) {
                     Ok(x) => {

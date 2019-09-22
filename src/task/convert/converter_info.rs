@@ -1,7 +1,7 @@
 use std::str::FromStr;
 
-use nature_common::{Instance, Meta, MetaType, NatureError, ParaForQueryByID, Result};
-use nature_db::{MetaGetter, Mission, RawMeta, RawTask, TaskType};
+use nature_common::{Instance, MetaType, NatureError, ParaForQueryByID, Result};
+use nature_db::{MetaCacheGetter, MetaGetter, Mission, RawMeta, RawTask, TaskType};
 
 use crate::system::CONTEXT_TARGET_INSTANCE_ID;
 use crate::task::TaskForStore;
@@ -24,7 +24,7 @@ impl Default for TaskForConvert {
 }
 
 impl TaskForConvert {
-    pub fn gen_task<FIG>(task: &TaskForStore, meta_cache_getter: fn(&Meta, MetaGetter) -> Result<RawMeta>, meta_getter: MetaGetter, instance_getter: FIG) -> Result<Vec<(TaskForConvert, RawTask)>>
+    pub fn gen_task<FIG>(task: &TaskForStore, meta_cache_getter: MetaCacheGetter, meta_getter: MetaGetter, instance_getter: FIG) -> Result<Vec<(TaskForConvert, RawTask)>>
         where FIG: Fn(&ParaForQueryByID) -> Result<Option<Instance>>
     {
         let mut new_carriers: Vec<(TaskForConvert, RawTask)> = Vec::new();
@@ -41,7 +41,7 @@ impl TaskForConvert {
         Ok(new_carriers)
     }
 
-    fn new_one_task<FIG>(instance: &Instance, mapping: &Mission, meta_cache_getter: fn(&Meta, MetaGetter) -> Result<RawMeta>, meta_getter: MetaGetter, instance_getter: &FIG) -> Result<TaskForConvert>
+    fn new_one_task<FIG>(instance: &Instance, mapping: &Mission, meta_cache_getter: MetaCacheGetter, meta_getter: MetaGetter, instance_getter: &FIG) -> Result<TaskForConvert>
         where FIG: Fn(&ParaForQueryByID) -> Result<Option<Instance>>
     {
         let define = match mapping.to.get_meta_type() {

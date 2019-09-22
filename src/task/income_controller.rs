@@ -13,7 +13,7 @@ impl IncomeController {
     pub fn input(mut instance: Instance) -> Result<u128> {
         instance.change_meta_type(MetaType::Business);
         let _ = instance.check_and_fix_id(MetaCacheImpl::get, MetaDaoImpl::get)?;
-        let task = TaskForStore::gen_task(&instance, OneStepFlowCacheImpl::get, OneStepFlowDaoImpl::get_relations, Mission::filter_relations)?;
+        let task = TaskForStore::gen_task(&instance, OneStepFlowCacheImpl::get, OneStepFlowDaoImpl::get_relations, MetaCacheImpl::get, MetaDaoImpl::get, Mission::filter_relations)?;
         let raw = RawTask::new(&task, &instance.meta.get_full_key(), TaskType::Store as i16)?;
         TaskDaoImpl::insert(&raw)?;
         InnerController::save_instance(task, raw)?;

@@ -1,11 +1,9 @@
 # plan
 
 ## finished but did not submit
-    implement has_name and include for State, Meta
-    check TargetState for `OneStepFlow` load
 
 ## Underway
-    
+    `Meta`'s get method is queer, remove it
     state for same name check
     converted instance handle TargetState
        

@@ -1,5 +1,5 @@
-use nature_common::{Instance, Meta, MetaType, NatureError, Result};
-use nature_db::{MetaGetter, RawMeta, RawTask};
+use nature_common::{Instance, MetaType, NatureError, Result};
+use nature_db::{MetaGetter, RawMeta, RawTask, MetaCacheGetter};
 
 use crate::task::TaskForConvert;
 
@@ -9,7 +9,7 @@ pub struct Converted {
 }
 
 impl Converted {
-    pub fn gen(task: &TaskForConvert, carrier: &RawTask, instances: Vec<Instance>, meta_cache_getter: fn(&Meta, MetaGetter) -> Result<RawMeta>, meta_getter: MetaGetter) -> Result<Converted> {
+    pub fn gen(task: &TaskForConvert, carrier: &RawTask, instances: Vec<Instance>, meta_cache_getter: MetaCacheGetter, meta_getter: MetaGetter) -> Result<Converted> {
         // check `MetaType` for Null
         if task.target.to.get_meta_type() == MetaType::Null {
             let rtn = Converted {
@@ -36,7 +36,7 @@ impl Converted {
         Ok(rtn)
     }
 
-    fn verify(task: &TaskForConvert, instances: &[Instance], meta_cache_getter: fn(&Meta, MetaGetter) -> Result<RawMeta>, meta_getter: MetaGetter) -> Result<Vec<Instance>> {
+    fn verify(task: &TaskForConvert, instances: &[Instance], meta_cache_getter: MetaCacheGetter, meta_getter: MetaGetter) -> Result<Vec<Instance>> {
         let mut rtn: Vec<Instance> = Vec::new();
         // only one status instance should return
         let to = task.target.to.clone();
@@ -91,7 +91,7 @@ impl Converted {
 mod test {
     use chrono::Local;
 
-    use nature_common::State;
+    use nature_common::{State, Meta};
     use nature_db::{MetaDaoImpl, Mission};
 
     use super::*;
