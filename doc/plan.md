@@ -1,11 +1,12 @@
 # plan
 
 ## finished but did not submit
+    implement has_name and include for State, Meta
+    check TargetState for `OneStepFlow` load
 
 ## Underway
     
-    move weight_filter to `OneStepFlow`
-    check TargetState for `OneStepFlow` load
+    state for same name check
     converted instance handle TargetState
        
     generate order

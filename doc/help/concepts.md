@@ -29,12 +29,12 @@ There are two kind of data: `meta` and `instance`.
 
 #### State
 
-Some `Meta` has states, for example, a order can new, paid, picked, outbound, delivering states etcetera.  State can includes sub states,  and states can be mutually exclusive. you can use the following symbols to form a `Meta`'s state property.
+Some `Meta` has states, for example, a order can new, paid, picked, outbound, delivering states etcetera.  States can be grouped,  and states can be mutually exclusive. you can use the following symbols to form a `Meta`'s state property.
 
 | symbol | description                                                  |
 | ------ | ------------------------------------------------------------ |
 | ,      | **used to separate between states**                          |
-| [,]    | express a sub-states list, items are separated by ","        |
+| [,]    | express a grouped state, items are separated by ","          |
 | \|     | states connected with "\|" that only one can be used for `instance`. |
 
 A example：
@@ -44,6 +44,8 @@ Suppose we have s1,s2,s3,s4 four states, s1 has s1-1, s1-2, s1-3, s1-4 four sub-
 ```
 s1[s1-1,s1-2,s1-3|s1-4],s2,s3|s4
 ```
+
+**Important note:** each state's name can't be same, even they are in different groups.
 
 ### instance
 
