@@ -1,5 +1,5 @@
 use nature_common::{Instance, MetaType, NatureError, Result};
-use nature_db::{MetaGetter, RawMeta, RawTask, MetaCacheGetter};
+use nature_db::{MetaCacheGetter, MetaGetter, RawMeta, RawTask};
 
 use crate::task::TaskForConvert;
 
@@ -57,15 +57,20 @@ impl Converted {
                 if task.target.use_upstream_id {
                     ins.id = task.from.id;
                 }
-                // TODO add and remove state
                 match &task.last_status {
                     None => {
-                        ins.state_version = 1
+                        ins.state_version = 1;
                     }
                     Some(x) => {
-                        ins.state_version = x.state_version + 1
+                        ins.state_version = x.state_version + 1;
+                        ins.states = x.states.clone();
                     }
                 };
+                if let Some(lsd) = &task.target.last_status_demand {
+                    if let Some(ts) = &lsd.target_states {
+                        ins.modify_state(ts.clone());
+                    }
+                }
                 ins.data.meta = to.clone();
                 rtn.push(ins);
             }
@@ -91,7 +96,7 @@ impl Converted {
 mod test {
     use chrono::Local;
 
-    use nature_common::{State, Meta};
+    use nature_common::{Meta, State};
     use nature_db::{MetaDaoImpl, Mission};
 
     use super::*;
