@@ -13,7 +13,6 @@ pub struct TaskForStore {
     pub mission: Option<Vec<Mission>>,
 }
 
-
 impl TaskForStore {
     pub fn gen_task(instance: &Instance, step_cache_getter: RelationCacheGetter, relation_getter: RelationGetter, meta_cache: MetaCacheGetter, meta: MetaGetter, mission_filter: MissionFilter) -> Result<Self> {
         let steps = match step_cache_getter(&instance.meta, relation_getter, meta_cache, meta)? {

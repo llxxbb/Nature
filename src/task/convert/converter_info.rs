@@ -62,7 +62,7 @@ impl TaskForConvert {
             }
         } else { None };
         if let Some(ref last) = last_target {
-            if let Some(demand) = &mapping.last_status_demand {
+            if let Some(demand) = &mapping.last_states_demand {
                 demand.check(&last.states)?;
             }
         };

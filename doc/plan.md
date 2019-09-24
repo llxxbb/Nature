@@ -5,7 +5,6 @@
 ## Underway
     
     `Meta`'s get method is queer, remove it
-    rename status to state in struct LastStatusDemand 
        
     generate order
     
