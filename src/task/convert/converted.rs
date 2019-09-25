@@ -1,7 +1,5 @@
-use std::convert::TryInto;
-
 use nature_common::{Instance, MetaType, NatureError, Result};
-use nature_db::{MetaCacheGetter, MetaGetter, RawMeta, RawTask};
+use nature_db::{MetaCacheGetter, MetaGetter, RawTask};
 
 use crate::task::TaskForConvert;
 
@@ -43,12 +41,8 @@ impl Converted {
         // only one status instance should return
         let mut to = task.target.to.clone();
         match to.get_meta_type() {
-            MetaType::Dynamic => RawMeta::from(to.clone()),
-            _ => {
-                let m = meta_cache_getter(&to, meta_getter)?;
-                to = m.clone().try_into()?;
-                m
-            }
+            MetaType::Dynamic => (),
+            _ => meta_cache_getter(&mut to, meta_getter)?
         };
         if task.target.use_upstream_id && instances.len() > 1 {
             return Err(NatureError::ConverterLogicalError("[use_upstream_id] must return less 2 instances!".to_string()));
@@ -136,25 +130,16 @@ mod test {
         let ins = vec![ins];
 
         // for normal
-        let result = Converted::gen(&task, &raw, ins.clone(), mate_to_raw, MetaDaoImpl::get).unwrap();
+        let result = Converted::gen(&task, &raw, ins.clone(), mate_cache, MetaDaoImpl::get).unwrap();
         assert_eq!(result.converted[0].id, 567);
 
         // for state
         task.target.to.state = Some(vec![State::Normal("hello".to_string())]);
-        let result = Converted::gen(&task, &raw, ins, mate_to_raw, MetaDaoImpl::get).unwrap();
+        let result = Converted::gen(&task, &raw, ins, mate_cache, MetaDaoImpl::get).unwrap();
         assert_eq!(result.converted[0].id, 567);
     }
 
-    fn mate_to_raw(_: &Meta, _: MetaGetter) -> Result<RawMeta> {
-        Ok(RawMeta {
-            full_key: "".to_string(),
-            description: None,
-            version: 0,
-            states: Some("a,b,c".to_string()),
-            fields: None,
-            config: "".to_string(),
-            flag: 0,
-            create_time: Local::now().naive_local(),
-        })
+    fn mate_cache(_: &mut Meta, _: MetaGetter) -> Result<()> {
+        Ok(())
     }
 }

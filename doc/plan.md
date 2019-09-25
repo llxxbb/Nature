@@ -4,7 +4,7 @@
 
 ## Underway
 
-    MetaCacheGetter return `Meta` 
+    change MetaCacheImpl's key to string type
     inplement From<Meta> and TryInto<Meta> for RawMeta.
     status field is empty but the meta is status.
     

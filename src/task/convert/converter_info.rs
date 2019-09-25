@@ -1,8 +1,7 @@
-use std::convert::TryInto;
 use std::str::FromStr;
 
-use nature_common::{Instance, Meta, MetaType, NatureError, ParaForQueryByID, Result};
-use nature_db::{MetaCacheGetter, MetaGetter, Mission, RawMeta, RawTask, TaskType};
+use nature_common::{Instance, MetaType, NatureError, ParaForQueryByID, Result};
+use nature_db::{MetaCacheGetter, MetaGetter, Mission, RawTask, TaskType};
 
 use crate::system::CONTEXT_TARGET_INSTANCE_ID;
 use crate::task::TaskForStore;
@@ -45,17 +44,17 @@ impl TaskForConvert {
     fn new_one_task<FIG>(instance: &Instance, mapping: &Mission, meta_cache_getter: MetaCacheGetter, meta_getter: MetaGetter, instance_getter: &FIG) -> Result<TaskForConvert>
         where FIG: Fn(&ParaForQueryByID) -> Result<Option<Instance>>
     {
-        let define = match mapping.to.get_meta_type() {
-            MetaType::Dynamic => RawMeta::default(),
-            _ => meta_cache_getter(&mapping.to, meta_getter)?
+        let mut to = mapping.to.clone();
+        match to.get_meta_type() {
+            MetaType::Dynamic => (),
+            _ => meta_cache_getter(&mut to, meta_getter)?
         };
-        let to: Meta = define.try_into()?;
         let last_target = if to.is_state {
             match instance.context.get(&*CONTEXT_TARGET_INSTANCE_ID) {
                 // context have target id
                 Some(state_id) => {
                     let state_id = u128::from_str(state_id)?;
-                    match instance_getter(&ParaForQueryByID { id: state_id, meta: mapping.to.get_full_key() }) {
+                    match instance_getter(&ParaForQueryByID { id: state_id, meta: to.get_full_key() }) {
                         Ok(ins) => ins,
                         Err(_) => return Err(NatureError::Break)
                     }
