@@ -1,3 +1,5 @@
+use std::convert::TryInto;
+
 use nature_common::{Instance, MetaType, NatureError, Result};
 use nature_db::{MetaCacheGetter, MetaGetter, RawMeta, RawTask};
 
@@ -39,15 +41,19 @@ impl Converted {
     fn verify(task: &TaskForConvert, instances: &[Instance], meta_cache_getter: MetaCacheGetter, meta_getter: MetaGetter) -> Result<Vec<Instance>> {
         let mut rtn: Vec<Instance> = Vec::new();
         // only one status instance should return
-        let to = task.target.to.clone();
-        let define = match to.get_meta_type() {
-            MetaType::Dynamic => RawMeta::default(),
-            _ => meta_cache_getter(&to, meta_getter)?
+        let mut to = task.target.to.clone();
+        match to.get_meta_type() {
+            MetaType::Dynamic => RawMeta::from(to.clone()),
+            _ => {
+                let m = meta_cache_getter(&to, meta_getter)?;
+                to = m.clone().try_into()?;
+                m
+            }
         };
         if task.target.use_upstream_id && instances.len() > 1 {
             return Err(NatureError::ConverterLogicalError("[use_upstream_id] must return less 2 instances!".to_string()));
         }
-        if define.has_states() {
+        if to.is_state {
             if instances.len() > 1 {
                 return Err(NatureError::ConverterLogicalError("[status meta] must return less 2 instances!".to_string()));
             }

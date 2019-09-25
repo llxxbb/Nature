@@ -3,19 +3,14 @@
 ## finished but did not submit
 
 ## Underway
+
+    MetaCacheGetter return `Meta` 
+    inplement From<Meta> and TryInto<Meta> for RawMeta.
+    status field is empty but the meta is status.
     
-    `Meta`'s get method is queer, remove it
-       
     generate order
-    
-    meta support state
-    instance support state
-    status:
-        can include sub status
-        satus can mutex each other
         
 ## meta
-    status field is empty but the meta is status.
 
 `instance` parametrization (pending)
     可以用于条件查询，如 订单-> 用户订单 关系中，订单不能按用户维度检索订单，

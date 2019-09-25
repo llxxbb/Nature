@@ -1,6 +1,7 @@
+use std::convert::TryInto;
 use std::str::FromStr;
 
-use nature_common::{Instance, MetaType, NatureError, ParaForQueryByID, Result};
+use nature_common::{Instance, Meta, MetaType, NatureError, ParaForQueryByID, Result};
 use nature_db::{MetaCacheGetter, MetaGetter, Mission, RawMeta, RawTask, TaskType};
 
 use crate::system::CONTEXT_TARGET_INSTANCE_ID;
@@ -48,7 +49,8 @@ impl TaskForConvert {
             MetaType::Dynamic => RawMeta::default(),
             _ => meta_cache_getter(&mapping.to, meta_getter)?
         };
-        let last_target = if define.has_states() {
+        let to: Meta = define.try_into()?;
+        let last_target = if to.is_state {
             match instance.context.get(&*CONTEXT_TARGET_INSTANCE_ID) {
                 // context have target id
                 Some(state_id) => {
