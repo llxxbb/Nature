@@ -3,10 +3,9 @@
 ## finished but did not submit
 
 ## Underway
-
-    inplement From<Meta> and TryInto<Meta> for RawMeta.
-    status field is empty but the meta is status.
     
+    #Splite Meta to Meta and SimpleMeta
+
     generate order
         
 ## meta
