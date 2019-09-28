@@ -3,8 +3,6 @@
 ## finished but did not submit
 
 ## Underway
-    
-    #Splite Meta to Meta and SimpleMeta
 
     generate order
         

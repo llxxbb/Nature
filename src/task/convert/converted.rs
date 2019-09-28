@@ -1,5 +1,5 @@
 use nature_common::{Instance, MetaType, NatureError, Result};
-use nature_db::{MetaCacheGetter, MetaGetter, RawTask};
+use nature_db::RawTask;
 
 use crate::task::TaskForConvert;
 
@@ -9,7 +9,7 @@ pub struct Converted {
 }
 
 impl Converted {
-    pub fn gen(task: &TaskForConvert, carrier: &RawTask, instances: Vec<Instance>, meta_cache_getter: MetaCacheGetter, meta_getter: MetaGetter) -> Result<Converted> {
+    pub fn gen(task: &TaskForConvert, carrier: &RawTask, instances: Vec<Instance>) -> Result<Converted> {
         // check `MetaType` for Null
         if task.target.to.get_meta_type() == MetaType::Null {
             let rtn = Converted {
@@ -23,12 +23,12 @@ impl Converted {
         // fix id and modify the meta
         for one in instances {
             let mut n = one.clone();
-            n.data.meta = task.target.to.clone();
+            n.data.meta = task.target.to.get_string();
             let _ = n.fix_id();
             fixxed_ins.push(n)
         }
         // verify
-        let instances = Self::verify(&task, &fixxed_ins, meta_cache_getter, meta_getter)?;
+        let instances = Self::verify(&task, &fixxed_ins)?;
         let rtn = Converted {
             done_task: carrier.to_owned(),
             converted: instances,
@@ -36,14 +36,10 @@ impl Converted {
         Ok(rtn)
     }
 
-    fn verify(task: &TaskForConvert, instances: &[Instance], meta_cache_getter: MetaCacheGetter, meta_getter: MetaGetter) -> Result<Vec<Instance>> {
+    fn verify(task: &TaskForConvert, instances: &[Instance]) -> Result<Vec<Instance>> {
         let mut rtn: Vec<Instance> = Vec::new();
         // only one status instance should return
-        let mut to = task.target.to.clone();
-        match to.get_meta_type() {
-            MetaType::Dynamic => (),
-            _ => meta_cache_getter(&mut to, meta_getter)?
-        };
+        let to = task.target.to.clone();
         if task.target.use_upstream_id && instances.len() > 1 {
             return Err(NatureError::ConverterLogicalError("[use_upstream_id] must return less 2 instances!".to_string()));
         }
@@ -71,7 +67,7 @@ impl Converted {
                         ins.modify_state(ts.clone());
                     }
                 }
-                ins.data.meta = to.clone();
+                ins.data.meta = to.get_string();
                 rtn.push(ins);
             }
             return Ok(rtn);
@@ -83,7 +79,7 @@ impl Converted {
             if task.target.use_upstream_id {
                 instance.id = task.from.id;
             }
-            instance.data.meta = to.clone();
+            instance.data.meta = to.get_string();
             let _ = instance.fix_id();
             rtn.push(instance);
         }
@@ -97,7 +93,7 @@ mod test {
     use chrono::Local;
 
     use nature_common::{Meta, State};
-    use nature_db::{MetaDaoImpl, Mission};
+    use nature_db::Mission;
 
     use super::*;
 
@@ -105,7 +101,7 @@ mod test {
     fn use_upstream_id() {
         let mut from_ins = Instance::default();
         from_ins.id = 567;
-        let meta = Meta::new("to").unwrap();
+        let meta = Meta::new("to", 1, MetaType::Business).unwrap();
         let mut task = TaskForConvert {
             from: from_ins,
             target: Mission {
@@ -130,16 +126,12 @@ mod test {
         let ins = vec![ins];
 
         // for normal
-        let result = Converted::gen(&task, &raw, ins.clone(), mate_cache, MetaDaoImpl::get).unwrap();
+        let result = Converted::gen(&task, &raw, ins.clone()).unwrap();
         assert_eq!(result.converted[0].id, 567);
 
         // for state
         task.target.to.state = Some(vec![State::Normal("hello".to_string())]);
-        let result = Converted::gen(&task, &raw, ins, mate_cache, MetaDaoImpl::get).unwrap();
+        let result = Converted::gen(&task, &raw, ins).unwrap();
         assert_eq!(result.converted[0].id, 567);
-    }
-
-    fn mate_cache(_: &mut Meta, _: MetaGetter) -> Result<()> {
-        Ok(())
     }
 }

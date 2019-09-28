@@ -1,7 +1,7 @@
 use std::str::FromStr;
 
-use nature_common::{Instance, MetaType, NatureError, ParaForQueryByID, Result};
-use nature_db::{MetaCacheGetter, MetaGetter, Mission, RawTask, TaskType};
+use nature_common::{Instance, NatureError, ParaForQueryByID, Result};
+use nature_db::{Mission, RawTask, TaskType};
 
 use crate::system::CONTEXT_TARGET_INSTANCE_ID;
 use crate::task::TaskForStore;
@@ -24,13 +24,13 @@ impl Default for TaskForConvert {
 }
 
 impl TaskForConvert {
-    pub fn gen_task<FIG>(task: &TaskForStore, meta_cache_getter: MetaCacheGetter, meta_getter: MetaGetter, instance_getter: FIG) -> Result<Vec<(TaskForConvert, RawTask)>>
+    pub fn gen_task<FIG>(task: &TaskForStore, instance_getter: FIG) -> Result<Vec<(TaskForConvert, RawTask)>>
         where FIG: Fn(&ParaForQueryByID) -> Result<Option<Instance>>
     {
         let mut new_carriers: Vec<(TaskForConvert, RawTask)> = Vec::new();
         let missions = task.mission.clone().unwrap();
         for c in missions {
-            match Self::new_one_task(&task.instance, &c, meta_cache_getter, meta_getter, &instance_getter) {
+            match Self::new_one_task(&task.instance, &c, &instance_getter) {
                 Err(err) => return Err(err),
                 Ok(x) => {
                     let car = RawTask::new(&x, &c.to.get_full_key(), TaskType::Convert as i16)?;
@@ -41,20 +41,15 @@ impl TaskForConvert {
         Ok(new_carriers)
     }
 
-    fn new_one_task<FIG>(instance: &Instance, mapping: &Mission, meta_cache_getter: MetaCacheGetter, meta_getter: MetaGetter, instance_getter: &FIG) -> Result<TaskForConvert>
+    fn new_one_task<FIG>(instance: &Instance, mapping: &Mission, instance_getter: &FIG) -> Result<TaskForConvert>
         where FIG: Fn(&ParaForQueryByID) -> Result<Option<Instance>>
     {
-        let mut to = mapping.to.clone();
-        match to.get_meta_type() {
-            MetaType::Dynamic => (),
-            _ => meta_cache_getter(&mut to, meta_getter)?
-        };
-        let last_target = if to.is_state {
+        let last_target = if mapping.to.is_state {
             match instance.context.get(&*CONTEXT_TARGET_INSTANCE_ID) {
                 // context have target id
                 Some(state_id) => {
                     let state_id = u128::from_str(state_id)?;
-                    match instance_getter(&ParaForQueryByID { id: state_id, meta: to.get_full_key() }) {
+                    match instance_getter(&ParaForQueryByID { id: state_id, meta: mapping.to.get_full_key() }) {
                         Ok(ins) => ins,
                         Err(_) => return Err(NatureError::Break)
                     }

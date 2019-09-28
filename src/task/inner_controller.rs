@@ -20,7 +20,7 @@ impl InnerController {
                 Ok(())
             }
             Err(NatureError::DaoDuplicated(err)) => {
-                warn!("Instance duplicated for id : {}, of `Meta` : {:?}, will delete it's task!", task.instance.id, &task.instance.meta.get_full_key());
+                warn!("Instance duplicated for id : {}, of `Meta` : {}, will delete it's task!", task.instance.id, &task.instance.meta);
                 // Don't worry about the previous task would deleted while in processing!
                 // the task will be duplicated too or an new one for same instance.
                 let _ = TaskDaoImpl::delete(&&carrier.task_id);
@@ -35,7 +35,7 @@ impl InnerController {
             let _ = TaskDaoImpl::delete(&&raw.task_id);
             return;
         }
-        match TaskForConvert::gen_task(&task, MetaCacheImpl::get, MetaDaoImpl::get, InstanceDaoImpl::get_by_id) {
+        match TaskForConvert::gen_task(&task, InstanceDaoImpl::get_by_id) {
             Ok(converters) => {
                 let raws: Vec<RawTask> = converters.iter().map(|x| x.1.clone()).collect();
                 if RawTask::save_batch(&raws, &raw.task_id, TaskDaoImpl::insert, TaskDaoImpl::delete).is_err() {
@@ -80,7 +80,7 @@ impl InnerController {
 
     pub fn received_instance(task: &TaskForConvert, raw: &RawTask, instances: Vec<Instance>) -> Result<()> {
         debug!("converted {} instances for `Meta`: {:?}", instances.len(), &task.target.to.get_full_key());
-        match Converted::gen(&task, &raw, instances, MetaCacheImpl::get, MetaDaoImpl::get) {
+        match Converted::gen(&task, &raw, instances) {
             Ok(rtn) => {
                 let plan = PlanInfo::save(&task, &rtn.converted, StorePlanDaoImpl::save, StorePlanDaoImpl::get)?;
                 Ok(prepare_to_store(&rtn.done_task, plan))
@@ -99,7 +99,7 @@ impl InnerController {
             match si.to_virtual_instance(finish) {
                 Ok(instance) => {
                     if let Ok(si) = TaskForStore::gen_task(&instance, OneStepFlowCacheImpl::get, OneStepFlowDaoImpl::get_relations, MetaCacheImpl::get, MetaDaoImpl::get, Mission::filter_relations) {
-                        match RawTask::new(&si, &instance.meta.get_full_key(), TaskType::QueueBatch as i16) {
+                        match RawTask::new(&si, &instance.meta, TaskType::QueueBatch as i16) {
                             Ok(mut new) => {
                                 if let Ok(_route) = new.finish_old(&carrier, TaskDaoImpl::insert, TaskDaoImpl::delete) {
                                     let _ = ACT_STORED.try_send(MsgForTask(si, new));
@@ -124,7 +124,7 @@ impl InnerController {
         for instance in task.0.instances.iter() {
             match TaskForStore::gen_task(&instance, OneStepFlowCacheImpl::get, OneStepFlowDaoImpl::get_relations, MetaCacheImpl::get, MetaDaoImpl::get, Mission::filter_relations) {
                 Ok(task) => {
-                    match RawTask::new(&task, &instance.meta.get_full_key(), TaskType::Store as i16) {
+                    match RawTask::new(&task, &instance.meta, TaskType::Store as i16) {
                         Ok(raw) => {
                             match TaskDaoImpl::insert(&raw) {
                                 Ok(_) => {
@@ -170,7 +170,7 @@ fn prepare_to_store(carrier: &RawTask, plan: PlanInfo) {
     for instance in plan.plan.iter() {
         match TaskForStore::gen_task(&instance, OneStepFlowCacheImpl::get, OneStepFlowDaoImpl::get_relations, MetaCacheImpl::get, MetaDaoImpl::get, Mission::filter_relations) {
             Ok(task) => {
-                match RawTask::new(&task, &plan.to.get_full_key(), TaskType::Store as i16) {
+                match RawTask::new(&task, &plan.to, TaskType::Store as i16) {
                     Ok(x) => {
                         store_infos.push(x.clone());
                         t_d.push((task, x))

@@ -23,7 +23,7 @@ impl SerialFinished {
         Ok(Instance {
             id: 0,
             data: InstanceNoID {
-                meta: Meta::new_with_type(&SYS_KEY_SERIAL, MetaType::System)?,
+                meta: format!("{}{}:1", MetaType::System.get_prefix(), SYS_KEY_SERIAL.clone()),
                 event_time: time,
                 execute_time: time,
                 create_time: time,
@@ -47,8 +47,7 @@ impl TaskForSerialWrapper {
         let mut errors: Vec<String> = Vec::new();
         let mut succeeded_id: Vec<u128> = Vec::new();
         for mut instance in serial.instances {
-            instance.change_meta_type(MetaType::Business);
-            instance.data.meta = serial.meta.clone();
+            instance.data.meta = serial.meta.get_string();
             if let Err(err) = instance.check_and_fix_id(meta_cache_getter, meta_getter) {
                 errors.push(format!("{:?}", err));
                 continue;

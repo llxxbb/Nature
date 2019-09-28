@@ -11,10 +11,10 @@ pub struct IncomeController {}
 impl IncomeController {
     /// born an instance which is the beginning of the changes.
     pub fn input(mut instance: Instance) -> Result<u128> {
-        instance.change_meta_type(MetaType::Business);
+        MetaType::check_type(&instance.meta, MetaType::Business)?;
         let _ = instance.check_and_fix_id(MetaCacheImpl::get, MetaDaoImpl::get)?;
         let task = TaskForStore::gen_task(&instance, OneStepFlowCacheImpl::get, OneStepFlowDaoImpl::get_relations, MetaCacheImpl::get, MetaDaoImpl::get, Mission::filter_relations)?;
-        let raw = RawTask::new(&task, &instance.meta.get_full_key(), TaskType::Store as i16)?;
+        let raw = RawTask::new(&task, &instance.meta, TaskType::Store as i16)?;
         TaskDaoImpl::insert(&raw)?;
         InnerController::save_instance(task, raw)?;
         Ok(instance.id)
@@ -25,10 +25,10 @@ impl IncomeController {
         let _ = instance.verify()?;
         // Convert a Self-Route-Instance to Normal Instance
         let mut ins = instance.to_instance();
-        ins.change_meta_type(MetaType::Dynamic);
+        MetaType::check_type(&ins.meta, MetaType::Dynamic)?;
         let uuid = ins.fix_id()?.id;
         let task = TaskForStore::for_dynamic(&ins, instance.converter)?;
-        let raw = RawTask::new(&task, &ins.meta.get_full_key(), TaskType::Store as i16)?;
+        let raw = RawTask::new(&task, &ins.meta, TaskType::Store as i16)?;
         let _ = TaskDaoImpl::insert(&raw)?;
         InnerController::save_instance(task, raw)?;
         Ok(uuid)

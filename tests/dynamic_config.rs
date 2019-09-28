@@ -51,7 +51,7 @@ fn target_is_null() {
     assert_eq!(rtn, 49643220399713451557679845528054125035);
     // check input
     let written = InstanceDaoImpl::get_by_id(&ParaForQueryByID { id: 49643220399713451557679845528054125035, meta: "/D/dynamic/target/is/null:1".to_string() }).unwrap().unwrap();
-    assert_eq!("/D/dynamic/target/is/null", written.data.meta.get_full_key());
+    assert_eq!("/D/dynamic/target/is/null:1", written.data.meta);
 }
 
 
@@ -75,7 +75,7 @@ fn write_one_target_to_db() {
     // query target
     sleep(3000);
     let ins_db = InstanceDaoImpl::get_by_id(&ParaForQueryByID { id: 181722669403695488419718147584639762211, meta: "/D/dynamic/one_target:1".to_string() }).unwrap().unwrap();
-    assert_eq!("/D/dynamic/one_target", ins_db.meta.get_full_key());
+    assert_eq!("/D/dynamic/one_target:1", ins_db.meta);
 }
 
 #[test]
@@ -105,9 +105,9 @@ fn write_two_target_to_db() {
     // query target
     sleep(2500);
     let ins_db = InstanceDaoImpl::get_by_id(&ParaForQueryByID { id: 55616048154417122855568645913854815816, meta: "/D/dynamic/two_of_1:1".to_string() }).unwrap().unwrap();
-    assert_eq!("/D/dynamic/two_of_1", ins_db.meta.get_full_key());
+    assert_eq!("/D/dynamic/two_of_1:1", ins_db.meta);
     let ins_db = InstanceDaoImpl::get_by_id(&ParaForQueryByID { id: 111584038074855073593792440340378505974, meta: "/D/dynamic/two_of_2:1".to_string() }).unwrap().unwrap();
-    assert_eq!("/D/dynamic/two_of_2", ins_db.meta.get_full_key());
+    assert_eq!("/D/dynamic/two_of_2:1", ins_db.meta);
 }
 
 
