@@ -4,6 +4,9 @@
 
 ## Underway
 
+    IncomeController#input meta type check can moved to other place.
+    
+    NatureError#Break is not handled
       
     generate task and check task before save plan will be efficiency.
     
@@ -12,6 +15,9 @@
     TaskForStore upstream property is weird
   
     generate order
+    
+    remove TaskForParallel' meta field
+    parallel instances must have the same meta
 
     give a graph at concepts.md for the flow that how to generate instances.
     

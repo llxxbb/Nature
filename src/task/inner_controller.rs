@@ -1,7 +1,7 @@
 use serde::export::From;
 
 use nature_common::{ConverterReturned, Instance, NatureError, Result, SelfRouteInstance, TaskForParallel, TaskForSerial};
-use nature_db::{InstanceDaoImpl, MetaCacheImpl, MetaDaoImpl, Mission, OneStepFlowCacheImpl, RawTask, RelationDaoImpl, StorePlanDaoImpl, TaskDaoImpl, TaskType};
+use nature_db::{InstanceDaoImpl, MetaCacheImpl, MetaDaoImpl, Mission, RawTask, RelationCacheImpl, RelationDaoImpl, StorePlanDaoImpl, TaskDaoImpl, TaskType};
 
 use crate::actor::*;
 use crate::task::{CallOutParaWrapper, Converted, PlanInfo, TaskForConvert, TaskForSerialWrapper, TaskForStore};
@@ -56,7 +56,7 @@ impl InnerController {
         match CallOutParaWrapper::gen_and_call_out(&task, raw.task_id.clone(), &task.target) {
             Err(err) => match err {
                 // only **Environment Error** will be retry
-                NatureError::ConverterEnvironmentError(_) => (),
+                NatureError::EnvironmentError(_) => (),
                 // other error will drop into error
                 _ => {
                     let _ = TaskDaoImpl::raw_to_error(&err, &raw);
@@ -90,7 +90,7 @@ impl InnerController {
         match Converted::gen(&task, &raw, instances) {
             Ok(rtn) => {
                 let plan = PlanInfo::save(&task, &rtn.converted, StorePlanDaoImpl::save, StorePlanDaoImpl::get)?;
-                Ok(prepare_to_store(&rtn.done_task, plan))
+                prepare_to_store(&rtn.done_task, plan)
             }
             Err(err) => {
                 let _ = TaskDaoImpl::raw_to_error(&err, &raw);
@@ -99,58 +99,42 @@ impl InnerController {
         }
     }
 
-    pub fn received_self_route(task: &TaskForConvert, raw: &RawTask, instances: Vec<SelfRouteInstance>) -> Result<()> {
+    pub fn received_self_route(_task: &TaskForConvert, _raw: &RawTask, _instances: Vec<SelfRouteInstance>) -> Result<()> {
+        // TODO
         unimplemented!()
     }
 
     pub fn channel_serial(task: MsgForTask<TaskForSerial>) {
-        let (task, carrier) = (task.0, task.1);
-        let finish = &task.context_for_finish.clone();
-        if let Ok(si) = TaskForSerialWrapper::save(task, MetaCacheImpl::get, MetaDaoImpl::get, InstanceDaoImpl::insert) {
-            match si.to_virtual_instance(finish) {
-                Ok(instance) => {
-                    if let Ok(si) = TaskForStore::gen_task(&instance, OneStepFlowCacheImpl::get, RelationDaoImpl::get_relations, MetaCacheImpl::get, MetaDaoImpl::get, Mission::filter_relations) {
-                        match RawTask::new(&si, &instance.meta, TaskType::QueueBatch as i16) {
-                            Ok(mut new) => {
-                                if let Ok(_route) = new.finish_old(&carrier, TaskDaoImpl::insert, TaskDaoImpl::delete) {
-                                    let _ = ACT_STORED.try_send(MsgForTask(si, new));
-                                }
-                            }
-                            Err(err) => {
-                                let _ = TaskDaoImpl::raw_to_error(&err, &carrier);
-                            }
-                        }
-                    }
-                }
-                Err(err) => {
-                    let _ = TaskDaoImpl::raw_to_error(&err, &carrier);
-                }
-            };
+        if let Err(e) = inner_serial(&task) {
+            let _ = TaskDaoImpl::raw_to_error(&e, &task.1);
         }
     }
+
 
     pub fn channel_parallel(task: MsgForTask<TaskForParallel>) {
         let mut tuple: Vec<(TaskForStore, RawTask)> = Vec::new();
         let mut err: Option<NatureError> = None;
         for instance in task.0.instances.iter() {
-            match TaskForStore::gen_task(&instance, OneStepFlowCacheImpl::get, RelationDaoImpl::get_relations, MetaCacheImpl::get, MetaDaoImpl::get, Mission::filter_relations) {
-                Ok(task) => {
-                    match RawTask::new(&task, &instance.meta, TaskType::Store as i16) {
-                        Ok(raw) => {
-                            match TaskDaoImpl::insert(&raw) {
-                                Ok(_) => {
-                                    tuple.push((task, raw))
-                                }
-                                Err(e) => {
-                                    err = Some(e);
-                                    break;
-                                }
+            match RelationCacheImpl::get(&instance.meta, RelationDaoImpl::get_relations, MetaCacheImpl::get, MetaDaoImpl::get) {
+                Ok(relations) => match TaskForStore::gen_task(&instance, &relations, Mission::filter_relations) {
+                    Ok(task) => match RawTask::new(&task, &instance.meta, TaskType::Store as i16) {
+                        Ok(raw) => match TaskDaoImpl::insert(&raw) {
+                            Ok(_) => {
+                                tuple.push((task, raw))
+                            }
+                            Err(e) => {
+                                err = Some(e);
+                                break;
                             }
                         }
                         Err(e) => {
                             err = Some(e);
                             break;
                         }
+                    }
+                    Err(e) => {
+                        err = Some(e);
+                        break;
                     }
                 }
                 Err(e) => {
@@ -166,8 +150,8 @@ impl InnerController {
                 }
                 let _ = TaskDaoImpl::delete(&task.1.task_id);
             }
-            Some(NatureError::DaoLogicalError(s)) => {
-                let _ = TaskDaoImpl::raw_to_error(&NatureError::DaoLogicalError(s), &task.1);
+            Some(NatureError::SystemError(s)) => {
+                let _ = TaskDaoImpl::raw_to_error(&NatureError::SystemError(s), &task.1);
             }
             Some(_) => ()
         }
@@ -175,28 +159,21 @@ impl InnerController {
 }
 
 
-fn prepare_to_store(carrier: &RawTask, plan: PlanInfo) {
+fn prepare_to_store(carrier: &RawTask, plan: PlanInfo) -> Result<()> {
     let mut store_infos: Vec<RawTask> = Vec::new();
     let mut t_d: Vec<(TaskForStore, RawTask)> = Vec::new();
+    let relations = RelationCacheImpl::get(&carrier.meta, RelationDaoImpl::get_relations, MetaCacheImpl::get, MetaDaoImpl::get)?;
     for instance in plan.plan.iter() {
-        match TaskForStore::gen_task(&instance, OneStepFlowCacheImpl::get, RelationDaoImpl::get_relations, MetaCacheImpl::get, MetaDaoImpl::get, Mission::filter_relations) {
-            Ok(task) => {
-                match RawTask::new(&task, &plan.to, TaskType::Store as i16) {
-                    Ok(x) => {
-                        store_infos.push(x.clone());
-                        t_d.push((task, x))
-                    }
-                    Err(e) => {
-                        error!("{}", e);
-                        let _ = TaskDaoImpl::raw_to_error(&e, carrier);
-                        return;
-                    }
-                }
+        let task = TaskForStore::gen_task(&instance, &relations, Mission::filter_relations)?;
+        match RawTask::new(&task, &plan.to, TaskType::Store as i16) {
+            Ok(x) => {
+                store_infos.push(x.clone());
+                t_d.push((task, x))
             }
-            // break process when environment error occurs.
             Err(e) => {
-                warn!("{}", e);
-                return;
+                error!("{}", e);
+                let _ = TaskDaoImpl::raw_to_error(&e, carrier);
+                return Ok(());
             }
         }
     }
@@ -205,4 +182,19 @@ fn prepare_to_store(carrier: &RawTask, plan: PlanInfo) {
             ACT_STORE.do_send(MsgForTask(task.0, task.1));
         }
     }
+    Ok(())
+}
+
+fn inner_serial(task: &MsgForTask<TaskForSerial>) -> Result<()> {
+    let (task, carrier) = (&task.0, &task.1);
+    let finish = &task.context_for_finish.clone();
+    let sf = TaskForSerialWrapper::save(task, MetaCacheImpl::get, MetaDaoImpl::get, InstanceDaoImpl::insert)?;
+    let ins = sf.to_virtual_instance(finish)?;
+    let relations = RelationCacheImpl::get(&ins.meta, RelationDaoImpl::get_relations, MetaCacheImpl::get, MetaDaoImpl::get)?;
+    let store_task = TaskForStore::gen_task(&ins, &relations, Mission::filter_relations)?;
+    let mut raw = RawTask::new(&store_task, &ins.meta, TaskType::QueueBatch as i16)?;
+    if let Ok(_route) = raw.finish_old(&carrier, TaskDaoImpl::insert, TaskDaoImpl::delete) {
+        let _ = ACT_STORED.try_send(MsgForTask(store_task, raw));
+    }
+    Ok(())
 }

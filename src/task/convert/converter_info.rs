@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-use nature_common::{Instance, NatureError, ParaForQueryByID, Result};
+use nature_common::{Instance, ParaForQueryByID, Result};
 use nature_db::{Mission, RawTask, TaskType};
 
 use crate::system::CONTEXT_TARGET_INSTANCE_ID;
@@ -30,41 +30,34 @@ impl TaskForConvert {
         let mut new_carriers: Vec<(TaskForConvert, RawTask)> = Vec::new();
         let missions = task.mission.clone().unwrap();
         for c in missions {
-            match Self::new_one_task(&task.instance, &c, &instance_getter) {
-                Err(err) => return Err(err),
-                Ok(x) => {
-                    let car = RawTask::new(&x, &c.to.get_full_key(), TaskType::Convert as i16)?;
-                    new_carriers.push((x, car));
-                }
-            }
+            let x = Self::new_one_task(&task.instance, &c, &instance_getter)?;
+            let car = RawTask::new(&x, &c.to.get_full_key(), TaskType::Convert as i16)?;
+            new_carriers.push((x, car));
         }
         Ok(new_carriers)
     }
 
-    fn new_one_task<FIG>(instance: &Instance, mapping: &Mission, instance_getter: &FIG) -> Result<TaskForConvert>
+    fn new_one_task<FIG>(instance: &Instance, mission: &Mission, instance_getter: &FIG) -> Result<TaskForConvert>
         where FIG: Fn(&ParaForQueryByID) -> Result<Option<Instance>>
     {
-        let last_target = if mapping.to.is_state {
+        let last_target = if mission.to.is_state {
             match instance.context.get(&*CONTEXT_TARGET_INSTANCE_ID) {
                 // context have target id
                 Some(state_id) => {
                     let state_id = u128::from_str(state_id)?;
-                    match instance_getter(&ParaForQueryByID { id: state_id, meta: mapping.to.get_full_key() }) {
-                        Ok(ins) => ins,
-                        Err(_) => return Err(NatureError::Break)
-                    }
+                    instance_getter(&ParaForQueryByID { id: state_id, meta: mission.to.get_full_key() })?
                 }
                 None => None,
             }
         } else { None };
         if let Some(ref last) = last_target {
-            if let Some(demand) = &mapping.last_states_demand {
+            if let Some(demand) = &mission.last_states_demand {
                 demand.check(&last.states)?;
             }
         };
         let rtn = TaskForConvert {
             from: instance.clone(),
-            target: mapping.clone(),
+            target: mission.clone(),
             last_status: last_target,
         };
         Ok(rtn)

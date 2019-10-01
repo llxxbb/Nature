@@ -80,7 +80,7 @@ impl TryInto<RawPlanInfo> for PlanInfo {
             content: {
                 let json = serde_json::to_string(&self.plan)?;
                 if json.len() > *PLAN_CONTENT_MAX_LENGTH.deref() {
-                    return Err(NatureError::DaoLogicalError("content's length can' be over : ".to_owned() + &PLAN_CONTENT_MAX_LENGTH.to_string()));
+                    return Err(NatureError::SystemError("content's length can' be over : ".to_owned() + &PLAN_CONTENT_MAX_LENGTH.to_string()));
                 }
                 json
             },

@@ -41,12 +41,12 @@ impl SerialFinished {
 pub struct TaskForSerialWrapper;
 
 impl TaskForSerialWrapper {
-    pub fn save<FS>(serial: TaskForSerial, meta_cache_getter: MetaCacheGetter, meta_getter: MetaGetter, saver: FS) -> Result<SerialFinished>
+    pub fn save<FS>(serial: &TaskForSerial, meta_cache_getter: MetaCacheGetter, meta_getter: MetaGetter, saver: FS) -> Result<SerialFinished>
         where FS: Fn(&Instance) -> Result<usize>
     {
         let mut errors: Vec<String> = Vec::new();
         let mut succeeded_id: Vec<u128> = Vec::new();
-        for mut instance in serial.instances {
+        for mut instance in serial.instances.clone() {
             instance.data.meta = serial.meta.get_string();
             if let Err(err) = instance.check_and_fix_id(meta_cache_getter, meta_getter) {
                 errors.push(format!("{:?}", err));
@@ -55,7 +55,7 @@ impl TaskForSerialWrapper {
             match saver(&instance) {
                 Ok(_) => succeeded_id.push(instance.id),
                 Err(err) => match err {
-                    NatureError::DaoEnvironmentError(_) => return Err(err),
+                    NatureError::EnvironmentError(_) => return Err(err),
                     NatureError::DaoDuplicated(_) => succeeded_id.push(instance.id),
                     _ => {
                         errors.push(format!("{:?}", err));

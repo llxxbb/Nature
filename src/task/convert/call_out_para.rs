@@ -27,7 +27,7 @@ impl CallOutParaWrapper {
         match protocol {
             Protocol::Http => Ok(HTTP_CALLER),
             Protocol::LocalRust => Ok(LOCAL_RUST_CALLER),
-            _ => Err(NatureError::ConverterProtocalError(format!("Did not implement for protocal : {:?}", protocol)))
+            _ => Err(NatureError::VerifyError(format!("Did not implement for protocal : {:?}", protocol)))
         }
     }
 }
