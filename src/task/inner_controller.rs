@@ -1,7 +1,7 @@
 use serde::export::From;
 
-use nature_common::{ConverterReturned, Instance, NatureError, Result, TaskForParallel, TaskForSerial};
-use nature_db::{InstanceDaoImpl, MetaCacheImpl, MetaDaoImpl, Mission, OneStepFlowCacheImpl, OneStepFlowDaoImpl, RawTask, StorePlanDaoImpl, TaskDaoImpl, TaskType};
+use nature_common::{ConverterReturned, Instance, NatureError, Result, SelfRouteInstance, TaskForParallel, TaskForSerial};
+use nature_db::{InstanceDaoImpl, MetaCacheImpl, MetaDaoImpl, Mission, OneStepFlowCacheImpl, RawTask, RelationDaoImpl, StorePlanDaoImpl, TaskDaoImpl, TaskType};
 
 use crate::actor::*;
 use crate::task::{CallOutParaWrapper, Converted, PlanInfo, TaskForConvert, TaskForSerialWrapper, TaskForStore};
@@ -66,6 +66,13 @@ impl InnerController {
                 ConverterReturned::Instances(instances) => {
                     let _ = Self::received_instance(&task, &raw, instances);
                 }
+                ConverterReturned::SelfRoute(ins) => {
+                    let _ = Self::received_self_route(&task, &raw, ins);
+                }
+                ConverterReturned::Mixed((ins, sf)) => {
+                    let _ = Self::received_instance(&task, &raw, ins);
+                    let _ = Self::received_self_route(&task, &raw, sf);
+                }
                 ConverterReturned::Delay(delay) => {
                     let _ = TaskDaoImpl::update_execute_time(&raw.task_id, i64::from(delay));
                 }
@@ -92,13 +99,17 @@ impl InnerController {
         }
     }
 
+    pub fn received_self_route(task: &TaskForConvert, raw: &RawTask, instances: Vec<SelfRouteInstance>) -> Result<()> {
+        unimplemented!()
+    }
+
     pub fn channel_serial(task: MsgForTask<TaskForSerial>) {
         let (task, carrier) = (task.0, task.1);
         let finish = &task.context_for_finish.clone();
         if let Ok(si) = TaskForSerialWrapper::save(task, MetaCacheImpl::get, MetaDaoImpl::get, InstanceDaoImpl::insert) {
             match si.to_virtual_instance(finish) {
                 Ok(instance) => {
-                    if let Ok(si) = TaskForStore::gen_task(&instance, OneStepFlowCacheImpl::get, OneStepFlowDaoImpl::get_relations, MetaCacheImpl::get, MetaDaoImpl::get, Mission::filter_relations) {
+                    if let Ok(si) = TaskForStore::gen_task(&instance, OneStepFlowCacheImpl::get, RelationDaoImpl::get_relations, MetaCacheImpl::get, MetaDaoImpl::get, Mission::filter_relations) {
                         match RawTask::new(&si, &instance.meta, TaskType::QueueBatch as i16) {
                             Ok(mut new) => {
                                 if let Ok(_route) = new.finish_old(&carrier, TaskDaoImpl::insert, TaskDaoImpl::delete) {
@@ -122,7 +133,7 @@ impl InnerController {
         let mut tuple: Vec<(TaskForStore, RawTask)> = Vec::new();
         let mut err: Option<NatureError> = None;
         for instance in task.0.instances.iter() {
-            match TaskForStore::gen_task(&instance, OneStepFlowCacheImpl::get, OneStepFlowDaoImpl::get_relations, MetaCacheImpl::get, MetaDaoImpl::get, Mission::filter_relations) {
+            match TaskForStore::gen_task(&instance, OneStepFlowCacheImpl::get, RelationDaoImpl::get_relations, MetaCacheImpl::get, MetaDaoImpl::get, Mission::filter_relations) {
                 Ok(task) => {
                     match RawTask::new(&task, &instance.meta, TaskType::Store as i16) {
                         Ok(raw) => {
@@ -168,7 +179,7 @@ fn prepare_to_store(carrier: &RawTask, plan: PlanInfo) {
     let mut store_infos: Vec<RawTask> = Vec::new();
     let mut t_d: Vec<(TaskForStore, RawTask)> = Vec::new();
     for instance in plan.plan.iter() {
-        match TaskForStore::gen_task(&instance, OneStepFlowCacheImpl::get, OneStepFlowDaoImpl::get_relations, MetaCacheImpl::get, MetaDaoImpl::get, Mission::filter_relations) {
+        match TaskForStore::gen_task(&instance, OneStepFlowCacheImpl::get, RelationDaoImpl::get_relations, MetaCacheImpl::get, MetaDaoImpl::get, Mission::filter_relations) {
             Ok(task) => {
                 match RawTask::new(&task, &plan.to, TaskType::Store as i16) {
                     Ok(x) => {

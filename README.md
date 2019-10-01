@@ -1,8 +1,10 @@
 # Nature
 
-Nature Help you to manage your data from a __High Perspective__.  All your **Business-Meta-Data** can be viewed and be managed globally; and more, all the **relations** between Meta-Data can be choreographed globally also. Just like a globe, all things on it. 
+Nature free data define from program processing. Nature isolate **Business-Goals** from execution clearly, that will make you system adjust quickly , more correctly and easy to maintain. Unlike a `Service`, which bind goals and implements together, commonly, **the service would make data dirty and hardly to maintains**. 
 
-Nature isolate **Business-Goals** from execution clearly, that will make you system adjust quickly and make your team more **effectively**. This is the most important thing to design for this project, unlike a `Service`, which bind goals and implements together. Commonly, it's hard to change when a lots of clients connected to it.
+If you are very understanding of the business but you are not a programmer, by Nature you will be a good leader for the business system.
+
+Nature Help you to manage your data from a __High Perspective__.  All your **Business-Domain** can be viewed and be managed globally; and more, all the **relations** between domain can be choreographed globally also. Just like a terrestrial globe, all things on it. 
 
 Nature is `FaaS`(Function as a Service) platform technically. But I don't like to use this concept, because I don't want to hype a concept or a fan of it, `FaaS` is not the primary goal for this project. Nonetheless `FaaS` is the key point to make Nature working. Nature break meta-relations into pieces(a function) for developer to implement, and then put them together at runtime.
 

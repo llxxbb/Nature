@@ -38,13 +38,13 @@ impl Converted {
 
     fn verify(task: &TaskForConvert, instances: &[Instance]) -> Result<Vec<Instance>> {
         let mut rtn: Vec<Instance> = Vec::new();
-        // only one status instance should return
         let to = task.target.to.clone();
         if task.target.use_upstream_id && instances.len() > 1 {
             return Err(NatureError::ConverterLogicalError("[use_upstream_id] must return less 2 instances!".to_string()));
         }
         if to.is_state {
             if instances.len() > 1 {
+                // only one status instance should return
                 return Err(NatureError::ConverterLogicalError("[status meta] must return less 2 instances!".to_string()));
             }
             // status version must equal old + 1

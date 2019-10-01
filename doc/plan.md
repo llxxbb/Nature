@@ -3,10 +3,20 @@
 ## finished but did not submit
 
 ## Underway
-    
-    change one_step to relation
 
+      
+    generate task and check task before save plan will be efficiency.
+    
+    prepare_to_store only need get meta and generate task once for all instance.
+    
+    TaskForStore upstream property is weird
+  
     generate order
+
+    give a graph at concepts.md for the flow that how to generate instances.
+    
+    doc : trace
+    
         
 ## meta
 

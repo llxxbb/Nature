@@ -1,7 +1,7 @@
 use std::convert::TryFrom;
 
 use nature_common::{Instance, MetaType, NatureError, Result, SelfRouteInstance, TaskForParallel, TaskForSerial};
-use nature_db::{CallbackResult, DelayedInstances, MetaCacheImpl, MetaDaoImpl, Mission, OneStepFlowCacheImpl, OneStepFlowDaoImpl, RawTask, TaskDaoImpl, TaskType};
+use nature_db::{CallbackResult, DelayedInstances, MetaCacheImpl, MetaDaoImpl, Mission, OneStepFlowCacheImpl, RawTask, TaskDaoImpl, TaskType, RelationDaoImpl};
 
 use crate::actor::*;
 use crate::task::{InnerController, TaskForConvert, TaskForStore};
@@ -13,7 +13,7 @@ impl IncomeController {
     pub fn input(mut instance: Instance) -> Result<u128> {
         MetaType::check_type(&instance.meta, MetaType::Business)?;
         let _ = instance.check_and_fix_id(MetaCacheImpl::get, MetaDaoImpl::get)?;
-        let task = TaskForStore::gen_task(&instance, OneStepFlowCacheImpl::get, OneStepFlowDaoImpl::get_relations, MetaCacheImpl::get, MetaDaoImpl::get, Mission::filter_relations)?;
+        let task = TaskForStore::gen_task(&instance, OneStepFlowCacheImpl::get, RelationDaoImpl::get_relations, MetaCacheImpl::get, MetaDaoImpl::get, Mission::filter_relations)?;
         let raw = RawTask::new(&task, &instance.meta, TaskType::Store as i16)?;
         TaskDaoImpl::insert(&raw)?;
         InnerController::save_instance(task, raw)?;
