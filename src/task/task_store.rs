@@ -1,7 +1,7 @@
 use std::sync::mpsc::Sender;
 
 use nature_common::{DynamicConverter, Instance, Result};
-use nature_db::{Mission, MissionFilter, RawTask, Relation};
+use nature_db::{Mission, RawTask};
 
 #[derive(Debug, Serialize, Deserialize, Clone, Default)]
 pub struct TaskForStore {
@@ -10,21 +10,6 @@ pub struct TaskForStore {
 }
 
 impl TaskForStore {
-    pub fn gen_task(instance: &Instance, mission: &Option<Vec<Relation>>, mission_filter: MissionFilter) -> Result<Self> {
-        let steps = match mission {
-            Some(steps) => {
-                mission_filter(&instance, steps)
-            }
-            None => None
-        };
-        Ok(
-            TaskForStore {
-                instance: instance.clone(),
-                mission: steps,
-            }
-        )
-    }
-
     pub fn send(&self, raw: &RawTask, sender: &Sender<(TaskForStore, RawTask)>) {
         let _ = sender.send((self.to_owned(), raw.to_owned()));
     }
