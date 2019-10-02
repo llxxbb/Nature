@@ -1,6 +1,10 @@
-use crate::actor::*;
+use serde::export::From;
 
-use super::*;
+use nature_common::{ConverterReturned, Instance, NatureError, Result, SelfRouteInstance, TaskForSerial};
+use nature_db::{InstanceDaoImpl, MetaCacheImpl, MetaDaoImpl, Mission, RawTask, RelationCacheImpl, RelationDaoImpl, StorePlanDaoImpl, TaskDaoImpl, TaskType};
+
+use crate::actor::*;
+use crate::task::{CallOutParaWrapper, Converted, PlanInfo, TaskForConvert, TaskForSerialWrapper, TaskForStore};
 
 pub struct InnerController {}
 
@@ -10,41 +14,49 @@ impl InnerController {
     }
 
     pub fn save_instance(task: TaskForStore, carrier: RawTask) -> Result<()> {
-        let _ = task.instance.save(InstanceDaoImpl::save)?;
-        ACT_STORED.try_send(MsgForTask(task, carrier))?;
-        Ok(())
+        match InstanceDaoImpl::insert(&task.instance) {
+            Ok(_) => {
+                ACT_STORED.try_send(MsgForTask(task, carrier))?;
+                Ok(())
+            }
+            Err(NatureError::DaoDuplicated(err)) => {
+                warn!("Instance duplicated for id : {}, of `Meta` : {}, will delete it's task!", task.instance.id, &task.instance.meta);
+                // Don't worry about the previous task would deleted while in processing!
+                // the task will be duplicated too or an new one for same instance.
+                let _ = TaskDaoImpl::delete(&&carrier.task_id);
+                Err(NatureError::DaoDuplicated(err))
+            }
+            Err(e) => Err(e)
+        }
     }
 
     pub fn channel_stored(task: TaskForStore, raw: RawTask) {
         if task.mission.is_none() {
-            debug!("no follow data for : {}", &task.instance.thing.get_full_key());
             let _ = TaskDaoImpl::delete(&&raw.task_id);
             return;
         }
-        match TaskForConvert::gen_task(&task, ThingDefineCacheImpl::get, InstanceDaoImpl::get_by_id) {
-            Err(err) => {
-                let _ = TaskDaoImpl::raw_to_error(&err, &raw);
-                return;
-            }
+        match TaskForConvert::gen_task(&task, InstanceDaoImpl::get_by_id) {
             Ok(converters) => {
                 let raws: Vec<RawTask> = converters.iter().map(|x| x.1.clone()).collect();
                 if RawTask::save_batch(&raws, &raw.task_id, TaskDaoImpl::insert, TaskDaoImpl::delete).is_err() {
                     return;
                 }
-                debug!("will dispatch {} convert tasks for `Thing` : {:?}", converters.len(), task.instance.thing.get_full_key());
                 for t in converters {
                     let _ = ACT_CONVERT.try_send(MsgForTask(t.0, t.1));
                 }
+            }
+            Err(err) => {
+                let _ = TaskDaoImpl::raw_to_error(&err, &raw);
+                return;
             }
         }
     }
 
     pub fn channel_convert(task: TaskForConvert, raw: RawTask) {
-        debug!("convert for {:?}", &task.target.to);
         match CallOutParaWrapper::gen_and_call_out(&task, raw.task_id.clone(), &task.target) {
             Err(err) => match err {
                 // only **Environment Error** will be retry
-                NatureError::ConverterEnvironmentError(_) => (),
+                NatureError::EnvironmentError(_) => (),
                 // other error will drop into error
                 _ => {
                     let _ = TaskDaoImpl::raw_to_error(&err, &raw);
@@ -53,6 +65,13 @@ impl InnerController {
             Ok(returned) => match returned {
                 ConverterReturned::Instances(instances) => {
                     let _ = Self::received_instance(&task, &raw, instances);
+                }
+                ConverterReturned::SelfRoute(ins) => {
+                    let _ = Self::received_self_route(&task, &raw, ins);
+                }
+                ConverterReturned::Mixed((ins, sf)) => {
+                    let _ = Self::received_instance(&task, &raw, ins);
+                    let _ = Self::received_self_route(&task, &raw, sf);
                 }
                 ConverterReturned::Delay(delay) => {
                     let _ = TaskDaoImpl::update_execute_time(&raw.task_id, i64::from(delay));
@@ -67,11 +86,11 @@ impl InnerController {
     }
 
     pub fn received_instance(task: &TaskForConvert, raw: &RawTask, instances: Vec<Instance>) -> Result<()> {
-        debug!("converted {} instances for `Thing`: {:?}", instances.len(), &task.target.to);
-        match Converted::gen(&task, &raw, instances, ThingDefineCacheImpl::get) {
+        debug!("converted {} instances for `Meta`: {:?}", instances.len(), &task.target.to.get_full_key());
+        match Converted::gen(&task, &raw, instances) {
             Ok(rtn) => {
                 let plan = PlanInfo::save(&task, &rtn.converted, StorePlanDaoImpl::save, StorePlanDaoImpl::get)?;
-                Ok(prepare_to_store(&rtn.done_task, plan))
+                prepare_to_store(&rtn.done_task, plan)
             }
             Err(err) => {
                 let _ = TaskDaoImpl::raw_to_error(&err, &raw);
@@ -80,83 +99,40 @@ impl InnerController {
         }
     }
 
+    pub fn received_self_route(_task: &TaskForConvert, _raw: &RawTask, _instances: Vec<SelfRouteInstance>) -> Result<()> {
+        // TODO
+        unimplemented!()
+    }
+
     pub fn channel_serial(task: MsgForTask<TaskForSerial>) {
-        let (task, carrier) = (task.0, task.1);
-        let finish = &task.context_for_finish.clone();
-        if let Ok(si) = TaskForSerialWrapper::save(task, &ThingDefineCacheImpl::get, InstanceDaoImpl::insert) {
-            match si.to_virtual_instance(finish) {
-                Ok(instance) => {
-                    if let Ok(si) = TaskForStore::gen_task(&instance, OneStepFlowCacheImpl::get, Mission::filter_relations) {
-                        match RawTask::new(&si, &instance.thing.get_full_key(), TaskType::QueueBatch as i16) {
-                            Ok(mut new) => {
-                                if let Ok(_route) = new.finish_old(&carrier, TaskDaoImpl::insert, TaskDaoImpl::delete) {
-                                    let _ = ACT_STORED.try_send(MsgForTask(si, new));
-                                }
-                            }
-                            Err(err) => {
-                                let _ = TaskDaoImpl::raw_to_error(&err, &carrier);
-                            }
-                        }
-                    }
-                }
-                Err(err) => {
-                    let _ = TaskDaoImpl::raw_to_error(&err, &carrier);
-                }
-            };
+        if let Err(e) = inner_serial(&task) {
+            let _ = TaskDaoImpl::raw_to_error(&e, &task.1);
         }
     }
 
-    pub fn channel_parallel(task: MsgForTask<TaskForParallel>) {
-        let mut tuple: Vec<(TaskForStore, RawTask)> = Vec::new();
-        for instance in task.0.instances.iter() {
-            match TaskForStore::gen_task(&instance, OneStepFlowCacheImpl::get, Mission::filter_relations) {
-                Ok(task) => {
-                    match RawTask::save(&task, &instance.thing.get_full_key(), TaskType::Store as i16, TaskDaoImpl::insert) {
-                        Ok(car) => {
-                            tuple.push((task, car))
-                        }
-                        Err(e) => {
-                            error!("{}", e);
-                            return;
-                        }
-                    }
-                }
-                // any error will break the process
-                _ => return
-            }
-        }
-        if TaskDaoImpl::delete(&task.1.task_id).is_err() {
-            return;
-        }
-        for c in tuple {
-            ACT_STORE.do_send(MsgForTask(c.0, c.1));
+
+    pub fn channel_parallel(task: MsgForTask<Vec<Instance>>) {
+        if let Err(e) = inner_parallel(&task) {
+            let _ = TaskDaoImpl::raw_to_error(&e, &task.1);
         }
     }
 }
 
-
-fn prepare_to_store(carrier: &RawTask, plan: PlanInfo) {
+fn prepare_to_store(carrier: &RawTask, plan: PlanInfo) -> Result<()> {
     let mut store_infos: Vec<RawTask> = Vec::new();
     let mut t_d: Vec<(TaskForStore, RawTask)> = Vec::new();
+    let relations = RelationCacheImpl::get(&carrier.meta, RelationDaoImpl::get_relations, MetaCacheImpl::get, MetaDaoImpl::get)?;
     for instance in plan.plan.iter() {
-        match TaskForStore::gen_task(&instance, OneStepFlowCacheImpl::get, Mission::filter_relations) {
-            Ok(task) => {
-                match RawTask::new(&task, &plan.to.get_full_key(), TaskType::Store as i16) {
-                    Ok(x) => {
-                        store_infos.push(x.clone());
-                        t_d.push((task, x))
-                    }
-                    Err(e) => {
-                        error!("{}", e);
-                        let _ = TaskDaoImpl::raw_to_error(&e, carrier);
-                        return;
-                    }
-                }
+        let task = TaskForStore::gen_task(&instance, &relations, Mission::filter_relations)?;
+        match RawTask::new(&task, &plan.to, TaskType::Store as i16) {
+            Ok(x) => {
+                store_infos.push(x.clone());
+                t_d.push((task, x))
             }
-            // break process will environment error occurs.
             Err(e) => {
                 error!("{}", e);
-                return;
+                let _ = TaskDaoImpl::raw_to_error(&e, carrier);
+                return Ok(());
             }
         }
     }
@@ -164,5 +140,54 @@ fn prepare_to_store(carrier: &RawTask, plan: PlanInfo) {
         for task in t_d {
             ACT_STORE.do_send(MsgForTask(task.0, task.1));
         }
+    }
+    Ok(())
+}
+
+fn inner_serial(task: &MsgForTask<TaskForSerial>) -> Result<()> {
+    let (task, carrier) = (&task.0, &task.1);
+    let finish = &task.context_for_finish.clone();
+    match TaskForSerialWrapper::save(task, MetaCacheImpl::get, MetaDaoImpl::get, InstanceDaoImpl::insert) {
+        Ok(sf) => {
+            let ins = sf.to_virtual_instance(finish)?;
+            match RelationCacheImpl::get(&ins.meta, RelationDaoImpl::get_relations, MetaCacheImpl::get, MetaDaoImpl::get) {
+                Ok(relations) => {
+                    let store_task = TaskForStore::gen_task(&ins, &relations, Mission::filter_relations)?;
+                    let mut raw = RawTask::new(&store_task, &ins.meta, TaskType::QueueBatch as i16)?;
+                    if let Ok(_route) = raw.finish_old(&carrier, TaskDaoImpl::insert, TaskDaoImpl::delete) {
+                        let _ = ACT_STORED.try_send(MsgForTask(store_task, raw));
+                    }
+                    Ok(())
+                }
+                Err(NatureError::EnvironmentError(_)) => Ok(()),
+                Err(e) => Err(e)
+            }
+        }
+        Err(NatureError::EnvironmentError(_)) => Ok(()),
+        Err(e) => Err(e)
+    }
+}
+
+fn inner_parallel(task: &MsgForTask<Vec<Instance>>) -> Result<()> {
+    let mut tuple: Vec<(TaskForStore, RawTask)> = Vec::new();
+    match RelationCacheImpl::get(&task.0[0].meta, RelationDaoImpl::get_relations, MetaCacheImpl::get, MetaDaoImpl::get) {
+        Ok(relations) => {
+            for instance in task.0.iter() {
+                let task = TaskForStore::gen_task(&instance, &relations, Mission::filter_relations)?;
+                let raw = RawTask::new(&task, &instance.meta, TaskType::Store as i16)?;
+                match TaskDaoImpl::insert(&raw) {
+                    Ok(_) => tuple.push((task, raw)),
+                    Err(NatureError::EnvironmentError(_)) => return Ok(()),
+                    Err(e) => return Err(e)
+                }
+            }
+            for c in tuple {
+                ACT_STORE.do_send(MsgForTask(c.0, c.1));
+            }
+            let _ = TaskDaoImpl::delete(&task.1.task_id);
+            Ok(())
+        }
+        Err(NatureError::EnvironmentError(_)) => Ok(()),
+        Err(e) => Err(e)
     }
 }

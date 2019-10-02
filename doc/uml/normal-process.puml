@@ -6,7 +6,7 @@ hide footbox
 activate IncomeController
 IncomeController -> Instance: init to `Business` \nfor `ThingType
 IncomeController -> Instance: check and fix id
-note right: `thing` maybe not exists
+note right: `meta` maybe not exists
 IncomeController -> TaskForStore: gen_task(instance)
 IncomeController -> RawTask: save(task)
 note right: can redo when failed

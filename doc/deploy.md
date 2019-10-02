@@ -2,8 +2,10 @@
 
 ## web 
 
-port is set in `Rocket.toml`
+SERVER_PORT  is set in .`env` file
 
 ## DB
 
-DATABASE_URL is set in `.enf` file 
+
+DATABASE_URL is set in .`env` file 
+

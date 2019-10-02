@@ -8,10 +8,9 @@ use std::thread::JoinHandle;
 use actix_web::{App, HttpServer};
 use dotenv::dotenv;
 
-use nature_common::util::setup_logger;
-
 use crate::actor::*;
 use crate::rpc::actix::*;
+use nature_common::setup_logger;
 
 // for product and mock
 lazy_static! {
@@ -39,6 +38,10 @@ lazy_static! {
 
     pub static ref THREAD_NUM_FOR_CONVERT_ACTOR : usize = {
         env::var("THREAD_NUM_FOR_CONVERT_ACTOR").unwrap_or_else(|_| "3".to_string()).parse::<usize>().unwrap()
+    };
+
+    pub static ref QUERY_SIZE_LIMIT : usize = {
+        env::var("QUERY_SIZE_LIMIT").unwrap_or_else(|_| "1000".to_string()).parse::<usize>().unwrap()
     };
 
 }

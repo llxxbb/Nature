@@ -23,14 +23,14 @@ impl SerialFinished {
         Ok(Instance {
             id: 0,
             data: InstanceNoID {
-                thing: Thing::new_with_type(&SYS_KEY_SERIAL, ThingType::System)?,
+                meta: format!("{}{}:1", MetaType::System.get_prefix(), SYS_KEY_SERIAL.clone()),
                 event_time: time,
                 execute_time: time,
                 create_time: time,
                 content: String::new(),
                 context,
-                status: HashSet::new(),
-                status_version: 0,
+                states: HashSet::new(),
+                state_version: 0,
                 from: None,
             },
         })
@@ -41,23 +41,20 @@ impl SerialFinished {
 pub struct TaskForSerialWrapper;
 
 impl TaskForSerialWrapper {
-    pub fn save<FC, FS>(serial: TaskForSerial, checker: &FC, saver: FS) -> Result<SerialFinished>
-        where FC: Fn(&Thing) -> Result<RawThingDefine>,
-              FS: Fn(&Instance) -> Result<usize>
+    pub fn save<FS>(serial: &TaskForSerial, meta_cache_getter: MetaCacheGetter, meta_getter: MetaGetter, saver: FS) -> Result<SerialFinished>
+        where FS: Fn(&Instance) -> Result<usize>
     {
         let mut errors: Vec<String> = Vec::new();
         let mut succeeded_id: Vec<u128> = Vec::new();
-        for mut instance in serial.instances {
-            instance.change_thing_type(ThingType::Business);
-            instance.data.thing = serial.thing.clone();
-            if let Err(err) = instance.check_and_fix_id(checker) {
+        for mut instance in serial.instances.clone() {
+            if let Err(err) = instance.check_and_fix_id(meta_cache_getter, meta_getter) {
                 errors.push(format!("{:?}", err));
                 continue;
             }
             match saver(&instance) {
                 Ok(_) => succeeded_id.push(instance.id),
                 Err(err) => match err {
-                    NatureError::DaoEnvironmentError(_) => return Err(err),
+                    NatureError::EnvironmentError(_) => return Err(err),
                     NatureError::DaoDuplicated(_) => succeeded_id.push(instance.id),
                     _ => {
                         errors.push(format!("{:?}", err));

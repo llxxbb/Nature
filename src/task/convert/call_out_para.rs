@@ -1,11 +1,14 @@
 use nature_common::{CallOutParameter, ConverterReturned, NatureError, Protocol, Result};
 use nature_db::Mission;
 
-use crate::task::{TaskForConvert, ExecutorTrait, HttpExecutorImpl, LocalExecutorImpl};
+use crate::task::{HttpExecutorImpl, LocalExecutorImpl, TaskForConvert};
 
 static HTTP_CALLER: &dyn ExecutorTrait = &HttpExecutorImpl;
 static LOCAL_RUST_CALLER: &dyn ExecutorTrait = &LocalExecutorImpl;
 
+pub trait ExecutorTrait: Sync {
+    fn execute(&self, executor: &str, para: &CallOutParameter) -> ConverterReturned;
+}
 
 pub struct CallOutParaWrapper;
 
@@ -24,7 +27,7 @@ impl CallOutParaWrapper {
         match protocol {
             Protocol::Http => Ok(HTTP_CALLER),
             Protocol::LocalRust => Ok(LOCAL_RUST_CALLER),
-            _ => Err(NatureError::ConverterProtocalError(format!("Did not implement for protocal : {:?}", protocol)))
+            _ => Err(NatureError::VerifyError(format!("Did not implement for protocal : {:?}", protocol)))
         }
     }
 }

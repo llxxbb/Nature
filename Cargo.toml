@@ -1,6 +1,6 @@
 [package]
 name = "nature"
-version = "0.0.1"
+version = "0.0.2"
 authors = ["XueBin Li"]
 edition = "2018"
 description = "A FaaS platform implement"
@@ -15,7 +15,7 @@ chrono = { version = "0.4", features = ["serde"] }
 serde_json = "1.0"
 serde = "1.0"
 serde_derive = "1.0"
-lazy_static = "1.0"
+lazy_static = "1.4"
 uuid = { version = "0.7", features = ["v3"] }
 lru_time_cache = "0.8"
 futures = "0.1"
@@ -24,25 +24,27 @@ futures = "0.1"
 libloading = "0.5.0"
 
 # log
-log = "0.4.1"
+log = "0.4"
 fern = "0.5"        # Simple, efficient logging
 
 #config
 dotenv = "0.11"
 
-# webup
+# web
 reqwest = "0.9"
 actix-web = "1.0"
-actix = "0.7"
+actix = "0.8"
 
 # self project group
-nature_common = {path = "../Nature-Common", version = "0.0.1"}
-nature_db = {path = "../Nature-DB", features = ["sqlite"], version = "0.0.1"}
+nature_common = {path = "../Nature-Common", version = "0.0.2"}
+nature_db = {path = "../Nature-DB", features = ["sqlite"], version = "0.0.2"}
 
 [workspace]
 members = ["../Nature-Common",
 "../Nature-DB",
 "../Nature-Retry",
 "../Nature-integrate-test-converter",
-"../Nature-Demo"
+"../Nature-Demo",
+"../Nature-Demo-Converter",
+"../Nature-Demo-Common",
 ]

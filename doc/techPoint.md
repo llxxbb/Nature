@@ -84,5 +84,8 @@ all actors must be started between `System::new` and `System.run` . Otherwise th
 version 0.7 problem :
 use SyncArbiter can cause memory allocation error, it's queer.
 
+## Actix_web
 
-
+version 1.0.7 problem:
+When return ErrorResponse the whole program break down, and will get the following message:
+thread 'actix-rt:worker:0' has overflowed its stack

@@ -8,16 +8,18 @@
 
 ## Orchestration
 
-- dynamic orchestration: use dynamic `ThingType` and dynamic `Converter` to orchestrate workflow`
-- static  orchestration: `ThingType`'s and `Converter`'s are configured at DB tables to repress a workflow.
+- dynamic orchestration
+- static  orchestration
 
 ## Converter
 
-### protocol
+supported protocol
 
-- Restful converter
-- Local converter
+- restful
+- rust local
 
 ### other
 
 - target status
+
+## demo

@@ -31,7 +31,7 @@ pub fn init_actors() {
         let _ = ACT_CONVERT.clone();
         let _ = ACT_PARALLEL.clone();
         let _ = ACT_SERIAL.clone();
-        sys.run();
+        let _ = sys.run();
     });
 }
 
