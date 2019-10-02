@@ -24,7 +24,6 @@ impl SerialFinished {
             id: 0,
             data: InstanceNoID {
                 meta: format!("{}{}:1", MetaType::System.get_prefix(), SYS_KEY_SERIAL.clone()),
-                event_time: time,
                 execute_time: time,
                 create_time: time,
                 content: String::new(),
