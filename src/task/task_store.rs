@@ -3,13 +3,9 @@ use std::sync::mpsc::Sender;
 use nature_common::{DynamicConverter, Instance, Result};
 use nature_db::{Mission, MissionFilter, RawTask, Relation};
 
-use crate::task::TaskForConvert;
-
 #[derive(Debug, Serialize, Deserialize, Clone, Default)]
 pub struct TaskForStore {
     pub instance: Instance,
-    /// save outside has non converter info.
-    pub upstream: Option<TaskForConvert>,
     pub mission: Option<Vec<Mission>>,
 }
 
@@ -24,7 +20,6 @@ impl TaskForStore {
         Ok(
             TaskForStore {
                 instance: instance.clone(),
-                upstream: None,
                 mission: steps,
             }
         )
@@ -39,7 +34,6 @@ impl TaskForStore {
         // save to task to make it can redo
         let task = TaskForStore {
             instance: instance.clone(),
-            upstream: None,
             mission: Some(target),
         };
         Ok(task)
