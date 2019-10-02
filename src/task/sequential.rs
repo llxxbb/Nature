@@ -47,7 +47,6 @@ impl TaskForSerialWrapper {
         let mut errors: Vec<String> = Vec::new();
         let mut succeeded_id: Vec<u128> = Vec::new();
         for mut instance in serial.instances.clone() {
-            instance.data.meta = serial.meta.get_string();
             if let Err(err) = instance.check_and_fix_id(meta_cache_getter, meta_getter) {
                 errors.push(format!("{:?}", err));
                 continue;

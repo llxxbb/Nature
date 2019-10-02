@@ -4,7 +4,7 @@ use actix_web::{HttpResponse, ResponseError, web};
 use actix_web::web::Json;
 use serde::export::fmt::Debug;
 
-use nature_common::{Instance, NatureError, ParaForQueryByID, SelfRouteInstance, TaskForParallel, TaskForSerial};
+use nature_common::{Instance, NatureError, ParaForQueryByID, SelfRouteInstance, TaskForSerial};
 use nature_db::{DelayedInstances, InstanceDaoImpl, RawTask};
 
 use crate::task::IncomeController;
@@ -31,7 +31,7 @@ fn batch_for_serial(serial_batch: Json<TaskForSerial>) -> HttpResponse {
     return_result(x)
 }
 
-fn batch_for_parallel(parallel_batch: Json<TaskForParallel>) -> HttpResponse {
+fn batch_for_parallel(parallel_batch: Json<Vec<Instance>>) -> HttpResponse {
     let x = IncomeController::parallel(parallel_batch.0);
     return_result(x)
 }

@@ -2,8 +2,9 @@
 
 ## finished but did not submit
 
-## Underway
 
+## Underway
+    
     IncomeController#input meta type check can moved to other place.
     
     NatureError#Break is not handled
@@ -16,9 +17,6 @@
   
     generate order
     
-    remove TaskForParallel' meta field
-    parallel instances must have the same meta
-
     give a graph at concepts.md for the flow that how to generate instances.
     
     doc : trace

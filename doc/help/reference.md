@@ -1,5 +1,11 @@
 # Reference
 
+## Batch process
+
+Include serial mode and parallel mode。 Both of them demand the `instance`s's `meta` are same. 
+
+serial mode can set finished context when finished stored.
+
 ## Meta
 
 

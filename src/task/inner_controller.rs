@@ -1,6 +1,6 @@
 use serde::export::From;
 
-use nature_common::{ConverterReturned, Instance, NatureError, Result, SelfRouteInstance, TaskForParallel, TaskForSerial};
+use nature_common::{ConverterReturned, Instance, NatureError, Result, SelfRouteInstance, TaskForSerial};
 use nature_db::{InstanceDaoImpl, MetaCacheImpl, MetaDaoImpl, Mission, RawTask, RelationCacheImpl, RelationDaoImpl, StorePlanDaoImpl, TaskDaoImpl, TaskType};
 
 use crate::actor::*;
@@ -111,53 +111,12 @@ impl InnerController {
     }
 
 
-    pub fn channel_parallel(task: MsgForTask<TaskForParallel>) {
-        let mut tuple: Vec<(TaskForStore, RawTask)> = Vec::new();
-        let mut err: Option<NatureError> = None;
-        for instance in task.0.instances.iter() {
-            match RelationCacheImpl::get(&instance.meta, RelationDaoImpl::get_relations, MetaCacheImpl::get, MetaDaoImpl::get) {
-                Ok(relations) => match TaskForStore::gen_task(&instance, &relations, Mission::filter_relations) {
-                    Ok(task) => match RawTask::new(&task, &instance.meta, TaskType::Store as i16) {
-                        Ok(raw) => match TaskDaoImpl::insert(&raw) {
-                            Ok(_) => {
-                                tuple.push((task, raw))
-                            }
-                            Err(e) => {
-                                err = Some(e);
-                                break;
-                            }
-                        }
-                        Err(e) => {
-                            err = Some(e);
-                            break;
-                        }
-                    }
-                    Err(e) => {
-                        err = Some(e);
-                        break;
-                    }
-                }
-                Err(e) => {
-                    err = Some(e);
-                    break;
-                }
-            }
-        }
-        match err {
-            None => {
-                for c in tuple {
-                    ACT_STORE.do_send(MsgForTask(c.0, c.1));
-                }
-                let _ = TaskDaoImpl::delete(&task.1.task_id);
-            }
-            Some(NatureError::SystemError(s)) => {
-                let _ = TaskDaoImpl::raw_to_error(&NatureError::SystemError(s), &task.1);
-            }
-            Some(_) => ()
+    pub fn channel_parallel(task: MsgForTask<Vec<Instance>>) {
+        if let Err(e) = inner_parallel(&task) {
+            let _ = TaskDaoImpl::raw_to_error(&e, &task.1);
         }
     }
 }
-
 
 fn prepare_to_store(carrier: &RawTask, plan: PlanInfo) -> Result<()> {
     let mut store_infos: Vec<RawTask> = Vec::new();
@@ -188,13 +147,47 @@ fn prepare_to_store(carrier: &RawTask, plan: PlanInfo) -> Result<()> {
 fn inner_serial(task: &MsgForTask<TaskForSerial>) -> Result<()> {
     let (task, carrier) = (&task.0, &task.1);
     let finish = &task.context_for_finish.clone();
-    let sf = TaskForSerialWrapper::save(task, MetaCacheImpl::get, MetaDaoImpl::get, InstanceDaoImpl::insert)?;
-    let ins = sf.to_virtual_instance(finish)?;
-    let relations = RelationCacheImpl::get(&ins.meta, RelationDaoImpl::get_relations, MetaCacheImpl::get, MetaDaoImpl::get)?;
-    let store_task = TaskForStore::gen_task(&ins, &relations, Mission::filter_relations)?;
-    let mut raw = RawTask::new(&store_task, &ins.meta, TaskType::QueueBatch as i16)?;
-    if let Ok(_route) = raw.finish_old(&carrier, TaskDaoImpl::insert, TaskDaoImpl::delete) {
-        let _ = ACT_STORED.try_send(MsgForTask(store_task, raw));
+    match TaskForSerialWrapper::save(task, MetaCacheImpl::get, MetaDaoImpl::get, InstanceDaoImpl::insert) {
+        Ok(sf) => {
+            let ins = sf.to_virtual_instance(finish)?;
+            match RelationCacheImpl::get(&ins.meta, RelationDaoImpl::get_relations, MetaCacheImpl::get, MetaDaoImpl::get) {
+                Ok(relations) => {
+                    let store_task = TaskForStore::gen_task(&ins, &relations, Mission::filter_relations)?;
+                    let mut raw = RawTask::new(&store_task, &ins.meta, TaskType::QueueBatch as i16)?;
+                    if let Ok(_route) = raw.finish_old(&carrier, TaskDaoImpl::insert, TaskDaoImpl::delete) {
+                        let _ = ACT_STORED.try_send(MsgForTask(store_task, raw));
+                    }
+                    Ok(())
+                }
+                Err(NatureError::EnvironmentError(_)) => Ok(()),
+                Err(e) => Err(e)
+            }
+        }
+        Err(NatureError::EnvironmentError(_)) => Ok(()),
+        Err(e) => Err(e)
     }
-    Ok(())
+}
+
+fn inner_parallel(task: &MsgForTask<Vec<Instance>>) -> Result<()> {
+    let mut tuple: Vec<(TaskForStore, RawTask)> = Vec::new();
+    match RelationCacheImpl::get(&task.0[0].meta, RelationDaoImpl::get_relations, MetaCacheImpl::get, MetaDaoImpl::get) {
+        Ok(relations) => {
+            for instance in task.0.iter() {
+                let task = TaskForStore::gen_task(&instance, &relations, Mission::filter_relations)?;
+                let raw = RawTask::new(&task, &instance.meta, TaskType::Store as i16)?;
+                match TaskDaoImpl::insert(&raw) {
+                    Ok(_) => tuple.push((task, raw)),
+                    Err(NatureError::EnvironmentError(_)) => return Ok(()),
+                    Err(e) => return Err(e)
+                }
+            }
+            for c in tuple {
+                ACT_STORE.do_send(MsgForTask(c.0, c.1));
+            }
+            let _ = TaskDaoImpl::delete(&task.1.task_id);
+            Ok(())
+        }
+        Err(NatureError::EnvironmentError(_)) => Ok(()),
+        Err(e) => Err(e)
+    }
 }
