@@ -123,7 +123,8 @@ fn prepare_to_store(carrier: &RawTask, plan: PlanInfo) -> Result<()> {
     let mut t_d: Vec<(TaskForStore, RawTask)> = Vec::new();
     let relations = RelationCacheImpl::get(&carrier.meta, RelationDaoImpl::get_relations, MetaCacheImpl::get, MetaDaoImpl::get)?;
     for instance in plan.plan.iter() {
-        let task = TaskForStore::gen_task(&instance, &relations, Mission::filter_relations)?;
+        let mission = Mission::get_by_instance(instance, &relations);
+        let task = TaskForStore { instance: instance.clone(), mission };
         match RawTask::new(&task, &plan.to, TaskType::Store as i16) {
             Ok(x) => {
                 store_infos.push(x.clone());
@@ -152,7 +153,8 @@ fn inner_serial(task: &MsgForTask<TaskForSerial>) -> Result<()> {
             let ins = sf.to_virtual_instance(finish)?;
             match RelationCacheImpl::get(&ins.meta, RelationDaoImpl::get_relations, MetaCacheImpl::get, MetaDaoImpl::get) {
                 Ok(relations) => {
-                    let store_task = TaskForStore::gen_task(&ins, &relations, Mission::filter_relations)?;
+                    let mission = Mission::get_by_instance(&ins, &relations);
+                    let store_task = TaskForStore { instance: ins.clone(), mission };
                     let mut raw = RawTask::new(&store_task, &ins.meta, TaskType::QueueBatch as i16)?;
                     if let Ok(_route) = raw.finish_old(&carrier, TaskDaoImpl::insert, TaskDaoImpl::delete) {
                         let _ = ACT_STORED.try_send(MsgForTask(store_task, raw));
@@ -173,7 +175,8 @@ fn inner_parallel(task: &MsgForTask<Vec<Instance>>) -> Result<()> {
     match RelationCacheImpl::get(&task.0[0].meta, RelationDaoImpl::get_relations, MetaCacheImpl::get, MetaDaoImpl::get) {
         Ok(relations) => {
             for instance in task.0.iter() {
-                let task = TaskForStore::gen_task(&instance, &relations, Mission::filter_relations)?;
+                let mission = Mission::get_by_instance(&instance, &relations);
+                let task = TaskForStore { instance: instance.clone(), mission };
                 let raw = RawTask::new(&task, &instance.meta, TaskType::Store as i16)?;
                 match TaskDaoImpl::insert(&raw) {
                     Ok(_) => tuple.push((task, raw)),
