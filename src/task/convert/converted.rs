@@ -72,7 +72,7 @@ impl Converted {
             }
         };
         // target
-        if let Some(lsd) = &task.target.last_states_demand {
+        if let Some(lsd) = &task.target.states_demand {
             if let Some(ts) = &lsd.target_states {
                 ins.modify_state(ts.clone());
             }
@@ -100,7 +100,7 @@ mod test {
             target: Mission {
                 to: meta.clone(),
                 executor: Default::default(),
-                last_states_demand: None,
+                states_demand: None,
                 use_upstream_id: true,
             },
             last_status: None,
