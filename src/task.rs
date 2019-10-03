@@ -1,5 +1,4 @@
 use nature_common::*;
-use nature_db::*;
 
 pub use self::convert::*;
 pub use self::income_controller::*;

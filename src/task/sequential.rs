@@ -40,13 +40,13 @@ impl SerialFinished {
 pub struct TaskForSerialWrapper;
 
 impl TaskForSerialWrapper {
-    pub fn save<FS>(serial: &TaskForSerial, meta_cache_getter: MetaCacheGetter, meta_getter: MetaGetter, saver: FS) -> Result<SerialFinished>
+    pub fn save<FS>(serial: &TaskForSerial, saver: FS) -> Result<SerialFinished>
         where FS: Fn(&Instance) -> Result<usize>
     {
         let mut errors: Vec<String> = Vec::new();
         let mut succeeded_id: Vec<u128> = Vec::new();
         for mut instance in serial.instances.clone() {
-            if let Err(err) = instance.revise(meta_cache_getter, meta_getter) {
+            if let Err(err) = instance.revise() {
                 errors.push(format!("{:?}", err));
                 continue;
             }

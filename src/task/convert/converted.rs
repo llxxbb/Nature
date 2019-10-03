@@ -19,16 +19,24 @@ impl Converted {
             return Ok(rtn);
         }
 
-        let mut fixxed_ins: Vec<Instance> = Vec::new();
-        // fix id and modify the meta
-        for one in instances {
-            let mut n = one.clone();
-            n.data.meta = task.target.to.get_string();
-            let _ = n.fix_id();
-            fixxed_ins.push(n)
+        if instances.is_empty() {
+            let msg = format!("Must return instance for meta: {}", task.target.to.get_string());
+            warn!("{}", &msg);
+            return Err(NatureError::VerifyError(msg));
         }
+
+        // fix id and modify the meta
+        let mut instances = instances;
+        instances.iter_mut().for_each(|n| {
+            n.data.meta = task.target.to.get_string();
+            if task.target.use_upstream_id {
+                n.id = task.from.id;
+            }
+            let _ = n.revise();
+        });
+
         // verify
-        let instances = Self::verify(&task, &fixxed_ins)?;
+        let _ = Self::verify_state(&task, &mut instances)?;
         let rtn = Converted {
             done_task: carrier.to_owned(),
             converted: instances,
@@ -36,55 +44,40 @@ impl Converted {
         Ok(rtn)
     }
 
-    fn verify(task: &TaskForConvert, instances: &[Instance]) -> Result<Vec<Instance>> {
-        let mut rtn: Vec<Instance> = Vec::new();
-        let to = task.target.to.clone();
+    fn verify_state(task: &TaskForConvert, instances: &mut Vec<Instance>) -> Result<()> {
+        let to = &task.target.to;
+        if !to.is_state {
+            return Ok(());
+        }
         if task.target.use_upstream_id && instances.len() > 1 {
             return Err(NatureError::ConverterLogicalError("[use_upstream_id] must return less 2 instances!".to_string()));
         }
-        if to.is_state {
-            if instances.len() > 1 {
-                // only one status instance should return
-                return Err(NatureError::ConverterLogicalError("[status meta] must return less 2 instances!".to_string()));
-            }
-            // status version must equal old + 1
-            if instances.len() == 1 {
-                let mut ins = instances[0].clone();
-                if task.target.use_upstream_id {
-                    ins.id = task.from.id;
-                }
-                match &task.last_status {
-                    None => {
-                        ins.state_version = 1;
-                    }
-                    Some(x) => {
-                        ins.state_version = x.state_version + 1;
-                        ins.states = x.states.clone();
-                    }
-                };
-                if let Some(lsd) = &task.target.last_states_demand {
-                    if let Some(ts) = &lsd.target_states {
-                        ins.modify_state(ts.clone());
-                    }
-                }
-                ins.data.meta = to.get_string();
-                rtn.push(ins);
-            }
-            return Ok(rtn);
+        if instances.len() > 1 {
+            // only one status instance should return
+            return Err(NatureError::ConverterLogicalError("[status meta] must return less 2 instances!".to_string()));
         }
-
-        // all biz must same to "to" and set id
-        for r in instances {
-            let mut instance = r.clone();
-            if task.target.use_upstream_id {
-                instance.id = task.from.id;
-            }
-            instance.data.meta = to.get_string();
-            let _ = instance.fix_id();
-            rtn.push(instance);
+        let mut ins = &mut instances[0];
+        // upstream id
+        if task.target.use_upstream_id {
+            ins.id = task.from.id;
         }
-
-        Ok(rtn)
+        // states and state version
+        match &task.last_status {
+            None => {
+                ins.state_version = 1;
+            }
+            Some(x) => {
+                ins.state_version = x.state_version + 1;
+                ins.states = x.states.clone();
+            }
+        };
+        // target
+        if let Some(lsd) = &task.target.last_states_demand {
+            if let Some(ts) = &lsd.target_states {
+                ins.modify_state(ts.clone());
+            }
+        }
+        Ok(())
     }
 }
 

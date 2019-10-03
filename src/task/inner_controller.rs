@@ -148,7 +148,7 @@ fn prepare_to_store(carrier: &RawTask, plan: PlanInfo) -> Result<()> {
 fn inner_serial(task: &MsgForTask<TaskForSerial>) -> Result<()> {
     let (task, carrier) = (&task.0, &task.1);
     let finish = &task.context_for_finish.clone();
-    match TaskForSerialWrapper::save(task, MetaCacheImpl::get, MetaDaoImpl::get, InstanceDaoImpl::insert) {
+    match TaskForSerialWrapper::save(task, InstanceDaoImpl::insert) {
         Ok(sf) => {
             let ins = sf.to_virtual_instance(finish)?;
             match RelationCacheImpl::get(&ins.meta, RelationDaoImpl::get_relations, MetaCacheImpl::get, MetaDaoImpl::get) {
