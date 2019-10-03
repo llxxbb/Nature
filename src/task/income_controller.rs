@@ -11,7 +11,7 @@ pub struct IncomeController {}
 impl IncomeController {
     /// born an instance which is the beginning of the changes.
     pub fn input(mut instance: Instance) -> Result<u128> {
-        let _ = instance.check_and_fix_id(MetaCacheImpl::get, MetaDaoImpl::get)?;
+        let _ = instance.revise(MetaCacheImpl::get, MetaDaoImpl::get)?;
         let relations = RelationCacheImpl::get(&instance.meta, RelationDaoImpl::get_relations, MetaCacheImpl::get, MetaDaoImpl::get)?;
         let mission = Mission::get_by_instance(&instance, &relations);
         let task = TaskForStore { instance: instance.clone(), mission };
