@@ -11,9 +11,10 @@ pub struct IncomeController {}
 impl IncomeController {
     /// born an instance which is the beginning of the changes.
     pub fn input(mut instance: Instance) -> Result<u128> {
-        let _ = instance.check_and_fix_id(MetaCacheImpl::get, MetaDaoImpl::get)?;
+        let _ = instance.check_and_revise(MetaCacheImpl::get, MetaDaoImpl::get)?;
         let relations = RelationCacheImpl::get(&instance.meta, RelationDaoImpl::get_relations, MetaCacheImpl::get, MetaDaoImpl::get)?;
-        let task = TaskForStore::gen_task(&instance, &relations, Mission::filter_relations)?;
+        let mission = Mission::get_by_instance(&instance, &relations);
+        let task = TaskForStore { instance: instance.clone(), mission };
         let raw = RawTask::new(&task, &instance.meta, TaskType::Store as i16)?;
         TaskDaoImpl::insert(&raw)?;
         InnerController::save_instance(task, raw)?;
@@ -26,7 +27,7 @@ impl IncomeController {
         // Convert a Self-Route-Instance to Normal Instance
         let mut ins = instance.to_instance();
         MetaType::check_type(&ins.meta, MetaType::Dynamic)?;
-        let uuid = ins.fix_id()?.id;
+        let uuid = ins.revise()?.id;
         let task = TaskForStore::for_dynamic(&ins, instance.converter)?;
         let raw = RawTask::new(&task, &ins.meta, TaskType::Store as i16)?;
         let _ = TaskDaoImpl::insert(&raw)?;

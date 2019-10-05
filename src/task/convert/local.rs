@@ -32,7 +32,7 @@ impl ExecutorTrait for LocalExecutorImpl {
                 let cfg_lib = lib_cache.entry(entry.path).or_insert_with(move || {
                     match lib::Library::new(path.clone()) {
                         Err(e) => {
-                            error!("  load local lib error for path {}, error : {}", path, e);
+                            warn!("  load local lib error for path {}, error : {}", path, e);
                             None
                         }
                         Ok(local_lib) => Some(local_lib)

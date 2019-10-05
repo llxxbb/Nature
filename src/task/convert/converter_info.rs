@@ -51,7 +51,7 @@ impl TaskForConvert {
             }
         } else { None };
         if let Some(ref last) = last_target {
-            if let Some(demand) = &mission.last_states_demand {
+            if let Some(demand) = &mission.states_demand {
                 demand.check(&last.states)?;
             }
         };

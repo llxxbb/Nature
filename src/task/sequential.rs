@@ -22,17 +22,16 @@ impl SerialFinished {
         let time = Local::now().timestamp();
         Ok(Instance {
             id: 0,
-            data: InstanceNoID {
+            data: BizObject {
                 meta: format!("{}{}:1", MetaType::System.get_prefix(), SYS_KEY_SERIAL.clone()),
-                event_time: time,
-                execute_time: time,
-                create_time: time,
                 content: String::new(),
                 context,
                 states: HashSet::new(),
                 state_version: 0,
                 from: None,
             },
+            execute_time: time,
+            create_time: time,
         })
     }
 }
@@ -41,13 +40,13 @@ impl SerialFinished {
 pub struct TaskForSerialWrapper;
 
 impl TaskForSerialWrapper {
-    pub fn save<FS>(serial: &TaskForSerial, meta_cache_getter: MetaCacheGetter, meta_getter: MetaGetter, saver: FS) -> Result<SerialFinished>
+    pub fn save<FS>(serial: &TaskForSerial, saver: FS) -> Result<SerialFinished>
         where FS: Fn(&Instance) -> Result<usize>
     {
         let mut errors: Vec<String> = Vec::new();
         let mut succeeded_id: Vec<u128> = Vec::new();
         for mut instance in serial.instances.clone() {
-            if let Err(err) = instance.check_and_fix_id(meta_cache_getter, meta_getter) {
+            if let Err(err) = instance.revise() {
                 errors.push(format!("{:?}", err));
                 continue;
             }
