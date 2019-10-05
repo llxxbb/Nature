@@ -74,7 +74,7 @@ impl Converted {
         // target
         if let Some(lsd) = &task.target.states_demand {
             if let Some(ts) = &lsd.target_states {
-                ins.modify_state(ts.clone());
+                ins.modify_state(ts);
             }
         }
         Ok(())
@@ -85,8 +85,8 @@ impl Converted {
 mod test {
     use chrono::Local;
 
-    use nature_common::{Meta, State};
-    use nature_db::Mission;
+    use nature_common::{Meta, State, TargetState};
+    use nature_db::{Mission, StateDemand};
 
     use super::*;
 
@@ -126,5 +126,34 @@ mod test {
         task.target.to.state = Some(vec![State::Normal("hello".to_string())]);
         let result = Converted::gen(&task, &raw, ins).unwrap();
         assert_eq!(result.converted[0].id, 567);
+    }
+
+    #[test]
+    fn target_states_test() {
+        let task = TaskForConvert {
+            from: Default::default(),
+            target: Mission {
+                to: {
+                    let mut m = Meta::from_string("/B/hello:1").unwrap();
+                    m.is_state = true;
+                    m
+                },
+                executor: Default::default(),
+                states_demand: Some(StateDemand {
+                    last_states_include: Default::default(),
+                    last_states_exclude: Default::default(),
+                    target_states: Some(TargetState {
+                        add: Some(vec!["new".to_string()]),
+                        remove: None,
+                    }),
+                }),
+                use_upstream_id: false,
+            },
+            last_status: None,
+        };
+        let mut ins = vec![Instance::new("test").unwrap()];
+        let _ = Converted::verify_state(&task, &mut ins);
+        let one = &ins[0];
+        assert_eq!(one.states.contains("new"), true)
     }
 }

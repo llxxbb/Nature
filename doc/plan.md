@@ -2,14 +2,12 @@
 
 ## finished but did not submit
 
-
 ## Underway
     
-    rename LastStatusDemand 
+    time enlarged 1000 times
+    instance no from meta
     
     implement self_route for converted
-    
-    target state not take effect.
     
     generate order
     
