@@ -4,7 +4,6 @@
 
 ## Underway
     
-    time enlarged 1000 times
     instance no from meta
     
     implement self_route for converted
