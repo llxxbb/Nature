@@ -1,4 +1,4 @@
-use nature_common::{Instance, MetaType, NatureError, Result};
+use nature_common::{FromInstance, Instance, MetaType, NatureError, Result};
 use nature_db::RawTask;
 
 use crate::task::TaskForConvert;
@@ -25,13 +25,19 @@ impl Converted {
             return Err(NatureError::VerifyError(msg));
         }
 
-        // fix id and modify the meta
+        // fix id, meta and From
+        let from = FromInstance {
+            id: task.from.id,
+            meta: task.from.meta.to_string(),
+            state_version: task.from.state_version,
+        };
         let mut instances = instances;
         instances.iter_mut().for_each(|n| {
             n.data.meta = task.target.to.get_string();
             if task.target.use_upstream_id {
                 n.id = task.from.id;
             }
+            n.from = Some(from.clone());
             let _ = n.revise();
         });
 
@@ -91,9 +97,11 @@ mod test {
     use super::*;
 
     #[test]
-    fn use_upstream_id() {
+    fn upstream_test() {
         let mut from_ins = Instance::default();
         from_ins.id = 567;
+        from_ins.meta = "/B/from:1".to_string();
+        from_ins.state_version = 2;
         let meta = Meta::new("to", 1, MetaType::Business).unwrap();
         let mut task = TaskForConvert {
             from: from_ins,
@@ -120,6 +128,11 @@ mod test {
 
         // for normal
         let result = Converted::gen(&task, &raw, ins.clone()).unwrap();
+        let c = &result.converted[0];
+        let from = c.from.as_ref().unwrap();
+        assert_eq!(from.id, 567);
+        assert_eq!(from.meta, "/B/from:1");
+        assert_eq!(from.state_version, 2);
         assert_eq!(result.converted[0].id, 567);
 
         // for state

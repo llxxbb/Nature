@@ -4,11 +4,8 @@
 
 ## Underway
     
-    instance no from meta
-    
     implement self_route for converted
     
-    generate order
     
     give a graph at concepts.md for the flow that how to generate instances.
     
