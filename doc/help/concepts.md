@@ -29,6 +29,3 @@ A `relation` defined a `converter` to convert from **from**-`meta`'s instance' t
 `converter` will **glue all your logical together at runtime**. 
 
 [converter](concept-converter.md)
-
-![Alt text](../img/%E5%B9%BB%E7%81%AF%E7%89%8713.jpg)
-
