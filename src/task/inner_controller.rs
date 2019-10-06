@@ -4,7 +4,7 @@ use nature_common::{ConverterReturned, Instance, NatureError, Result, SelfRouteI
 use nature_db::{InstanceDaoImpl, MetaCacheImpl, MetaDaoImpl, Mission, RawTask, RelationCacheImpl, RelationDaoImpl, StorePlanDaoImpl, TaskDaoImpl, TaskType};
 
 use crate::actor::*;
-use crate::task::{CallOutParaWrapper, Converted, PlanInfo, TaskForConvert, TaskForSerialWrapper, TaskForStore};
+use crate::task::{ConverterParameterWrapper, Converted, PlanInfo, TaskForConvert, TaskForSerialWrapper, TaskForStore};
 
 pub struct InnerController {}
 
@@ -53,7 +53,7 @@ impl InnerController {
     }
 
     pub fn channel_convert(task: TaskForConvert, raw: RawTask) {
-        match CallOutParaWrapper::gen_and_call_out(&task, raw.task_id.clone(), &task.target) {
+        match ConverterParameterWrapper::gen_and_call_out(&task, raw.task_id.clone(), &task.target) {
             Err(err) => match err {
                 // only **Environment Error** will be retry
                 NatureError::EnvironmentError(_) => (),

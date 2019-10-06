@@ -1,5 +1,7 @@
 # Reference
 
+[Write a local-converter](howto_localRustConverter.md)
+
 ## Batch process
 
 Include serial mode and parallel mode。 Both of them demand the `instance`s's `meta` are same. 

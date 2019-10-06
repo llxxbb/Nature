@@ -1,6 +1,6 @@
 use reqwest::Client;
 
-use nature_common::{CallOutParameter, ConverterReturned, Instance};
+use nature_common::{ConverterParameter, ConverterReturned, Instance};
 
 use crate::task::ExecutorTrait;
 
@@ -11,7 +11,7 @@ lazy_static! {
 pub struct HttpExecutorImpl;
 
 impl ExecutorTrait for HttpExecutorImpl {
-    fn execute(&self, address: &str, para: &CallOutParameter) -> ConverterReturned {
+    fn execute(&self, address: &str, para: &ConverterParameter) -> ConverterReturned {
         let response = CLIENT.post(address).json(para).send();
         match response {
             Err(e) => {
@@ -28,6 +28,7 @@ impl ExecutorTrait for HttpExecutorImpl {
         }
     }
 }
+// TODO
 //
 //#[cfg(test)]
 //mod test {

@@ -33,9 +33,11 @@ Nature care about the **x** and **y** only but not the `converter`, this unify s
 
 The `relation` between data is important,  but the more relationships, the more complicated. For example, relationships between boss and employees, from the boss end we can see that he have many employees, it's **one-to-many**, it's complicated; but from the employee end there is one relationship connected, it's **one-to-one**, it's simple. Nature maybe can not reduce the relations, but Nature let you have one-to-one relation only.
 
-Thank to the unify of **y=f(x)**, Nature can make pure **data-flow**, and this make it easy to organize the business logic. The downstream know what upstream he wanted, so he can **select** a **x** as his input and don't care about how many downstream after him. so there is no **control-flow** in `relation`.  no such **branch, loop** complicated will be seen in Nature but Nature do it for you at backend, and this simplify the develop process greatly, because control means to-many, when one of the downstream changed, the upstream might need to be modify.  but **select** only affects itself.
+Thank to the unify of **y=f(x)**, Nature can make pure **data-flow**, and this make it easy to organize the business logic. The downstream know what upstream he wanted, so he can **select** a **x** as his input and don't care about how many downstream after him. so there is no **control-flow** in `relation`.  no such **branch, loop** complicated will be seen in Nature but Nature do it for you at backend, and this simplify the develop process greatly, because control means to-many, when one of the downstream changed, the upstream might need to be modified.  but **select** only affects itself.
 
-Though you can't see control-flow in Nature, but the control-flow just in there. Same upstream different downstream will make branch; different upstream same downstream will make confluence. All control logic are formed naturally, that is to say control-flow is not designed by you but it **spring up** itself. Furthermore, `relation` is the **one-step** of the data-flow.  all `relation`s can connected together to form a large business web and you can modify the web anywhere freely and easily, this is difficulty for **hard control logic** for normal business system implement. 
+Furthermore, `relation` is the **one-step** of the data-flow.  all `relation`s can connected together to form a large business web and you can modify the web anywhere freely and easily, this is difficulty for **hard control logic** for normal business system implement. 
+
+Though you can't see control-flow in Nature, but the control-flow just in there. Same upstream different downstream will make branch; different upstream same downstream will make confluence. All control logic are formed naturally, that is to say control-flow is not designed by you but it **spring up** itself.
 
 ### Data driven vs. function driven
 
@@ -51,21 +53,31 @@ Though the **control-flow**  spring up itself, Nature give a deep control under 
 
 ### Idempotent
 
-Idempotent is important and obligatory when retry exists, there are some cases for retries
+Idempotent is important and obligatory when retry exists, `Nature` only insert data to database, no __deletions__ no __updates__. Once they inputted, you can't change any of them, even for the state data.
+
+Nature is **making history**.
+
+There are some cases for retries
 
 - `instance` inputted from outside
 - dispatch tasks to `converter`s
 - `instance` converted by `converter`
 
-Let's to see the dispatch-task first, there is an example : One upstream has tow downstream,  and Nature failed for the  first downstream generating and succeed for the second downstream; at that time we removed the first downstream `relation` from the upstream; and then the Nature retry the the failed for the first downstream. Boom! same input get different outputs, So Nature must to avoid this case happen. One possible way to do this is generate all tasks before dispatch, so that the `relation` changes do not affect the dispatch.
+#### Save task before data
 
-But there is another problem: save 'instance' and generate converter tasks may be broken by bad network environment.  You may say database **transaction** can resolve it,  considering the large distribute database system will be used, so **Nature will not use the database-transaction**.  To resolve this problem, Nature save task which include instance and downstream targets before save instance, so that Nature retry can rebuild all data consistently.
+Let's to see the dispatch-task first, there is an example : One upstream has tow downstream flows,  and Nature failed for the  first downstream generating and succeed for the second downstream; and at that time we do a dangerous operation that we removed the first downstream `relation` definition from the database; and then the Nature retry the the failed for the first branch. Boom! same input get different outputs, So Nature must to avoid this case happen. One possible way to do this is **generate all tasks before dispatch**, so that the `relation` changes will not take affect on the retrying tasks.
 
-Now for the third case. a `converter` may return many instances,  because we can not use transaction,  all these need to be saved one by one,  It can be interrupt by bad environment also. Nature introduced `plan` to resolve it. Plan is a big object include all returned instances. before  we save `instance`s for each, we save `plan` first, so that we can redo it when instances saving is broken. 
+But there is another problem: save 'instance' and generate converter tasks may be broken on bad network environment.  You may say database **transaction** can resolve it,  considering the large distribute database system will be used, so **Nature can not use the database-transaction**.  To resolve this problem, **Nature will save task before save instances**, so that Nature retry can rebuild all data consistently.
 
-But there is a particular case be ignored, the `converter` may be not idempotent, that mean the `plan` may be changed. Nature does not allow this happen: the `plan` table's primary key is made up of upstream `meta` and downstream `meta`,  and Nature only insert data to plan table, so as a developer you don't worry about the repeated processing.
+#### Save plan before data
 
-Another point is instance table.  Nature only insert data to it too, and the table's primary key is little complex, it is made up of id, `meta` and statue version. But in fact this is not enough,  **id** is the stumbling  block when instance inputted from outside. Id must be unique, if you don't give one to Nature, Nature generated one by hash. so it's idempotent in this situation.  Theoretically, hash algorithm has conflict problem, though it's a small chance, so Nature recommends to use your own unique id. Maybe a center-id-generator like facebook 's snowflake is a good choice..
+Now for the third case. a `converter` may return many instances,  because we can not use transaction,  all these need to be saved one by one,  It can be interrupt by bad environment also. Nature introduced `plan` to resolve it. Plan is a big object include all returned instances. **before  we save `instance`s for each, we save `plan` first**, so that we can redo it when instances saving is broken. 
+
+But there is a particular case be ignored, the `converter` may be not idempotent, that mean the `plan` may be changed. Nature does not allow this happen: the `plan` table's primary key is made up of upstream `meta` and downstream `meta`,  in this mechanism Nature would reject all the later plans that with the same upstream and downstream, **the first is the last**.
+
+#### Primary key of the `Instance` table
+
+Another point is instance table. same as `plan` described upper, Nature only insert data to it too, and the table's primary key is little complex, it is made up of id, `meta` and state version. But in fact this is not enough,  id is the stumbling  block when instance inputted from outside. Id must be unique, if you don't give one to Nature, Nature generated one by hash. so it's idempotent in this situation.  Theoretically, hash algorithm has conflict problem, though it's a small chance, so Nature recommends to use your own unique id. Maybe a center-id-generator like facebook 's snowflake is a good choice..
 
 ### Error, retry and callback
 
