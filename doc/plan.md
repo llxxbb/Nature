@@ -4,8 +4,8 @@
 
 
 ## Underway
-    
-    implement auto_converter
+
+    Relation.from_raw has repeated blocks
     
     implement self_route for converted
     
