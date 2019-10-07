@@ -2,9 +2,10 @@
 
 ## finished but did not submit
 
-    rename CallOutParameter to ConverterParameter
 
 ## Underway
+    
+    implement auto_converter
     
     implement self_route for converted
     

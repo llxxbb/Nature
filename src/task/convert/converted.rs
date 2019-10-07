@@ -68,7 +68,7 @@ impl Converted {
             ins.id = task.from.id;
         }
         // states and state version
-        match &task.last_status {
+        match &task.last_state {
             None => {
                 ins.state_version = 1;
             }
@@ -111,7 +111,7 @@ mod test {
                 states_demand: None,
                 use_upstream_id: true,
             },
-            last_status: None,
+            last_state: None,
         };
         let raw = RawTask {
             task_id: vec![],
@@ -162,7 +162,7 @@ mod test {
                 }),
                 use_upstream_id: false,
             },
-            last_status: None,
+            last_state: None,
         };
         let mut ins = vec![Instance::new("test").unwrap()];
         let _ = Converted::verify_state(&task, &mut ins);

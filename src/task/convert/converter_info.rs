@@ -10,7 +10,7 @@ use crate::task::TaskForStore;
 pub struct TaskForConvert {
     pub from: Instance,
     pub target: Mission,
-    pub last_status: Option<Instance>,
+    pub last_state: Option<Instance>,
 }
 
 impl Default for TaskForConvert {
@@ -18,7 +18,7 @@ impl Default for TaskForConvert {
         TaskForConvert {
             from: Instance::default(),
             target: Mission::default(),
-            last_status: None,
+            last_state: None,
         }
     }
 }
@@ -58,7 +58,7 @@ impl TaskForConvert {
         let rtn = TaskForConvert {
             from: instance.clone(),
             target: mission.clone(),
-            last_status: last_target,
+            last_state: last_target,
         };
         Ok(rtn)
     }

@@ -16,7 +16,7 @@ impl ConverterParameterWrapper {
     pub fn gen_and_call_out(task: &TaskForConvert, carrier_id: Vec<u8>, mission: &Mission) -> Result<ConverterReturned> {
         let para = ConverterParameter {
             from: task.from.clone(),
-            last_status: task.last_status.clone(),
+            last_state: task.last_state.clone(),
             carrier_id,
         };
         let executor = Self::get_executer(&mission.executor.protocol)?;
