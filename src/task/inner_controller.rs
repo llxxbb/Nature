@@ -53,6 +53,7 @@ impl InnerController {
     }
 
     pub fn channel_convert(task: TaskForConvert, raw: RawTask) {
+        // TODO change check
         if let Some(setting) = &task.target.to.setting {
             if setting.is_empty_content {
                 let _ = Self::received_instance(&task, &raw, vec![Instance::default()]);
