@@ -45,7 +45,8 @@ impl TaskForConvert {
                 // context have target id
                 Some(state_id) => {
                     let state_id = u128::from_str(state_id)?;
-                    instance_getter(&ParaForQueryByID { id: state_id, meta: mission.to.get_full_key() })?
+                    let old = instance_getter(&ParaForQueryByID { id: state_id, meta: mission.to.get_string() })?;
+                    old
                 }
                 None => None,
             }

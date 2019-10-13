@@ -20,7 +20,8 @@ impl ConverterParameterWrapper {
             carrier_id,
         };
         let executor = Self::get_executer(&mission.executor.protocol)?;
-        Ok(executor.execute(&mission.executor.url, &para))
+        let rtn = executor.execute(&mission.executor.url, &para);
+        Ok(rtn)
     }
 
     fn get_executer(protocol: &Protocol) -> Result<&'static dyn ExecutorTrait> {
