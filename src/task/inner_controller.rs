@@ -1,6 +1,6 @@
 use serde::export::From;
 
-use nature_common::{ConverterReturned, Instance, NatureError, Result, SelfRouteInstance, TaskForSerial};
+use nature_common::{ConverterReturned, Instance, NatureError, Protocol, Result, SelfRouteInstance, TaskForSerial};
 use nature_db::{InstanceDaoImpl, MetaCacheImpl, MetaDaoImpl, Mission, RawTask, RelationCacheImpl, RelationDaoImpl, StorePlanDaoImpl, TaskDaoImpl, TaskType};
 
 use crate::actor::*;
@@ -53,14 +53,10 @@ impl InnerController {
     }
 
     pub fn channel_convert(task: TaskForConvert, raw: RawTask) {
-        // TODO change check
-        if let Some(setting) = &task.target.to.setting {
-            if setting.is_empty_content {
-                let _ = Self::received_instance(&task, &raw, vec![Instance::default()]);
-                return;
-            }
+        if Protocol::Auto == task.target.executor.protocol {
+            let _ = Self::received_instance(&task, &raw, vec![Instance::default()]);
+            return;
         }
-
         match ConverterParameterWrapper::gen_and_call_out(&task, raw.task_id.clone(), &task.target) {
             Err(err) => match err {
                 // only **Environment Error** will be retry

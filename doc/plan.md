@@ -5,8 +5,6 @@
 
 ## Underway
 
-    `Relation` and `Mission`'s executor property support `Option`
-    add weight for relation
 
     implement self_route for converted
     
