@@ -5,6 +5,8 @@
 
 ## Underway
 
+    fix bug : Converted.verify_state for add new state
+    
     implement self_route for converted
     
     give a graph at concepts.md for the flow that how to generate instances.

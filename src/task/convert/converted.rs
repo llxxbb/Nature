@@ -77,11 +77,13 @@ impl Converted {
                 ins.states = x.states.clone();
             }
         };
-        // target
+        // set status
         if let Some(lsd) = &task.target.states_demand {
             if let Some(ts) = &lsd.target_states {
                 ins.modify_state(ts);
             }
+        }else{
+            ins.modify_state()
         }
         Ok(())
     }
