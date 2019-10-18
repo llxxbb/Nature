@@ -40,7 +40,7 @@ impl TaskForConvert {
     fn new_one_task<FIG>(instance: &Instance, mission: &Mission, instance_getter: &FIG) -> Result<TaskForConvert>
         where FIG: Fn(&ParaForQueryByID) -> Result<Option<Instance>>
     {
-        let last_target = if mission.to.is_state {
+        let last_target = if mission.to.is_state() {
             match instance.context.get(&*CONTEXT_TARGET_INSTANCE_ID) {
                 // context have target id
                 Some(state_id) => {

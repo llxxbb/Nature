@@ -2,10 +2,7 @@
 
 ## finished but did not submit
 
-
 ## Underway
-
-    fix bug : Converted.verify_state for add new state
     
     implement self_route for converted
     

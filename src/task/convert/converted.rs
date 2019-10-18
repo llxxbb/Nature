@@ -52,7 +52,7 @@ impl Converted {
 
     fn verify_state(task: &TaskForConvert, instances: &mut Vec<Instance>) -> Result<()> {
         let to = &task.target.to;
-        if !to.is_state {
+        if !to.is_state() {
             return Ok(());
         }
         if task.target.use_upstream_id && instances.len() > 1 {
@@ -68,6 +68,7 @@ impl Converted {
             ins.id = task.from.id;
         }
         // states and state version
+        let temp_states = ins.states.clone();
         match &task.last_state {
             None => {
                 ins.state_version = 1;
@@ -82,8 +83,9 @@ impl Converted {
             if let Some(ts) = &lsd.target_states {
                 ins.modify_state(ts);
             }
-        }else{
-            ins.modify_state()
+        } else {
+            task.target.to.verify_state(&temp_states)?;
+            ins.states = temp_states
         }
         Ok(())
     }
@@ -138,7 +140,7 @@ mod test {
         assert_eq!(result.converted[0].id, 567);
 
         // for state
-        task.target.to.state = Some(vec![State::Normal("hello".to_string())]);
+        let _ = task.target.to.set_states(Some(vec![State::Normal("hello".to_string())]));
         let result = Converted::gen(&task, &raw, ins).unwrap();
         assert_eq!(result.converted[0].id, 567);
     }
@@ -150,7 +152,7 @@ mod test {
             target: Mission {
                 to: {
                     let mut m = Meta::from_string("/B/hello:1").unwrap();
-                    m.is_state = true;
+                    let _ = m.set_states(Some(vec![State::Normal("test".to_string())]));
                     m
                 },
                 executor: Default::default(),
