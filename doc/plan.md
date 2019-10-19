@@ -3,6 +3,8 @@
 ## finished but did not submit
 
 ## Underway
+
+    remove last_state from TaskForConvert
     
     implement self_route for converted
     

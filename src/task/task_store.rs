@@ -6,7 +6,7 @@ use nature_db::{Mission, RawTask};
 #[derive(Debug, Serialize, Deserialize, Clone, Default)]
 pub struct TaskForStore {
     pub instance: Instance,
-    pub mission: Option<Vec<Mission>>,
+    pub next_mission: Option<Vec<Mission>>,
 }
 
 impl TaskForStore {
@@ -19,7 +19,7 @@ impl TaskForStore {
         // save to task to make it can redo
         let task = TaskForStore {
             instance: instance.clone(),
-            mission: Some(target),
+            next_mission: Some(target),
         };
         Ok(task)
     }

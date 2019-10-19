@@ -28,7 +28,7 @@ impl TaskForConvert {
         where FIG: Fn(&ParaForQueryByID) -> Result<Option<Instance>>
     {
         let mut new_carriers: Vec<(TaskForConvert, RawTask)> = Vec::new();
-        let missions = task.mission.clone().unwrap();
+        let missions = task.next_mission.clone().unwrap();
         for c in missions {
             let x = Self::new_one_task(&task.instance, &c, &instance_getter)?;
             let car = RawTask::new(&x, &c.to.get_full_key(), TaskType::Convert as i16)?;

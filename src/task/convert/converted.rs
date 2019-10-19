@@ -74,6 +74,7 @@ impl Converted {
                 ins.state_version = 1;
             }
             Some(x) => {
+                ins.id = x.id;
                 ins.state_version = x.state_version + 1;
                 ins.states = x.states.clone();
             }
