@@ -1,7 +1,7 @@
 use std::convert::TryFrom;
 
 use nature_common::{Instance, MetaType, NatureError, Result, SelfRouteInstance, TaskForSerial};
-use nature_db::{CallbackResult, DelayedInstances, MetaCacheImpl, MetaDaoImpl, Mission, RawTask, RelationCacheImpl, RelationDaoImpl, TaskDaoImpl, TaskType};
+use nature_db::{CallbackResult, DelayedInstances, InstanceDaoImpl, MetaCacheImpl, MetaDaoImpl, Mission, RawTask, RelationCacheImpl, RelationDaoImpl, TaskDaoImpl, TaskType};
 
 use crate::actor::*;
 use crate::task::{InnerController, TaskForConvert, TaskForStore};
@@ -48,8 +48,11 @@ impl IncomeController {
                         }
                         CallbackResult::Instances(ins) => {
                             let task: TaskForConvert = serde_json::from_str(&carrier.data)?;
-                            // TODO
-                            InnerController::received_instance(&task, &carrier, ins, &None)
+                            let last = match task.target.to.is_state() {
+                                true => task.from.get_last_taget(&task.target.to.meta_string(), InstanceDaoImpl::get_by_id)?,
+                                false => None
+                            };
+                            InnerController::received_instance(&task, &carrier, ins, &last)
                         }
                     }
                 }
