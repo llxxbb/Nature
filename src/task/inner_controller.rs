@@ -20,10 +20,9 @@ impl InnerController {
                 Ok(())
             }
             Err(NatureError::DaoDuplicated(err)) => {
-                if task.instance.state_version > 0{
+                if task.instance.state_version > 0 {
                     // TODO
                     // state_version conflict need retry
-
                 }
 
                 warn!("Instance duplicated for id : {}, of `Meta` : {}, will delete it's task!", task.instance.id, &task.instance.meta);
@@ -40,7 +39,7 @@ impl InnerController {
             let _ = TaskDaoImpl::delete(&&raw.task_id);
             return;
         }
-        match TaskForConvert::gen_task(&task, InstanceDaoImpl::get_by_id) {
+        match TaskForConvert::gen_task(&task) {
             Ok(converters) => {
                 let raws: Vec<RawTask> = converters.iter().map(|x| x.1.clone()).collect();
                 if RawTask::save_batch(&raws, &raw.task_id, TaskDaoImpl::insert, TaskDaoImpl::delete).is_err() {
@@ -57,12 +56,20 @@ impl InnerController {
         }
     }
 
-    pub fn channel_convert(task: TaskForConvert, raw: RawTask) {
+    pub fn channel_convert(task: TaskForConvert, raw: RawTask)
+    {
+        let last = match task.target.to.is_state() {
+            true => match task.from.get_last_taget(&task.target.to.meta_string(), InstanceDaoImpl::get_by_id) {
+                Err(_) => { return; }
+                Ok(last) => last
+            }
+            false => None
+        };
         if Protocol::Auto == task.target.executor.protocol {
-            let _ = Self::received_instance(&task, &raw, vec![Instance::default()]);
+            let _ = Self::received_instance(&task, &raw, vec![Instance::default()], &last);
             return;
         }
-        match ConverterParameterWrapper::gen_and_call_out(&task, raw.task_id.clone(), &task.target) {
+        match ConverterParameterWrapper::gen_and_call_out(&task, raw.task_id.clone(), &task.target, &last) {
             Err(err) => match err {
                 // only **Environment Error** will be retry
                 NatureError::EnvironmentError(_) => (),
@@ -73,14 +80,10 @@ impl InnerController {
             }
             Ok(returned) => match returned {
                 ConverterReturned::Instances(instances) => {
-                    let _ = Self::received_instance(&task, &raw, instances);
+                    let _ = Self::received_instance(&task, &raw, instances, &last);
                 }
                 ConverterReturned::SelfRoute(ins) => {
                     let _ = Self::received_self_route(&task, &raw, ins);
-                }
-                ConverterReturned::Mixed((ins, sf)) => {
-                    let _ = Self::received_instance(&task, &raw, ins);
-                    let _ = Self::received_self_route(&task, &raw, sf);
                 }
                 ConverterReturned::Delay(delay) => {
                     let _ = TaskDaoImpl::update_execute_time(&raw.task_id, i64::from(delay));
@@ -94,9 +97,9 @@ impl InnerController {
         };
     }
 
-    pub fn received_instance(task: &TaskForConvert, raw: &RawTask, instances: Vec<Instance>) -> Result<()> {
+    pub fn received_instance(task: &TaskForConvert, raw: &RawTask, instances: Vec<Instance>, last_state: &Option<Instance>) -> Result<()> {
         debug!("converted {} instances for `Meta`: {:?}", instances.len(), &task.target.to.get_full_key());
-        match Converted::gen(&task, &raw, instances) {
+        match Converted::gen(&task, &raw, instances, last_state) {
             Ok(rtn) => {
                 let plan = PlanInfo::save(&task, &rtn.converted, StorePlanDaoImpl::save, StorePlanDaoImpl::get)?;
                 prepare_to_store(&rtn.done_task, plan)

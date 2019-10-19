@@ -9,7 +9,7 @@ pub struct Converted {
 }
 
 impl Converted {
-    pub fn gen(task: &TaskForConvert, carrier: &RawTask, instances: Vec<Instance>) -> Result<Converted> {
+    pub fn gen(task: &TaskForConvert, carrier: &RawTask, instances: Vec<Instance>, last_state: &Option<Instance>) -> Result<Converted> {
         // check `MetaType` for Null
         if task.target.to.get_meta_type() == MetaType::Null {
             let rtn = Converted {
@@ -42,7 +42,7 @@ impl Converted {
         });
 
         // verify
-        let _ = Self::verify_state(&task, &mut instances)?;
+        let _ = Self::verify_state(&task, &mut instances, last_state)?;
         let rtn = Converted {
             done_task: carrier.to_owned(),
             converted: instances,
@@ -50,7 +50,7 @@ impl Converted {
         Ok(rtn)
     }
 
-    fn verify_state(task: &TaskForConvert, instances: &mut Vec<Instance>) -> Result<()> {
+    fn verify_state(task: &TaskForConvert, instances: &mut Vec<Instance>, last_state: &Option<Instance>) -> Result<()> {
         let to = &task.target.to;
         if !to.is_state() {
             return Ok(());
@@ -69,7 +69,7 @@ impl Converted {
         }
         // states and state version
         let temp_states = ins.states.clone();
-        match &task.last_state {
+        match last_state {
             None => {
                 ins.state_version = 1;
             }
@@ -116,7 +116,6 @@ mod test {
                 states_demand: None,
                 use_upstream_id: true,
             },
-            last_state: None,
         };
         let raw = RawTask {
             task_id: vec![],
@@ -132,7 +131,7 @@ mod test {
         let ins = vec![ins];
 
         // for normal
-        let result = Converted::gen(&task, &raw, ins.clone()).unwrap();
+        let result = Converted::gen(&task, &raw, ins.clone(), &None).unwrap();
         let c = &result.converted[0];
         let from = c.from.as_ref().unwrap();
         assert_eq!(from.id, 567);
@@ -142,7 +141,7 @@ mod test {
 
         // for state
         let _ = task.target.to.set_states(Some(vec![State::Normal("hello".to_string())]));
-        let result = Converted::gen(&task, &raw, ins).unwrap();
+        let result = Converted::gen(&task, &raw, ins, &None).unwrap();
         assert_eq!(result.converted[0].id, 567);
     }
 
@@ -167,10 +166,9 @@ mod test {
                 }),
                 use_upstream_id: false,
             },
-            last_state: None,
         };
         let mut ins = vec![Instance::new("test").unwrap()];
-        let _ = Converted::verify_state(&task, &mut ins);
+        let _ = Converted::verify_state(&task, &mut ins, &None);
         let one = &ins[0];
         assert_eq!(one.states.contains("new"), true)
     }

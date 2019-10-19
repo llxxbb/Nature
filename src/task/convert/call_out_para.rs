@@ -1,4 +1,4 @@
-use nature_common::{ConverterParameter, ConverterReturned, NatureError, Protocol, Result};
+use nature_common::{ConverterParameter, ConverterReturned, Instance, NatureError, Protocol, Result};
 use nature_db::Mission;
 
 use crate::task::{HttpExecutorImpl, LocalExecutorImpl, TaskForConvert};
@@ -13,10 +13,19 @@ pub trait ExecutorTrait: Sync {
 pub struct ConverterParameterWrapper;
 
 impl ConverterParameterWrapper {
-    pub fn gen_and_call_out(task: &TaskForConvert, carrier_id: Vec<u8>, mission: &Mission) -> Result<ConverterReturned> {
+    pub fn gen_and_call_out(task: &TaskForConvert, carrier_id: Vec<u8>, mission: &Mission, last_target: &Option<Instance>) -> Result<ConverterReturned>
+    {
+        if let Some(ref last) = last_target {
+            if let Some(demand) = &mission.states_demand {
+                if let Err(_) = demand.check_last(&last.states) {
+                    return Ok(ConverterReturned::None);
+                }
+            }
+        };
+
         let para = ConverterParameter {
             from: task.from.clone(),
-            last_state: task.last_state.clone(),
+            last_state: last_target.clone(),
             carrier_id,
         };
         let executor = Self::get_executer(&mission.executor.protocol)?;

@@ -4,7 +4,8 @@
 
 ## Underway
 
-    remove last_state from TaskForConvert
+    add self check for state conflic
+    fix callback last_status missed
     
     implement self_route for converted
     
