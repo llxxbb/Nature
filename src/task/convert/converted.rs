@@ -122,6 +122,7 @@ mod test {
             meta: "".to_string(),
             data_type: 0,
             data: "".to_string(),
+            last_state_version: 0,
             create_time: Local::now().naive_local(),
             execute_time: Local::now().naive_local(),
             retried_times: 0,
