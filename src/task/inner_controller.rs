@@ -1,6 +1,6 @@
 use serde::export::From;
 
-use nature_common::{ConverterReturned, Instance, NatureError, Protocol, Result, SelfRouteInstance, TaskForSerial};
+use nature_common::{ConverterReturned, Instance, NatureError, ParaForIDAndFrom, Protocol, Result, SelfRouteInstance, TaskForSerial};
 use nature_db::{InstanceDaoImpl, MetaCacheImpl, MetaDaoImpl, Mission, RawTask, RelationCacheImpl, RelationDaoImpl, StorePlanDaoImpl, TaskDaoImpl, TaskType};
 
 use crate::actor::*;
@@ -21,10 +21,23 @@ impl InnerController {
             }
             Err(NatureError::DaoDuplicated(err)) => {
                 if task.instance.state_version > 0 {
-                    // TODO
-                    // state_version conflict need retry
+                    let ins_from = task.instance.from.clone().unwrap();
+                    let para = ParaForIDAndFrom {
+                        id: task.instance.id,
+                        meta: task.instance.meta.clone(),
+                        from_id: ins_from.id,
+                        from_meta: ins_from.meta.clone(),
+                        from_state_version: ins_from.state_version,
+                    };
+                    let old = InstanceDaoImpl::get_by_from(&para)?;
+                    if let Some(_ins) = old {
+                        ACT_STORED.try_send(MsgForTask(task, carrier))?;
+                        return Ok(());
+                    } else {
+                        // TODO delete plan and re-convert
+                        let _ = StorePlanDaoImpl::delete(&ins_from.get_upstream(), &task.instance.meta)?;
+                    }
                 }
-
                 warn!("Instance duplicated for id : {}, of `Meta` : {}, will delete it's task!", task.instance.id, &task.instance.meta);
                 // Don't worry about the previous task would deleted while in processing!, the old task will be continue.
                 let _ = TaskDaoImpl::delete(&&carrier.task_id);
@@ -102,7 +115,7 @@ impl InnerController {
         match Converted::gen(&task, &raw, instances, last_state) {
             Ok(rtn) => {
                 let plan = PlanInfo::save(&task, &rtn.converted, StorePlanDaoImpl::save, StorePlanDaoImpl::get)?;
-                prepare_to_store(&rtn.done_task, plan)
+                prepare_to_store(&rtn.done_task, plan, &task.target)
             }
             Err(err) => {
                 let _ = TaskDaoImpl::raw_to_error(&err, &raw);
@@ -130,13 +143,13 @@ impl InnerController {
     }
 }
 
-fn prepare_to_store(carrier: &RawTask, plan: PlanInfo) -> Result<()> {
+fn prepare_to_store(carrier: &RawTask, plan: PlanInfo, previous_mission: &Mission) -> Result<()> {
     let mut store_infos: Vec<RawTask> = Vec::new();
     let mut t_d: Vec<(TaskForStore, RawTask)> = Vec::new();
     let relations = RelationCacheImpl::get(&carrier.meta, RelationDaoImpl::get_relations, MetaCacheImpl::get, MetaDaoImpl::get)?;
     for instance in plan.plan.iter() {
         let mission = Mission::get_by_instance(instance, &relations);
-        let task = TaskForStore { instance: instance.clone(), next_mission: mission };
+        let task = TaskForStore::new_with_previous_mission(instance.clone(), mission, previous_mission);
         match RawTask::new(&task, &plan.to, TaskType::Store as i16) {
             Ok(x) => {
                 store_infos.push(x.clone());
@@ -166,7 +179,7 @@ fn inner_serial(task: &MsgForTask<TaskForSerial>) -> Result<()> {
             match RelationCacheImpl::get(&ins.meta, RelationDaoImpl::get_relations, MetaCacheImpl::get, MetaDaoImpl::get) {
                 Ok(relations) => {
                     let mission = Mission::get_by_instance(&ins, &relations);
-                    let store_task = TaskForStore { instance: ins.clone(), next_mission: mission };
+                    let store_task = TaskForStore::new(ins.clone(), mission);
                     let mut raw = RawTask::new(&store_task, &ins.meta, TaskType::QueueBatch as i16)?;
                     if let Ok(_route) = raw.finish_old(&carrier, TaskDaoImpl::insert, TaskDaoImpl::delete) {
                         let _ = ACT_STORED.try_send(MsgForTask(store_task, raw));
@@ -188,7 +201,7 @@ fn inner_parallel(task: &MsgForTask<Vec<Instance>>) -> Result<()> {
         Ok(relations) => {
             for instance in task.0.iter() {
                 let mission = Mission::get_by_instance(&instance, &relations);
-                let task = TaskForStore { instance: instance.clone(), next_mission: mission };
+                let task = TaskForStore::new(instance.clone(), mission);
                 let raw = RawTask::new(&task, &instance.meta, TaskType::Store as i16)?;
                 match TaskDaoImpl::insert(&raw) {
                     Ok(_) => tuple.push((task, raw)),

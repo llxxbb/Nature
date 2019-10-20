@@ -41,14 +41,12 @@ impl ExecutorTrait for LocalExecutorImpl {
                     }
                 });
                 // get entry to call
-//                dbg!(&entry.entry);
                 match cfg_lib {
                     None => ConverterReturned::None,
                     Some(local_lib) => {
                         let fun: CALLER = unsafe {
                             local_lib.get(entry.entry.as_bytes()).unwrap()
                         };
-//                        dbg!(&fun);
                         match catch_unwind(|| { fun(para) }) {
                             Ok(rtn) => rtn,
                             Err(e) => {

@@ -3,10 +3,10 @@
 ## finished but did not submit
 
 
+
 ## Underway
 
-    retry support last_status_version field
-    add self check for state conflic
+    regenerate convert task for state confilct
     
     implement self_route for converted
     

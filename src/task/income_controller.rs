@@ -14,7 +14,7 @@ impl IncomeController {
         let _ = instance.check_and_revise(MetaCacheImpl::get, MetaDaoImpl::get)?;
         let relations = RelationCacheImpl::get(&instance.meta, RelationDaoImpl::get_relations, MetaCacheImpl::get, MetaDaoImpl::get)?;
         let mission = Mission::get_by_instance(&instance, &relations);
-        let task = TaskForStore { instance: instance.clone(), next_mission: mission };
+        let task = TaskForStore::new(instance.clone(), mission);
         let raw = RawTask::new(&task, &instance.meta, TaskType::Store as i16)?;
         TaskDaoImpl::insert(&raw)?;
         InnerController::save_instance(task, raw)?;
@@ -63,6 +63,7 @@ impl IncomeController {
 
     pub fn redo_task(raw: RawTask) -> Result<()> {
         // TODO check busy first
+        dbg!(&raw);
         match TaskType::try_from(raw.data_type)? {
             TaskType::Store => {
                 let rtn = serde_json::from_str(&raw.data)?;
