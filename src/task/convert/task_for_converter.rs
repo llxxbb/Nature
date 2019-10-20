@@ -28,36 +28,9 @@ impl TaskForConvert {
                 from: task.instance.clone(),
                 target: c.clone(),
             };
-            let car = RawTask::new(&x, &c.to.get_full_key(), TaskType::Convert as i16)?;
+            let car = RawTask::new(&x, &c.to.meta_string(), TaskType::Convert as i16)?;
             new_carriers.push((x, car));
         }
         Ok(new_carriers)
     }
-}
-
-#[cfg(test)]
-mod test {
-    // TODO
-//    use mockers::matchers::ANY;
-//
-//    use super::*;
-//
-//    #[test]
-//    fn convert_for_null_target() {
-//        let mocks = MyMocks::new();
-//        let service_impl = init_svc(&mocks);
-//        mocks.s.expect(mocks.call_out.convert_call(ANY, ANY)
-//            .and_return(Ok(ConverterReturned::None)));
-//        let info = ConverterInfo::default();
-//        let raw = RawTask::new(&info, "hello", 10).unwrap();
-//        service_impl.convert(&info, &raw)
-//    }
-//
-//    fn init_svc(mockers: &MyMocks) -> ConvertServiceImpl {
-//        ConvertServiceImpl {
-//            svc_task: mockers.s_task.clone(),
-//            caller: mockers.call_out.clone(),
-//            svc_define: mockers.s_tmeta_cache.clone(),
-//        }
-//    }
 }

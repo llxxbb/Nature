@@ -29,7 +29,7 @@ impl PlanInfo {
             from_sn: converter_info.from.id,
             from_meta: converter_info.from.meta.clone(),
             from_sta_ver: converter_info.from.state_version,
-            to: converter_info.target.to.get_string(),
+            to: converter_info.target.to.meta_string(),
             plan: instances.clone(),
         };
 

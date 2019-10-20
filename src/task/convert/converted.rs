@@ -20,7 +20,7 @@ impl Converted {
         }
 
         if instances.is_empty() {
-            let msg = format!("Must return instance for meta: {}", task.target.to.get_string());
+            let msg = format!("Must return instance for meta: {}", task.target.to.meta_string());
             warn!("{}", &msg);
             return Err(NatureError::VerifyError(msg));
         }
@@ -33,7 +33,7 @@ impl Converted {
         };
         let mut instances = instances;
         instances.iter_mut().for_each(|n| {
-            n.data.meta = task.target.to.get_string();
+            n.data.meta = task.target.to.meta_string();
             if task.target.use_upstream_id {
                 n.id = task.from.id;
             }
