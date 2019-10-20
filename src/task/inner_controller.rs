@@ -1,6 +1,6 @@
 use serde::export::From;
 
-use nature_common::{ConverterReturned, Instance, NatureError, ParaForIDAndFrom, Protocol, Result, SelfRouteInstance, TaskForSerial};
+use nature_common::{ConverterReturned, Instance, NatureError, ParaForIDAndFrom, ParaForQueryByID, Protocol, Result, SelfRouteInstance, TaskForSerial};
 use nature_db::{InstanceDaoImpl, MetaCacheImpl, MetaDaoImpl, Mission, RawTask, RelationCacheImpl, RelationDaoImpl, StorePlanDaoImpl, TaskDaoImpl, TaskType};
 
 use crate::actor::*;
@@ -8,6 +8,7 @@ use crate::task::{Converted, ConverterParameterWrapper, PlanInfo, TaskForConvert
 
 pub struct InnerController {}
 
+/// The core process of the Nature
 impl InnerController {
     pub fn channel_store(store: (TaskForStore, RawTask)) {
         let _ = InnerController::save_instance(store.0, store.1);
@@ -19,31 +20,54 @@ impl InnerController {
                 ACT_STORED.try_send(MsgForTask(task, carrier))?;
                 Ok(())
             }
-            Err(NatureError::DaoDuplicated(err)) => {
-                if task.instance.state_version > 0 {
-                    let ins_from = task.instance.from.clone().unwrap();
-                    let para = ParaForIDAndFrom {
-                        id: task.instance.id,
-                        meta: task.instance.meta.clone(),
-                        from_id: ins_from.id,
-                        from_meta: ins_from.meta.clone(),
-                        from_state_version: ins_from.state_version,
-                    };
-                    let old = InstanceDaoImpl::get_by_from(&para)?;
-                    if let Some(_ins) = old {
-                        ACT_STORED.try_send(MsgForTask(task, carrier))?;
-                        return Ok(());
-                    } else {
-                        // TODO delete plan and re-convert
-                        let _ = StorePlanDaoImpl::delete(&ins_from.get_upstream(), &task.instance.meta)?;
-                    }
-                }
-                warn!("Instance duplicated for id : {}, of `Meta` : {}, will delete it's task!", task.instance.id, &task.instance.meta);
-                // Don't worry about the previous task would deleted while in processing!, the old task will be continue.
-                let _ = TaskDaoImpl::delete(&&carrier.task_id);
-                Err(NatureError::DaoDuplicated(err))
-            }
+            Err(NatureError::DaoDuplicated(err)) => InnerController::duplicated_instance(&task, &carrier, err),
             Err(e) => Err(e)
+        }
+    }
+
+    fn duplicated_instance(task: &TaskForStore, carrier: &RawTask, err: String) -> Result<()> {
+        // none state-meta process
+        if task.instance.state_version == 0 {
+            warn!("Instance duplicated for id : {}, of `Meta` : {}, will delete it's task!", task.instance.id, &task.instance.meta);
+            // Don't worry about the previous task would deleted while in processing!, the old task will be continue.
+            let _ = TaskDaoImpl::delete(&&carrier.task_id);
+            return Err(NatureError::DaoDuplicated(err));
+        }
+
+        let ins_from = task.instance.from.clone().unwrap();
+        let para = ParaForIDAndFrom {
+            id: task.instance.id,
+            meta: task.instance.meta.clone(),
+            from_id: ins_from.id,
+            from_meta: ins_from.meta.clone(),
+            from_state_version: ins_from.state_version,
+        };
+        let old = InstanceDaoImpl::get_by_from(&para)?;
+        if let Some(ins) = old {
+            // same frominstance
+            warn!("same from-instance for meta: [{}] on version : {}", &task.instance.meta, task.instance.state_version);
+            let task = TaskForStore::new(ins, Some(vec![task.previous_mission.clone().unwrap()]));
+            ACT_STORED.try_send(MsgForTask(task, carrier.clone()))?;
+            return Ok(());
+        } else {
+            warn!("conflict for state-meta: [{}] on version : {}", &task.instance.meta, task.instance.state_version);
+            let _ = StorePlanDaoImpl::delete(&ins_from.get_upstream(), &task.instance.meta)?;
+            let ins = InstanceDaoImpl::get_by_id(&ParaForQueryByID {
+                id: ins_from.id,
+                meta: ins_from.meta,
+            })?;
+            match ins {
+                Some(ins) => {
+                    let task = TaskForStore::new(ins, Some(vec![task.previous_mission.clone().unwrap()]));
+                    ACT_STORED.try_send(MsgForTask(task, carrier.clone()))?;
+                    return Ok(());
+                }
+                None => {
+                    let error = NatureError::VerifyError("from-instance does not found".to_string());
+                    let _ = TaskDaoImpl::raw_to_error(&error, &carrier);
+                    return Err(error);
+                }
+            }
         }
     }
 
