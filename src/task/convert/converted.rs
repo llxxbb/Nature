@@ -82,10 +82,13 @@ impl Converted {
         // set status
         if let Some(lsd) = &task.target.states_demand {
             if let Some(ts) = &lsd.target_states {
-                ins.modify_state(ts);
+                ins.modify_state(ts, &task.target.to);
             }
         } else {
-            task.target.to.verify_state(&temp_states)?;
+            let (_, mutex) = task.target.to.check_state(&temp_states.clone().into_iter().collect())?;
+            if mutex.len() > 0 {
+                return Err(NatureError::ConverterLogicalError(format!("returned mutex state {:?}", mutex)));
+            }
             ins.states = temp_states
         }
         Ok(())

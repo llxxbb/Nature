@@ -153,10 +153,7 @@ fn duplicated_instance(task: &TaskForStore, carrier: &RawTask, err: String) -> R
     } else {
         warn!("conflict for state-meta: [{}] on version : {}", &task.instance.meta, task.instance.state_version);
         let _ = StorePlanDaoImpl::delete(&ins_from.get_upstream(), &task.instance.meta)?;
-        let ins = InstanceDaoImpl::get_by_id(&ParaForQueryByID {
-            id: ins_from.id,
-            meta: ins_from.meta,
-        })?;
+        let ins = InstanceDaoImpl::get_by_id(&ParaForQueryByID::new(ins_from.id, &ins_from.meta))?;
         match ins {
             Some(ins) => {
                 let task = TaskForStore::new(ins, Some(vec![task.previous_mission.clone().unwrap()]));
