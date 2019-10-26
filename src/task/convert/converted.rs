@@ -9,7 +9,7 @@ pub struct Converted {
 }
 
 impl Converted {
-    pub fn gen(task: &TaskForConvert, carrier: &RawTask, instances: Vec<Instance>) -> Result<Converted> {
+    pub fn gen(task: &TaskForConvert, carrier: &RawTask, instances: Vec<Instance>, last_state: &Option<Instance>) -> Result<Converted> {
         // check `MetaType` for Null
         if task.target.to.get_meta_type() == MetaType::Null {
             let rtn = Converted {
@@ -20,7 +20,7 @@ impl Converted {
         }
 
         if instances.is_empty() {
-            let msg = format!("Must return instance for meta: {}", task.target.to.get_string());
+            let msg = format!("Must return instance for meta: {}", task.target.to.meta_string());
             warn!("{}", &msg);
             return Err(NatureError::VerifyError(msg));
         }
@@ -33,7 +33,7 @@ impl Converted {
         };
         let mut instances = instances;
         instances.iter_mut().for_each(|n| {
-            n.data.meta = task.target.to.get_string();
+            n.data.meta = task.target.to.meta_string();
             if task.target.use_upstream_id {
                 n.id = task.from.id;
             }
@@ -42,7 +42,7 @@ impl Converted {
         });
 
         // verify
-        let _ = Self::verify_state(&task, &mut instances)?;
+        let _ = Self::verify_state(&task, &mut instances, last_state)?;
         let rtn = Converted {
             done_task: carrier.to_owned(),
             converted: instances,
@@ -50,9 +50,9 @@ impl Converted {
         Ok(rtn)
     }
 
-    fn verify_state(task: &TaskForConvert, instances: &mut Vec<Instance>) -> Result<()> {
+    fn verify_state(task: &TaskForConvert, instances: &mut Vec<Instance>, last_state: &Option<Instance>) -> Result<()> {
         let to = &task.target.to;
-        if !to.is_state {
+        if !to.is_state() {
             return Ok(());
         }
         if task.target.use_upstream_id && instances.len() > 1 {
@@ -68,20 +68,28 @@ impl Converted {
             ins.id = task.from.id;
         }
         // states and state version
-        match &task.last_status {
+        let temp_states = ins.states.clone();
+        match last_state {
             None => {
                 ins.state_version = 1;
             }
             Some(x) => {
+                ins.id = x.id;
                 ins.state_version = x.state_version + 1;
                 ins.states = x.states.clone();
             }
         };
-        // target
+        // set status
         if let Some(lsd) = &task.target.states_demand {
             if let Some(ts) = &lsd.target_states {
-                ins.modify_state(ts);
+                ins.modify_state(ts, &task.target.to);
             }
+        } else {
+            let (_, mutex) = task.target.to.check_state(&temp_states.clone().into_iter().collect())?;
+            if mutex.len() > 0 {
+                return Err(NatureError::ConverterLogicalError(format!("returned mutex state {:?}", mutex)));
+            }
+            ins.states = temp_states
         }
         Ok(())
     }
@@ -111,13 +119,13 @@ mod test {
                 states_demand: None,
                 use_upstream_id: true,
             },
-            last_status: None,
         };
         let raw = RawTask {
             task_id: vec![],
             meta: "".to_string(),
             data_type: 0,
             data: "".to_string(),
+            last_state_version: 0,
             create_time: Local::now().naive_local(),
             execute_time: Local::now().naive_local(),
             retried_times: 0,
@@ -127,7 +135,7 @@ mod test {
         let ins = vec![ins];
 
         // for normal
-        let result = Converted::gen(&task, &raw, ins.clone()).unwrap();
+        let result = Converted::gen(&task, &raw, ins.clone(), &None).unwrap();
         let c = &result.converted[0];
         let from = c.from.as_ref().unwrap();
         assert_eq!(from.id, 567);
@@ -136,8 +144,8 @@ mod test {
         assert_eq!(result.converted[0].id, 567);
 
         // for state
-        task.target.to.state = Some(vec![State::Normal("hello".to_string())]);
-        let result = Converted::gen(&task, &raw, ins).unwrap();
+        let _ = task.target.to.set_states(Some(vec![State::Normal("hello".to_string())]));
+        let result = Converted::gen(&task, &raw, ins, &None).unwrap();
         assert_eq!(result.converted[0].id, 567);
     }
 
@@ -148,7 +156,7 @@ mod test {
             target: Mission {
                 to: {
                     let mut m = Meta::from_string("/B/hello:1").unwrap();
-                    m.is_state = true;
+                    let _ = m.set_states(Some(vec![State::Normal("test".to_string())]));
                     m
                 },
                 executor: Default::default(),
@@ -162,10 +170,9 @@ mod test {
                 }),
                 use_upstream_id: false,
             },
-            last_status: None,
         };
         let mut ins = vec![Instance::new("test").unwrap()];
-        let _ = Converted::verify_state(&task, &mut ins);
+        let _ = Converted::verify_state(&task, &mut ins, &None);
         let one = &ins[0];
         assert_eq!(one.states.contains("new"), true)
     }

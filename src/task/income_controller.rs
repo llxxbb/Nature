@@ -1,7 +1,7 @@
 use std::convert::TryFrom;
 
 use nature_common::{Instance, MetaType, NatureError, Result, SelfRouteInstance, TaskForSerial};
-use nature_db::{CallbackResult, DelayedInstances, MetaCacheImpl, MetaDaoImpl, Mission, RawTask, RelationCacheImpl, RelationDaoImpl, TaskDaoImpl, TaskType};
+use nature_db::{CallbackResult, DelayedInstances, InstanceDaoImpl, MetaCacheImpl, MetaDaoImpl, Mission, RawTask, RelationCacheImpl, RelationDaoImpl, TaskDaoImpl, TaskType};
 
 use crate::actor::*;
 use crate::task::{InnerController, TaskForConvert, TaskForStore};
@@ -14,7 +14,7 @@ impl IncomeController {
         let _ = instance.check_and_revise(MetaCacheImpl::get, MetaDaoImpl::get)?;
         let relations = RelationCacheImpl::get(&instance.meta, RelationDaoImpl::get_relations, MetaCacheImpl::get, MetaDaoImpl::get)?;
         let mission = Mission::get_by_instance(&instance, &relations);
-        let task = TaskForStore { instance: instance.clone(), mission };
+        let task = TaskForStore::new(instance.clone(), mission);
         let raw = RawTask::new(&task, &instance.meta, TaskType::Store as i16)?;
         TaskDaoImpl::insert(&raw)?;
         InnerController::save_instance(task, raw)?;
@@ -48,7 +48,11 @@ impl IncomeController {
                         }
                         CallbackResult::Instances(ins) => {
                             let task: TaskForConvert = serde_json::from_str(&carrier.data)?;
-                            InnerController::received_instance(&task, &carrier, ins)
+                            let last = match task.target.to.is_state() {
+                                true => task.from.get_last_taget(&task.target.to.meta_string(), InstanceDaoImpl::get_by_id)?,
+                                false => None
+                            };
+                            InnerController::received_instance(&task, &carrier, ins, &last)
                         }
                     }
                 }
@@ -59,6 +63,7 @@ impl IncomeController {
 
     pub fn redo_task(raw: RawTask) -> Result<()> {
         // TODO check busy first
+        dbg!(&raw);
         match TaskType::try_from(raw.data_type)? {
             TaskType::Store => {
                 let rtn = serde_json::from_str(&raw.data)?;

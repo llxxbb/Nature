@@ -1,14 +1,16 @@
 extern crate libloading as lib;
 
+use std::panic::catch_unwind;
 use std::sync::Mutex;
 use std::time::Duration;
 
 use lru_time_cache::LruCache;
 
 use nature_common::*;
+
 use crate::task::ExecutorTrait;
 
-type CALLER<'a> = lib::Symbol<'a, fn(&CallOutParameter) -> ConverterReturned>;
+type CALLER<'a> = lib::Symbol<'a, fn(&ConverterParameter) -> ConverterReturned>;
 type LIB = Option<lib::Library>;
 
 lazy_static! {
@@ -21,7 +23,7 @@ lazy_static! {
 pub struct LocalExecutorImpl;
 
 impl ExecutorTrait for LocalExecutorImpl {
-    fn execute(&self, executor: &str, para: &CallOutParameter) -> ConverterReturned {
+    fn execute(&self, executor: &str, para: &ConverterParameter) -> ConverterReturned {
         match Self::get_entry(executor) {
             None => ConverterReturned::None,
             Some(entry) => {
@@ -39,14 +41,19 @@ impl ExecutorTrait for LocalExecutorImpl {
                     }
                 });
                 // get entry to call
-//                debug!("call entry for :[{}]", entry.entry);
                 match cfg_lib {
                     None => ConverterReturned::None,
                     Some(local_lib) => {
                         let fun: CALLER = unsafe {
                             local_lib.get(entry.entry.as_bytes()).unwrap()
                         };
-                        fun(para)
+                        match catch_unwind(|| { fun(para) }) {
+                            Ok(rtn) => rtn,
+                            Err(e) => {
+                                warn!("{:?} return error: {:?}", &entry.entry, e);
+                                ConverterReturned::LogicalError("converter implement error".to_string())
+                            }
+                        }
                     }
                 }
             }

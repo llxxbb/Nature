@@ -29,16 +29,3 @@ A `relation` defined a `converter` to convert from **from**-`meta`'s instance' t
 `converter` will **glue all your logical together at runtime**. 
 
 [converter](concept-converter.md)
-
-## unfinished
-
-
-
-There are good news for developers too, __short process__ will be easy to develop, 
-and `Nature` try to run the __short process__ in parallel.
-
-![Alt text](../img/%E5%B9%BB%E7%81%AF%E7%89%8713.jpg)
-
-`Nature` only insert `Instance` to db, no __deletion__ no __update__.
-`Nature` use __state version__ to express any chang on an `instance` and not all `Thing` have states.
-This feature let `Nature` run converter equally for any times, tt is __idempotent__.

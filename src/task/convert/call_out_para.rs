@@ -1,4 +1,4 @@
-use nature_common::{CallOutParameter, ConverterReturned, NatureError, Protocol, Result};
+use nature_common::{ConverterParameter, ConverterReturned, Instance, NatureError, Protocol, Result};
 use nature_db::Mission;
 
 use crate::task::{HttpExecutorImpl, LocalExecutorImpl, TaskForConvert};
@@ -7,20 +7,30 @@ static HTTP_CALLER: &dyn ExecutorTrait = &HttpExecutorImpl;
 static LOCAL_RUST_CALLER: &dyn ExecutorTrait = &LocalExecutorImpl;
 
 pub trait ExecutorTrait: Sync {
-    fn execute(&self, executor: &str, para: &CallOutParameter) -> ConverterReturned;
+    fn execute(&self, executor: &str, para: &ConverterParameter) -> ConverterReturned;
 }
 
-pub struct CallOutParaWrapper;
+pub struct ConverterParameterWrapper;
 
-impl CallOutParaWrapper {
-    pub fn gen_and_call_out(task: &TaskForConvert, carrier_id: Vec<u8>, mission: &Mission) -> Result<ConverterReturned> {
-        let para = CallOutParameter {
+impl ConverterParameterWrapper {
+    pub fn gen_and_call_out(task: &TaskForConvert, carrier_id: Vec<u8>, mission: &Mission, last_target: &Option<Instance>) -> Result<ConverterReturned>
+    {
+        if let Some(ref last) = last_target {
+            if let Some(demand) = &mission.states_demand {
+                if let Err(_) = demand.check_last(&last.states) {
+                    return Ok(ConverterReturned::None);
+                }
+            }
+        };
+
+        let para = ConverterParameter {
             from: task.from.clone(),
-            last_status: task.last_status.clone(),
+            last_state: last_target.clone(),
             carrier_id,
         };
-        let executer = Self::get_executer(&mission.executor.protocol)?;
-        Ok(executer.execute(&mission.executor.url, &para))
+        let executor = Self::get_executer(&mission.executor.protocol)?;
+        let rtn = executor.execute(&mission.executor.url, &para);
+        Ok(rtn)
     }
 
     fn get_executer(protocol: &Protocol) -> Result<&'static dyn ExecutorTrait> {
