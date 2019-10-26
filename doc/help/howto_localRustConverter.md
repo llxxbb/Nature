@@ -19,11 +19,21 @@ extern crate nature_common;
 
 use nature_common::*;
 
-
 #[no_mangle]
-pub extern fn simple_convert(para: CallOutParameter) -> ConverterReturned {
+pub extern fn simple_convert(para: ConverterParameter) -> ConverterReturned {
+    let obj: YouBusinessObject = serde_json::from_str(&para.from.content).unwrap();
     // TODO your logical
-    ConverterReturned::Instances(vec![your_instance])
+    let mut instance = Instance::default();
+    instance.content = serde_json::to_string(&new_other_business_object).unwrap();
+    ConverterReturned::Instances(vec![instance])
 }
 
 ```
+
+You can get your business-object through:
+
+```rust
+serde_json::from_str(&para.from.content).unwrap();
+```
+
+You should put your business-object to `Instance.content` field.
