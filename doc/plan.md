@@ -2,7 +2,16 @@
 
 ## finished but did not submit
 
+
+
+
 ## Underway
+
+    the following meta must use the belong_to's id 
+    
+    converter support belong_to
+    
+    relevant-instance support normal instance
 
     implement self_route for converted
     
