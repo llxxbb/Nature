@@ -4,11 +4,6 @@
 
 ## Underway
 
-
-    the following meta must use the master's id 
-    
-    converter support master
-
     check master setting whether is correct
 
     relevant-instance support normal instance

@@ -50,11 +50,13 @@ impl InnerController {
     pub fn channel_convert(task: TaskForConvert, raw: RawTask) {
         let protocol = task.target.executor.protocol.clone();
         let mut from_instance = task.from.clone();
-        // this logic can't move to place where after converted, because it might not get the last state and cause state conflict
-        if protocol == Protocol::Auto && task.target.use_upstream_id == true {
+        // -----begin this logic can't move to place where after converted, because it might not get the last state and cause state conflict
+        dbg!(&protocol);
+        if protocol == Protocol::Auto {
             let id = from_instance.id.to_string();
             from_instance.context.insert(CONTEXT_TARGET_INSTANCE_ID.to_string(), id);
         }
+        // -----end
         let last = match task.target.to.is_state() {
             true => match from_instance.get_last_taget(&task.target.to.meta_string(), InstanceDaoImpl::get_by_id) {
                 Err(_) => { return; }

@@ -1,5 +1,5 @@
-use nature_common::{FromInstance, Instance, MetaType, NatureError, Result};
-use nature_db::RawTask;
+use nature_common::{FromInstance, Instance, MetaType, NatureError, Protocol, Result};
+use nature_db::{Mission, RawTask};
 
 use crate::task::TaskForConvert;
 
@@ -31,15 +31,17 @@ impl Converted {
             meta: task.from.meta.to_string(),
             state_version: task.from.state_version,
         };
+
+        // init meta and [from]
         let mut instances = instances;
         instances.iter_mut().for_each(|n| {
             n.data.meta = task.target.to.meta_string();
-            if task.target.use_upstream_id {
-                n.id = task.from.id;
-            }
             n.from = Some(from.clone());
             let _ = n.revise();
         });
+
+        // check id
+        Self::check_id(&mut instances, &last_state, &from, &task.target);
 
         // verify
         let _ = Self::verify_state(&task, &mut instances, last_state)?;
@@ -48,6 +50,30 @@ impl Converted {
             converted: instances,
         };
         Ok(rtn)
+    }
+
+    fn check_id(ins: &mut Vec<Instance>, last: &Option<Instance>, from: &FromInstance, target: &Mission) {
+        let id = match target.to.is_state() {
+            true => match last {
+                Some(old) => Some(old.id),
+                None => match target.executor.protocol {
+                    Protocol::Auto => Some(from.id),
+                    _ => None
+                }
+            }
+            false => match target.use_upstream_id {
+                true => match ins.len() {
+                    1 => Some(from.id),
+                    _ => None
+                },
+                false => None
+            }
+        };
+        if let Some(id) = id {
+            let mut first = ins[0].clone();
+            first.id = id;
+            ins[0] = first;
+        }
     }
 
     fn verify_state(task: &TaskForConvert, instances: &mut Vec<Instance>, last_state: &Option<Instance>) -> Result<()> {
