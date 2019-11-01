@@ -7,14 +7,14 @@
     check master setting whether is correct
 
     relevant-instance support normal instance
+    
+    business parameter 
+    doc#architecture : instance's parameter.
 
     implement self_route for converted
     
     give a graph at concepts.md for the flow that how to generate instances.
     
-    doc : trace
-    
-    doc#architecture : instance's parameter.
     
         
 ## meta
