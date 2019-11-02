@@ -69,10 +69,7 @@ impl Converted {
                         }
                     }
                     false => match target.use_upstream_id {
-                        true => match ins.len() {
-                            1 => Some(from.id),
-                            _ => None
-                        },
+                        true => Some(from.id),
                         false => None
                     }
                 }
@@ -210,5 +207,102 @@ mod test {
         let _ = Converted::verify_state(&task, &mut ins, &None);
         let one = &ins[0];
         assert_eq!(one.states.contains("new"), true)
+    }
+}
+
+#[cfg(test)]
+mod check_id_test {
+    use nature_common::{Meta, MetaSetting};
+
+    use super::*;
+
+    #[test]
+    fn vec_is_empty() {
+        let (last, from, mission) = init_input();
+        Converted::check_id(&mut vec![], &Some(last), &from, &mission)
+    }
+
+    #[test]
+    fn vec_more_then_one() {
+        let (last, from, mission) = init_input();
+        let one = Instance::new("one").unwrap();
+        let two = Instance::new("two").unwrap();
+        let mut input = vec![one.clone(), two.clone()];
+        Converted::check_id(&mut input, &Some(last), &from, &mission);
+        assert_eq!(one, input[0]);
+        assert_eq!(two, input[1]);
+    }
+
+    #[test]
+    fn no_effect_for_none_state_taget() {
+        let (last, from, mut mission) = init_input();
+        mission.to = Meta::new("noState", 1, MetaType::Business).unwrap();
+        let one = Instance::new("one").unwrap();
+        let mut input = vec![one.clone()];
+        Converted::check_id(&mut input, &Some(last), &from, &mission);
+        assert_eq!(input[0].id, 0);
+    }
+
+    #[test]
+    fn use_last_id() {
+        let (last, from, mission) = init_input();
+        let one = Instance::new("one").unwrap();
+        let mut input = vec![one.clone()];
+        assert_eq!(input[0].id, 0);
+        Converted::check_id(&mut input, &Some(last), &from, &mission);
+        assert_eq!(input[0].id, 456);
+    }
+
+    #[test]
+    fn master_not_matched() {
+        let (_last, mut from, mission) = init_input();
+        from.meta = "not_matched".to_string();
+        let one = Instance::new("one").unwrap();
+        let mut input = vec![one.clone()];
+        Converted::check_id(&mut input, &None, &from, &mission);
+        assert_eq!(input[0].id, 0);
+    }
+
+    #[test]
+    fn master_matched() {
+        let (_last, from, mission) = init_input();
+        let one = Instance::new("one").unwrap();
+        let mut input = vec![one.clone()];
+        Converted::check_id(&mut input, &None, &from, &mission);
+        assert_eq!(input[0].id, 123);
+    }
+
+    #[test]
+    fn use_upstream_id() {
+        let (_last, from, mut mission) = init_input();
+        mission.to = Meta::default();
+        mission.use_upstream_id = true;
+        let one = Instance::new("one").unwrap();
+        let mut input = vec![one.clone()];
+        Converted::check_id(&mut input, &None, &from, &mission);
+        assert_eq!(input[0].id, 123);
+    }
+
+    fn init_input() -> (Instance, FromInstance, Mission) {
+        let mut last = Instance::new("last").unwrap();
+        last.id = 456;
+        let from = FromInstance {
+            id: 123,
+            meta: "from".to_string(),
+            state_version: 1,
+        };
+        let mut meta = Meta::new("to", 1, MetaType::Business).unwrap();
+        let setting = MetaSetting {
+            is_state: true,
+            master: Some("from".to_string()),
+        };
+        let _ = meta.set_setting(&serde_json::to_string(&setting).unwrap());
+        let mission = Mission {
+            to: meta,
+            executor: Default::default(),
+            states_demand: None,
+            use_upstream_id: false,
+        };
+        (last, from, mission)
     }
 }

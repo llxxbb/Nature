@@ -4,8 +4,6 @@
 
 ## Underway
 
-    check master setting whether is correct
-
     relevant-instance support normal instance
     
     business parameter 
