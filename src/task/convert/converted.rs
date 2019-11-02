@@ -1,4 +1,4 @@
-use nature_common::{FromInstance, Instance, MetaType, NatureError, Protocol, Result};
+use nature_common::{FromInstance, Instance, MetaType, NatureError, Result};
 use nature_db::{Mission, RawTask};
 
 use crate::task::TaskForConvert;
@@ -53,20 +53,29 @@ impl Converted {
     }
 
     fn check_id(ins: &mut Vec<Instance>, last: &Option<Instance>, from: &FromInstance, target: &Mission) {
-        let id = match target.to.is_state() {
-            true => match last {
-                Some(old) => Some(old.id),
-                None => match target.executor.protocol {
-                    Protocol::Auto => Some(from.id),
-                    _ => None
+        let id = {
+            if ins.len() != 1 {
+                None
+            } else {
+                match target.to.is_state() {
+                    true => match last {
+                        Some(old) => Some(old.id),
+                        None => match &target.to.get_setting() {
+                            Some(setting) => match &setting.master {
+                                None => None,
+                                Some(master) => if master.eq(&from.meta) { Some(from.id) } else { None },
+                            }
+                            None => None
+                        }
+                    }
+                    false => match target.use_upstream_id {
+                        true => match ins.len() {
+                            1 => Some(from.id),
+                            _ => None
+                        },
+                        false => None
+                    }
                 }
-            }
-            false => match target.use_upstream_id {
-                true => match ins.len() {
-                    1 => Some(from.id),
-                    _ => None
-                },
-                false => None
             }
         };
         if let Some(id) = id {
