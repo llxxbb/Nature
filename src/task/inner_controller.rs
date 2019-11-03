@@ -51,7 +51,6 @@ impl InnerController {
         let protocol = task.target.executor.protocol.clone();
         let mut from_instance = task.from.clone();
         // -----begin this logic can't move to place where after converted, because it might not get the last state and cause state conflict
-        dbg!(&protocol);
         if protocol == Protocol::Auto {
             let id = from_instance.id.to_string();
             from_instance.context.insert(CONTEXT_TARGET_INSTANCE_ID.to_string(), id);
@@ -68,7 +67,22 @@ impl InnerController {
             let _ = Self::received_instance(&task, &raw, vec![Instance::default()], &last);
             return;
         }
-        match ConverterParameterWrapper::gen_and_call_out(&task, raw.task_id.clone(), &task.target, &last) {
+        // init master
+        let meta = match MetaCacheImpl::get(&task.from.meta, MetaDaoImpl::get) {
+            Ok(m) => m,
+            Err(e) => {
+                let _ = TaskDaoImpl::raw_to_error(&e, &raw);
+                return;
+            }
+        };
+        let master = match task.from.get_master(&meta, InstanceDaoImpl::get_by_id) {
+            Ok(m) => m,
+            Err(e) => {
+                let _ = TaskDaoImpl::raw_to_error(&e, &raw);
+                return;
+            }
+        };
+        match ConverterParameterWrapper::gen_and_call_out(&task, raw.task_id.clone(), &task.target, &last, master) {
             Err(err) => match err {
                 // only **Environment Error** will be retry
                 NatureError::EnvironmentError(_) => (),

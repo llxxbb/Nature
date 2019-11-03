@@ -2,10 +2,9 @@
 
 ## finished but did not submit
 
+
 ## Underway
 
-    relevant-instance support normal instance
-    
     business parameter 
     doc#architecture : instance's parameter.
 
