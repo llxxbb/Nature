@@ -64,7 +64,7 @@ impl InnerController {
             false => None
         };
         if Protocol::Auto == protocol {
-            let _ = Self::received_instance(&task, &raw, vec![Instance::default()], &last);
+            let _ = Self::after_converted(&task, &raw, vec![Instance::default()], &last);
             return;
         }
         // init master
@@ -93,7 +93,7 @@ impl InnerController {
             }
             Ok(returned) => match returned {
                 ConverterReturned::Instances(instances) => {
-                    let _ = Self::received_instance(&task, &raw, instances, &last);
+                    let _ = Self::after_converted(&task, &raw, instances, &last);
                 }
                 ConverterReturned::SelfRoute(ins) => {
                     let _ = Self::received_self_route(&task, &raw, ins);
@@ -110,7 +110,7 @@ impl InnerController {
         };
     }
 
-    pub fn received_instance(task: &TaskForConvert, raw: &RawTask, instances: Vec<Instance>, last_state: &Option<Instance>) -> Result<()> {
+    pub fn after_converted(task: &TaskForConvert, raw: &RawTask, instances: Vec<Instance>, last_state: &Option<Instance>) -> Result<()> {
         debug!("converted {} instances for `Meta`: {:?}", instances.len(), &task.target.to.get_full_key());
         match Converted::gen(&task, &raw, instances, last_state) {
             Ok(rtn) => {

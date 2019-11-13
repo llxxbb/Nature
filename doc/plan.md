@@ -5,6 +5,9 @@
 
 ## Underway
 
+    fix bugs for release filter
+    change protocol to lowercase
+
     business parameter 
     doc#architecture : instance's parameter.
 

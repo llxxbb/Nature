@@ -52,7 +52,7 @@ impl IncomeController {
                                 true => task.from.get_last_taget(&task.target.to.meta_string(), InstanceDaoImpl::get_by_id)?,
                                 false => None
                             };
-                            InnerController::received_instance(&task, &carrier, ins, &last)
+                            InnerController::after_converted(&task, &carrier, ins, &last)
                         }
                     }
                 }
