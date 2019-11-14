@@ -2,10 +2,9 @@
 
 ## finished but did not submit
 
-
 ## Underway
 
-    fix bugs for release filter
+
     change protocol to lowercase
 
     business parameter 
