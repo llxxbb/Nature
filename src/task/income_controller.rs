@@ -36,7 +36,7 @@ impl IncomeController {
     }
 
     pub fn callback(delayed: DelayedInstances) -> Result<()> {
-        match TaskDaoImpl::get(&delayed.carrier_id) {
+        match TaskDaoImpl::get(&delayed.task_id) {
             Ok(raw) => {
                 match raw {
                     None => Err(NatureError::VerifyError("task data missed, maybe it had done already.".to_string())),
@@ -62,7 +62,7 @@ impl IncomeController {
                         }
                         ConverterReturned::None => {
                             let (task, _last) = get_task_and_last(&carrier.data)?;
-                            InnerController::process_null(task.target.to.get_meta_type(), &delayed.carrier_id)
+                            InnerController::process_null(task.target.to.get_meta_type(), &delayed.task_id)
                         }
                     }
                 }
