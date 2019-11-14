@@ -2,8 +2,14 @@
 
 ## finished but did not submit
 
+
+
 ## Underway
 
+    ConverterReturned::None need chedk
+    
+    bug fix: converter returned LogicalError does not move to task_error 
+    [reqwest::wait][WARN] blocking API used inside an async Executor can negatively impact perfomance
 
     change protocol to lowercase
 

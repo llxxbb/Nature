@@ -1,6 +1,6 @@
 use std::convert::TryFrom;
 
-use nature_common::{CallbackResult, DelayedInstances, Instance, MetaType, NatureError, Result, SelfRouteInstance, TaskForSerial};
+use nature_common::{ConverterReturned, DelayedInstances, Instance, MetaType, NatureError, Result, SelfRouteInstance, TaskForSerial};
 use nature_db::{InstanceDaoImpl, MetaCacheImpl, MetaDaoImpl, Mission, RawTask, RelationCacheImpl, RelationDaoImpl, TaskDaoImpl, TaskType};
 
 use crate::actor::*;
@@ -41,18 +41,30 @@ impl IncomeController {
                 match raw {
                     None => Err(NatureError::VerifyError("task data missed, maybe it had done already.".to_string())),
                     Some(carrier) => match delayed.result {
-                        CallbackResult::Err(err) => {
+                        ConverterReturned::LogicalError(err) => {
                             let err = NatureError::ConverterLogicalError(err);
                             let _ = TaskDaoImpl::raw_to_error(&err, &carrier);
                             Ok(())
                         }
-                        CallbackResult::Instances(ins) => {
-                            let task: TaskForConvert = serde_json::from_str(&carrier.data)?;
-                            let last = match task.target.to.is_state() {
-                                true => task.from.get_last_taget(&task.target.to.meta_string(), InstanceDaoImpl::get_by_id)?,
-                                false => None
-                            };
-                            InnerController::after_converted(&task, &carrier, ins, &last)
+                        ConverterReturned::EnvError => {
+                            Ok(())
+                        }
+                        ConverterReturned::Delay(_) => {
+                            Err(NatureError::VerifyError("callback can not process [ConverterReturned::Delay]".to_string()))
+                        }
+                        ConverterReturned::Instances(ins) => {
+                            let (task, last) = get_task_and_last(&carrier.data)?;
+                            let _ = InnerController::after_converted(&task, &carrier, ins, &last)?;
+                            Ok(())
+                        }
+                        ConverterReturned::SelfRoute(sf) => {
+                            let (task, _last) = get_task_and_last(&carrier.data)?;
+                            let _ = InnerController::received_self_route(&task, &carrier, sf)?;
+                            Ok(())
+                        }
+                        ConverterReturned::None => {
+                            let _ = TaskDaoImpl::delete(&delayed.carrier_id)?;
+                            Ok(())
                         }
                     }
                 }
@@ -100,4 +112,13 @@ impl IncomeController {
         let _ = ACT_PARALLEL.try_send(MsgForTask(batch, raw));
         Ok(())
     }
+}
+
+fn get_task_and_last(task: &str) -> Result<(TaskForConvert, Option<Instance>)> {
+    let task: TaskForConvert = serde_json::from_str(task)?;
+    let last = match task.target.to.is_state() {
+        true => task.from.get_last_taget(&task.target.to.meta_string(), InstanceDaoImpl::get_by_id)?,
+        false => None
+    };
+    Ok((task, last))
 }

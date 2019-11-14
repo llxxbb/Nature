@@ -99,13 +99,16 @@ impl InnerController {
                     let _ = Self::received_self_route(&task, &raw, ins);
                 }
                 ConverterReturned::Delay(delay) => {
+                    debug!("delay for meta: {}", meta.meta_string());
                     let _ = TaskDaoImpl::update_execute_time(&raw.task_id, i64::from(delay), &last);
                 }
                 ConverterReturned::LogicalError(ss) => {
                     let _ = TaskDaoImpl::raw_to_error(&NatureError::ConverterLogicalError(ss), &raw);
                 }
                 ConverterReturned::EnvError => (),
-                ConverterReturned::None => (),
+                ConverterReturned::None => {
+                    let _ = TaskDaoImpl::delete(&raw.task_id);
+                }
             }
         };
     }
