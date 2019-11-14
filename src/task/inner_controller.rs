@@ -1,6 +1,6 @@
 use serde::export::From;
 
-use nature_common::{CONTEXT_TARGET_INSTANCE_ID, ConverterReturned, Instance, NatureError, ParaForIDAndFrom, ParaForQueryByID, Protocol, Result, SelfRouteInstance, TaskForSerial};
+use nature_common::{CONTEXT_TARGET_INSTANCE_ID, ConverterReturned, Instance, MetaType, NatureError, ParaForIDAndFrom, ParaForQueryByID, Protocol, Result, SelfRouteInstance, TaskForSerial};
 use nature_db::{InstanceDaoImpl, MetaCacheImpl, MetaDaoImpl, Mission, RawTask, RelationCacheImpl, RelationDaoImpl, StorePlanDaoImpl, TaskDaoImpl, TaskType};
 
 use crate::actor::*;
@@ -107,10 +107,20 @@ impl InnerController {
                 }
                 ConverterReturned::EnvError => (),
                 ConverterReturned::None => {
-                    let _ = TaskDaoImpl::delete(&raw.task_id);
+                    let _ = Self::process_null(task.target.to.get_meta_type(), &raw.task_id);
                 }
             }
         };
+    }
+
+    pub fn process_null(meta_type: MetaType, task_id: &[u8]) -> Result<()> {
+        match meta_type {
+            MetaType::Null => {
+                let _ = TaskDaoImpl::delete(task_id)?;
+                Ok(())
+            }
+            _ => Err(NatureError::VerifyError("need return [ConverterReturned::None]".to_string()))
+        }
     }
 
     pub fn after_converted(task: &TaskForConvert, raw: &RawTask, instances: Vec<Instance>, last_state: &Option<Instance>) -> Result<()> {

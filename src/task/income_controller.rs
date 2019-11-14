@@ -43,7 +43,7 @@ impl IncomeController {
                     Some(carrier) => match delayed.result {
                         ConverterReturned::LogicalError(err) => {
                             let err = NatureError::ConverterLogicalError(err);
-                            let _ = TaskDaoImpl::raw_to_error(&err, &carrier);
+                            let _ = TaskDaoImpl::raw_to_error(&err, &carrier)?;
                             Ok(())
                         }
                         ConverterReturned::EnvError => {
@@ -54,17 +54,15 @@ impl IncomeController {
                         }
                         ConverterReturned::Instances(ins) => {
                             let (task, last) = get_task_and_last(&carrier.data)?;
-                            let _ = InnerController::after_converted(&task, &carrier, ins, &last)?;
-                            Ok(())
+                            InnerController::after_converted(&task, &carrier, ins, &last)
                         }
                         ConverterReturned::SelfRoute(sf) => {
                             let (task, _last) = get_task_and_last(&carrier.data)?;
-                            let _ = InnerController::received_self_route(&task, &carrier, sf)?;
-                            Ok(())
+                            InnerController::received_self_route(&task, &carrier, sf)
                         }
                         ConverterReturned::None => {
-                            let _ = TaskDaoImpl::delete(&delayed.carrier_id)?;
-                            Ok(())
+                            let (task, _last) = get_task_and_last(&carrier.data)?;
+                            InnerController::process_null(task.target.to.get_meta_type(), &delayed.carrier_id)
                         }
                     }
                 }

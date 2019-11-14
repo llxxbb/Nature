@@ -103,7 +103,11 @@ impl Converted {
         let temp_states = ins.states.clone();
         match last_state {
             None => {
-                ins.state_version = 1;
+                if task.from.meta == task.target.to.meta_string() {
+                    ins.state_version = task.from.state_version + 1;
+                } else {
+                    ins.state_version = 1;
+                }
             }
             Some(x) => {
                 ins.id = x.id;
