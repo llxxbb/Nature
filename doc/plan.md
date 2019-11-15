@@ -2,14 +2,11 @@
 
 ## finished but did not submit
 
-fix callback bug
 
 ## Underway
 
     bug fix: converter returned LogicalError does not move to task_error 
-    [reqwest::wait][WARN] blocking API used inside an async Executor can negatively impact perfomance
 
-    change protocol to lowercase
 
     business parameter 
     doc#architecture : instance's parameter.
@@ -39,4 +36,9 @@ fix callback bug
 
 ## demo
     shopping cart(add, remove, clear, submit)
+    
+## reqwest
+    [reqwest::wait][WARN] blocking API used inside an async Executor can negatively impact perfomance
+
+
 
