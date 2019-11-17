@@ -148,7 +148,6 @@ impl InnerController {
         }
     }
 
-
     pub fn channel_parallel(task: MsgForTask<Vec<Instance>>) {
         if let Err(e) = inner_parallel(&task) {
             let _ = TaskDaoImpl::raw_to_error(&e, &task.1);

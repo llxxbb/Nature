@@ -29,6 +29,7 @@ impl SerialFinished {
                 states: HashSet::new(),
                 state_version: 0,
                 from: None,
+                para: String::new(),
             },
             execute_time: time,
             create_time: time,

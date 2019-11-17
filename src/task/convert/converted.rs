@@ -25,7 +25,7 @@ impl Converted {
             return Err(NatureError::VerifyError(msg));
         }
 
-        // fix id, meta and From
+        // From
         let from = FromInstance {
             id: task.from.id,
             meta: task.from.meta.to_string(),
@@ -170,7 +170,7 @@ mod test {
         ins.id = 123;
         let ins = vec![ins];
 
-// for normal
+        // for normal
         let result = Converted::gen(&task, &raw, ins.clone(), &None).unwrap();
         let c = &result.converted[0];
         let from = c.from.as_ref().unwrap();
@@ -179,7 +179,7 @@ mod test {
         assert_eq!(from.state_version, 2);
         assert_eq!(result.converted[0].id, 567);
 
-// for state
+        // for state
         let _ = task.target.to.set_states(Some(vec![State::Normal("hello".to_string())]));
         let result = Converted::gen(&task, &raw, ins, &None).unwrap();
         assert_eq!(result.converted[0].id, 567);

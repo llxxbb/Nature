@@ -73,7 +73,6 @@ impl IncomeController {
 
     pub fn redo_task(raw: RawTask) -> Result<()> {
         // TODO check busy first
-        dbg!(&raw);
         match TaskType::try_from(raw.data_type)? {
             TaskType::Store => {
                 let rtn = serde_json::from_str(&raw.data)?;
