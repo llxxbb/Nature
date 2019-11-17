@@ -5,6 +5,8 @@
 
 ## Underway
 
+    bug fix: instance table missed from_para field.
+
     bug fix: auto converter support sys.target
     
     doc#architecture : instance's parameter.
@@ -12,7 +14,6 @@
     implement self_route for converted
     
     give a graph at concepts.md for the flow that how to generate instances.
-    
     
         
 ## meta

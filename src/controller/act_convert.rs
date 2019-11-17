@@ -1,4 +1,4 @@
-use nature_common::{CONTEXT_TARGET_INSTANCE_ID, ConverterReturned, Instance, NatureError, Protocol};
+use nature_common::{CONTEXT_TARGET_INSTANCE_ID, ConverterReturned, Instance, NatureError, Protocol, Result};
 use nature_db::{InstanceDaoImpl, MetaCacheImpl, MetaDaoImpl, RawTask, TaskDaoImpl};
 
 use crate::controller::{after_converted, process_null, received_self_route};
@@ -9,24 +9,42 @@ pub fn channel_convert(task: TaskForConvert, raw: RawTask) {
     let mut from_instance = task.from.clone();
     // -----begin this logic can't move to place where after converted, because it might not get the last state and cause state conflict
     if protocol == Protocol::Auto {
+        let msg = format!("auto converter missed master info, maybe you should fill context with [{}] for meta: {}", CONTEXT_TARGET_INSTANCE_ID, &task.from.meta);
+        let err = NatureError::VerifyError(msg);
         let target = from_instance.context.get(CONTEXT_TARGET_INSTANCE_ID);
-        let id = match target {
-            Some(t) => t.clone(),
+        let id: Result<String> = match target {
+            Some(t) => Ok(t.clone()),
             None => {
                 // the master must exists, otherwise `Protocol::Auto` would not be generated.
                 let to_meta = task.target.to.clone();
                 let master = to_meta.get_setting().unwrap().master.unwrap();
                 match master.eq(&from_instance.meta) {
-                    true => from_instance.id.to_string(),
+                    true => Ok(from_instance.id.to_string()),
                     false => {
-                        let msg = format!("auto converter missed master info, maybe you should fill context with [{}] for meta: {}", CONTEXT_TARGET_INSTANCE_ID, to_meta.meta_string());
-                        let _ = TaskDaoImpl::raw_to_error(&NatureError::VerifyError(msg), &raw);
-                        return;
+                        let f_meta = MetaCacheImpl::get(&task.from.meta, MetaDaoImpl::get).unwrap();
+                        match f_meta.get_setting() {
+                            Some(f_setting) => match f_setting.master {
+                                None => Err(err.clone()),
+                                Some(f_master) => match f_master.eq(&master) {
+                                    true => Ok(from_instance.id.to_string()),
+                                    false => Err(err.clone()),
+                                },
+                            }
+                            None => Err(err.clone())
+                        }
                     }
                 }
             }
         };
-        from_instance.context.insert(CONTEXT_TARGET_INSTANCE_ID.to_string(), id);
+        match id {
+            Ok(id) => {
+                from_instance.context.insert(CONTEXT_TARGET_INSTANCE_ID.to_string(), id);
+            }
+            Err(_) => {
+                let _ = TaskDaoImpl::raw_to_error(&err, &raw);
+                return;
+            }
+        }
     }
     // -----end
     let last = match task.target.to.is_state() {
