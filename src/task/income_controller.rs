@@ -4,6 +4,7 @@ use nature_common::{ConverterReturned, DelayedInstances, Instance, MetaType, Nat
 use nature_db::{InstanceDaoImpl, MetaCacheImpl, MetaDaoImpl, Mission, RawTask, RelationCacheImpl, RelationDaoImpl, TaskDaoImpl, TaskType};
 
 use crate::actor::*;
+use crate::controller::*;
 use crate::task::{InnerController, TaskForConvert, TaskForStore};
 
 pub struct IncomeController {}
@@ -54,15 +55,15 @@ impl IncomeController {
                         }
                         ConverterReturned::Instances(ins) => {
                             let (task, last) = get_task_and_last(&carrier.data)?;
-                            InnerController::after_converted(&task, &carrier, ins, &last)
+                            after_converted(&task, &carrier, ins, &last)
                         }
                         ConverterReturned::SelfRoute(sf) => {
                             let (task, _last) = get_task_and_last(&carrier.data)?;
-                            InnerController::received_self_route(&task, &carrier, sf)
+                            received_self_route(&task, &carrier, sf)
                         }
                         ConverterReturned::None => {
                             let (task, _last) = get_task_and_last(&carrier.data)?;
-                            InnerController::process_null(task.target.to.get_meta_type(), &delayed.task_id)
+                            process_null(task.target.to.get_meta_type(), &delayed.task_id)
                         }
                     }
                 }
