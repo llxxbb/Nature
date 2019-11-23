@@ -25,12 +25,7 @@ impl Converted {
             return Err(NatureError::VerifyError(msg));
         }
 
-        // From
-        let from = FromInstance {
-            id: task.from.id,
-            meta: task.from.meta.to_string(),
-            state_version: task.from.state_version,
-        };
+        let from = FromInstance::from(&task.from);
 
         // init meta and [from]
         let mut instances = instances;
@@ -293,6 +288,7 @@ mod check_id_test {
         let from = FromInstance {
             id: 123,
             meta: "from".to_string(),
+            para: "".to_string(),
             state_version: 1,
         };
         let mut meta = Meta::new("to", 1, MetaType::Business).unwrap();
