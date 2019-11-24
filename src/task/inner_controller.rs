@@ -1,10 +1,8 @@
-use serde::export::From;
-
-use nature_common::{CONTEXT_TARGET_INSTANCE_ID, ConverterReturned, Instance, NatureError, ParaForIDAndFrom, ParaForQueryByID, Protocol, Result, SelfRouteInstance, TaskForSerial};
+use nature_common::{Instance, NatureError, ParaForIDAndFrom, ParaForQueryByID, Result, TaskForSerial};
 use nature_db::{InstanceDaoImpl, MetaCacheImpl, MetaDaoImpl, Mission, RawTask, RelationCacheImpl, RelationDaoImpl, StorePlanDaoImpl, TaskDaoImpl, TaskType};
 
 use crate::actor::*;
-use crate::task::{Converted, ConverterParameterWrapper, PlanInfo, TaskForConvert, TaskForSerialWrapper, TaskForStore};
+use crate::task::{TaskForConvert, TaskForSerialWrapper, TaskForStore};
 
 pub struct InnerController {}
 
@@ -37,7 +35,9 @@ impl InnerController {
                     return;
                 }
                 for t in converters {
-                    let _ = ACT_CONVERT.try_send(MsgForTask(t.0, t.1));
+                    if t.0.target.delay == 0 {
+                        let _ = ACT_CONVERT.try_send(MsgForTask(t.0, t.1));
+                    }
                 }
             }
             Err(err) => {
@@ -47,77 +47,11 @@ impl InnerController {
         }
     }
 
-    pub fn channel_convert(task: TaskForConvert, raw: RawTask) {
-        let protocol = task.target.executor.protocol.clone();
-        let mut from_instance = task.from.clone();
-        if protocol == Protocol::Auto && task.target.use_upstream_id == true {
-            let id = from_instance.id.to_string();
-            from_instance.context.insert(CONTEXT_TARGET_INSTANCE_ID.to_string(), id);
-        }
-        let last = match task.target.to.is_state() {
-            true => match from_instance.get_last_taget(&task.target.to.meta_string(), InstanceDaoImpl::get_by_id) {
-                Err(_) => { return; }
-                Ok(last) => last
-            }
-            false => None
-        };
-        if Protocol::Auto == protocol {
-            let _ = Self::received_instance(&task, &raw, vec![Instance::default()], &last);
-            return;
-        }
-        match ConverterParameterWrapper::gen_and_call_out(&task, raw.task_id.clone(), &task.target, &last) {
-            Err(err) => match err {
-                // only **Environment Error** will be retry
-                NatureError::EnvironmentError(_) => (),
-                // other error will drop into error
-                _ => {
-                    let _ = TaskDaoImpl::raw_to_error(&err, &raw);
-                }
-            }
-            Ok(returned) => match returned {
-                ConverterReturned::Instances(instances) => {
-                    let _ = Self::received_instance(&task, &raw, instances, &last);
-                }
-                ConverterReturned::SelfRoute(ins) => {
-                    let _ = Self::received_self_route(&task, &raw, ins);
-                }
-                ConverterReturned::Delay(delay) => {
-                    let _ = TaskDaoImpl::update_execute_time(&raw.task_id, i64::from(delay), &last);
-                }
-                ConverterReturned::LogicalError(ss) => {
-                    let _ = TaskDaoImpl::raw_to_error(&NatureError::ConverterLogicalError(ss), &raw);
-                }
-                ConverterReturned::EnvError => (),
-                ConverterReturned::None => (),
-            }
-        };
-    }
-
-    pub fn received_instance(task: &TaskForConvert, raw: &RawTask, instances: Vec<Instance>, last_state: &Option<Instance>) -> Result<()> {
-        debug!("converted {} instances for `Meta`: {:?}", instances.len(), &task.target.to.get_full_key());
-        match Converted::gen(&task, &raw, instances, last_state) {
-            Ok(rtn) => {
-                let plan = PlanInfo::save(&task, &rtn.converted, StorePlanDaoImpl::save, StorePlanDaoImpl::get)?;
-                prepare_to_store(&rtn.done_task, plan, &task.target)
-            }
-            Err(err) => {
-                let _ = TaskDaoImpl::raw_to_error(&err, &raw);
-                Err(err)
-            }
-        }
-    }
-
-    pub fn received_self_route(_task: &TaskForConvert, _raw: &RawTask, _instances: Vec<SelfRouteInstance>) -> Result<()> {
-        // TODO unimplemented
-        unimplemented!()
-    }
-
     pub fn channel_serial(task: MsgForTask<TaskForSerial>) {
         if let Err(e) = inner_serial(&task) {
             let _ = TaskDaoImpl::raw_to_error(&e, &task.1);
         }
     }
-
 
     pub fn channel_parallel(task: MsgForTask<Vec<Instance>>) {
         if let Err(e) = inner_parallel(&task) {
@@ -169,32 +103,6 @@ fn duplicated_instance(task: &TaskForStore, carrier: &RawTask, err: String) -> R
     }
 }
 
-fn prepare_to_store(carrier: &RawTask, plan: PlanInfo, previous_mission: &Mission) -> Result<()> {
-    let mut store_infos: Vec<RawTask> = Vec::new();
-    let mut t_d: Vec<(TaskForStore, RawTask)> = Vec::new();
-    let relations = RelationCacheImpl::get(&carrier.meta, RelationDaoImpl::get_relations, MetaCacheImpl::get, MetaDaoImpl::get)?;
-    for instance in plan.plan.iter() {
-        let mission = Mission::get_by_instance(instance, &relations);
-        let task = TaskForStore::new_with_previous_mission(instance.clone(), mission, previous_mission);
-        match RawTask::new(&task, &plan.to, TaskType::Store as i16) {
-            Ok(x) => {
-                store_infos.push(x.clone());
-                t_d.push((task, x))
-            }
-            Err(e) => {
-                error!("{}", e);
-                let _ = TaskDaoImpl::raw_to_error(&e, carrier);
-                return Ok(());
-            }
-        }
-    }
-    if RawTask::save_batch(&store_infos, &carrier.task_id, TaskDaoImpl::insert, TaskDaoImpl::delete).is_ok() {
-        for task in t_d {
-            ACT_STORE.do_send(MsgForTask(task.0, task.1));
-        }
-    }
-    Ok(())
-}
 
 fn inner_serial(task: &MsgForTask<TaskForSerial>) -> Result<()> {
     let (task, carrier) = (&task.0, &task.1);

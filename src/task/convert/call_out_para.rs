@@ -13,7 +13,7 @@ pub trait ExecutorTrait: Sync {
 pub struct ConverterParameterWrapper;
 
 impl ConverterParameterWrapper {
-    pub fn gen_and_call_out(task: &TaskForConvert, carrier_id: Vec<u8>, mission: &Mission, last_target: &Option<Instance>) -> Result<ConverterReturned>
+    pub fn gen_and_call_out(task: &TaskForConvert, task_id: Vec<u8>, mission: &Mission, last_target: &Option<Instance>, master: Option<Instance>) -> Result<ConverterReturned>
     {
         if let Some(ref last) = last_target {
             if let Some(demand) = &mission.states_demand {
@@ -26,8 +26,10 @@ impl ConverterParameterWrapper {
         let para = ConverterParameter {
             from: task.from.clone(),
             last_state: last_target.clone(),
-            carrier_id,
+            task_id,
+            master,
         };
+
         let executor = Self::get_executer(&mission.executor.protocol)?;
         let rtn = executor.execute(&mission.executor.url, &para);
         Ok(rtn)

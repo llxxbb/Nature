@@ -26,11 +26,11 @@ pub fn init_actors() {
     thread::spawn(|| {
         let sys = System::new("other_actors");
         // force to init
-        let _ = ACT_STORE.clone();
-        let _ = ACT_STORED.clone();
-        let _ = ACT_CONVERT.clone();
-        let _ = ACT_PARALLEL.clone();
-        let _ = ACT_SERIAL.clone();
+        lazy_static::initialize(&ACT_STORE);
+        lazy_static::initialize(&ACT_STORED);
+        lazy_static::initialize(&ACT_CONVERT);
+        lazy_static::initialize(&ACT_PARALLEL);
+        lazy_static::initialize(&ACT_SERIAL);
         let _ = sys.run();
     });
 }

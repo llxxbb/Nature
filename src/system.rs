@@ -54,10 +54,8 @@ fn start_actor() {
     init_actors();
     // web actor
     HttpServer::new(|| App::new().configure(web_config))
-        .bind("127.0.0.1:".to_owned() + &SERVER_PORT)
-        .unwrap()
-        .run()
-        .unwrap();
+        .bind("127.0.0.1:".to_owned() + &SERVER_PORT).unwrap()
+        .run().unwrap();
 }
 
 pub fn finish_threads<T>(threads: Vec<JoinHandle<T>>) {
