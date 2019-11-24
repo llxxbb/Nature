@@ -35,7 +35,9 @@ impl InnerController {
                     return;
                 }
                 for t in converters {
-                    let _ = ACT_CONVERT.try_send(MsgForTask(t.0, t.1));
+                    if t.0.target.delay == 0 {
+                        let _ = ACT_CONVERT.try_send(MsgForTask(t.0, t.1));
+                    }
                 }
             }
             Err(err) => {

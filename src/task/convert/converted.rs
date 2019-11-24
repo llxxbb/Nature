@@ -149,6 +149,7 @@ mod test {
                 executor: Default::default(),
                 states_demand: None,
                 use_upstream_id: true,
+                delay: 0,
             },
         };
         let raw = RawTask {
@@ -200,6 +201,7 @@ mod test {
                     }),
                 }),
                 use_upstream_id: false,
+                delay: 0,
             },
         };
         let mut ins = vec![Instance::new("test").unwrap()];
@@ -302,6 +304,7 @@ mod check_id_test {
             executor: Default::default(),
             states_demand: None,
             use_upstream_id: false,
+            delay: 0,
         };
         (last, from, mission)
     }

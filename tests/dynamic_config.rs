@@ -13,6 +13,7 @@ use nature_common::*;
 use nature_db::*;
 
 use crate::common::{CONN_STR, sleep, test_init};
+use std::collections::{HashMap, HashSet};
 
 pub mod common;
 
@@ -24,7 +25,7 @@ lazy_static! {
 fn convert_is_empty() {
     env::set_var("DATABASE_URL", CONN_STR);
     // prepare input para
-    let instance = Instance::new_with_type("/dynamic/converter/is/empty", MetaType::Dynamic).unwrap();
+    let instance = new_with_type("/dynamic/converter/is/empty", MetaType::Dynamic).unwrap();
     let instance = SelfRouteInstance {
         instance,
         converter: vec![],
@@ -37,21 +38,22 @@ fn convert_is_empty() {
 fn target_is_null() {
     test_init();
     // prepare input para
-    let instance = Instance::new_with_type("/dynamic/target/is/null", MetaType::Dynamic).unwrap();
+    let instance = new_with_type("/dynamic/target/is/null", MetaType::Dynamic).unwrap();
     let instance = SelfRouteInstance {
         instance,
         converter: vec![DynamicConverter {
             to: None,
             fun: Executor::for_local(""),
             use_upstream_id: false,
+            delay: 0,
         }],
     };
     sleep(3000);
     let rtn = query(instance);
-    assert_eq!(rtn, 49643220399713451557679845528054125035);
+    assert_eq!(rtn, 338344869912127221082806885982185864543);
     // check input
     let written = InstanceDaoImpl::get_by_id(&ParaForQueryByID {
-        id: 49643220399713451557679845528054125035,
+        id: 338344869912127221082806885982185864543,
         meta: "/D/dynamic/target/is/null:1".to_string(),
         state_version_from: 0,
         limit: 1,
@@ -64,23 +66,24 @@ fn target_is_null() {
 fn write_one_target_to_db() {
     test_init();
     // prepare input para
-    let instance = Instance::new_with_type("/dynamic/write/one", MetaType::Dynamic).unwrap();
+    let instance = new_with_type("/dynamic/write/one", MetaType::Dynamic).unwrap();
     let instance = SelfRouteInstance {
         instance,
         converter: vec![DynamicConverter {
             to: Some("/dynamic/one_target".to_string()),
             fun: Executor::for_local(r#"nature_integrate_test_converter.dll:rtn_one"#),
             use_upstream_id: false,
+            delay: 0,
         }],
     };
     sleep(5000);
     let rtn = query(instance);
-    assert_eq!(rtn, 188888439101979617029421464687504850608);
+    assert_eq!(rtn, 82729090071796891440669834987910301379);
 
     // query target
     sleep(3000);
     let ins_db = InstanceDaoImpl::get_by_id(&ParaForQueryByID {
-        id: 181722669403695488419718147584639762211,
+        id: 303195405634045585338298858306929603801,
         meta: "/D/dynamic/one_target:1".to_string(),
         state_version_from: 0,
         limit: 1,
@@ -92,7 +95,7 @@ fn write_one_target_to_db() {
 fn write_two_target_to_db() {
     test_init();
     // prepare input para
-    let instance = Instance::new_with_type("/dynamic/write/two", MetaType::Dynamic).unwrap();
+    let instance = new_with_type("/dynamic/write/two", MetaType::Dynamic).unwrap();
     let instance = SelfRouteInstance {
         instance,
         converter: vec![
@@ -100,29 +103,31 @@ fn write_two_target_to_db() {
                 to: Some("/dynamic/two_of_1".to_string()),
                 fun: Executor::for_local(r#"nature_integrate_test_converter.dll:rtn_one"#),
                 use_upstream_id: false,
+                delay: 0,
             },
             DynamicConverter {
                 to: Some("/dynamic/two_of_2".to_string()),
                 fun: Executor::for_local(r#"nature_integrate_test_converter.dll:rtn_one"#),
                 use_upstream_id: false,
+                delay: 0,
             }],
     };
     sleep(5000);
 
     let rtn = query(instance);
-    assert_eq!(rtn, 327619968921838952969959264616383630104);
+    assert_eq!(rtn, 302121533483322119686559454437223883973);
 
     // query target
     sleep(2500);
     let ins_db = InstanceDaoImpl::get_by_id(&ParaForQueryByID {
-        id: 55616048154417122855568645913854815816,
+        id: 251184288685302246237493378684975241377,
         meta: "/D/dynamic/two_of_1:1".to_string(),
         state_version_from: 0,
         limit: 1,
     }).unwrap().unwrap();
     assert_eq!("/D/dynamic/two_of_1:1", ins_db.meta);
     let ins_db = InstanceDaoImpl::get_by_id(&ParaForQueryByID {
-        id: 111584038074855073593792440340378505974,
+        id: 280748872477529468003584044421765998976,
         meta: "/D/dynamic/two_of_2:1".to_string(),
         state_version_from: 0,
         limit: 1,
@@ -137,6 +142,27 @@ fn query(instance: SelfRouteInstance) -> u128 {
     let rtn = rtn.json::<Result<u128>>();
     let rtn = rtn.unwrap().unwrap();
     rtn
+}
+
+pub fn new_with_type(key: &str, meta: MetaType) -> Result<Instance> {
+    if key.is_empty() {
+        return Err(NatureError::VerifyError("key can not be empty".to_string()));
+    }
+    let key = Meta::key_standardize(key)?;
+    Ok(Instance {
+        id: 0,
+        data: BizObject {
+            meta: format!("{}{}:1", meta.get_prefix(), key),
+            content: "".to_string(),
+            context: HashMap::new(),
+            states: HashSet::new(),
+            state_version: 0,
+            from: None,
+            para: String::new(),
+        },
+        execute_time: 0,
+        create_time: 0,
+    })
 }
 
 

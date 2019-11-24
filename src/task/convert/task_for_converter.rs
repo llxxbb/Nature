@@ -1,3 +1,7 @@
+use std::ops::Add;
+
+use chrono::{FixedOffset, Local};
+
 use nature_common::{Instance, Result};
 use nature_db::{Mission, RawTask, TaskType};
 
@@ -28,9 +32,27 @@ impl TaskForConvert {
                 from: task.instance.clone(),
                 target: c.clone(),
             };
-            let car = RawTask::new(&x, &c.to.meta_string(), TaskType::Convert as i16)?;
+            let mut car = RawTask::new(&x, &c.to.meta_string(), TaskType::Convert as i16)?;
+            if c.delay > 0 {
+                car.execute_time = Local::now().add(FixedOffset::east(c.delay)).naive_local()
+            }
             new_carriers.push((x, car));
         }
         Ok(new_carriers)
     }
+}
+
+#[cfg(test)]
+mod test{
+    use chrono::{Local, FixedOffset};
+    use std::ops::Add;
+
+    #[allow(dead_code)]
+    fn time_add_test(){
+        let a = Local::now();
+        let b = a.add(FixedOffset::east(1));
+        let x = a.signed_duration_since(b);
+        dbg!(x);
+    }
+
 }
