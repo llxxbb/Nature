@@ -23,3 +23,4 @@ pub mod rpc;
 pub mod task;
 pub mod actor;
 pub mod controller;
+pub mod converter;
