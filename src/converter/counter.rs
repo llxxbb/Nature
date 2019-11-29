@@ -1,6 +1,13 @@
 use nature_common::{ConverterParameter, ConverterReturned};
 
-pub fn count(_para: ConverterParameter) -> ConverterReturned {
-    // TODO
-    unimplemented!()
+use crate::task::ExecutorTrait;
+
+pub struct Counter;
+
+impl ExecutorTrait for Counter {
+    fn execute(&self, _executor: &str, _para: &ConverterParameter) -> ConverterReturned {
+        // TODO
+        unimplemented!();
+    }
 }
+

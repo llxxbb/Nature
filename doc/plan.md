@@ -6,7 +6,6 @@
 ## Underway
 
     built-in converter support
-        add builtIn protocol
         implement builtIn converter: counter 
     
     remove demo from release version

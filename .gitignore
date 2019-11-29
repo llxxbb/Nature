@@ -8,3 +8,4 @@ rls/
 target/
 nature.sqlite
 nature.sqlite-journal
+/out
