@@ -31,7 +31,6 @@ mod counter;
 #[cfg(test)]
 mod test {
     use super::*;
-    use nature_common::{ConverterParameter, ConverterReturned};
 
     #[test]
     fn get_test() {

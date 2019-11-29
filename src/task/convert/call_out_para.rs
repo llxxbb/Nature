@@ -28,6 +28,7 @@ impl ConverterParameterWrapper {
             last_state: last_target.clone(),
             task_id,
             master,
+            cfg: None,
         };
 
         let executor = Self::get_executer(&mission.executor.protocol)?;
