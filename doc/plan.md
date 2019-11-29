@@ -6,7 +6,8 @@
 ## Underway
 
     built-in converter support
-        implement builtIn converter: counter 
+        builtIn converter suppot self settings
+        implement builtIn converter: counter
     
     remove demo from release version
 
