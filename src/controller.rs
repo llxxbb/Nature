@@ -1,6 +1,6 @@
 pub use act_convert::*;
 pub use act_parallel::*;
-pub use act_sequence::*;
+pub use act_serial::*;
 pub use act_store::*;
 pub use act_stored::*;
 pub use after_converted::*;
@@ -8,7 +8,7 @@ pub use income_controller::*;
 
 mod act_convert;
 mod act_parallel;
-mod act_sequence;
+mod act_serial;
 mod act_store;
 mod act_stored;
 mod after_converted;
