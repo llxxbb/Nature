@@ -3,7 +3,7 @@ use actix::{Actor, Context, Handler};
 use nature_common::TaskForSerial;
 
 use crate::actor::MsgForTask;
-use crate::task::InnerController;
+use crate::controller::channel_serial;
 
 pub struct SerialActor;
 
@@ -19,6 +19,6 @@ impl Handler<MsgForTask<TaskForSerial>> for SerialActor {
     type Result = ();
 
     fn handle(&mut self, msg: MsgForTask<TaskForSerial>, _ctx: &mut Self::Context) -> Self::Result {
-        let _ = InnerController::channel_serial(msg);
+        let _ = channel_serial(msg);
     }
 }

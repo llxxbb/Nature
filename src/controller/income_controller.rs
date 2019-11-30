@@ -1,11 +1,10 @@
-use std::convert::TryFrom;
-
 use nature_common::{ConverterReturned, DelayedInstances, Instance, MetaType, NatureError, Result, SelfRouteInstance, TaskForSerial};
 use nature_db::{InstanceDaoImpl, MetaCacheImpl, MetaDaoImpl, Mission, RawTask, RelationCacheImpl, RelationDaoImpl, TaskDaoImpl, TaskType};
+use std::convert::TryFrom;
 
 use crate::actor::*;
 use crate::controller::*;
-use crate::task::{InnerController, TaskForConvert, TaskForStore};
+use crate::task::{TaskForConvert, TaskForStore};
 
 pub struct IncomeController {}
 
@@ -18,7 +17,7 @@ impl IncomeController {
         let task = TaskForStore::new(instance.clone(), mission);
         let raw = RawTask::new(&task, &instance.meta, TaskType::Store as i16)?;
         TaskDaoImpl::insert(&raw)?;
-        InnerController::save_instance(task, raw)?;
+        save_instance(task, raw)?;
         Ok(instance.id)
     }
 
@@ -32,7 +31,7 @@ impl IncomeController {
         let task = TaskForStore::for_dynamic(&ins, instance.converter)?;
         let raw = RawTask::new(&task, &ins.meta, TaskType::Store as i16)?;
         let _ = TaskDaoImpl::insert(&raw)?;
-        InnerController::save_instance(task, raw)?;
+        save_instance(task, raw)?;
         Ok(uuid)
     }
 
