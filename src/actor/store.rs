@@ -1,7 +1,8 @@
 use actix::prelude::*;
 
 use crate::actor::MsgForTask;
-use crate::task::{InnerController, TaskForStore};
+use crate::controller::{channel_stored, save_instance};
+use crate::task::TaskForStore;
 
 pub struct StoreActor;
 
@@ -17,7 +18,7 @@ impl Handler<MsgForTask<TaskForStore>> for StoreActor {
     type Result = ();
 
     fn handle(&mut self, msg: MsgForTask<TaskForStore>, _ctx: &mut Self::Context) -> Self::Result {
-        let _ = InnerController::save_instance(msg.0, msg.1);
+        let _ = save_instance(msg.0, msg.1);
     }
 }
 
@@ -35,6 +36,6 @@ impl Handler<MsgForTask<TaskForStore>> for StoredActor {
     type Result = ();
 
     fn handle(&mut self, msg: MsgForTask<TaskForStore>, _ctx: &mut Self::Context) -> Self::Result {
-        InnerController::channel_stored(msg.0, msg.1)
+        channel_stored(msg.0, msg.1)
     }
 }

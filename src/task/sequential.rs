@@ -4,9 +4,9 @@ use std::collections::HashSet;
 use chrono::prelude::*;
 use serde_json;
 
-use crate::system::*;
+use nature_common::{BizObject, Instance, MetaType, NatureError, Result, TaskForSerial};
 
-use super::*;
+use crate::system::*;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct SerialFinished {

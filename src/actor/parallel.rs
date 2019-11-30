@@ -3,7 +3,7 @@ use actix::{Actor, Context, Handler};
 use nature_common::Instance;
 
 use crate::actor::MsgForTask;
-use crate::task::InnerController;
+use crate::controller::channel_parallel;
 
 pub struct ParallelActor;
 
@@ -19,6 +19,6 @@ impl Handler<MsgForTask<Vec<Instance>>> for ParallelActor {
     type Result = ();
 
     fn handle(&mut self, msg: MsgForTask<Vec<Instance>>, _ctx: &mut Self::Context) -> Self::Result {
-        let _ = InnerController::channel_parallel(msg);
+        let _ = channel_parallel(msg);
     }
 }

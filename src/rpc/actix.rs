@@ -7,7 +7,7 @@ use serde::export::fmt::Debug;
 use nature_common::{DelayedInstances, Instance, NatureError, ParaForQueryByID, SelfRouteInstance, TaskForSerial};
 use nature_db::{InstanceDaoImpl, RawTask};
 
-use crate::task::IncomeController;
+use crate::controller::IncomeController;
 
 /// **Note** This do not receive System `Meta`'s instances
 fn input(instance: Json<Instance>) -> HttpResponse {

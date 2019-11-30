@@ -4,16 +4,16 @@ extern crate nature;
 extern crate nature_common;
 extern crate nature_db;
 
+use std::collections::{HashMap, HashSet};
 use std::env;
 
 use reqwest::Client;
 
-use nature::task::IncomeController;
+use nature::controller::IncomeController;
 use nature_common::*;
 use nature_db::*;
 
 use crate::common::{CONN_STR, sleep, test_init};
-use std::collections::{HashMap, HashSet};
 
 pub mod common;
 
