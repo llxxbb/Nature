@@ -6,7 +6,8 @@
 ## Underway
 
 multi target `meta` support
-    
+    implement conflict_avoid
+    implement multi_meta
 
 built-in converter support
     builtIn converter suppot self settings
