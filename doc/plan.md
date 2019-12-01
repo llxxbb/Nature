@@ -6,17 +6,17 @@
 ## Underway
 
 multi target `meta` support
-    add doc 
-
-    built-in converter support
-        builtIn converter suppot self settings
-        implement builtIn converter: counter
     
-    remove demo from release version
 
-    implement self_route for converted
-    
-    give a graph at concepts.md for the flow that how to generate instances.
+built-in converter support
+    builtIn converter suppot self settings
+    implement builtIn converter: counter
+
+remove demo from release version
+
+implement self_route for converted
+
+give a graph at concepts.md for the flow that how to generate instances.
     
         
 ## add synchronous call for outer( the main part of the gateway)
