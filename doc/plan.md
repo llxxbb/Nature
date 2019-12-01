@@ -6,7 +6,6 @@
 ## Underway
 
 multi target `meta` support
-    metaCache support /P & /R 
     implement conflict_avoid in mod converted.parallel_process
     implement multi_meta
     architect doc for conflict_avoid and multi_meta
