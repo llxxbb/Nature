@@ -297,6 +297,8 @@ mod check_id_test {
         let setting = MetaSetting {
             is_state: true,
             master: Some("from".to_string()),
+            multi_meta: None,
+            conflict_avoid: false
         };
         let _ = meta.set_setting(&serde_json::to_string(&setting).unwrap());
         let mission = Mission {
