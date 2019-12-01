@@ -5,6 +5,9 @@
 
 ## Underway
 
+multi target `meta` support
+    add doc 
+
     built-in converter support
         builtIn converter suppot self settings
         implement builtIn converter: counter
