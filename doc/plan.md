@@ -6,6 +6,7 @@
 ## Underway
 
 multi target `meta` support
+    set cached_key when instance saved,
     implement conflict_avoid in mod converted.parallel_process
     implement multi_meta
     architect doc for conflict_avoid and multi_meta
