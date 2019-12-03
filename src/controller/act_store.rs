@@ -2,7 +2,7 @@ use nature_common::{NatureError, ParaForIDAndFrom, ParaForQueryByID, Result};
 use nature_db::{InstanceDaoImpl, RawTask, StorePlanDaoImpl, TaskDaoImpl};
 
 use crate::actor::{ACT_STORED, MsgForTask};
-use crate::task::TaskForStore;
+use crate::task::{CachedKey, TaskForStore};
 
 pub fn channel_store(store: (TaskForStore, RawTask)) {
     let _ = save_instance(store.0, store.1);
@@ -11,6 +11,9 @@ pub fn channel_store(store: (TaskForStore, RawTask)) {
 pub fn save_instance(task: TaskForStore, carrier: RawTask) -> Result<()> {
     match InstanceDaoImpl::insert(&task.instance) {
         Ok(_) => {
+            if task.need_cache {
+                CachedKey::set(&task.instance.get_unique());
+            }
             ACT_STORED.try_send(MsgForTask(task, carrier))?;
             Ok(())
         }

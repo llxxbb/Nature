@@ -8,6 +8,8 @@ pub struct TaskForStore {
     pub instance: Instance,
     pub next_mission: Option<Vec<Mission>>,
     pub previous_mission: Option<Mission>,
+    /// to avoid save conflict
+    pub need_cache: bool,
 }
 
 impl TaskForStore {
@@ -27,10 +29,16 @@ impl TaskForStore {
             instance,
             next_mission,
             previous_mission: None,
+            // TODO
+            need_cache: false,
         }
     }
 
     pub fn new_with_previous_mission(instance: Instance, next_mission: Option<Vec<Mission>>, previous_mision: &Mission) -> Self {
+        let need_cache = match previous_mision.to.get_setting() {
+            Some(setting) => setting.conflict_avoid,
+            None => false
+        };
         let previous_mission = match previous_mision.to.is_state() {
             true => Some(previous_mision.clone()),
             false => None
@@ -39,6 +47,7 @@ impl TaskForStore {
             instance,
             next_mission,
             previous_mission,
+            need_cache,
         }
     }
 }
