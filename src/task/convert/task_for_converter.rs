@@ -40,19 +40,25 @@ impl TaskForConvert {
         }
         Ok(new_carriers)
     }
+    pub fn check_cache(&self) -> bool {
+        match self.target.to.get_setting() {
+            Some(s) => s.conflict_avoid,
+            None => false,
+        }
+    }
 }
 
 #[cfg(test)]
-mod test{
-    use chrono::{Local, FixedOffset};
+mod test {
     use std::ops::Add;
 
+    use chrono::{FixedOffset, Local};
+
     #[allow(dead_code)]
-    fn time_add_test(){
+    fn time_add_test() {
         let a = Local::now();
         let b = a.add(FixedOffset::east(1));
         let x = a.signed_duration_since(b);
         dbg!(x);
     }
-
 }

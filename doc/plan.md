@@ -6,7 +6,6 @@
 ## Underway
 
 multi target `meta` support
-    check cached_key in mod converted.parallel_process
     implement multi_meta
     architect doc for conflict_avoid and multi_meta
 

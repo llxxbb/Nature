@@ -29,7 +29,6 @@ impl TaskForStore {
             instance,
             next_mission,
             previous_mission: None,
-            // TODO
             need_cache: false,
         }
     }

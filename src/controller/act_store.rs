@@ -11,10 +11,12 @@ pub fn channel_store(store: (TaskForStore, RawTask)) {
 pub fn save_instance(task: TaskForStore, carrier: RawTask) -> Result<()> {
     match InstanceDaoImpl::insert(&task.instance) {
         Ok(_) => {
-            if task.need_cache {
-                CachedKey::set(&task.instance.get_unique());
-            }
+            let need_cache = task.need_cache;
+            let key = &task.instance.get_unique();
             ACT_STORED.try_send(MsgForTask(task, carrier))?;
+            if need_cache {
+                CachedKey::set(key);
+            }
             Ok(())
         }
         Err(NatureError::DaoDuplicated(err)) => duplicated_instance(&task, &carrier, err),
