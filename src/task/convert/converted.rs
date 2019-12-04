@@ -1,7 +1,7 @@
-use nature_common::{FromInstance, Instance, MetaType, NatureError, Result};
+use nature_common::{FromInstance, Instance, NatureError, Result};
 use nature_db::{Mission, RawTask};
 
-use crate::task::TaskForConvert;
+use crate::task::{CachedKey, TaskForConvert};
 
 pub struct Converted {
     pub done_task: RawTask,
@@ -10,18 +10,35 @@ pub struct Converted {
 
 impl Converted {
     pub fn gen(task: &TaskForConvert, carrier: &RawTask, instances: Vec<Instance>, last_state: &Option<Instance>) -> Result<Converted> {
-        // check `MetaType` for Null
-        let meta_type = task.target.to.get_meta_type();
-        match meta_type {
-            MetaType::Null => Ok(converted_none(carrier)),
-            MetaType::Business => normal_process(task, carrier, instances, last_state),
-            MetaType::System => normal_process(task, carrier, instances, last_state),
-            MetaType::Dynamic => normal_process(task, carrier, instances, last_state),
-            MetaType::Parallel => parallel_process(task, carrier, instances, last_state),
-            MetaType::Serial => {
-                unimplemented!()
-            }
+        // filter from cache
+        let mut instances: Vec<Instance> = if task.check_cache() {
+            instances.into_iter().filter(|one| !CachedKey::get(&one.get_unique())).collect()
+        } else {
+            instances
+        };
+
+        if instances.is_empty() {
+            return Ok(converted_none(carrier));
         }
+
+        // init meta and [from]
+        let from = FromInstance::from(&task.from);
+        instances.iter_mut().for_each(|n| {
+            n.data.meta = task.target.to.meta_string();
+            n.from = Some(from.clone());
+            let _ = n.revise();
+        });
+
+        // check id
+        check_id(&mut instances, &last_state, &from, &task.target);
+
+        // verify
+        let _ = verify_state(&task, &mut instances, last_state)?;
+        let rtn = Converted {
+            done_task: carrier.to_owned(),
+            converted: instances,
+        };
+        Ok(rtn)
     }
 }
 
@@ -32,62 +49,6 @@ fn converted_none(carrier: &RawTask) -> Converted {
     }
 }
 
-fn normal_process(task: &TaskForConvert, carrier: &RawTask, instances: Vec<Instance>, last_state: &Option<Instance>) -> Result<Converted> {
-    if instances.is_empty() {
-        let msg = format!("Must return instance for meta: {}", task.target.to.meta_string());
-        warn!("{}", &msg);
-        return Err(NatureError::VerifyError(msg));
-    }
-
-    let from = FromInstance::from(&task.from);
-
-    // init meta and [from]
-    let mut instances = instances;
-    instances.iter_mut().for_each(|n| {
-        n.data.meta = task.target.to.meta_string();
-        n.from = Some(from.clone());
-        let _ = n.revise();
-    });
-
-    // check id
-    check_id(&mut instances, &last_state, &from, &task.target);
-
-    // verify
-    let _ = verify_state(&task, &mut instances, last_state)?;
-    let rtn = Converted {
-        done_task: carrier.to_owned(),
-        converted: instances,
-    };
-    Ok(rtn)
-}
-
-fn parallel_process(task: &TaskForConvert, carrier: &RawTask, instances: Vec<Instance>, last_state: &Option<Instance>) -> Result<Converted> {
-    if instances.is_empty() {
-        return Ok(converted_none(carrier));
-    }
-
-    let from = FromInstance::from(&task.from);
-
-    // TODO
-    // init meta and [from]
-    let mut instances = instances;
-    instances.iter_mut().for_each(|n| {
-        n.data.meta = task.target.to.meta_string();
-        n.from = Some(from.clone());
-        let _ = n.revise();
-    });
-
-    // check id
-    check_id(&mut instances, &last_state, &from, &task.target);
-
-    // verify
-    let _ = verify_state(&task, &mut instances, last_state)?;
-    let rtn = Converted {
-        done_task: carrier.to_owned(),
-        converted: instances,
-    };
-    Ok(rtn)
-}
 
 fn check_id(ins: &mut Vec<Instance>, last: &Option<Instance>, from: &FromInstance, target: &Mission) {
     let id = {
@@ -171,7 +132,7 @@ fn verify_state(task: &TaskForConvert, instances: &mut Vec<Instance>, last_state
 mod test {
     use chrono::Local;
 
-    use nature_common::{Meta, State, TargetState};
+    use nature_common::{Meta, MetaType, State, TargetState};
     use nature_db::{Mission, StateDemand};
 
     use super::*;
@@ -254,7 +215,7 @@ mod test {
 
 #[cfg(test)]
 mod check_id_test {
-    use nature_common::{Meta, MetaSetting};
+    use nature_common::{Meta, MetaSetting, MetaType};
 
     use super::*;
 
