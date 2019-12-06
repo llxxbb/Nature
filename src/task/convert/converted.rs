@@ -1,4 +1,4 @@
-use nature_common::{FromInstance, Instance, NatureError, Result};
+use nature_common::{FromInstance, Instance, Meta, MetaType, NatureError, Result};
 use nature_db::{Mission, RawTask};
 
 use crate::task::{CachedKey, TaskForConvert};
@@ -23,11 +23,7 @@ impl Converted {
 
         // init meta and [from]
         let from = FromInstance::from(&task.from);
-        instances.iter_mut().for_each(|n| {
-            n.data.meta = task.target.to.meta_string();
-            n.from = Some(from.clone());
-            let _ = n.revise();
-        });
+        let _ = set_from(&mut instances, &from, &task.target.to)?;
 
         // check id
         check_id(&mut instances, &last_state, &from, &task.target);
@@ -47,6 +43,30 @@ fn converted_none(carrier: &RawTask) -> Converted {
         done_task: carrier.to_owned(),
         converted: Vec::new(),
     }
+}
+
+fn set_from(instances: &mut Vec<Instance>, from: &FromInstance, target_meta: &Meta) -> Result<()> {
+    match target_meta.get_meta_type() {
+        MetaType::Parallel => {
+            match target_meta.get_setting() {
+                Some(s) => match s.multi_meta {
+                    Some(multi) => multi.check_metas(instances)?,
+                    None => set_from_to_target_meta(instances, from, target_meta),
+                }
+                None => set_from_to_target_meta(instances, from, target_meta),
+            }
+        }
+        _ => set_from_to_target_meta(instances, from, target_meta),
+    }
+    Ok(())
+}
+
+fn set_from_to_target_meta(instances: &mut Vec<Instance>, from: &FromInstance, target_meta: &Meta) {
+    instances.iter_mut().for_each(|n| {
+        n.data.meta = target_meta.meta_string();
+        n.from = Some(from.clone());
+        let _ = n.revise();
+    });
 }
 
 
