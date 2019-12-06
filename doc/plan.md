@@ -6,7 +6,6 @@
 ## Underway
 
 optimize Meta.meta_string performance
-implement MultiMetaSetting::check_metas
 
 multi target `meta` support
     implement multi_meta
