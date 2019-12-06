@@ -5,8 +5,6 @@
 
 ## Underway
 
-optimize Meta.meta_string performance
-
 multi target `meta` support
     implement multi_meta
     architect doc for conflict_avoid and multi_meta
