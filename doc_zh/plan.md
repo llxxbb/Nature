@@ -5,11 +5,10 @@
 
 ## Underway
 
-Meta
-  修改字符串的表达方式，`MetaType`和`key` 之间用 ":" 分隔，替代之前的 "/" 分隔。
+remove TaskForSerial
 
-  重命名 `MetaType::Parallel` 为 `MetaType::Multi` 
-  变更：Demo 数据库
+Meta
+  变更：Demo sql
 
 multi target `meta` support
     implement multi_meta

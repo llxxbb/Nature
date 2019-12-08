@@ -4,7 +4,7 @@ use actix_web::{HttpResponse, ResponseError, web};
 use actix_web::web::Json;
 use serde::export::fmt::Debug;
 
-use nature_common::{DelayedInstances, Instance, NatureError, ParaForQueryByID, SelfRouteInstance, TaskForSerial};
+use nature_common::{DelayedInstances, Instance, NatureError, ParaForQueryByID, SelfRouteInstance};
 use nature_db::{InstanceDaoImpl, RawTask};
 
 use crate::controller::IncomeController;
@@ -26,13 +26,8 @@ fn callback(delayed: Json<DelayedInstances>) -> HttpResponse {
     return_result(x)
 }
 
-fn batch_for_serial(serial_batch: Json<TaskForSerial>) -> HttpResponse {
-    let x = IncomeController::serial(serial_batch.0);
-    return_result(x)
-}
-
-fn batch_for_parallel(parallel_batch: Json<Vec<Instance>>) -> HttpResponse {
-    let x = IncomeController::parallel(parallel_batch.0);
+fn batch(parallel_batch: Json<Vec<Instance>>) -> HttpResponse {
+    let x = IncomeController::batch(parallel_batch.0);
     return_result(x)
 }
 
@@ -52,8 +47,7 @@ pub fn web_config(cfg: &mut web::ServiceConfig) {
         .route("/input", web::post().to(input))
         .route("/self_route", web::post().to(self_route))
         .route("/callback", web::post().to(callback))
-        .route("/serial_batch", web::post().to(batch_for_serial))
-        .route("/parallel_batch", web::post().to(batch_for_parallel))
+        .route("/batch", web::post().to(batch))
         .route("/redo_task", web::post().to(redo_task))
         .route("/get_by_id", web::post().to(get_by_id));
 }
