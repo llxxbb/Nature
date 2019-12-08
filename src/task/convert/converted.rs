@@ -47,7 +47,7 @@ fn converted_none(carrier: &RawTask) -> Converted {
 
 fn set_from(instances: &mut Vec<Instance>, from: &FromInstance, target_meta: &Meta) -> Result<()> {
     match target_meta.get_meta_type() {
-        MetaType::Parallel => {
+        MetaType::Multi => {
             match target_meta.get_setting() {
                 Some(s) => match s.multi_meta {
                     Some(multi) => multi.check_metas(instances)?,
@@ -161,7 +161,7 @@ mod test {
     fn upstream_test() {
         let mut from_ins = Instance::default();
         from_ins.id = 567;
-        from_ins.meta = "/B/from:1".to_string();
+        from_ins.meta = "B:from:1".to_string();
         from_ins.state_version = 2;
         let meta = Meta::new("to", 1, MetaType::Business).unwrap();
         let mut task = TaskForConvert {
@@ -193,7 +193,7 @@ mod test {
         let c = &result.converted[0];
         let from = c.from.as_ref().unwrap();
         assert_eq!(from.id, 567);
-        assert_eq!(from.meta, "/B/from:1");
+        assert_eq!(from.meta, "B:from:1");
         assert_eq!(from.state_version, 2);
         assert_eq!(result.converted[0].id, 567);
 
@@ -209,7 +209,7 @@ mod test {
             from: Default::default(),
             target: Mission {
                 to: {
-                    let mut m = Meta::from_string("/B/hello:1").unwrap();
+                    let mut m = Meta::from_string("B:hello:1").unwrap();
                     let _ = m.set_states(Some(vec![State::Normal("new".to_string())]));
                     m
                 },

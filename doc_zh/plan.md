@@ -5,9 +5,16 @@
 
 ## Underway
 
+Meta
+  修改字符串的表达方式，`MetaType`和`key` 之间用 ":" 分隔，替代之前的 "/" 分隔。
+
+  重命名 `MetaType::Parallel` 为 `MetaType::Multi` 
+  变更：Demo 数据库
+
 multi target `meta` support
     implement multi_meta
     architect doc for conflict_avoid and multi_meta
+
 
 built-in converter support
     builtIn converter suppot self settings
@@ -18,6 +25,15 @@ remove demo from release version
 implement self_route for converted
 
 give a graph at concepts.md for the flow that how to generate instances.
+
+merge parallel and serial process mode
+  文档
+
+`wait_finish` convert setting
+    implement `wait_finish` 
+    document for `wait_finish` 
+    
+以中文文档为主
     
         
 ## add synchronous call for outer( the main part of the gateway)
