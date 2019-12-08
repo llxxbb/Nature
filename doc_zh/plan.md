@@ -10,10 +10,6 @@ remove TaskForSerial
 Meta
   变更：Demo sql
 
-multi target `meta` support
-    implement multi_meta
-    architect doc for conflict_avoid and multi_meta
-
 
 built-in converter support
     builtIn converter suppot self settings
