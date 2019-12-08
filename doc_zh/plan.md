@@ -5,11 +5,9 @@
 
 ## Underway
 
-remove TaskForSerial
 
 Meta
   变更：Demo sql
-
 
 built-in converter support
     builtIn converter suppot self settings
@@ -21,14 +19,18 @@ implement self_route for converted
 
 give a graph at concepts.md for the flow that how to generate instances.
 
+provide bin package for user to download. 
+
+## unsure
+ 
 merge parallel and serial process mode
   文档
+
+remove TaskForSerial
 
 `wait_finish` convert setting
     implement `wait_finish` 
     document for `wait_finish` 
-    
-以中文文档为主
     
         
 ## add synchronous call for outer( the main part of the gateway)
