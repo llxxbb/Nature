@@ -4,22 +4,19 @@ use actix::{Actor, Addr, Message, System};
 
 use nature_db::RawTask;
 
+pub use self::batch::*;
 pub use self::convert::*;
-pub use self::parallel::*;
-pub use self::serial::*;
 pub use self::store::*;
 
 mod store;
 mod convert;
-mod parallel;
-mod serial;
+mod batch;
 
 lazy_static! {
     pub static ref ACT_STORE: Addr<StoreActor> = StoreActor{}.start();
     pub static ref ACT_STORED: Addr<StoredActor> = StoredActor{}.start();
     pub static ref ACT_CONVERT: Addr<ConvertActor> = ConvertActor{}.start();
-    pub static ref ACT_PARALLEL: Addr<ParallelActor> = ParallelActor{}.start();
-    pub static ref ACT_SERIAL: Addr<SerialActor> = SerialActor{}.start();
+    pub static ref ACT_BATCH: Addr<BatchActor> = BatchActor{}.start();
 }
 
 pub fn init_actors() {
@@ -29,8 +26,7 @@ pub fn init_actors() {
         lazy_static::initialize(&ACT_STORE);
         lazy_static::initialize(&ACT_STORED);
         lazy_static::initialize(&ACT_CONVERT);
-        lazy_static::initialize(&ACT_PARALLEL);
-        lazy_static::initialize(&ACT_SERIAL);
+        lazy_static::initialize(&ACT_BATCH);
         let _ = sys.run();
     });
 }

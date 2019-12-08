@@ -1,6 +1,7 @@
-use nature_common::{ConverterReturned, DelayedInstances, Instance, MetaType, NatureError, Result, SelfRouteInstance, TaskForSerial};
-use nature_db::{InstanceDaoImpl, MetaCacheImpl, MetaDaoImpl, Mission, RawTask, RelationCacheImpl, RelationDaoImpl, TaskDaoImpl, TaskType};
 use std::convert::TryFrom;
+
+use nature_common::{ConverterReturned, DelayedInstances, Instance, MetaType, NatureError, Result, SelfRouteInstance};
+use nature_db::{InstanceDaoImpl, MetaCacheImpl, MetaDaoImpl, Mission, RawTask, RelationCacheImpl, RelationDaoImpl, TaskDaoImpl, TaskType};
 
 use crate::actor::*;
 use crate::controller::*;
@@ -82,31 +83,19 @@ impl IncomeController {
                 let rtn = serde_json::from_str(&raw.data)?;
                 ACT_CONVERT.do_send(MsgForTask(rtn, raw));
             }
-            TaskType::ParallelBatch => {
+            TaskType::Batch => {
                 let rtn = serde_json::from_str(&raw.data)?;
-                ACT_PARALLEL.do_send(MsgForTask(rtn, raw));
-            }
-            TaskType::QueueBatch => {
-                let rtn = serde_json::from_str(&raw.data)?;
-                ACT_SERIAL.do_send(MsgForTask(rtn, raw));
+                ACT_BATCH.do_send(MsgForTask(rtn, raw));
             }
         }
         Ok(())
     }
 
-    pub fn serial(batch: TaskForSerial) -> Result<()> {
-        let _ = Instance::meta_must_same(&batch.instances)?;
-        let raw = RawTask::new(&batch, &batch.instances[0].meta, TaskType::QueueBatch as i16)?;
-        let _ = TaskDaoImpl::insert(&raw)?;
-        let _ = ACT_SERIAL.try_send(MsgForTask(batch.to_owned(), raw));
-        Ok(())
-    }
-
     pub fn batch(batch: Vec<Instance>) -> Result<()> {
         let _ = Instance::meta_must_same(&batch)?;
-        let raw = RawTask::new(&batch, &batch[0].meta, TaskType::ParallelBatch as i16)?;
+        let raw = RawTask::new(&batch, &batch[0].meta, TaskType::Batch as i16)?;
         let _ = TaskDaoImpl::insert(&raw)?;
-        let _ = ACT_PARALLEL.try_send(MsgForTask(batch, raw));
+        let _ = ACT_BATCH.try_send(MsgForTask(batch, raw));
         Ok(())
     }
 }

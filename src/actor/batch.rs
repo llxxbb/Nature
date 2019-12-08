@@ -5,9 +5,9 @@ use nature_common::Instance;
 use crate::actor::MsgForTask;
 use crate::controller::channel_parallel;
 
-pub struct ParallelActor;
+pub struct BatchActor;
 
-impl Actor for ParallelActor {
+impl Actor for BatchActor {
     type Context = Context<Self>;
 
     fn started(&mut self, _ctx: &mut Self::Context) {
@@ -15,7 +15,7 @@ impl Actor for ParallelActor {
     }
 }
 
-impl Handler<MsgForTask<Vec<Instance>>> for ParallelActor {
+impl Handler<MsgForTask<Vec<Instance>>> for BatchActor {
     type Result = ();
 
     fn handle(&mut self, msg: MsgForTask<Vec<Instance>>, _ctx: &mut Self::Context) -> Self::Result {
