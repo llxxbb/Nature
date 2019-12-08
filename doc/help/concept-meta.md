@@ -24,7 +24,7 @@ The following table lists all `metaType`
 | Dynamic        | /D     | Used with BO, need not to register to `meta` table, it's used for defining workflow as `runtime` |
 | Null           | /N     | The terminate for the end of the workflow. You need not to define it in `meta` table |
 | Multi-Serial   | /R     | This will allow  converter return multi target meta of instances and process them serially |
-| Multi-Parallel | /M     | This will allow  converter return multi target meta |
+| Multi-Parallel | M     | This will allow  converter return multi target meta |
 
 ## version
 

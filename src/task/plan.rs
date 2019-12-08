@@ -56,13 +56,13 @@ impl TryFrom<RawPlanInfo> for PlanInfo {
 
     fn try_from(value: RawPlanInfo) -> Result<Self> {
         let x: Vec<&str> = value.upstream.split(':').collect();
-        if x.len() != 4 {
+        if x.len() != 5 {
             return Err(NatureError::VerifyError("format error : ".to_owned() + &value.upstream));
         }
         Ok(PlanInfo {
-            from_meta: MetaString::make_meta_string(x[0], x[1].parse()?),
-            from_sn: x[2].parse()?,
-            from_sta_ver: x[3].parse()?,
+            from_meta: format!("{}:{}:{}", x[0], x[1], x[2]),
+            from_sn: x[3].parse()?,
+            from_sta_ver: x[4].parse()?,
             to: value.downstream,
             plan: serde_json::from_str(&value.content)?,
         })

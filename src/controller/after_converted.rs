@@ -6,7 +6,7 @@ use crate::actor::MsgForTask;
 use crate::task::{Converted, PlanInfo, TaskForConvert, TaskForStore};
 
 pub fn after_converted(task: &TaskForConvert, raw: &RawTask, instances: Vec<Instance>, last_state: &Option<Instance>) -> Result<()> {
-    debug!("converted {} instances for `Meta`: {:?}", instances.len(), &task.target.to.get_full_key());
+    debug!("converted {} instances for `Meta`: {:?}", instances.len(), &task.target.to.meta_string());
     match Converted::gen(&task, &raw, instances, last_state) {
         Ok(rtn) => {
             let plan = PlanInfo::save(&task, &rtn.converted, StorePlanDaoImpl::save, StorePlanDaoImpl::get)?;
