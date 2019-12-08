@@ -6,12 +6,12 @@
 
 They are what important Nature to handle. Each BO must has a `meta` to bind to, like 'Order', 'Sheet', 'Check', 'Apply' and other things.
 
-You can express a BO by `MetaType`, `key` and `version`. for example :  "/B/sale/order:1" we call it `meta_string`,  `meta_string` should be unique to identify the BO.
+You can express a BO by `MetaType`, `key` and `version`. for example :  "B:sale/order:1" we call it `meta_string`,  `meta_string` should be unique to identify the BO.
 
 - "/B" is `metaType`
 - "/sale/order" is `key`
 - ":1" is version
-- "/B/sale/order" we name it `full_key`
+- "B:sale/order" we name it `full_key`
 
 ## MetaType
 
@@ -24,7 +24,7 @@ The following table lists all `metaType`
 | Dynamic        | /D     | Used with BO, need not to register to `meta` table, it's used for defining workflow as `runtime` |
 | Null           | /N     | The terminate for the end of the workflow. You need not to define it in `meta` table |
 | Multi-Serial   | /R     | This will allow  converter return multi target meta of instances and process them serially |
-| Multi-Parallel | /P     | This will allow  converter return multi target meta of instances and process them parallelly |
+| Multi-Parallel | /M     | This will allow  converter return multi target meta |
 
 ## version
 
@@ -76,11 +76,11 @@ For example, if we would register an __Order__, the sql  might be :
 ```sqlite
 INSERT INTO meta
 (full_key, description, version, states, fields, config)
-VALUES('/B/sale/order', 'order', 1, '', '', '{}');
+VALUES('B:sale/order', 'order', 1, '', '', '{}');
 ```
 
 ## Limitations
 
-Nature does not allow converter to return more than one `metaType` of instances except "/R" and "/P" `metaType`.
+Nature does not allow converter to return more than one `metaType` of instances except "M" and "/R" `metaType`.
 
 **Only one** `state-instance`  can be returned by converter. because `state-instance` may cause state-version conflict and a re-convert will be needed. That is great complex for multi-instance to face to this problem.
