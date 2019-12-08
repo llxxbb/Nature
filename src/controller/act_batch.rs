@@ -5,12 +5,12 @@ use crate::actor::{ACT_STORE, MsgForTask};
 use crate::task::TaskForStore;
 
 pub fn channel_parallel(task: MsgForTask<Vec<Instance>>) {
-    if let Err(e) = inner_parallel(&task) {
+    if let Err(e) = inner_batch(&task) {
         let _ = TaskDaoImpl::raw_to_error(&e, &task.1);
     }
 }
 
-fn inner_parallel(task: &MsgForTask<Vec<Instance>>) -> Result<()> {
+fn inner_batch(task: &MsgForTask<Vec<Instance>>) -> Result<()> {
     let mut tuple: Vec<(TaskForStore, RawTask)> = Vec::new();
     match RelationCacheImpl::get(&task.0[0].meta, RelationDaoImpl::get_relations, MetaCacheImpl::get, MetaDaoImpl::get) {
         Ok(relations) => {

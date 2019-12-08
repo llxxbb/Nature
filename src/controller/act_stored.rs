@@ -3,8 +3,6 @@ use nature_db::{RawTask, TaskDaoImpl};
 use crate::actor::*;
 use crate::task::{TaskForConvert, TaskForStore};
 
-pub struct InnerController {}
-
 pub fn channel_stored(task: TaskForStore, raw: RawTask) {
     if task.next_mission.is_none() {
         let _ = TaskDaoImpl::delete(&&raw.task_id);
