@@ -102,7 +102,7 @@ impl IncomeController {
         Ok(())
     }
 
-    pub fn parallel(batch: Vec<Instance>) -> Result<()> {
+    pub fn batch(batch: Vec<Instance>) -> Result<()> {
         let _ = Instance::meta_must_same(&batch)?;
         let raw = RawTask::new(&batch, &batch[0].meta, TaskType::ParallelBatch as i16)?;
         let _ = TaskDaoImpl::insert(&raw)?;
