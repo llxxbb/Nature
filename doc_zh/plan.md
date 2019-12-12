@@ -2,12 +2,9 @@
 
 ## finished but did not submit
 
-
 ## Underway
 
-
-Meta
-  变更：Demo sql
+完善 `relation` 的说明
 
 built-in converter support
     builtIn converter suppot self settings
