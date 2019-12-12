@@ -1,6 +1,4 @@
-# Meta
-
-`Meta` 用于表示某一个业务对象。它有点像编程语言中的 `class`，而 `instance` 就是 `Meta` 的实例。当我们把 `instance` 输入到 Nature 中时，Nature 会检查 `instance` 的 `Meta` 信息是否被预先定义过，如果没有 Nature 是不接受这个输入的。
+# 使用Meta
 
 ## Meta 的构成
 
@@ -109,6 +107,6 @@ full_key由“{`MetaType`}:{`key`}”构成。
 
 ## 限制说明
 
-Nature 允许 `converter` 返回多个具有不同 `Meta` 的实例，除非目标 `MetaType` 为”M“。
+Nature 不允许 `converter` 返回多个具有不同 `Meta` 的实例，除非目标 `MetaType` 为”M“。
 
 如果 `Meta` 是有状态的，那么 `converter` 只能返回一个 `instance`。这是因为 Nature 对于状态数据的冲突处理较为复杂，需要 "re-convert"，如果是返回多个状态数据，多个状态数据的一致性将非常难以保证。
