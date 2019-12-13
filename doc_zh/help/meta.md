@@ -74,7 +74,7 @@ pub struct MetaSetting {
 
 - is_state:  缺省为 false，适用于`Meta`的 `state` 属性为空但又需要状态功能的时候，可以将这个属性设置为true,。如一个计数器 `Meta` 是需要状态的.
 
-- master: 缺省为 None，当前`Meta`依附于指定的`Meta`。当前`Meta`的`instance`会使用`master`对应`instance`的ID。如果 `converter` 的输入是当前 `Meta`, 则 Nature 会将其对应 `master` 的 `instance` 也一并传入。这也是 Nature 实现自动 `converter` 魔法的依据。
+- master: 缺省为 None，当前`Meta`依附于指定的`Meta`。当前`Meta`的`instance`会使用`master`对应`instance`的ID。如果 `converter` 的输入是当前 `Meta`, 则 Nature 会将其对应 `master` 的 `instance` 也一并传入。这也是 Nature 实现自动 `converter` 魔法的依据。注意：如果 [`Relation`](relation.md) 的配置中使用了 `use_upstream_id` ，则优先使用 上游 `Instance`的ID。
 
 - multi_meta：缺省为 None，意味着 `converter`将返回多个不同的`Meta`实例，如根基一个输入数据进行多维度统计。这可以减少大量的 `Meta` 定义和 `converter` 定义。子`Meta`的定义由`MultiMetaSetting`结构进行说明：
 
