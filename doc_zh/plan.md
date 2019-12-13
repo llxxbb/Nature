@@ -4,7 +4,10 @@
 
 ## Underway
 
-完善 `relation` 的说明
+文档：
+    README_ZH
+    完善 `relation` 的说明
+    `Instance` 的 `context` 说明。
 
 built-in converter support
     builtIn converter suppot self settings
