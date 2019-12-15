@@ -1,99 +1,102 @@
 # Nature
 
-Nature 是一种新的构建大型系统的方式，她会让你“**失去对下游节点的控制”**，用下游**“自然选择”**上游的开放模式来构建复杂的系统。因为控制和依赖的减少业务间的耦合度将变得非常低，进而业务系统本身的**“进化”**将变得前所未有的简单和高效，这会大量减少系统的管理、建设和维护成本。这也是本项目名称的由来。
+Nature 是一种新的**数据驱动**的**面向业务**的用于构建大型系统的**支撑平台**。Nature 使用下游**“自然选择”**上游（整体上还是自下而上）的方式来替代传统的**“上游控制下游”**方式来构建系统，从而将**复杂度由“一对多”变为“一对一”**，大幅度减少模块间的耦合，并在不断选择中实现整个系统的**“进化”**，这也是本项目名称的寓意所在。而这种开发方式将为系统生命周期的各个阶段减负。
 
-数据是系统的灵魂，是企业的灵魂，但现状是必须借助研发体系来驾驭，所以效率沟通很成问题。而 Nature 让懂业务的人描述数据、掌控数据流向，从而使开发人员失去对数据控制的主导地位。不用去担心算法问题，Nature 已内嵌常规的算法。
+请不要认为这是个复杂的项目，理论足够简单的核心才能支撑起复杂和庞大的应用体系，就像量子构成我们的世界一样。当然我只是一个推动者，使Nature 变得简单，可能离真正的简单还很遥远。
 
-驱动数据有效工作的常规设计已经被Nature。
+## 相关概念
 
-Nature free data define from program processing. Nature isolate **Business-Goals** from execution clearly, that will make you system adjust quickly , more correctly and easy to maintain. Unlike a `Service`, which bind goals and implements together, commonly, **the service would make data dirty and hardly to maintains**. 
+Nature 只关注两样东西：一个是**数据**，一个是数据间的**关系**。数据其实就是**业务目标**，而关系是可以让你一个接一个**实现这些目标的跳板**。跳板不是方法，Nature不告诉你怎么做。
 
-If you are very understanding of the business but you are not a programmer, by Nature you will be a good leader for the business system.
+### 数据为什么是“目标”？
 
-Nature Help you to manage your data from a __High Perspective__.  All your **Business-Domain** can be viewed and be managed globally; and more, all the **relations** between domain can be choreographed globally also. Just like a terrestrial globe, all things on it. 
+宏观上讲，系统就是为了处理数据，显示器里看到的都是数据，系统间交互的也都是数据，所以**系统为数据而生**。从微观上讲，一个方法输入的是数据，输出的也是数据，**方法存在的意义就是处理数据**，数据才是我们想要的东西，所以**数据和目标是等同的**。**数据是系统的灵魂，是企业的灵魂**。
 
-Nature is `FaaS`(Function as a Service) platform technically. But I don't like to use this concept, because I don't want to hype a concept or a fan of it, `FaaS` is not the primary goal for this project. Nonetheless `FaaS` is the key point to make Nature working. Nature break meta-relations into pieces(a function) for developer to implement, and then put them together at runtime.
+### 传统开发方式的问题
 
-__Important__:  this project is in a very earlier stage, it is far to mature.
+传统开发方式下的数据的描述和控制是非常有局限性性的，如：
 
-## A big question
+- 业务人员提的需求往往是功能性的，对数据的概念及数据的边界定义是**模糊**的，数据定义的好坏十分依赖设计人员的抽象能力，这是第一道坎。
+- 设计说明书中的数据是文本性的，需要人的理解才能映射到系统上去，很容易**失真**，这是第二道坎。
+- 将设计变为代码，代码中将数据绑定到接口，甚至技术数据和业务数据混杂在一起，**代码成为数据的实际控制者**，很容易造成目标的迷失，使迭代变得困难，这是第三道坎。
 
-This project covered a lot of  fields (__Work-Flow__, __Message Queue__, __Stream__, __BPMN__, __Gateway__, __Distributed_System__ and __Database__) , and each field have their own mature and good projects. why do I provide a new one? 
+上面三点说明了在传统开发方式下，企业的目标无形中被研发所制约，沟通、开发、维护成本高昂。而 **Nature 将目标和实现进行了彻底隔离，让懂业务的人直接掌控纯粹的业务数据，并指导开发，以**解决了传统开发方式的弊端；同时 **Nature 內建了一套完整的，统一的和广泛的能够对目标进行保驾护航的处理机制**，如幂等，重试，最终一致性等，大幅度简化了开发和维护成本。
 
-I have no intention of competing with other fields.  it's just involves these field. Sorry for the  __Nature__ name for this project.  Nature means all things,  surely this it can not do that. But I could not think out a suitable name for it. 
+### Nature 的数据表示
 
-Please do not think it too complicated. there are only few things be introduced in this project: __data__ and __relations__ between data. Just like atoms and there relations make up the complex world, in this project, __data__ make up all your business. So I like the name __Nature__. let us to see it deeper.
+数据在Nature 里有两种形式：`Meta` 和 `Instance`。 `Meta` 表示业务对象的定义，而 `instance`则是业务对象的实例，也是你最终想要的业务数据。`Meta` 和 `Instance`相当于编程语言中的 `Class` 和 `Object`。
 
-### Functions vs goals
+`Instance`可以由 Nature 外部输入或者由 `Relation`（下面会讲） 中定义的 `Converter` 转换而来。**`Instance` 数据一旦生成将无法改变**，对于`Stateful-Instance`数据 Nature 使用版本化技术来保证数据的不可变性。
 
-Work-Flow and BPMN are __function__ oriented solutions, it may let business run, but when business growing too large, you may __lost in functions__, they call tell you how-to-do, but do-for-what is uneasy  to describe. because function can __hide goals(data) inadvertently__, then the business system is hard to understand, and you will find it is difficult to find out what your really want.
+### `Relation` 
 
-Message-Queue and Stream face to connection more than data: a connector between functions. Nevertheless I think they are better then Work-Flow and BPMN, because they rise the data's value. But I do not think it is enough yet, it let developers are both a player and a referee. 
+`Meta` 和 `Meta` 是通过 `Relation` 来建立联系的，比如“订单”和“生产申请单”之间存在着直接的联系。 `Relation` 仅支持**”一对一“**这种形式，`Relation` 的这种形式有下面几个重要的好处：
 
-Nature make data(__goals__) clearly and isolate data from functions and hide functions back-end. **data are pure energy** for system running. , so you can get a agiler and powerful business system based on Nature,.
+- 这种形式只能是下游选择上游，不可能是上游控制下游，这就大幅度减少彼此之间的耦合，使得每块业务的开发维护变得轻松简单。
+- “一对一”意味着一个输入对应一个输出，这就简化了 Nature与 `Converter` 的交互形式：[**y=f(x)**](doc_zh/help/architecture.md) 。
+- 因为由 “控制” 变成了“选择”，相对于传统编程模式 If,else,switch 等控制语句在 Nature 模式下基本上消失了，所以业务系统的复杂性也随之降低，稳定性和可维护性随之提高。
 
-### Bottom-up management vs top-down management
+`Relation` 通过“一对一”这种方式可以将所有的`Meta`串接成一个庞大的业务网，这**是业务系统的一个完整的实时的结构快照**。 `Relation` 能够强有力的将 “松散” 的 `Converter` 黏连在一起，发挥 1 + 1 > 2的效果。
 
-__Gateway__, __Distributed_System__ and __Database__ are __bottom-up management__. They are technology oriented, there manage their own affairs in their own way. Because they are different things, so it's hard to unify and simplify the management.
+### `Converter` 
 
-Nature let you declare **business-goals** (not technical things) and **relation** between them and **who** can do transfer between the goals(execute the goals), this is all you need to manage, Nature and developers will take care **How** to execute the goals. This is a **top-down** manner of management, it's simple, directly and effectively.  From the **top** we can glue multiple elements together and make it 1 + 1 > 2.
+关系建立起来之后，需要借助 `converter` 才能将源`instance`加工成为目标`instance`。`Converter`由业务系统来实现并被Nature调用。Nature中定义的每个`Relation`都需要一个独立的`Converter`来实现。
 
-- Nature is a __gateway__: Nature can control and route all you business request.
-- Nature is a __distributed system__: you needn't care about data availability and consistently.
-- Nature is a __KV-database__:  you can query data you putted in and  Nature itself transferred, and your data will __never be lost and changed__ when they are written down.
+`Converter`将相关的 `Instance` 串接在一起，**构成一个完整的可视的可追溯的业务跟踪链条**。
 
-## What's in it for you
+## Nature 的价值
 
-Let to see what benefit to you when using Nature
+借助 Nature 可以实现**目标管理**，并大幅度减少达成目标的成本，主要表现为以下几个方面：
 
-- give a clearly interface between **what** and **how**.  and achieve the goal  **no distortion**, **full restraint**. this will reduce communication costs greatly in your team. 
-- Easy to focus on goals and less detours, you will __never lost your target__ among a big system..
+- **纯粹的目标**：Nature 中的`Meta`是对业务目标的抽象提纯，什么时候你都能得到一个干净的目标描述，并对开发构成强制约束，保证你的目标不会被淹没和迷失。
+- **更准确的目标**。由业务人员直接表达，不需要设计人员和开发人员的多次翻译，摆脱功能性驱动的魔咒。
+- **全局视图**：Nature 中的`Relation`是目标的连接，而非功能的连接。就像一个地球仪一样，所有的东西都在那里了，而不是飞机、轮船和火车。所以**管理者可以非常容易的从更高的视角去审视这些目标的合理性**，尤其适用于迭代开发。
+- **快速迭代**：允许目标和实现独立迭代。Nature 的 `Meta` 用版本来管理变化，`Relation` 可以更换 `Converter`，没有任何技术障碍来妨碍你的变更。
+- **简化的开发**。 有下面几个点：
+  - 所有的`Converter`都是可插拔的，可替换的。
+  - 不用关心数据的一致性、高并发、幂等、重试等事情，Nature 已经为你搞定了这些。
+- Nature 可以节省你的时间和金钱，系统越大效果越明显。
 
-- Development task is more easier and Nature can __speed up your development iterations__: 
-  - All workpiece is pluggable. developer focus one goals once a time, need not to have a global view and understand the whole thing, though it is easy to present by Nature.
-  - Need not to take care about data consistently, high concurrency, idempotent and other things.  so you can reduce the need of *senior programmer*s and then reduce the cost.
-- More directly, Nature will save you time and money,  __bigger is cheaper__.
-
-## Usage scenarios
-
-Complex business system like web store.
-
-## Want to know more?
-
-[A concrete example](https://github.com/llxxbb/Nature-Demo)
-
-[Concepts](doc\help\concepts.md)
-
-[Architecture](doc\help\architecture.md)
-
-[Reference](doc\help\reference.md)
-
-
-
-
-
-# Nature
-
-The Virtual World is made of data, VW is made of connection also. Data is static and present at certain time, connection is dynamic and along the time make date to connect each other. So the tow important abstraction made the VM running.
-
-This project allow you define you data and connections between data. connection can be processed by Converter defined by you. Those are all you need, then a distribute, effective, consistent, fault tolerance system is ready for you.
-
-## 大数据处理我们只需要一个解决方案就可以了
-
-消息中间间, 流式计算, spring cloud 各自只解决一部分问题。事件源。
+## Nature 特性
 
 ### 可扩展性
 
-* 分布式服务
-    每个节点都是职能对等的，可通过增加服务器来达到线性扩展。
-* 分布式数据库
+* 分布式：每个节点都是职能对等的，可通过增加服务器来达到线性扩展。
 
 ### 可用性
 
-* 数据一致性
-* 幂等
-* 重试
+* 数据一致性：Nature 生成的数据具有不变性，并实现最终一致性。
+* 幂等：Nature 支持幂等
 
 ### 可靠性
 
-* 重试
+* 重试：Nature 遇到环境问题可以自动重试。
+
+## 与其他系统的区别
+
+### 消息系统
+
+Nature 中的“选择”是从消息系统中借鉴而来的，有点类似于消息系统的发布与订阅，但 Nature 与消息系统存在着本质的不同。消息系统仅仅是一种技术形式，他允许开发者既是球员（功能开发）又是裁判员（目标数据定义），其中的消息是暂态的，消息与消息之间没有必然的相关性，消息系统的本质是解耦两个技术过程。而 Nature 是面向业务的，不关心技术形态，其中的数据是永恒的，数据和数据间存在强相关性，Nature 中的“选择”衔接的是两个目标而不是过程，衔接的是真个业务网中的一个一个的里程碑。
+
+### `workflow` 和 `BPMN` 
+
+从业务流程控制来看，Nature 与 `workflow` 和 `BPMN` 有一定的相似之处。其重要区别在于后者告诉我们**怎么做（功能性驱动）**，“怎么做”是非常复杂的，具象的，迭代多了我们的**目标可能会迷失**。而 Nature 告诉我**需要什么**，而“需要什么”是简单但最为重要的更不会迷失，Nature 把“需要什么”放到了 `Meta` 里。这样我们就能**聚焦到真正重要的事情**上，并**让管理变得简单**。Nature 把怎么做交到了外部的 `Converter` 去处理，如何处理是不去管的。
+
+### Faas 和 Serveless
+
+Nature 和 `Converter` 协作的方式实际上可以看做是 FaaS(Function as a Service) 或者 Serveless 的一种形式，但我不想使用这个概念，因为`FaaS` 不是这个项目的主要设计意图，我没有看到 `FaaS` 是如何管理业务目标的。
+
+## 深入了解Nature
+
+[示例及功能讲解](https://github.com/llxxbb/Nature-Demo)
+
+[架构说明](doc_zh\help\architecture.md)
+
+`Meta`的具体使用方法请参考：[使用 Meta](doc_zh/help/meta.md)
+
+`Relation`的具体使用方法请参考[使用 Relation](doc_zh/help/relation.md)
+
+`Converter`的实现方法请参考[实现`Converter`](doc_zh/help/converter.md)
+
+本系统还处于早期阶段
+
