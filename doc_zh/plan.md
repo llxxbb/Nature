@@ -5,7 +5,7 @@
 ## Underway
 
 文档：
-    README_ZH
+    完善 `architecture` 的说明
     完善 `relation` 的说明
     `Instance` 的 `context` 说明。
 

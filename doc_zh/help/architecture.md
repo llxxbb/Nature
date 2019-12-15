@@ -1,6 +1,6 @@
 # Architecture
 
-Before to read this, I suppose you have read the [concepts](concepts.md) of the Nature.
+Before to read this, I suppose you have read the [README](../../README.zh_CN.md) of the Nature.
 
 ## Space-time
 
