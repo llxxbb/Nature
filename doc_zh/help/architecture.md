@@ -1,14 +1,40 @@
-# Architecture
+# Nature 架构
 
-Before to read this, I suppose you have read the [README](../../README.zh_CN.md) of the Nature.
+在阅读之前请确保对Nature 的[概念](../../README.zh_CN.md)有所了解。
 
-## Space-time
+## 传统开发方式的弊端
 
-Nature can be divided in tow part space and time.
 
-Space is structures,  it is your `meta`s and `relation`s between them. they are **spatial relevance**.  You can use them to **express everything in the world**, like a photo to show the world, but it's **static** also. 
 
-Time is your `instance`s, new instances will be generated along the time line. `Nature` make `instance`s flow by rules(relations),  like a train can only run on tracks, and record changes and the branches they had taken. These instances are time-dependent. like music or movies,  they are **dynamic** also. 
+## 时空
+
+`空间`是结构，是你的业务对象模型，是规则，是目标。结构和规则出来了功能就有了依附。
+
+`时间`就是运行时，是功能，功能是一系列的动作过程的集合，所以功能是时间属性的。功能必须依托与结构和规则才能发挥作用，既`时间`依附与`空间`才能存在。
+
+Nature 将`时间`和`空间`进行了严格的区分管理，杜绝传统方式中的耦合。
+
+Nature 是如何解决时空关系的
+
+Nature 是一种简单的架构，她用时空关系来对复杂的世界进行抽象。
+
+
+
+而Nature 从理论层面保证了`时空`关系解耦，并确立了`空间`对`时间`的决定和主导作用。并使两个维度拥有独立发展的自由度，同时又保持功能依赖的可靠性。
+
+如何解决
+
+
+
+Nature 用 `Meta` 和 `Relation` 来表示结构和规则，既空间，用于编织各种业务模型来支撑业务运行。Nature 
+
+传统方式下的业务模型的定义非常困难，为什么？
+
+- 
+
+
+
+由 Nature 的 `Instance` 来承载。在时间长河里不断会有 `Instance` 生成并成为**不可变更的历史**。`Instance`的生成必须遵循规则（`Relation`）,就像运动必须遵循物理定律。
 
 You can see that `meta` and `relation`s control the whole thing.  Nature abstract all kinds of things to space, and can only generate one thing at runtime: `intance`, That is the Nature' all. Tt like DNA and proteins in biology, `meta`-and-`relation`  are DNA which control the generation of proteins, and `instance` is the protein. This abstract **decouple business logic into components**, and greatly **unify  the runtime technical logics**, such as concurrent, idempotent and retry etcetera, so you can get free from them, and focus on your business logics wholly.
 
