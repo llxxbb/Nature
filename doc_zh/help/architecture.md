@@ -2,8 +2,6 @@
 
 在阅读之前请确保对Nature 的[概念](../../README.zh_CN.md)有所了解。
 
-## 传统开发方式的弊端
-
 
 
 ## 时空
@@ -123,6 +121,23 @@ There is a special  `ConverterEnvironmentError`: timeout. If  the `converter` wi
 ## hot pluggable
 
 Nature is a platform focus on business and simplify it, that loose couples technology and business. So Nature make technology more generic and easy to integrate. such monitor, authorize and visualization etcetera.
+
+
+
+## Nature 特性
+
+### 可扩展性
+
+* 分布式：每个节点都是职能对等的，可通过增加服务器来达到线性扩展。
+
+### 可用性
+
+* 数据一致性：Nature 生成的数据具有不变性，并实现最终一致性。
+* 幂等：Nature 支持幂等
+
+### 可靠性
+
+* 重试：Nature 遇到环境问题可以自动重试。
 
 
 
