@@ -1,45 +1,63 @@
 # Nature 架构
 
-在阅读之前请确保对Nature 的[概念](../../README.zh_CN.md)有所了解。
-
-
+在阅读之前请确保对Nature 的[概念](../../README.md)有所了解。
 
 ## 时空
 
-`空间`是结构，是你的业务对象模型，是规则，是目标。结构和规则出来了功能就有了依附。
+Nature 是一种简单的架构，她用 `时空` 关系来简化对复杂世界的描述。`时空`将整个业务系统分成`设计时`和`运行时`，**实现了业务需要描述和功能实现的解耦**。**并建立起`设计时`对`运行时`的强制约束机制**，使代码少走弯路。
 
-`时间`就是运行时，是功能，功能是一系列的动作过程的集合，所以功能是时间属性的。功能必须依托与结构和规则才能发挥作用，既`时间`依附与`空间`才能存在。
+### 空间
 
-Nature 将`时间`和`空间`进行了严格的区分管理，杜绝传统方式中的耦合。
+`空间`就是Nature的`设计时`，Nature 用 `Meta` 来构造点， 用 `Relation` 来构造边，将所有的点和边链接在一起就可以构成无限延展的`空间`，有了`空间`就有了结构。点代表了业务对象，边代表了业务对象之间的关系，而结构则代表了业务布局。
 
-Nature 是如何解决时空关系的
+**`Relation `使得`设计时`对`运行时`具有完全的支配能力**，她切断了功能间的直接联系，使得功能间更松散，更容易开发和维护。
 
-Nature 是一种简单的架构，她用时空关系来对复杂的世界进行抽象。
-
-
-
-而Nature 从理论层面保证了`时空`关系解耦，并确立了`空间`对`时间`的决定和主导作用。并使两个维度拥有独立发展的自由度，同时又保持功能依赖的可靠性。
-
-如何解决
+Nature 提供了对这个`结构`的`动态调整`能力。引入了变更版本化控制技术，**避免了传统开发方式中既有代码对迭代制约作用**。
 
 
 
-Nature 用 `Meta` 和 `Relation` 来表示结构和规则，既空间，用于编织各种业务模型来支撑业务运行。Nature 
+### 时间
 
-传统方式下的业务模型的定义非常困难，为什么？
+`时间`由 Nature 的 `Instance` 来体现，是某个时刻的业务数据表示。在时间长河里不断会有各种业务对象的 `Instance` 生成，这些`Instance`将成为**不可变更的历史**。
 
-- 
+`时间`就是`运行时`，是功能，功能是一系列的动作过程的集合，功能必须依托与结构才能发挥作用，既`时间`依附与`空间`才能存在。`运行时`完全遵循`设计时`的规则来运转。
+
+### 时空关系
 
 
 
-由 Nature 的 `Instance` 来承载。在时间长河里不断会有 `Instance` 生成并成为**不可变更的历史**。`Instance`的生成必须遵循规则（`Relation`）,就像运动必须遵循物理定律。
 
-You can see that `meta` and `relation`s control the whole thing.  Nature abstract all kinds of things to space, and can only generate one thing at runtime: `intance`, That is the Nature' all. Tt like DNA and proteins in biology, `meta`-and-`relation`  are DNA which control the generation of proteins, and `instance` is the protein. This abstract **decouple business logic into components**, and greatly **unify  the runtime technical logics**, such as concurrent, idempotent and retry etcetera, so you can get free from them, and focus on your business logics wholly.
+
+并使`运行时`按规则运转以生成业务数据：`Instance`，所以Nature 的`空间`是整个业务系统的指挥平台。
+
+Nature 用版本记录`空间`的变化，不会对既有空间造成影响，也就不会对既有`运行时`造成影响。
+
+`Meta` 用于指导在`运行时`生成什么样的`instance`。
+
+`Relation` 用于说明在`运行时`应提供什么样的原材料来生成`Instance`，`Instance`的生成必须遵循`Relation`,的规则，就像运动必须遵循物理定律。
+
+## 简化的运行时
+
+由于`Relation`使用统一且简单的形式，这就赋予了 Nature 对`运行很容易做**切面（AOP）** ，这可以大幅度的简化开发人员的技术性工作，如并发、幂等、重试等，使开发者能够更好的将精力聚焦到业务本身上。因为开发复杂性降低，也提高了系统的可维护性和健壮性。
+
+
 
 Behand `space-time` there are tow theories
 
 - one for **science**: y=f(x)
 - one for **philosophy**: choose my onw destiny
+
+Nature 在使用层面保证了`时空`关系解耦，并确立了`空间`对`时间`的决定和主导作用。并使两个维度拥有独立发展的自由度，同时又保持功能依赖的可靠性。杜绝传统方式中代码对结构的制约作用.
+
+
+
+##### 为什么用时空这么大的概念？
+
+
+
+
+
+- 
 
 ### y=f(x)
 
@@ -121,23 +139,6 @@ There is a special  `ConverterEnvironmentError`: timeout. If  the `converter` wi
 ## hot pluggable
 
 Nature is a platform focus on business and simplify it, that loose couples technology and business. So Nature make technology more generic and easy to integrate. such monitor, authorize and visualization etcetera.
-
-
-
-## Nature 特性
-
-### 可扩展性
-
-* 分布式：每个节点都是职能对等的，可通过增加服务器来达到线性扩展。
-
-### 可用性
-
-* 数据一致性：Nature 生成的数据具有不变性，并实现最终一致性。
-* 幂等：Nature 支持幂等
-
-### 可靠性
-
-* 重试：Nature 遇到环境问题可以自动重试。
 
 
 

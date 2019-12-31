@@ -4,6 +4,10 @@
 
 ## Underway
 
+还未实现的功能：
+
+​	控制`Instance` 长什么样子。
+
 文档：
     完善 `architecture` 的说明
     完善 `relation` 的说明
@@ -22,7 +26,7 @@ give a graph at concepts.md for the flow that how to generate instances.
 provide bin package for user to download. 
 
 ## unsure
- 
+
 merge parallel and serial process mode
   文档
 
