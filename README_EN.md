@@ -1,5 +1,7 @@
 # Nature
 
+English|[中文](README.md)
+
 Nature free data define from program processing. Nature isolate **Business-Goals** from execution clearly, that will make you system adjust quickly , more correctly and easy to maintain. Unlike a `Service`, which bind goals and implements together, commonly, **the service would make data dirty and hardly to maintains**. 
 
 If you are very understanding of the business but you are not a programmer, by Nature you will be a good leader for the business system.
