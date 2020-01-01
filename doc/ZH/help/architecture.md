@@ -1,77 +1,48 @@
 # Nature 架构
 
-在阅读之前请确保对Nature 的[概念](../../README.md)有所了解。
+在阅读之前请确保对Nature 的[概念](../../../README.md)有所了解。
 
 ## 时空
 
 Nature 是一种简单的架构，她用 `时空` 关系来简化对复杂世界的描述。`时空`将整个业务系统分成`设计时`和`运行时`，**实现了业务需要描述和功能实现的解耦**。**并建立起`设计时`对`运行时`的强制约束机制**，使代码少走弯路。
 
-### 空间
-
 `空间`就是Nature的`设计时`，Nature 用 `Meta` 来构造点， 用 `Relation` 来构造边，将所有的点和边链接在一起就可以构成无限延展的`空间`，有了`空间`就有了结构。点代表了业务对象，边代表了业务对象之间的关系，而结构则代表了业务布局。
 
-**`Relation `使得`设计时`对`运行时`具有完全的支配能力**，她切断了功能间的直接联系，使得功能间更松散，更容易开发和维护。
+`时间`就是`运行时`，`时间`由 Nature 的 `Instance` 来体现，是某个时刻的业务数据表示。有时间顺序的一连串`Instance`就构成了功能，**`Instance` 一旦生成将不可变更，成为不可篡改的历史**。
 
-Nature 提供了对这个`结构`的`动态调整`能力。引入了变更版本化控制技术，**避免了传统开发方式中既有代码对迭代制约作用**。
+## 时空关系
 
+`Meta` 用于指导在`运行时`生成什么样的`instance`。`Relation` 用于说明在`运行时`应提供什么样的原材料来生成`Instance`。
 
+`Relation `**提供了`设计时`对`运行时`的完全支配能力。**她将传统开发方式下系统功能间的联系强行斩断，使得彼此间关系松散，更容易开发和维护。功能必须依托与结构才能发挥作用，既`时间`依附与`空间`才能存在。既`Instance`的生成必须遵循`Relation`,的规则，就像运动必须遵循物理定律。所以**Nature 的`空间`是整个业务系统的指挥平台**。
 
-### 时间
+Nature 提供了对`结构`的`动态调整`能力。对`Mata`引入了变更版本化控制技术，这使得`空间`和`时间`两个维度拥有各自独立发展的自由度，既不会对既有空间造成影响，也不会对既有`运行时`造成影响，保持了现有功能的稳定，**杜绝了传统开发方式中既有代码对迭代的制约作用**。
 
-`时间`由 Nature 的 `Instance` 来体现，是某个时刻的业务数据表示。在时间长河里不断会有各种业务对象的 `Instance` 生成，这些`Instance`将成为**不可变更的历史**。
+## y=f(x)是关系而不是功能
 
-`时间`就是`运行时`，是功能，功能是一系列的动作过程的集合，功能必须依托与结构才能发挥作用，既`时间`依附与`空间`才能存在。`运行时`完全遵循`设计时`的规则来运转。
+`Relation`可以用y=f(x)来表示。`Relation`在功能上你可以看做是传统意义上的接口。接口是一个非常重要概念，是功能间衔接的桥梁，在当下系统中具有举足轻重的地位。接口设计的合理性与否，直接决定了系统的扩展能力。但在Nature中`Relation`将接口的重要性弱化了，这反应在以下几个方面：
 
-### 时空关系
+#### 不需要名字
 
+这对于接口来讲是难以想象的。接口的名字是对功能的一种诠释，是**一种功能导向的产物**。言外之意就是，我必须通过这个功能才能实现目标。而Nature 不是面向功能的，而是面向目标的。对用户来讲真正重要的不是功能，而是功能所实现的目标。`Relation` 只是说要实现B目标，则需要`Meta` A 的数据， 至于使用哪种功能来实现这个目标并不在意。所以功能的名字也就没有什么存在的意义了，这就为目标和功能分离提供了理论支撑。
 
+也就是说 Nature 将目标和功能的在系统中的价值体现给掉了个个，**将原本本末倒置的从属关系进行了正位。使其有了“自然”的表达**。借助`Relation` **Nature 把功能放到了幕后**，功能不再重要，这为功能的替换提供了便利；同时Nature又把目标间的相关性推到了前台，这是一种极简又直白的表达方式。这样**业务需求与技术实现就有了直接的桥梁**，减少了沟通的环节，使管理更加高效，不像传统开发方式那样将这种联系含蓄的隐晦的藏在功能下面，成为不好管理的**黑箱**；同时也避免了既有系统拖业务变更后腿的现象发生。
 
+#### 只有一个入参和一个出参
 
+从技术上讲，任何数据都可以用JSON来表示，所以`Relation`只需要一个入参就可以了。之所有有这样的要求，是为了有一个简单的模型来表示目标之间的关系：一对一，我们可以用多个一对一来表示一对多、多对多和多对一等多种复杂的情形。也就是说Nature 只需要维护一堆一对一的`Relation`就可以表达任意复杂的业务模型，而一对多，多对一等复杂情况会自然地在Nature中“涌现”出来，这就大大简化了Nature 本身的复杂度。
 
-并使`运行时`按规则运转以生成业务数据：`Instance`，所以Nature 的`空间`是整个业务系统的指挥平台。
+因为形式的简单统一，使得我们可以很容易赋予 Nature 很多增值功能，如并发、幂等、重试等，这大幅度的简化开发人员的负担，使开发者能够更好的将精力聚焦到业务本身上，同时因为开发复杂性降低，间接提高了系统的可维护性和健壮性。
 
-Nature 用版本记录`空间`的变化，不会对既有空间造成影响，也就不会对既有`运行时`造成影响。
+## 选择自己的命运
 
-`Meta` 用于指导在`运行时`生成什么样的`instance`。
+上一小节主要从技术层面描述`Relation`，这一小节我们从哲学角度来分析`Relation`。关系是业务系统中最重要也是最复杂的部分，关系越复杂系统也就越复杂。这里我们重点说一说"一对多"和"一对一"。
 
-`Relation` 用于说明在`运行时`应提供什么样的原材料来生成`Instance`，`Instance`的生成必须遵循`Relation`,的规则，就像运动必须遵循物理定律。
-
-## 简化的运行时
-
-由于`Relation`使用统一且简单的形式，这就赋予了 Nature 对`运行很容易做**切面（AOP）** ，这可以大幅度的简化开发人员的技术性工作，如并发、幂等、重试等，使开发者能够更好的将精力聚焦到业务本身上。因为开发复杂性降低，也提高了系统的可维护性和健壮性。
-
-
-
-Behand `space-time` there are tow theories
-
-- one for **science**: y=f(x)
-- one for **philosophy**: choose my onw destiny
-
-Nature 在使用层面保证了`时空`关系解耦，并确立了`空间`对`时间`的决定和主导作用。并使两个维度拥有独立发展的自由度，同时又保持功能依赖的可靠性。杜绝传统方式中代码对结构的制约作用.
+举一个老板和员工的关系
 
 
 
-##### 为什么用时空这么大的概念？
-
-
-
-
-
-- 
-
-### y=f(x)
-
-Developers use functions to describe the complex world in the computer program field. There are great different between functions,  **a great diversity of** input-parameter, output-parameter and logic body, so it's very hard to read someone's code, so there are many "bad" history project running now yet. Though there are "good" specifications to constrain development, but the diversity is the soul for a language. 
-
-Function's free style is the main cause of the problem.  because most of the results of the functions are middle-results, this cause huge workload put on to the process-management, but they are exactly not important for user, this is determined by function's nature property. Nature focus on goals but not process, Nature break the process of a normal function into pieces(little goals), and make these pieces easy to implement: some simplified functions, Nature call these `converter`s. 
-
-`converter` only receive one input-parameter and one output-parameter, and `converter` is a property of a `relation`. You see, Nature give a great limit to function's style, and more, **Nature try to hide function to be seen** too. That will make it easy to management, because a long process will be divide into many `converter` to implement, the **black-box** of manage than will be broken too, so this can reduce the cost of the process management. but how does it work?
-
-All diversity of input-parameter and output-parameter call be expressed to a `JSON` object, so Nature unified the form of the functions, and all `converter`s's style are **y=f(x)**,  a linear equation with one variable, that is to say function can not to define input-parameter and output-parameter self. 
-
-Nature care about the **x** and **y** only but not the `converter`, this unify separate data from functions, that is to say  developer can not determine the data but manager can, and functions can be easy replaced. This may rise the efficiency of management and easy the function development. So this unify is of great significance, because it can let you to choose your own destiny.
-
-### Choose My Own Destiny
+这是个哲学理论
 
 The `relation` between data is important,  but the more relationships, the more complicated. For example, relationships between boss and employees, from the boss end we can see that he have many employees, it's **one-to-many**, it's complicated; but from the employee end there is one relationship connected, it's **one-to-one**, it's simple. Nature maybe can not reduce the relations, but Nature let you have one-to-one relation only.
 
