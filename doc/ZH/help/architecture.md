@@ -30,37 +30,43 @@ Nature 提供了对`结构`的`动态调整`能力。对`Mata`引入了变更版
 
 #### 只有一个入参和一个出参
 
-从技术上讲，任何数据都可以用JSON来表示，所以`Relation`只需要一个入参就可以了。之所有有这样的要求，是为了有一个简单的模型来表示目标之间的关系：一对一，我们可以用多个一对一来表示一对多、多对多和多对一等多种复杂的情形。也就是说Nature 只需要维护一堆一对一的`Relation`就可以表达任意复杂的业务模型，而一对多，多对一等复杂情况会自然地在Nature中“涌现”出来，这就大大简化了Nature 本身的复杂度。
+关系是复杂的，举一个老板和员工的关系的例子，从老板角度来看，是一对多的，一对多是复杂的，所以老板都是比较忙碌的人。而从员工角度来看，这个关系就是一对一的，一对一是简单的，我只需要做好自己并上报工作就可以了。
+
+如果要表达这些关系，关系数据库已经给出了一个最好的范例，所以Nature用一对一来表达复杂的关系。之所以用这样的形式，一方面是解耦复杂的业务，另一方面是为了像数据库那样有一个统一的处理模型。也就是说Nature 只需要维护一堆一对一的`Relation，像一对多，多对一等这些复杂关系就会自然而然地在Nature中“涌现”出来，这就大大简化了Nature 本身的复杂度。
 
 因为形式的简单统一，使得我们可以很容易赋予 Nature 很多增值功能，如并发、幂等、重试等，这大幅度的简化开发人员的负担，使开发者能够更好的将精力聚焦到业务本身上，同时因为开发复杂性降低，间接提高了系统的可维护性和健壮性。
 
 ## 选择自己的命运
 
-上一小节主要从技术层面描述`Relation`，这一小节我们从哲学角度来分析`Relation`。关系是业务系统中最重要也是最复杂的部分，关系越复杂系统也就越复杂。这里我们重点说一说"一对多"和"一对一"。
+上一小节主要从技术层面描述`Relation`，这一小节我们从哲学角度来分析`Relation`。主要讲一下选择和控制的区别。
 
-举一个老板和员工的关系
+### 控制
 
+先说`控制`，`控制`是实现目标所采取的手段和过程。传统开发方式大多是基于`控制`的，而每个公司的业务场景几乎没有一样的，所以需要定制，所以就有了复杂的系统。`控制`是自上而下的，是一对多的。下游的每一个变化，都需要**反馈**到上游进行协调处理，而反馈处理尤其复杂。在一个业务系统里这样的`控制`逻辑预计将占到80%的代码甚至更高。
 
+### 选择
 
-这是个哲学理论
+`选择`与`控制`相反，它是自下而上的，上游不会去`控制`下游，下游自行`选择`上游，因为上游不去`控制`，下游也没有必要将变化**反馈**到上游。就像一条河一样，上游是无法`控制`下游的流向的。从性能上来讲控制的执行需要两步：执行并依据反馈结果做出下一步的判断，而每个选择在运行时只执行一步（通过`Converter`中的`executor`执行）。所以`选择`一方面简化了关系提升了性能，另一方面给了下游充分的灵活性，下游可以方便的决定自已的意图，掌控自己的命运。
 
-The `relation` between data is important,  but the more relationships, the more complicated. For example, relationships between boss and employees, from the boss end we can see that he have many employees, it's **one-to-many**, it's complicated; but from the employee end there is one relationship connected, it's **one-to-one**, it's simple. Nature maybe can not reduce the relations, but Nature let you have one-to-one relation only.
+### 可以有多个选择吗？
 
-Thank to the unify of **y=f(x)**, Nature can make pure **data-flow**, and this make it easy to organize the business logic. The downstream know what upstream he wanted, so he can **select** a **x** as his input and don't care about how many downstream after him. so there is no **control-flow** in `relation`.  no such **branch, loop** complicated will be seen in Nature but Nature do it for you at backend, and this simplify the develop process greatly, because control means to-many, when one of the downstream changed, the upstream might need to be modified.  but **select** only affects itself.
+`Relation` 的一对一的形式是不能行使控制职能的，但可以选择。每个下游可以自由选择一个上游作为自己的输入。这里有个问题：我们不能选择多个上游吗？从业务场景上来讲，这是个合理的请求，如生产一台电脑我们需要很多原材料。然而每种材料的准备都是独立的事件，所以我们必须要等，这样“等”就是一个有状态的中间目标。
 
-Furthermore, `relation` is the **one-step** of the data-flow.  all `relation`s can connected together to form a large business web and you can modify the web anywhere freely and easily, this is difficulty for **hard control logic** for normal business system implement. 
+“等”可以`选择`材料1，可以`选择`材料2，可以`选择`材料N，当每种材料就位后，就在“等”里设置一个状态，当所有的材料都就位后，”等“的状态变成了等待完成。而电脑可以`选择`等待完成的“等”。这种“等”是异步的，不是系统在哪里傻等，所以不会有太多性能上的损耗。Nature 的Demo项目中有一个订单等待多笔支付完成的演示于此情景相同，可以参考一下。
 
-Though you can't see control-flow in Nature, but the control-flow just in there. Same upstream different downstream will make branch; different upstream same downstream will make confluence. All control logic are formed naturally, that is to say control-flow is not designed by you but it **spring up** itself.
+### 《失控》
 
-### Data driven vs. function driven
+传统的业务系统之所以死气沉沉，一方面是代码管的太多了，控制的过头了，另一方面是因为代码是“死”的。这就限制了业务变化的灵活性。而Nature 用`选择`来代替`控制`，且`选择`是可配置的，是活的。就像《失控》（作者：凯文凯利）里讲的那样，将一个业务系统看做是一个生态系统，让组件之间自发的产生依赖，而不是由上游控制，用简单的方式来构建一个复杂的业务系统，并遵循达尔文的自然选择理论使之成为一个活着的不断进化的生态系统。
 
-the unify of **y=f(x)** not just hide the **control-flow** but also the functions. On the business side this is a great important thing, it reduce the complexity significantly, you just think about what are you want. 
+Nature 因为去除了关系间的`控制`，就没有了像分支，循环，跳转等业务控制逻辑，这样就大幅度减少业务系统的复杂性。同时系统的演进的干预成本也将非常廉价，Relation的语义也就变成了纯粹的`数据流`，这种纯粹的数据流非常适合用来表示业务系统的核心价值。
 
-Of cause, it's not that easy, your must think of middle-data along the way, but it is much more easy then function. In this model you use some data to compose another data until the goal can be achieved. The manager can modify a big business system plan without interference by data only. but when he face to functions, there are all kind of problems emerged, why? because function coupling too many things: language, framework, developer capabilities, deploy environment and other things, they are all dynamic and complex to manage! 
+虽然Nature放弃了`控制`权，但无形的控制却依然在那里。同一个上游有多个不同的下游会表现出分支控制的语义，不同的上游汇集到同一个下游会表现出合并控制的语义。Nature 提供的只有一对一的关系，并没有提供一对多和多对一这样的控制选项，而这些`控制`是自然显现的，在《失控》里有一个词可以表达这个现象：涌现。
 
-**Data driven can give you a clear,simple and good view, but function driven make you confusing**.
+## 技术特性
 
-## Consistency
+Nature 虽然免去了对业务流的控制，但在技术上还是需要一些控制的，没有这些技术特性的保驾护航，Nature 将没有任何实用价值。
+
+### 一致性
 
 Though the **control-flow**  spring up itself, Nature give a deep control under your choice, such as dispatch tasks, retry tasks and store `instance`s generated, includes `instance`s inputted from out of Nature. It is hard to make data consistent in a complex network environment in normal business system, but Nature encapsulate those complexity for you. 
 
