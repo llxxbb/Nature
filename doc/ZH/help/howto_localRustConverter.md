@@ -1,6 +1,6 @@
-# Converter Of Local Rust Implement 
+# Executor Of Local Rust Implement 
 
-Tell you how to implement a Rust Converter locally
+Tell you how to implement a Rust Executor locally
 
 ## Cargo.toml
 

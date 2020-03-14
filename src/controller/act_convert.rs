@@ -94,7 +94,7 @@ pub fn channel_convert(task: TaskForConvert, raw: RawTask) {
                 let _ = TaskDaoImpl::update_execute_time(&raw.task_id, i64::from(delay), &last);
             }
             ConverterReturned::LogicalError(ss) => {
-                let _ = TaskDaoImpl::raw_to_error(&NatureError::ConverterLogicalError(ss), &raw);
+                let _ = TaskDaoImpl::raw_to_error(&NatureError::LogicalError(ss), &raw);
             }
             ConverterReturned::EnvError => (),
             ConverterReturned::None => {

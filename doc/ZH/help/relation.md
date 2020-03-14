@@ -24,7 +24,7 @@ pub struct RelationSettings {
 }
 ```
 
-- selector：属性用于选择符合条件的 `Instance` 进入 `Converter` 进入处理，其结构见下方 `FlowSelector`的结构说明。
+- selector：属性用于选择符合条件的 `Instance` 进入 `Executor` 进入处理，其结构见下方 `FlowSelector`的结构说明。
 - executor：属性用于定义谁来做这个转化处理，其结构见下方 `Executor`的结构说明。
 - use_upstream_id：新生成的 `Instance` 的 ID 将使用上游 `Instance`的 ID。
 - target_states：可以增加或删除转化后的 `Instance` 的状态，状态必须在 `Meta` 中定义过。
@@ -61,7 +61,7 @@ pub struct Executor {
 }
 ```
 
-protocol： Nature 与 执行器间的通讯协议，目前支持下面的方式。
+protocol： Nature 与 `Executor`间的通讯协议，目前支持下面的方式。
 
 - Http | Https：远程调用一个`Executor`。
 
@@ -73,11 +73,11 @@ protocol： Nature 与 执行器间的通讯协议，目前支持下面的方式
 
   
 
-# converter
+# Executor
 
-`converter` 用于实现 `Meta` 间 `Instance` 的转换，一般需要自己实现，Nature 也有内建及自动化的 `converter` 实现。
+`Executor` 用于实现 `Meta` 间 `Instance` 的转换，一般需要自己实现，Nature 也有内建及自动化的 `Executor` 实现。
 
-[Write a local-converter](howto_localRustConverter.md)
+[Write a local-Executor](howto_localRustConverter.md)
 
 调用的接口形式：
 
@@ -85,19 +85,19 @@ protocol： Nature 与 执行器间的通讯协议，目前支持下面的方式
 
 
 
-## 如何实现一个 `converter`
+## 如何实现一个 `Executor`
 
-`converter` 是面向业务的，没有技术上的难点，`converter`会接收一个``类型的输入 you will only concern about one input-parameter : `meta`'s `instance` and generate one or more output `instance`s
+`Executor` 是面向业务的，没有技术上的难点，`Executor`会接收一个``类型的输入 you will only concern about one input-parameter : `meta`'s `instance` and generate one or more output `instance`s
 
-## static converter (Static Orchestration)
+## static Executor (Static Orchestration)
 
-Converter Configuration must be added to `relation` table, so that it can be loaded before process `instance`s .In this way the  `relation` can be cached so it's efficient, 
+Executor Configuration must be added to `relation` table, so that it can be loaded before process `instance`s .In this way the  `relation` can be cached so it's efficient, 
 
-## dynamic-converter (Dynamic Orchestration)
+## dynamic-Executor (Dynamic Orchestration)
 
-You can dispatch you task at runtime for any downstream `meta` undefined. In this way you need provide `converter` in every inputted `instance`, It would spend more time than `Static Orchestration`, but it's flexible.
+You can dispatch you task at runtime for any downstream `meta` undefined. In this way you need provide `Executor` in every inputted `instance`, It would spend more time than `Static Orchestration`, but it's flexible.
 
-__Notice__ dynamic-meta can only use dynamic-converter and only can generate dynamic-meta (see [Meta](meta.md)).
+__Notice__ dynamic-meta can only use dynamic-Executor and only can generate dynamic-meta (see [Meta](meta.md)).
 
 
 

@@ -1,74 +1,23 @@
-# Release 0.1
+# 计划发布的版本
 
-    未发布
-## DB
+## Release 0.2
 
-- Sqlite
-- mysql
+- 区分系统上下文和业务上下文
+- 快速入门示例程序
+- 执行器
+  - 状态`Instance`支持`or`条件
+  - 使用 `min-max-heap` 来支持优先级
+  - 可以通过 contex 来 申请ID
+- 数据库：mysql 支持 r2d2
 
-## Orchestration
+* `Meta`：支持属性验证，更新时验证是否有`Relation`在使用，如有则发出警告
+* ID 生成器 snowflake for 128 bit implement.
+* 支持第三方插件
+  * monitor point
+  * traffic limit
+* 后台管理界面：更新配置时能够更新多个实例上的缓存
+* 密文存储：简单方案，不区分用户，对称加密，公私钥方案见云版
+* 提供公用外部系统查询接口：thirdQuery
 
-- dynamic orchestration
-- static  orchestration
-
-## Converter
-
-supported protocol
-
-- restful
-- rust local
-
-### other
-
-- target status
-
-## demo
-
-# Release 0.2
-
-    未发布
-## plan
-
-- context distinguish between business and system
-
-- quick start
-
-## 转换器
-  * status support `or` condition
-  * use `min-max-heap` to support priority converter
-  * 可以通过 contex 来 申请ID
-  * delay execute
-  
-## 基础
-  musql support r2d2
-* optimise : dispatch need not to save to task
-* Thing's key support parametrization
-
-## gateway
-
-## ID generator
-* snowflake for 128 bit implement.
-
-
-## support plugins
-
-## 配置管理页面
-
-  更新配置时能够更新多个实例上的缓存
-# Release 0.3
-
-未发布
-
-密文存储
-    简单方案，不区分用户，对称加密
-
-
-## 维护后台
-
-    转换器要对 thing 的定义进行验证。
-    对 thing 进行变更时要验证是否被转换器用到。
-
-
-* monitor point
-* traffic limit
+## 有待确认
 

@@ -26,7 +26,7 @@ If instance not assigned we will generate one for you by Hash, but I think this 
 ## Batch input
 
 ### parallel process
- 
+
 will ignore error while store instance.
 
 ### serial process
@@ -60,7 +60,7 @@ The given context will contains two list as a Json:
 使用灰度发布的情景：
 
 - 目标数据定义相同，处理方式有调整。
-    此情况下，不同的执行器位于相同的组（**不需要明确指定**）内，每个执行器依据权重值得到一个执行概率。
+    此情况下，不同的Executor位于相同的组（**不需要明确指定**）内，每个执行器依据权重值得到一个执行概率。
 - 目标数据发生改变，
     此情况下，多个不同转换配置共享一个组（**需要明确指定**），每个执行器依据权重值得到一个执行概率。
 
