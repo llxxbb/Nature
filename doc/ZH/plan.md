@@ -4,18 +4,22 @@
 
 ## Underway
 
+重命名 ConverterLogicalError 为 LogicalError
+
+Executor 支持内置缓存（仅适用于读取的业务）
+
 还未实现的功能：
 
-​	控制`Instance` 长什么样子。
+​	控制`Instance` 长什么样子。并清除 architecture 中**此功能暂未实现**的字样。
 
 文档：
     完善 `architecture` 的说明
     完善 `relation` 的说明
     `Instance` 的 `context` 说明。
 
-built-in converter support
-    builtIn converter suppot self settings
-    implement builtIn converter: counter
+built-in executor support
+    builtIn Executor suppot self settings
+    implement builtIn Executor: counter
 
 remove demo from release version
 

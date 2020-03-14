@@ -17,8 +17,8 @@
 | (**B**)usiness     | 表示一个**业务**对象，用B表示。该类型的 `Meta` 必须在 `meta` 数据表里定义才能使用。 |
 | (**S**)ystem       | 表示一个**系统**对象，由 Nature 自行管理，无需再`meta` 数据表里定义。 |
 | (**D**)ynamic      | 用于表示一个**运行时**由外部**动态**定义的**业务**对象，无须在 `meta` 数据表里定义。 |
-| (**N**)ull         | 表示一个没有实际意义的对象，用于`converter` 无输出的情况。无须在 `meta` 数据表里定义。 |
-| (**M**)ulti-Target | 允许 `converter` 返回多个不同类型的业务对象，每个业务对象需要在`MetaSetting` 中进行定义。该类型的 `Meta` 必须在 `meta` 数据表里定义才能使用。 |
+| (**N**)ull         | 表示一个没有实际意义的对象，用于`Executor` 无输出的情况。无须在 `meta` 数据表里定义。 |
+| (**M**)ulti-Target | 允许 `Executor` 返回多个不同类型的业务对象，每个业务对象需要在`MetaSetting` 中进行定义。该类型的 `Meta` 必须在 `meta` 数据表里定义才能使用。 |
 
 ## key
 
@@ -74,9 +74,9 @@ pub struct MetaSetting {
 
 - is_state:  缺省为 false，适用于`Meta`的 `state` 属性为空但又需要状态功能的时候，可以将这个属性设置为true,。如一个计数器 `Meta` 是需要状态的.
 
-- master: 缺省为 None，当前`Meta`依附于指定的`Meta`。当前`Meta`的`instance`会使用`master`对应`instance`的ID。如果 `converter` 的输入是当前 `Meta`, 则 Nature 会将其对应 `master` 的 `instance` 也一并传入。这也是 Nature 实现自动 `converter` 魔法的依据。注意：如果 [`Relation`](relation.md) 的配置中使用了 `use_upstream_id` ，则优先使用 上游 `Instance`的ID。
+- master: 缺省为 None，当前`Meta`依附于指定的`Meta`。当前`Meta`的`instance`会使用`master`对应`instance`的ID。如果 `Executor` 的输入是当前 `Meta`, 则 Nature 会将其对应 `master` 的 `instance` 也一并传入。这也是 Nature 实现自动 `Executor` 魔法的依据。注意：如果 [`Relation`](relation.md) 的配置中使用了 `use_upstream_id` ，则优先使用 上游 `Instance`的ID。
 
-- multi_meta：缺省为 None，意味着 `converter`将返回多个不同的`Meta`实例，如根基一个输入数据进行多维度统计。这可以减少大量的 `Meta` 定义和 `converter` 定义。子`Meta`的定义由`MultiMetaSetting`结构进行说明：
+- multi_meta：缺省为 None，意味着 `Executor`将返回多个不同的`Meta`实例，如根据一个输入数据进行多维度统计。这可以减少大量的 `Meta` 定义和 `Executor` 定义。子`Meta`的定义由`MultiMetaSetting`结构进行说明：
 
   ```rust
   pub struct MultiMetaSetting {
@@ -93,8 +93,6 @@ pub struct MetaSetting {
 
 ## 保存 `Meta`
 
-## Store `Meta` data
-
 下面为“订单” `Meta` 的示例：
 
 ```sqlite
@@ -107,6 +105,6 @@ full_key由“{`MetaType`}:{`key`}”构成。
 
 ## 限制说明
 
-Nature 不允许 `converter` 返回多个具有不同 `Meta` 的实例，除非目标 `MetaType` 为”M“。
+Nature 不允许 `Executor` 返回多个具有不同 `Meta` 的实例，除非目标 `MetaType` 为”M“。
 
-如果 `Meta` 是有状态的，那么 `converter` 只能返回一个 `instance`。这是因为 Nature 对于状态数据的冲突处理较为复杂，需要 "re-convert"，如果是返回多个状态数据，多个状态数据的一致性将非常难以保证。
+如果 `Meta` 是有状态的，那么 `Executor` 只能返回一个 `instance`。这是因为 Nature 对于状态数据的冲突处理较为复杂，需要 "re-execute"，如果是返回多个状态数据，多个状态数据的一致性将非常难以保证。

@@ -1,121 +1,201 @@
 # Nature 架构
 
-在阅读之前请确保对Nature 的[概念](../../../README.md)有所了解。
+在阅读之前请先阅读[README](../../../README.md)。
 
-## 时空
+## Nature 的时空概念
 
-Nature 是一种简单的架构，她用 `时空` 关系来简化对复杂世界的描述。`时空`将整个业务系统分成`设计时`和`运行时`，**实现了业务需要描述和功能实现的解耦**。**并建立起`设计时`对`运行时`的强制约束机制**，使代码少走弯路。
+Nature 是一种简单的架构，她用两个维度来简化对复杂世界的描述：“空间”和“时间”。
 
-`空间`就是Nature的`设计时`，Nature 用 `Meta` 来构造点， 用 `Relation` 来构造边，将所有的点和边链接在一起就可以构成无限延展的`空间`，有了`空间`就有了结构。点代表了业务对象，边代表了业务对象之间的关系，而结构则代表了业务布局。
+### Nature 的空间
 
-`时间`就是`运行时`，`时间`由 Nature 的 `Instance` 来体现，是某个时刻的业务数据表示。有时间顺序的一连串`Instance`就构成了功能，**`Instance` 一旦生成将不可变更，成为不可篡改的历史**。
+Nature 的空间并不是传统意义上的三维物理空间，而是逻辑空间。她代表着结构、规则，用于对功能进行支撑和制约。Nature 空间的意义在于：
 
-## 时空关系
+- 唯一标记一个业务对象，以便于Nature 区别对待每个业务队形，这有点类似于命名空间，Nature 用`Meta`来标记一个业务对象。
+- 对业务对象进行定义和验证，以说明该业务对象应该具有的样子，**此功能暂未实现**。
+- 建立起业务对象之间的联系，便于对业务结构进行支撑，并为系统的运转提供规则，Nature 用 `Relation`来表示业务对象之间的关系。
 
-`Meta` 用于指导在`运行时`生成什么样的`instance`。`Relation` 用于说明在`运行时`应提供什么样的原材料来生成`Instance`。
+对于一个物理世界来讲，我们一般用点、线和面来表示一个物体，在 Nature 中也存在着点、线和面。Nature 用 `Meta` 来构造点，代表了业务对象；用 `Relation` 来构造边，代表了业务对象之间的关系；Nature 的面则是隐式的，用于表示业务域，业务域由`Meta#key`来间接表示。将所有的点、线、面组织在一起就会构成一个完整的业务模型。
 
-`Relation `**提供了`设计时`对`运行时`的完全支配能力。**她将传统开发方式下系统功能间的联系强行斩断，使得彼此间关系松散，更容易开发和维护。功能必须依托与结构才能发挥作用，既`时间`依附与`空间`才能存在。既`Instance`的生成必须遵循`Relation`,的规则，就像运动必须遵循物理定律。所以**Nature 的`空间`是整个业务系统的指挥平台**。
+### Nature 的时间
 
-Nature 提供了对`结构`的`动态调整`能力。对`Mata`引入了变更版本化控制技术，这使得`空间`和`时间`两个维度拥有各自独立发展的自由度，既不会对既有空间造成影响，也不会对既有`运行时`造成影响，保持了现有功能的稳定，**杜绝了传统开发方式中既有代码对迭代的制约作用**。
+Nature 的“时间”也并不是指传统意义上的物理时间，她代表着运转、秩序、不可变更的历史和演进：
 
-## y=f(x)是关系而不是功能
+- 运转：只有运转起来的结构（空间）才能行施功能。Nature 用 `执行器`来保障业务系统的运转的，Nature 为业务系统的稳定运转提供了一些重要的保障措施，如幂等、重试、异常处理等。
+- 秩序：`执行器`没有流程控制功能，`执行器`之间的执行顺序是用`Relation`来保证的，`Relation`实现了传统的业务流程控制功能，有别于传统系统的硬编码方式，Nature 的流程控制不需要写代码，且是直观、可视、易用的。
+- 不可变更的历史：运转结果的历史见证物是`Instance`， **其一旦生成将成为永不可篡改的历史**，即便是状态数据也可以进行回溯。
+- 演进：业务是需要发展变化的，Nature 用`Meta#version`来承载业务对象定义的版本变化，既保证了既有业务的稳定，又为业务变更的灵活性带来便利。
 
-`Relation`可以用y=f(x)来表示。`Relation`在功能上你可以看做是传统意义上的接口。接口是一个非常重要概念，是功能间衔接的桥梁，在当下系统中具有举足轻重的地位。接口设计的合理性与否，直接决定了系统的扩展能力。但在Nature中`Relation`将接口的重要性弱化了，这反应在以下几个方面：
+## Nature 的运行机制
 
-#### 不需要名字
+业务系统在运行之前需要对`Meta`和`Relation`进行定义，所以`Meta`和`Relation`可以认为是`设计时`，而`执行器`则可以认为是`运行时`，`Instance`则是运行时的产物。`Meta` 和 `Instance`，相当于编程语言中的 `Class` 和 `Object`。
 
-这对于接口来讲是难以想象的。接口的名字是对功能的一种诠释，是**一种功能导向的产物**。言外之意就是，我必须通过这个功能才能实现目标。而Nature 不是面向功能的，而是面向目标的。对用户来讲真正重要的不是功能，而是功能所实现的目标。`Relation` 只是说要实现B目标，则需要`Meta` A 的数据， 至于使用哪种功能来实现这个目标并不在意。所以功能的名字也就没有什么存在的意义了，这就为目标和功能分离提供了理论支撑。
+Nature的`设计时`对`运行时`拥有**完全支配能力**。`Meta` 用于限定`运行时`生成什么样的`instance`。`Relation` 用于说明在`运行时`应提供什么样的`Instance`来生成另一种`Instance`，也就是说Nature 的**`Meta`和`Relation`是整个业务系统的指挥中心**。
 
-也就是说 Nature 将目标和功能的在系统中的价值体现给掉了个个，**将原本本末倒置的从属关系进行了正位。使其有了“自然”的表达**。借助`Relation` **Nature 把功能放到了幕后**，功能不再重要，这为功能的替换提供了便利；同时Nature又把目标间的相关性推到了前台，这是一种极简又直白的表达方式。这样**业务需求与技术实现就有了直接的桥梁**，减少了沟通的环节，使管理更加高效，不像传统开发方式那样将这种联系含蓄的隐晦的藏在功能下面，成为不好管理的**黑箱**；同时也避免了既有系统拖业务变更后腿的现象发生。
+业务流程中真正做事情的是`执行器`，`执行器`会在合适的时候被 `Relation`唤起并执行。`执行器`也是Nature中唯一需要程序员编码的部分。`执行器`只处理特定业务领域本身的逻辑，`执行器`之间是不需要直接通讯的。
 
-#### 只有一个入参和一个出参
+### Nature 运行机制的数学表达
 
-关系是复杂的，举一个老板和员工的关系的例子，从老板角度来看，是一对多的，一对多是复杂的，所以老板都是比较忙碌的人。而从员工角度来看，这个关系就是一对一的，一对一是简单的，我只需要做好自己并上报工作就可以了。
+Nature 的运行机制可以用一个数学公式来表达 : y=f(f(f(...f(x)...)))。
 
-如果要表达这些关系，关系数据库已经给出了一个最好的范例，所以Nature用一对一来表达复杂的关系。之所以用这样的形式，一方面是解耦复杂的业务，另一方面是为了像数据库那样有一个统一的处理模型。也就是说Nature 只需要维护一堆一对一的`Relation，像一对多，多对一等这些复杂关系就会自然而然地在Nature中“涌现”出来，这就大大简化了Nature 本身的复杂度。
+每个`Relation`都可以表示成y=f(x)，上游`Relation`的输出可以作为下游`Relation`的输入。其中x,y都是`Instance`，而 f 则是`执行器`，`执行器`可以看做是传统意义上的接口，接口在传统开发方式中具有举足轻重的地位，是功能间协作的桥梁，但`Relation`将接口的重要性弱化了，这反应在以下几个方面：
 
-因为形式的简单统一，使得我们可以很容易赋予 Nature 很多增值功能，如并发、幂等、重试等，这大幅度的简化开发人员的负担，使开发者能够更好的将精力聚焦到业务本身上，同时因为开发复杂性降低，间接提高了系统的可维护性和健壮性。
+#### 去功能化
 
-## 选择自己的命运
+传统的接口是一种功能导向的产物，功能是目标的实现，所以功能是现象级的，你得经过分析才知道它要干什么，甚至有时候会发现不知道它在干什么，或者为什么这么干。目标是一个点，而功能是一条线，所以对于一个复杂的业务系统要想厘清这些接口是件非常困难的事情。而Nature 不是面向功能的，而是面向目标的，她将传统系统本末倒置的**功能与目标的从属关系进行了正位**，使其有了“**自然**”的表达。
 
-上一小节主要从技术层面描述`Relation`，这一小节我们从哲学角度来分析`Relation`。主要讲一下选择和控制的区别。
+之所以能做到这一点，我们需要对`Relation`的数学形式再次解释一下，y=f(x)说明了我要借助于`执行器`来实现我的目的，而`执行器`如何实现是没有定义的，所以Nature才能够**用`Relation`把业务目标从幕后提升到了前台，用`执行器`把功能实现从台前压到了幕后**，实现了对功能实现的隔离。`执行器`只不过是一个无业务区别的纯技术上的一个接口，因此她无法限定业务目标，而`Relation`是可以限定目标的，目标限定了功能也就限定了。
 
-### 控制
+有了这个拆分，我们就可以用`Relation`在**人机界面层面而不是代码层面**来处理核心的业务问题。我们只需关注业务对象之间的关系，而不用担心`执行器`这种实施层面的技术性的功能性问题，也不会再受功能的羁绊和掣肘，而且我们可以得到一个**极简但却够用且实用的系统蓝图**，这将大幅度减少系统的复杂度并降低成本开销，这无疑是对传统系统的一种巨大变革，也许从此功能化系统将走下历史的舞台。
 
-先说`控制`，`控制`是实现目标所采取的手段和过程。传统开发方式大多是基于`控制`的，而每个公司的业务场景几乎没有一样的，所以需要定制，所以就有了复杂的系统。`控制`是自上而下的，是一对多的。下游的每一个变化，都需要**反馈**到上游进行协调处理，而反馈处理尤其复杂。在一个业务系统里这样的`控制`逻辑预计将占到80%的代码甚至更高。
+#### 去中心化
 
-### 选择
+我们上面说过，上游`Relation`的输出可以作为下游`Relation`的输入。这是一种串行的流式处理方式。只要上游`Relation`的输出`Meta`与下游`Relation`的输入`Meta` 一致，在运行时便可以一个接一个的自动流转并生成相应的`Instance`。这期间**不需要某一个或某几个点来进行任何的业务逻辑控制**，也就是说系统的行为是下游自由发挥的，是不受控制的，是去中心化的。
 
-`选择`与`控制`相反，它是自下而上的，上游不会去`控制`下游，下游自行`选择`上游，因为上游不去`控制`，下游也没有必要将变化**反馈**到上游。就像一条河一样，上游是无法`控制`下游的流向的。从性能上来讲控制的执行需要两步：执行并依据反馈结果做出下一步的判断，而每个选择在运行时只执行一步（通过`Converter`中的`executor`执行）。所以`选择`一方面简化了关系提升了性能，另一方面给了下游充分的灵活性，下游可以方便的决定自已的意图，掌控自己的命运。
+去中心化在一个大型系统里意义是非凡的。主要体现在以下几个方面
 
-### 可以有多个选择吗？
+- 效率：去中心化，意味着路径数量会减半，意味着用更短的时间更少的资源就能完成任务，意味着更少的成本。
+- 分布式：没有了中心，也就避免了集中所特有的拥堵隐患，能够充分发挥分布式水平扩展的潜力。
+- 自适应：控制的去除，就有了更多的灵活性，就可以自由的调整自己；再加上成本的减少，就有了更多尝试来完善自己做好自己。
 
-`Relation` 的一对一的形式是不能行使控制职能的，但可以选择。每个下游可以自由选择一个上游作为自己的输入。这里有个问题：我们不能选择多个上游吗？从业务场景上来讲，这是个合理的请求，如生产一台电脑我们需要很多原材料。然而每种材料的准备都是独立的事件，所以我们必须要等，这样“等”就是一个有状态的中间目标。
+#### 一对一
 
-“等”可以`选择`材料1，可以`选择`材料2，可以`选择`材料N，当每种材料就位后，就在“等”里设置一个状态，当所有的材料都就位后，”等“的状态变成了等待完成。而电脑可以`选择`等待完成的“等”。这种“等”是异步的，不是系统在哪里傻等，所以不会有太多性能上的损耗。Nature 的Demo项目中有一个订单等待多笔支付完成的演示于此情景相同，可以参考一下。
+`Relation`只允许一个输入对应一个输出，既一对一，一对一的做法借鉴于关系数据库，Nature 用一对一来表示所有`Meta`间的关系。之所以用这样的形式，除了形式简单外还有以下几方面原因。
 
-### 《失控》
+- `Relation` 是纯粹的`数据流`，这种纯粹的数据流非常适合用来表示业务对象的来龙去脉。
+- **将复杂关系解耦**，Nature 只需要维护一堆的一对一的`Relation`。这看起来很松散，但Nature 会自动组装它们，让它们“**涌现**”出一个复杂的整体，以形成一种**强有力的无形控制力**。这很像蜂群或蚁群的工作方式，这种方式将大大简化复杂业务模型的构建方式以及提供强大的灵活性。
+- 一对一模型能简化Nature 的运转控制逻辑，因为`执行器`形式的简单、统一，我们就很容易在`执行器`上施加`切面`技术，赋予 Nature 很多增值功能，如并发、幂等、重试等，从而大幅度降低系统的技术复杂度，使开发者能够更好的将精力聚焦到业务本身上。
 
-传统的业务系统之所以死气沉沉，一方面是代码管的太多了，控制的过头了，另一方面是因为代码是“死”的。这就限制了业务变化的灵活性。而Nature 用`选择`来代替`控制`，且`选择`是可配置的，是活的。就像《失控》（作者：凯文凯利）里讲的那样，将一个业务系统看做是一个生态系统，让组件之间自发的产生依赖，而不是由上游控制，用简单的方式来构建一个复杂的业务系统，并遵循达尔文的自然选择理论使之成为一个活着的不断进化的生态系统。
+### Nature 运转机制的哲学意义
 
-Nature 因为去除了关系间的`控制`，就没有了像分支，循环，跳转等业务控制逻辑，这样就大幅度减少业务系统的复杂性。同时系统的演进的干预成本也将非常廉价，Relation的语义也就变成了纯粹的`数据流`，这种纯粹的数据流非常适合用来表示业务系统的核心价值。
+除了技术意义之外，Nature 的运行机制还透射出哲学意义，这里我们讲一下**选择**和**控制**的区别。
 
-虽然Nature放弃了`控制`权，但无形的控制却依然在那里。同一个上游有多个不同的下游会表现出分支控制的语义，不同的上游汇集到同一个下游会表现出合并控制的语义。Nature 提供的只有一对一的关系，并没有提供一对多和多对一这样的控制选项，而这些`控制`是自然显现的，在《失控》里有一个词可以表达这个现象：涌现。
+#### 控制
+
+控制是实现目标所采取的手段和方法。传统系统大多是基于控制的。代码控制一切，这是编程这个行业诞生以来天经地义的一件事情，无论是框架、设计模式、组件都是一种控制，包含 Nature 本身也是控制的产物，不过Nature 是为了减少后续代码控制而诞生的。
+
+代码是思想的产物，思想有多复杂代码就有多复杂。而思想是灵活的，所以构建出复杂的系统也就不奇怪了。从另外一个角度来讲，这种灵活性也是一种灾难！比如拿团队协作来讲，通常情况下我们只能有限度的统一我们的思想。为了提高思想的统一度，现在有专门的学科和开发模式来应对这个问题，可想而知控制的复杂度有多高。控制是自上而下的，是一对多的。下游的每一个变化，都需要**反馈**到上游进行协调处理，而反馈处理尤其复杂。
+
+#### 选择
+
+选择与控制相反，它是自下而上的，上游不会去控制下游，而是下游自行选择上游，就像一条河一样，上游是无法控制下游的流向的。因为上游不去控制，下游也没有必要将信息**反馈**到上游。`Relation` 的形式决定了她不允许控制只允许选择。`Relation`不只是选择上游，他还选择`执行器`，这样就可以实现“功能”随意替换。
+
+从复杂度上来讲控制额外需要反馈，尤其是多级反馈的情况将更为糟糕。而选择只有执行这一步。所以选择既提升了性能，又给了下游充分的灵活性；下游可以方便的决定自已的意图，掌控自己的命运。
+
+其实Nature的选择还可以进一步细化，如对上游的状态和上下文做出选择。这里举一个支付和发货的例子：当支付状态为“已支付”则生成出库申请单，如果没有支付完成则不动作。如有用代码来描述的话这里很明显需要一个`if`控制语句，但在Nature 里没有`if` 控制语句，你只需要定义一个“支付状态=已支付->出库申请单”的 `Relation`就可以了，if 的控制由Nature 来帮你完成。我们再举一个上下文的例子:订单开发票。我们可以建立一个这样的`Relation` ：订单.context.发票=true -> 发票申请，同样的，这个任务不用开发人员进行流程控制。
+
+#### 生态与法则
+
+在一个生态系统里没有一个至高无上的主可以控制所有的一切，每一个物种都在选择中适应，这样才有了生物的**生机勃勃**和**多样性**。请注意生机勃勃和多样性两个词，这是目前传统系统所欠缺的。传统系统之所以死气沉沉，低效，就是因为自上而下的控制，类似于公司业务的层层汇报、层层审批，**当控制的链路非常长非常广时，由控制导致的内耗将十分突出**。
+
+对于一个个体而言，要想对其控制，必须对其所控制的资源进行某种形式的**占有**，控制的能力和范围与资源占有程度是紧密相关的。而占有是具有**侵入性**的，而侵入是有成本的。但选择只要对方存在就可以，不需要侵入，所以不需要额外的成本，既**选择比控制对环境的要求要低很多**。
+
+Nature 是适合于大型业务系统的，这是 Nature 的选择特性所赋予的。因为没有控制，你不会遇到复杂的逻辑问题，诸如分支、循环、跳转等；因为没有控制，系统的演进成本将会非常低廉，业务模块间的链路能方便的重组并容易找到最优路径；因为没有控制，各种各样的业务模块可以自由的试错和扩展，以灵活的方式去匹配业务发展的需要。
+
+虽然这里不强调控制，但万物运转如何保持其秩序呢？那就是法则。没有控制并不代表着没有法则，法则不是控制，控制有着明确的目的，而法则没有目的性。地球之所以围绕太阳转，不是太阳有意控制地球，而是万有引力法则在发挥作用。自然界的生态系统也是一样的，春夏秋冬、寒暑易节、昼夜轮回维系着自然生态的平衡。对于 Nature 来讲维系系统运转的法则便是 `Relation`，只要遵循Nature 的法则，我们就可以摆脱代码控制的繁琐、脆弱和低效，并拥有一个充满生机的且能够承载业务多样性的业务生态系统，
+
+### Nature 运行机制的技术意义
+
+在传统系统中流程控制是用代码来控制的，而Nature只需要定义`Relation`就可以对流程进行“**实际控制**”，不需要编码来实现，这行方式带来的好处是：
+
+- 降低设计成本：传统系统一般都会由需求团队、技术团队不断碰撞来完成一个设计，不管是人力还是时间上都有很多的成本。而 Nature 的设计完全是面向业务的，不需要这么多的人力和时间成本。另外在技术上因为Nature 承担了足够多的技术支撑能力，所以技术上的设计工作会大幅度降低，甚至可以忽略。
+- 解耦了`设计时`与`运行时`：传统方式下代码既是`设计时`又是`运行时`，所以流程控制的改动非常困难，而Nature 的`设计时`与`运行时`是隔离的，不管是业务迭代还是技术迭代都具有很好的灵活性。
+- 使设计具有**实际控制**能力：在传统系统中，代码是实际的控制者，设计只是指导，尤其在经过多次迭代之后，两者的匹配度将会变得更为糟糕！而Nature的设计可以做到100%的控制能力。`Meta`和`Relation`直接参与到`运行时`，并对`运行时`指挥和约束`执行器`。
+- 职责单一的`执行器`：在 Nature 环境下，由`Relation`进行整体控制，`执行器`之间不需要通讯，不需要考虑上、下游控制问题。也就是说我们的代码不需要关注流程控制，非功能需求也已经由Nature 代劳，这就大幅度较少了代码量，同时间接提高了系统的稳定性和可维护性。
+
+### Nature 法则所体现出来的无形控制
+
+在 [Demo](https://github.com/llxxbb/Nature-Demo) 中 涉及到网购和统计相关的示例，这些示例说明了 Nature 如何简化这些业务的实现。在这里不做具体展开，这里只想说明一下选择机制如何有效支撑系统的运行秩序。为了简单起见，所表达的内容可能与Demo中的不完全一致，还请谅解。
+
+上文中我们说到选择是下游对上游的选择，这就揭示了一种思考方式：**逆向思维**，既我们要达到目的需要什么。拿网购来讲，需要从流程的终点来倒推。用户若想拿到商品需要配送员送，交接数据为签收单，于是我们定义第一个`Meta`。然后我们再倒推，配送员需要和库房交接出库单才能拿到商品进行配送，出库单是我们的第二个`Meta`于是我们有了第一个`Relation` ： 出库单->签收单。
+
+以此类推我们可以定义出类似于下面的`Relation`
+
+```
+出库单->签收单
+订单->出库单
+```
+
+这里有个很重要的点需要说一下，从出库单到签收单如何调度的，是自己公司配送还是第三方配送这里并不关心，`Relation`的`执行器`想用哪个就用哪个。既`Relation`只关心结果，并不关心如何做。
+
+这样一个简单但完整的`设计时`便出来了。而这个设计不用代码就实现了对`运行时`的控制。
+
+像 `Relation` ：出库单->签收单 在`设计时`是一对一的关系，在`运行时`产出的`Instance`也是一对一的,既一张真实的出库单会对应一张真实的签收单。这在 Nature 里是最为常规的控制。其它控制方式都是由这种常规方式支撑的，如接下来要讲的分流。
+
+设计时的分流的形式是不同的下游拥有同样的上游，就像河流分叉一样。如上面的出库单还可以驱动库存状态，`Relation` 如下：
+
+```
+出库单->签收单
+出库单->库存状态
+```
+
+在此种情形下，出库单不需要知道有多少个下游，但Nature 会知道，因此Nature 需要在幕后分别执行每个`Relation`的`执行器`。
+
+注意这里的“出库单->库存状态”，这个在`设计时`是一对一的，但在`运行时`却有可能是多对一的。举例说明一下，假设在`运行时`我们有两个出库单，出库单1包括2个手机，出库单2包括3个手机，但却只能有一个手机的库存状态，所以在这个示例里就有了两个出库单实例分别对应同一个库存状态的不同版本的实例数据。（有关状态数据及状态的并发控制请看下面技术特性小节）
+
+那么有没有`运行时`是一对多的呢？这里有个例子：订单->支付单。这在`设计时`是一对一的，但在`运行时`是可以一对多的。假设用户第一张卡里的钱不够支付订单，这时候就会有多次支付的情形存在了，既一个订单实例对应多笔支付实例。
+
+那么在`设计时`有没有多对一的情形呢？答案是有的，`Relation`定义如下：
+
+```
+CPU->主机
+内存->主机
+```
+
+现在我们来看，`设计时`的一对多、多对一，`运行时`的一对多，多对一，可以随意搭配组合，这就在理论层面形成了完整的闭环。这样`Relation`就可以支撑非常复杂的业务。但对于使用者来讲基本上不用关心流程控制问题，使用者只需要做出合理的选择，大自然（Nature）便会在法则（`Relation`）下无形中操控一切。
 
 ## 技术特性
 
-Nature 虽然免去了对业务流的控制，但在技术上还是需要一些控制的，没有这些技术特性的保驾护航，Nature 将没有任何实用价值。
+在传统系统里，**要想保持数据一致性是一个非常具有挑战性的任务，当面对多个系统协作并保持整体一致性时问题会更加困难。**就个人的经历而言，我们大部分的工作都会消耗在这上面。导致不一致的原因可能是因为设计不到位，但更多的原因可能在于要实现一致性开发代价非常高。目前还没有见到有统一的、简单易用的、高效的、开箱即用的解决方案面世。Nature 诞生的目的，就是让使用者聚焦于业务而非技术，为了到达易用的目的，Nature 就装必须封账这些技术复杂性，包括辣手的数据一致性问题，下面我们分别来看一下：
 
-### 一致性
+### 数据的不可变性
 
-Though the **control-flow**  spring up itself, Nature give a deep control under your choice, such as dispatch tasks, retry tasks and store `instance`s generated, includes `instance`s inputted from out of Nature. It is hard to make data consistent in a complex network environment in normal business system, but Nature encapsulate those complexity for you. 
+Nature 只能插入数据不能变更数据，`Instance`一旦生成既被永久定格，这就防止变更导致的数据覆盖问题。这一特性使得 Nature 可以被信赖，因为生成的数据不可抵赖，且可以溯源。这就要求数据是无状态的，但 Nature 是支持状态数据的，如何解决这个逻辑相悖的问题？答案是版本。Nature 为状态数据的每一次状态变更都会生成一个新的`Instance`，但这些不同状态的`Instance`拥有相同的ID和`Meta`，只是版本号是不同的。上面提到的主机组装中的主机便是一个状态数据的例子。cpu 会形成一个主机的状态数据，内存也会形成一个主机的状态数据。这两条状态数据拥有相同的ID，但版本号不同。
 
-### Idempotent
+### 防重机制
 
-Idempotent is important and obligatory when retry exists, `Nature` only insert data to database, no __deletions__ no __updates__. Once they inputted, you can't change any of them, even for the state data.
+Nature 需要面对下面情形所产生的问题：
 
-Nature is **making history**.
+- 并发冲突
+- 环境变化
 
-There are some cases for retries
+我们先看第一种情况，Nature 是**事件驱动**的，既然是事件，就无法确定触发的时机，就可能出现并发冲突问题。还拿主机装配来讲，cpu 和内存有可能同时触发主机状态数据的版本变更，很显然我们只能让一个成功，另一个失败。Nature 內建了版本冲突的控制，无需`执行器`进行干预，除非外部直接输入。其实现机制是这样的，如果下游数据是状态数据，Nature 在调用`执行器`之前先取出下游状态数据并记录版本号，然后Nature 再调用`执行器`，当`执行器`返回状态数据后，Nature 会将之前记录的版本号+1 赋值给新返回的状态数据，当+1版本的数据已经存在时即可识别为冲突。冲突处理是Nature 內建的功能，`执行器`无需关注。
 
-- `instance` inputted from outside
-- dispatch tasks to `converter`s
-- `instance` converted by `converter`
+第二种情况可以举一个库存的例子，上一时间可能有库存，但可能下一时间就没有库存了。环境往往是脆弱的，如网络超导致Nature 重试，那么我们要如何对待同一调用的在不同时刻的不同的结果呢？依据数据不可变性 Nature 会舍弃后续的结果，从而保证 Nature 调度的**幂等性**。为了实现调度的幂等性，Nature 提供了以下措施和建议。
 
-#### Save task before data
+- 主键防重：`Instance` 数据表的主键构成为 ID + `Meta` + 状态版本。
+- 预分配ID，在调用Nature 之前预先生成一个ID，或许 facebook 的 snowflake ID 生成器算法是一个不错的选择。使用此ID作为`Instance`的ID，这样当出现环境问题时使用相同的ID提交数据到 Nature 就不会存储多条数据了。如果你不提供ID，Nature 会使用哈希算法为你生成一个。
 
-Let's to see the dispatch-task first, there is an example : One upstream has tow downstream flows,  and Nature failed for the  first downstream generating and succeed for the second downstream; and at that time we do a dangerous operation that we removed the first downstream `relation` definition from the database; and then the Nature retry the the failed for the first branch. Boom! same input get different outputs, So Nature must to avoid this case happen. One possible way to do this is **generate all tasks before dispatch**, so that the `relation` changes will not take affect on the retrying tasks. 
+### 任务分发与`Instance`
 
-But the task maybe be created many times on bad environment. When instance is same, nature will delete the new task to avoid unnecessary processing.
+调度的幂等性几乎遍及Nature的所有运行过程，这里我们讲一下任务分发。举一个例子：一个上游有两个下游跟随者，生成第一个下游时失败了，但第二个却成功了；这时候我们做了一个“危险”的操作，把第一个下游和上游的关系删除了；这时Nature正在重试失败的第一个分支，砰！相同的输入不同的输出！所以Nature 必须避免此类事情的发生。**Nature 的做法是将关系产生的所有的任务数据都落盘**，这样当关系改变时，就不会影响到已经生成的任务数据。
 
-But there is another problem: save 'instance' and generate converter tasks may be broken on bad network environment.  You may say database **transaction** can resolve it,  considering the large distribute database system will be used, so **Nature can not use the database-transaction**.  To resolve this problem, **Nature will save task before save instances**, so that Nature retry can rebuild all data consistently.
+但是如果网络很糟的话，Nature 可能会重复生成任务数据，而这也有可能导致不幂等，所以任务数据本身也需要防重设计，防重的依据就是上游`Instance`的ID。
 
-#### Save plan before data
+### 存储计划与`Instance`
 
-Now for the third case. a `converter` may return many instances,  because we can not use transaction,  all these need to be saved one by one,  It can be interrupt by bad environment also. Nature introduced `plan` to resolve it. Plan is a big object include all returned instances. **before  we save `instance`s for each, we save `plan` first**, so that we can redo it when instances saving is broken. 
+Nature 是一个平台，她可能面对海量的数据和高并发的情景，在这种场景下最好的选择是使用分布式数据库。因为是分布式数据库，事务可能不被支持，在此种情况下如果`执行器`返回多个`Instance`，Nature 必须一条一条的保存这些数据，而这个过程可能被坏的网络环境打断，被打断的任务会被Nature 重新唤起，既`执行器`重新执行了一次任务，而Nature 不能要求`执行器`本身具有幂等性，于是问题出现了：`执行器`可能返回与上次不同的数据！
 
-But there is a particular case be ignored, the `converter` may be not idempotent, that mean the `plan` may be changed. Nature does not allow this happen: the `plan` table's primary key is made up of upstream `meta` and downstream `meta`,  in this mechanism Nature would reject all the later plans that with the same upstream and downstream, **the first is the last**.
+为了解决这个问题，Nature 引入了一个新的数据对象：`存储计划`，`存储计划`的内容包含了所有从`执行器`返回的`Instance`。Nature 在逐条保存`Instance`之前先保存这个计划，计划本身也是防重的，其防重依据是上游的`Meta`+ `Instance`(ID，状态版本) + 下游`Meta`。这样如果被打断，Nature 只需要从计划中取出所有的`Instance`重新保存一下就好了。
 
-#### Primary key of the `Instance` table
+### 错误、重试、回调
 
-Another point is instance table. same as `plan` described upper, Nature only insert data to it too, and the table's primary key is little complex, it is made up of id, `meta` and state version. But in fact this is not enough,  id is the stumbling  block when instance inputted from outside. Id must be unique, if you don't give one to Nature, Nature generated one by hash. so it's idempotent in this situation.  Theoretically, hash algorithm has conflict problem, though it's a small chance, so Nature recommends to use your own unique id. Maybe a center-id-generator like facebook 's snowflake is a good choice..
+Nature 为`执行器`定义了两种类型的错误：
 
-### Error, retry and callback
+- `LogicalError`
+- `EnvironmentError`
 
-For `converter` Nature defined two type of error:
+如果`执行器`遇到一个未定义的错误并且应该中断处理，他就可以返回一个`LogicalError`，接下来Nature 会将这个任务从`task`数据表转移的`task—error`数据表，并且不会尝试重新执行这个任务。
 
-- `ConverterLogicalError`
-- `ConverterEnvironmentError`
+Nature 在与`执行器`通信或者进行自身调度时会自动捕捉`EnvironmentError`。针对 `EnvironmentError` Nature 实现了一套机制来多次重试，当所有的重试都失败的时候，任务会从`task`数据表转移的`task—error`数据表。
 
-If the `converter`  encounters an undefined condition and should break the process, it can return a `ConverterLogicalError` then Nature will move the task from task-table to task-error-table and don't retry it anymore. 
+然而有些`执行器`因为执行时间很长，所以无论你重试多少次都无法成功，为此Nature 提供的 回调机制来解决这个问题。当遇到这种情况是，`执行器`的实现者需要开启一个独立的线程去执行具体的任务，并立即返回一个异步处理信号及可能返回数据的时间给Nature，Nature 会依据此时间推迟下次重试的时间； 当`执行器`真正完成任务时，`执行器`的实现者需要主动调用Nature `callback`  接口并传入处理结果。
 
-The `ConverterEnvironmentError` will be caught by Nature itself for network error. Nature implemented a strong retry mechanism to retry the failed task for many times, if all that retry are failed, the task will move to task-error-table too.  In there user can find the error tasks and get know what error happened to the task.
+转移到`task——error`数据表中的任务都会记录失败的原因以便于使用者进行检查。
 
-There is a special  `ConverterEnvironmentError`: timeout. If  the `converter` will spend much time to process, then every retry will cause timeout. In that case Nature provide `callback` mechanism to resolve it. When Nature call the `converter`, converter can return a asynchronized signal with a time to be deferred instead of instances immediately, then Nature will suspend the task. Within the deferred time,  `converter` can process the task in another thread. When finished, `converter` then call Nature's `callback`  interface, then the suspended task will go on. But if no `callback` occurred, Nature will do the retry.
+### 历史回溯
 
-## hot pluggable
+`Relation`可以构建出一张现在运行的业务网。但具体到某一笔业务，要想给出这笔业务是走的业务网中的哪一条或哪几条线路，对于`Relation`来讲是不合适的。Nature 用`Instrance`的`from`属性来解决这个问题，该属性记录了它的上游`Instance`。这样就可以非常方便的知道该笔业务的来龙去脉了。这对于传统业务系统来讲是件非常困难的事情，如需要在不同的页面来回跳转，非常不直观，也非常难于排查问题，这是因为传统业务系统没有统一的处理模型，要做到像Nature 这样易用的程度，非常困难。
 
-Nature is a platform focus on business and simplify it, that loose couples technology and business. So Nature make technology more generic and easy to integrate. such monitor, authorize and visualization etcetera.
+## 可扩展性（还未实现）
 
-
-
+Nature 是面向业务的一个开发平台，并用简单的方式构建业务模型。她使技术和业务能够很好的解耦，这使得很多技术不用受限于具体的业务，同时又可以用统一而简单的方式来强化业务的能力，如监控、权限管理、可视化等。

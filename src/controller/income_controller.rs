@@ -43,7 +43,7 @@ impl IncomeController {
                     None => Err(NatureError::VerifyError("task data missed, maybe it had done already.".to_string())),
                     Some(carrier) => match delayed.result {
                         ConverterReturned::LogicalError(err) => {
-                            let err = NatureError::ConverterLogicalError(err);
+                            let err = NatureError::LogicalError(err);
                             let _ = TaskDaoImpl::raw_to_error(&err, &carrier)?;
                             Ok(())
                         }

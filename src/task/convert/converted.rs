@@ -106,11 +106,11 @@ fn verify_state(task: &TaskForConvert, instances: &mut Vec<Instance>, last_state
         return Ok(());
     }
     if task.target.use_upstream_id && instances.len() > 1 {
-        return Err(NatureError::ConverterLogicalError("[use_upstream_id] must return less 2 instances!".to_string()));
+        return Err(NatureError::LogicalError("[use_upstream_id] must return less 2 instances!".to_string()));
     }
     if instances.len() > 1 {
         // only one status instance should return
-        return Err(NatureError::ConverterLogicalError("[status meta] must return less 2 instances!".to_string()));
+        return Err(NatureError::LogicalError("[status meta] must return less 2 instances!".to_string()));
     }
     let mut ins = &mut instances[0];
     // upstream id
@@ -141,7 +141,7 @@ fn verify_state(task: &TaskForConvert, instances: &mut Vec<Instance>, last_state
     } else {
         let (_, mutex) = task.target.to.check_state(&temp_states.clone().into_iter().collect())?;
         if mutex.len() > 0 {
-            return Err(NatureError::ConverterLogicalError(format!("returned mutex state {:?}", mutex)));
+            return Err(NatureError::LogicalError(format!("returned mutex state {:?}", mutex)));
         }
         ins.states = temp_states
     }

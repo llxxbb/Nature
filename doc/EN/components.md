@@ -16,10 +16,10 @@
 ## context
 
 it is optional but it can greatly simple you business development.
- 
+
 * It can separate upstream and downstream clearly more.
   upstream supply what it has, don't care special downstream wanted. 
-* Nature will do some work for converter.
+* Nature will do some work for Executor.
   such as load last status instance. 
 
 

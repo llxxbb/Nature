@@ -16,7 +16,7 @@ There are all **Things** in Nature, and **Things** always transform into other t
     业务定义的约束性。
     业务的最高抽象是一个“点”，属性和功能是从属的。现行的业务系统是没有这个抽象的，有也是局部的。够不成“管理树”
     管理树。业务点间的联系
-    
+
 ### 点
 
     这是个非常重要的概念。
@@ -26,7 +26,7 @@ There are all **Things** in Nature, and **Things** always transform into other t
     在原子中粒子是点的存在
     ……
     你可以发现点是事物的最好抽象。它将世界的复杂性用两个东西就可以表述：点和点之间的联系。   
-    
+
 ## Things（点）
 
 空间：space
@@ -67,7 +67,7 @@ There are all **Things** in Nature, and **Things** always transform into other t
 ### 历史不可改变
 
  我们只能看到事务某一时刻的样子。
- 
+
 ### 自我治理
 
 ## Nature
@@ -110,10 +110,10 @@ When instance changed, Nature don't update it but version it, so you can have a 
 requirement vs control or how to balance between them.
     requirement is the primary target of a system to implement, then the control are following.
     `Nature` make it complete separated and easy to operate every side.
-    `converter` and `Thing` definition are the controls to manage the system
-    `select` in a converter definition is a requirement and don't care how to control the downstream.
+    `Executor` and `Thing` definition are the controls to manage the system
+    `select` in a Executor definition is a requirement and don't care how to control the downstream.
      
-  
+
 非常广泛的应用情景：
     统计分析：如统计班级的内学员的平均分
     工作流：如上线审批流程
