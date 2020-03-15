@@ -1,9 +1,9 @@
 [package]
 name = "nature"
-version = "0.0.2"
+version = "0.0.3"
 authors = ["XueBin Li <llxxbb@yeah.net>"]
 edition = "2018"
-description = "A FaaS platform implement"
+description = "Nature is a data-driven, business-oriented, decentralized platform for building big system."
 repository = "https://github.com/llxxbb/Nature"
 readme = "README.md"
 license = "MIT"
@@ -37,8 +37,8 @@ actix-web = "1.0"
 actix = "0.8"
 
 # self project group
-nature_common = {path = "../Nature-Common", version = "0.0.2"}
-nature_db = {path = "../Nature-DB", features = ["sqlite"], version = "0.0.2"}
+nature_common = {path = "../Nature-Common", version = "0.0.3"}
+nature_db = {path = "../Nature-DB", features = ["sqlite"], version = "0.0.3"}
 
 [workspace]
 members = ["../Nature-Common",
