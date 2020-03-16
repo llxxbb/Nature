@@ -95,6 +95,8 @@ Nature 中的 `Relation` 借鉴了关系数据库的设计思路，用统一的*
 
 [使用 Relation](doc/ZH/help/relation.md)
 
+[一些业务情景的解决方法](doc/ZH/help/use-case.md)
+
 ## 注意
 
 本系统还处于早期阶段，有不妥之处，还请多提建议。
