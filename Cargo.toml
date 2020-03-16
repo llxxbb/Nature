@@ -44,9 +44,9 @@ nature_db = {path = "../Nature-DB", features = ["sqlite"], version = "0.0.3"}
 members = ["../Nature-Common",
 "../Nature-DB",
 "../Nature-Retry",
-"../Nature-integrate-test-converter",
+"../Nature-Integrate-Test-Executor",
 "../Nature-Demo",
 "../Nature-Demo-Common",
-"../Nature-Demo-Converter",
-"../Nature-Demo-Converter-Restful",
+"../Nature-Demo-Executor",
+"../Nature-Demo-Executor-Restful",
 ]
