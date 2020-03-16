@@ -1,13 +1,13 @@
 use std::collections::HashMap;
 
-/// built-in converter
+/// built-in executor
 use nature_common::{NatureError, Result};
 
 use crate::task::ExecutorTrait;
 
 lazy_static! {
     static ref CACHE: HashMap<String,&'static dyn ExecutorTrait> = {
-        info!("BuiltIn converter initialized");
+        info!("BuiltIn executor initialized");
         let mut map: HashMap<String,&'static dyn ExecutorTrait> = HashMap::new();
         let cnt : &dyn ExecutorTrait = &counter::Counter{};
         map.insert("counter".to_string(), cnt);
@@ -21,7 +21,7 @@ impl BuiltIn {
     pub fn get(name: &str) -> Result<&'static dyn ExecutorTrait> {
         match CACHE.get(name) {
             Some(x) => Ok(*x),
-            None => Err(NatureError::VerifyError(format!("not exists built-in converter for name : {}", name))),
+            None => Err(NatureError::VerifyError(format!("not exists built-in executor for name : {}", name))),
         }
     }
 }

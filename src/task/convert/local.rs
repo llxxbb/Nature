@@ -51,7 +51,7 @@ impl ExecutorTrait for LocalExecutorImpl {
                             Ok(rtn) => rtn,
                             Err(e) => {
                                 warn!("{:?} return error: {:?}", &entry.entry, e);
-                                ConverterReturned::LogicalError("converter implement error".to_string())
+                                ConverterReturned::LogicalError("executor implement error".to_string())
                             }
                         }
                     }

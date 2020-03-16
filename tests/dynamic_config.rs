@@ -25,13 +25,13 @@ lazy_static! {
 fn convert_is_empty() {
     env::set_var("DATABASE_URL", CONN_STR);
     // prepare input para
-    let instance = new_with_type("/dynamic/converter/is/empty", MetaType::Dynamic).unwrap();
+    let instance = new_with_type("/dynamic/executor/is/empty", MetaType::Dynamic).unwrap();
     let instance = SelfRouteInstance {
         instance,
         converter: vec![],
     };
     let rtn = IncomeController::self_route(instance);
-    assert_eq!(rtn.err().unwrap(), NatureError::VerifyError("converter must not empty for dynamic convert!".to_string()));
+    assert_eq!(rtn.err().unwrap(), NatureError::VerifyError("executor must not empty for dynamic convert!".to_string()));
 }
 
 #[test]
