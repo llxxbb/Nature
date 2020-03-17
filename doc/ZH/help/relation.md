@@ -57,7 +57,7 @@ pub struct Executor {
     pub protocol: Protocol,
     pub url: String,
     pub group: String,
-    pub proportion: u32,
+    pub weight: u32,
 }
 ```
 

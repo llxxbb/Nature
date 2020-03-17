@@ -31,7 +31,7 @@ serial mode can set finished context when finished stored.
             "protocol":"",
             "url":"",
             "group":"",
-            "proportion":1,
+            "weight":1,
     	},
     ]
 }
