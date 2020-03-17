@@ -4,7 +4,7 @@ use nature_common::{ConverterParameter, ConverterReturned};
 
 use crate::task::ExecutorTrait;
 
-pub struct Counter;
+pub struct SimpleCounter;
 
 #[derive(Serialize, Deserialize)]
 enum Method {
@@ -18,7 +18,7 @@ struct MapItem {
     pub meta: String,
 }
 
-impl ExecutorTrait for Counter {
+impl ExecutorTrait for SimpleCounter {
     fn execute(&self, _executor: &str, _para: &ConverterParameter) -> ConverterReturned {
 //        let mut rtn: Vec<Instance> = Vec::new();
 //        let mut meta_cnt: HashMap<String, u32> = HashMap::new();

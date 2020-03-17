@@ -9,8 +9,8 @@ lazy_static! {
     static ref CACHE: HashMap<String,&'static dyn ExecutorTrait> = {
         info!("BuiltIn executor initialized");
         let mut map: HashMap<String,&'static dyn ExecutorTrait> = HashMap::new();
-        let cnt : &dyn ExecutorTrait = &counter::Counter{};
-        map.insert("counter".to_string(), cnt);
+        let cnt : &dyn ExecutorTrait = &simple_counter::SimpleCounter{};
+        map.insert("simpleCounter".to_string(), cnt);
         map
     };
 }
@@ -26,7 +26,7 @@ impl BuiltIn {
     }
 }
 
-mod counter;
+mod simple_counter;
 
 #[cfg(test)]
 mod test {
@@ -35,7 +35,7 @@ mod test {
     #[test]
     fn get_test() {
         assert_eq!(BuiltIn::get("hello").is_err(), true);
-        let rtn = BuiltIn::get("counter");
+        let rtn = BuiltIn::get("simpleCounter");
         assert_eq!(rtn.is_ok(), true);
     }
 }

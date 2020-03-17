@@ -28,7 +28,7 @@ pub struct RelationSettings {
 - executor：属性用于定义谁来做这个转化处理，其结构见下方 `Executor`的结构说明，之所以是数组是因为每个`执行器`可以有不同的权重。
 - use_upstream_id：新生成的 `Instance` 的 ID 将使用上游 `Instance`的 ID。
 - target_states：可以增加或删除转化后的 `Instance` 的状态，状态必须在 `Meta` 中定义过。
-- delay：本次转化需要延迟指定的秒数后执行。
+- delay：本次任务需要延迟指定的秒数后执行。
 
 ### 触发转换的条件： FlowSelector
 
