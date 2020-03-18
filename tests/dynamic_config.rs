@@ -155,6 +155,7 @@ pub fn new_with_type(key: &str, meta: MetaType) -> Result<Instance> {
             meta: format!("{}{}:1", meta.get_prefix(), key),
             content: "".to_string(),
             context: HashMap::new(),
+            sys_context: HashMap::new(),
             states: HashSet::new(),
             state_version: 0,
             from: None,

@@ -7,14 +7,29 @@
 ## Release 0.1.0
 
 - 文档:丰富业务场景，补充论坛。
+- instance 数据表增加了 sys_context字段
+- `关系`可以支持 any 选择，既满足其中的一个就可以执行。
+- 区分系统上下文和业务上下文
+ - 数据表
+ - BizObject
+ - RawInstance
+ - FlowSelector 及测试
 
 ### 未完成
-- `Relation`文档补全
+
+- 区分系统上下文和业务上下文
+ - mission 测试补充
+ - SerialFinished
+ - 选择器
+ - context_check
+ - sys.target
+ - /S/serial
 - 内置执行器
   - 内置执行器有自己的配置
-  - 实现`simpleCounter`内置执行器。 
+  - `Executor`支持内置执行器
+  - 实现`simpleCounter`内置执行器。
 - 执行器可设置系统上下文，以定义下一个执行器的延迟时间。这个时间可以覆盖`关系`中预定义的`延迟时间`
-- 区分系统上下文和业务上下文
+- `Relation`文档补全(完成统计Demo 回过头来写会更好)
 
 ## Release 0.1.1
 

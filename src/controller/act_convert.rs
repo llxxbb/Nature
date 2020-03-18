@@ -9,7 +9,7 @@ pub fn channel_convert(task: TaskForConvert, raw: RawTask) {
     let mut from_instance = task.from.clone();
     // -----begin this logic can't move to place where after converted, because it might not get the last state and cause state conflict
     if protocol == Protocol::Auto {
-        let msg = format!("auto converter missed master info, maybe you should fill context with [{}] for meta: {}", CONTEXT_TARGET_INSTANCE_ID, &task.from.meta);
+        let msg = format!("auto Executor missed master info, maybe you should fill context with [{}] for meta: {}", CONTEXT_TARGET_INSTANCE_ID, &task.from.meta);
         let err = NatureError::VerifyError(msg);
         let target = from_instance.context.get(CONTEXT_TARGET_INSTANCE_ID);
         let id: Result<String> = match target {

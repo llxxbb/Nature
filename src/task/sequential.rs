@@ -17,15 +17,16 @@ pub struct SerialFinished {
 impl SerialFinished {
     pub fn to_virtual_instance(&self, context_for_finish: &str) -> Result<Instance> {
         let json = serde_json::to_string(self)?;
-        let mut context: HashMap<String, String> = HashMap::new();
-        context.insert(context_for_finish.to_string(), json);
+        let mut sys_context: HashMap<String, String> = HashMap::new();
+        sys_context.insert(context_for_finish.to_string(), json);
         let time = Local::now().timestamp();
         Ok(Instance {
             id: 0,
             data: BizObject {
                 meta: format!("{}{}:1", MetaType::System.get_prefix(), SYS_KEY_SERIAL.clone()),
                 content: String::new(),
-                context,
+                context: HashMap::new(),
+                sys_context,
                 states: HashSet::new(),
                 state_version: 0,
                 from: None,
