@@ -1,5 +1,6 @@
 # 计划发布的版本
 
+发布原则：Demo 项目，单元测试都通过
 计划的总体原则：
 - 功能性先于非功能性需求
 - 应用情景支持，支持内部优先支持外部（如网关）
@@ -9,16 +10,17 @@
 - 文档:丰富业务场景，补充论坛。
 - instance 数据表增加了 sys_context字段
 - `关系`可以支持 any 选择，既满足其中的一个就可以执行。
+- FlowSelector built-in source state check and context check
 - 区分系统上下文和业务上下文
  - 数据表
  - BizObject
  - RawInstance
  - FlowSelector 及测试
+ - mission 测试补充
 
 ### 未完成
 
 - 区分系统上下文和业务上下文
- - mission 测试补充
  - SerialFinished
  - 选择器
  - context_check
