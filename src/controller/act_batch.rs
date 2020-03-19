@@ -1,5 +1,6 @@
 use nature_common::{Instance, NatureError, Result};
 use nature_db::{MetaCacheImpl, MetaDaoImpl, Mission, RawTask, RelationCacheImpl, RelationDaoImpl, TaskDaoImpl, TaskType};
+use nature_db::flow_tool::{context_check, state_check};
 
 use crate::actor::{ACT_STORE, MsgForTask};
 use crate::task::TaskForStore;
@@ -15,7 +16,7 @@ fn inner_batch(task: &MsgForTask<Vec<Instance>>) -> Result<()> {
     match RelationCacheImpl::get(&task.0[0].meta, RelationDaoImpl::get_relations, MetaCacheImpl::get, MetaDaoImpl::get) {
         Ok(relations) => {
             for instance in task.0.iter() {
-                let mission = Mission::get_by_instance(&instance, &relations);
+                let mission = Mission::get_by_instance(&instance, &relations, context_check, state_check);
                 let task = TaskForStore::new(instance.clone(), mission);
                 let raw = RawTask::new(&task, &instance.meta, TaskType::Store as i16)?;
                 match TaskDaoImpl::insert(&raw) {

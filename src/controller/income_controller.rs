@@ -6,6 +6,7 @@ use nature_db::{InstanceDaoImpl, MetaCacheImpl, MetaDaoImpl, Mission, RawTask, R
 use crate::actor::*;
 use crate::controller::*;
 use crate::task::{TaskForConvert, TaskForStore};
+use nature_db::flow_tool::{context_check, state_check};
 
 pub struct IncomeController {}
 
@@ -14,7 +15,7 @@ impl IncomeController {
     pub fn input(mut instance: Instance) -> Result<u128> {
         let _ = instance.check_and_revise(MetaCacheImpl::get, MetaDaoImpl::get)?;
         let relations = RelationCacheImpl::get(&instance.meta, RelationDaoImpl::get_relations, MetaCacheImpl::get, MetaDaoImpl::get)?;
-        let mission = Mission::get_by_instance(&instance, &relations);
+        let mission = Mission::get_by_instance(&instance, &relations, context_check, state_check);
         let task = TaskForStore::new(instance.clone(), mission);
         let raw = RawTask::new(&task, &instance.meta, TaskType::Store as i16)?;
         TaskDaoImpl::insert(&raw)?;

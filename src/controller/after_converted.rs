@@ -1,5 +1,6 @@
 use nature_common::{Instance, MetaType, NatureError, Result, SelfRouteInstance};
 use nature_db::{MetaCacheImpl, MetaDaoImpl, Mission, RawTask, Relation, RelationCacheImpl, RelationDaoImpl, StorePlanDaoImpl, TaskDaoImpl, TaskType};
+use nature_db::flow_tool::{context_check, state_check};
 
 use crate::actor::*;
 use crate::actor::MsgForTask;
@@ -48,7 +49,7 @@ pub fn prepare_to_store(carrier: &RawTask, plan: PlanInfo, previous_mission: &Mi
             }
             _ => &relations,
         };
-        let mission = Mission::get_by_instance(instance, r);
+        let mission = Mission::get_by_instance(instance, r, context_check, state_check);
         let task = TaskForStore::new_with_previous_mission(instance.clone(), mission, previous_mission);
         match RawTask::new(&task, &plan.to, TaskType::Store as i16) {
             Ok(x) => {
