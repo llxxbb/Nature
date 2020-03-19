@@ -10,7 +10,7 @@
 - 文档:丰富业务场景，补充论坛。
 - instance 数据表增加了 sys_context字段
 - `关系`可以支持 any 选择，既满足其中的一个就可以执行。
-- FlowSelector built-in source state check and context check
+- make state check and context check independence
 - 区分系统上下文和业务上下文
  - 数据表
  - BizObject
@@ -20,7 +20,7 @@
 
 ### 未完成
 
-- temp:flow-tool unit test
+- temp:flowSelector target demand checker
 - temp:mission.rs unit test 
 - 区分系统上下文和业务上下文
  - SerialFinished

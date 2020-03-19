@@ -46,10 +46,11 @@ pub struct FlowSelector {
 优先级
 
 ```
-/// none: the highest priority to process, means can't include any one
-/// all : the middle priority to process, means must include all
-/// any: the lowest priority to process, means must include one
+/// none: means can't include any one
+/// all : means must include all
+/// any : means must include one
 ```
+all of above are `and` relation
 
 - source_state_include：上游 `Instance` 的状态中必须包含指定的状态。
 - source_state_exclude：上游 `Instance` 的状态中不能包含指定的状态。
