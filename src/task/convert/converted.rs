@@ -135,9 +135,7 @@ fn verify_state(task: &TaskForConvert, instances: &mut Vec<Instance>, last_state
     };
     // set status
     if let Some(lsd) = &task.target.states_demand {
-        if let Some(ts) = &lsd.target_states {
-            ins.modify_state(ts, &task.target.to);
-        }
+        ins.modify_state(lsd, &task.target.to);
     } else {
         let (_, mutex) = task.target.to.check_state(&temp_states.clone().into_iter().collect())?;
         if mutex.len() > 0 {
@@ -153,7 +151,7 @@ mod test {
     use chrono::Local;
 
     use nature_common::{Meta, MetaType, State, TargetState};
-    use nature_db::{Mission, StateDemand};
+    use nature_db::Mission;
 
     use super::*;
 
@@ -214,13 +212,10 @@ mod test {
                     m
                 },
                 executor: Default::default(),
-                states_demand: Some(StateDemand {
-                    last_states_include: Default::default(),
-                    last_states_exclude: Default::default(),
-                    target_states: Some(TargetState {
-                        add: Some(vec!["new".to_string()]),
-                        remove: None,
-                    }),
+                states_demand: Some({
+                    let mut sd = TargetState::default();
+                    sd.add = Some(vec!["new".to_string()]);
+                    sd
                 }),
                 use_upstream_id: false,
                 delay: 0,

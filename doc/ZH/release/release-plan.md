@@ -18,10 +18,9 @@
  - FlowSelector 及测试
  - mission 测试补充
 
-### 未完成
+### should commit
 
-- temp:flowSelector target demand checker
-- temp:mission.rs unit test 
+### 未完成
 - 区分系统上下文和业务上下文
  - SerialFinished
  - 选择器

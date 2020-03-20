@@ -1,4 +1,5 @@
 use nature_common::{ConverterParameter, ConverterReturned, Instance, NatureError, Protocol, Result};
+use nature_db::flow_tool::state_check;
 use nature_db::Mission;
 
 use crate::task::{HttpExecutorImpl, LocalExecutorImpl, TaskForConvert};
@@ -17,7 +18,7 @@ impl ConverterParameterWrapper {
     {
         if let Some(ref last) = last_target {
             if let Some(demand) = &mission.states_demand {
-                if let Err(_) = demand.check_last(&last.states) {
+                if !state_check(&last.states, &demand.need_none, &demand.need_all, &demand.need_any) {
                     return Ok(ConverterReturned::None);
                 }
             }
