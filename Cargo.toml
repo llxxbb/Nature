@@ -32,13 +32,13 @@ fern = "0.5"        # Simple, efficient logging
 dotenv = "0.11"
 
 # web
-reqwest = "0.9"
+reqwest = { version = "0.10", features = ["blocking", "json"] }
 actix-web = "1.0"
 actix = "0.8"
 
 # self project group
 nature_common = {path = "../Nature-Common", version = "0.0.3"}
-nature_db = {path = "../Nature-DB", features = ["sqlite"], version = "0.0.3"}
+nature_db = {path = "../Nature-DB", features = ["mysql"], version = "0.0.3"}
 
 [workspace]
 members = ["../Nature-Common",

@@ -23,7 +23,7 @@ pub struct PlanInfo {
 
 impl PlanInfo {
     pub fn save<FI, FG>(converter_info: &TaskForConvert, instances: &Vec<Instance>, dao_insert: FI, dao_get: FG) -> Result<PlanInfo>
-        where FI: Fn(&RawPlanInfo) -> Result<()>, FG: Fn(&str) -> Result<Option<RawPlanInfo>>
+        where FI: Fn(&RawPlanInfo) -> Result<()>, FG: Fn(&str, &str) -> Result<Option<RawPlanInfo>>
     {
         let plan = PlanInfo {
             from_sn: converter_info.from.id,
@@ -32,20 +32,22 @@ impl PlanInfo {
             to: converter_info.target.to.meta_string(),
             plan: instances.clone(),
         };
-
+        debug!("plan info: from{},to{}", plan.from_meta, plan.to);
         // reload old plan if exists
         let will_save = plan.clone().try_into()?;
         match dao_insert(&will_save) {
             Ok(_) => Ok(plan),
             Err(err) => match err {
                 NatureError::DaoDuplicated(msg) => {
-                    let old = dao_get(&will_save.upstream)?;
+                    let old = dao_get(&will_save.upstream, &will_save.downstream)?;
                     match old {
                         Some(o) => PlanInfo::try_from(o),
                         None => Err(NatureError::SystemError(format!("old should exists for : {}", msg)))
                     }
                 }
-                _ => Err(err)
+                _ => {
+                    Err(err)
+                }
             }
         }
     }

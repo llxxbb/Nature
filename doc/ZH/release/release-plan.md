@@ -10,7 +10,13 @@
 - 文档:丰富业务场景，补充论坛。
 - instance 数据表增加了 sys_context字段
 - `关系`可以支持 any 选择，既满足其中的一个就可以执行。
-- make state check and context check independence
+- system context : sys.target -> target.id
+- optimize: fetch task witch need to redo
+- change mysql as default db because of sqlite's cb_lock
+- update reqwest to 0.10
+- bug fix: get old plan error “not 1 or 0 but get 2”
+
+### 未发布
 - 区分系统上下文和业务上下文
  - 数据表
  - BizObject
@@ -20,12 +26,19 @@
 
 ### should commit
 
+
 ### 未完成
+
+- bug fix: same task parallel input case error instance generate.  
+- bug fix: misused for TaskForStore#previous_mission
+- Do not delete task for executed, which can avoid do it repeatedly.
+- give an clean tool for executed task
+
+- 文档补充迁移 mysql 的说明
 - 区分系统上下文和业务上下文
  - SerialFinished
  - 选择器
  - context_check
- - sys.target
  - /S/serial
 - 内置执行器
   - 内置执行器有自己的配置
@@ -36,9 +49,7 @@
 
 ## Release 0.1.1
 
-- `关系`配置支持`or`条件，可应用于状态选择和上下文选择。
 - 以react的方式实现对restful`执行器`的调用.以消除下面的警告
-[2020-03-15][21:34:35][reqwest::wait][WARN] blocking API used inside an async Executor can negatively impact perfomance
   
 ## Release 0.2.0
 
@@ -58,6 +69,7 @@
 - 自路由：对`执行器`返回的自路由进行支持。
 - 数据库：mysql 支持 r2d2
 - ID 生成器 snowflake for 128 bit implement.
+- 优化 task.data 的数据存储以节省空间并提升性能。如from 实例，meta 等 只保存必要的数据。
 
 
 ## Release 1.0.0
@@ -72,5 +84,9 @@
   - 英文文档
   - `Instance` 的 `context` 说明。
   - 对 《概念》画一个流程图以说明怎样生成`Instance`
+- 执行重试任务时，检测是否忙碌，如果忙碌，返回忙碌信息。
 
+## 待解决的问题
 
+Nature-Retry once_test 报错
+no such table: task

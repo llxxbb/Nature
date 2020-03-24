@@ -1,4 +1,6 @@
-use nature_common::{FromInstance, Instance, Meta, MetaType, NatureError, Result};
+use std::str::FromStr;
+
+use nature_common::{CONTEXT_TARGET_INSTANCE_ID, FromInstance, Instance, Meta, MetaType, NatureError, Result};
 use nature_db::{Mission, RawTask};
 
 use crate::task::{CachedKey, TaskForConvert};
@@ -26,7 +28,7 @@ impl Converted {
         let _ = set_from(&mut instances, &from, &task.target.to)?;
 
         // check id
-        check_id(&mut instances, &last_state, &from, &task.target);
+        let _ = check_id(&mut instances, &last_state, &from, &task.target)?;
 
         // verify
         let _ = verify_state(&task, &mut instances, last_state)?;
@@ -70,34 +72,36 @@ fn set_from_to_target_meta(instances: &mut Vec<Instance>, from: &FromInstance, t
 }
 
 
-fn check_id(ins: &mut Vec<Instance>, last: &Option<Instance>, from: &FromInstance, target: &Mission) {
+fn check_id(ins: &mut Vec<Instance>, last: &Option<Instance>, from: &FromInstance, target: &Mission) -> Result<()> {
+    if ins.is_empty() {
+        return Ok(());
+    }
+    let is_master = match &target.to.get_setting() {
+        Some(setting) => match &setting.master {
+            None => false,
+            Some(master) => master.eq(&from.meta)
+        }
+        _ => false
+    };
+
     let id = {
         if ins.len() != 1 {
             None
-        } else {
-            match target.to.is_state() {
-                true => match last {
-                    Some(old) => Some(old.id),
-                    None => match &target.to.get_setting() {
-                        Some(setting) => match &setting.master {
-                            None => None,
-                            Some(master) => if master.eq(&from.meta) { Some(from.id) } else { None },
-                        }
-                        None => None
-                    }
-                }
-                false => match target.use_upstream_id {
-                    true => Some(from.id),
-                    false => None
-                }
-            }
-        }
+        } else if target.use_upstream_id || is_master {
+            Some(from.id)
+        } else if target.to.is_state() && last.is_some() {
+            Some(last.as_ref().unwrap().id)
+        } else { None }
     };
-    if let Some(id) = id {
-        let mut first = ins[0].clone();
-        first.id = id;
-        ins[0] = first;
+
+    let mut first = ins[0].clone();
+    if let Some(id_u) = id {
+        first.id = id_u;
+    } else if let Some(id_s) = first.sys_context.get(&*CONTEXT_TARGET_INSTANCE_ID) {
+        first.id = u128::from_str(id_s)?;
     }
+    ins[0] = first;
+    Ok(())
 }
 
 fn verify_state(task: &TaskForConvert, instances: &mut Vec<Instance>, last_state: &Option<Instance>) -> Result<()> {
@@ -109,15 +113,15 @@ fn verify_state(task: &TaskForConvert, instances: &mut Vec<Instance>, last_state
         return Err(NatureError::LogicalError("[use_upstream_id] must return less 2 instances!".to_string()));
     }
     if instances.len() > 1 {
-        // only one status instance should return
+// only one status instance should return
         return Err(NatureError::LogicalError("[status meta] must return less 2 instances!".to_string()));
     }
     let mut ins = &mut instances[0];
-    // upstream id
+// upstream id
     if task.target.use_upstream_id {
         ins.id = task.from.id;
     }
-    // states and state version
+// states and state version
     let temp_states = ins.states.clone();
     match last_state {
         None => {
@@ -133,7 +137,7 @@ fn verify_state(task: &TaskForConvert, instances: &mut Vec<Instance>, last_state
             ins.states = x.states.clone();
         }
     };
-    // set status
+// set status
     if let Some(lsd) = &task.target.states_demand {
         ins.modify_state(lsd, &task.target.to);
     } else {
@@ -186,7 +190,7 @@ mod test {
         ins.id = 123;
         let ins = vec![ins];
 
-        // for normal
+// for normal
         let result = Converted::gen(&task, &raw, ins.clone(), &None).unwrap();
         let c = &result.converted[0];
         let from = c.from.as_ref().unwrap();
@@ -195,7 +199,7 @@ mod test {
         assert_eq!(from.state_version, 2);
         assert_eq!(result.converted[0].id, 567);
 
-        // for state
+// for state
         let _ = task.target.to.set_states(Some(vec![State::Normal("hello".to_string())]));
         let result = Converted::gen(&task, &raw, ins, &None).unwrap();
         assert_eq!(result.converted[0].id, 567);
@@ -237,7 +241,8 @@ mod check_id_test {
     #[test]
     fn vec_is_empty() {
         let (last, from, mission) = init_input();
-        check_id(&mut vec![], &Some(last), &from, &mission)
+        let rtn = check_id(&mut vec![], &Some(last), &from, &mission);
+        assert_eq!(rtn.is_ok(), true)
     }
 
     #[test]
@@ -246,7 +251,7 @@ mod check_id_test {
         let one = Instance::new("one").unwrap();
         let two = Instance::new("two").unwrap();
         let mut input = vec![one.clone(), two.clone()];
-        check_id(&mut input, &Some(last), &from, &mission);
+        let _ = check_id(&mut input, &Some(last), &from, &mission);
         assert_eq!(one, input[0]);
         assert_eq!(two, input[1]);
     }
@@ -257,17 +262,39 @@ mod check_id_test {
         mission.to = Meta::new("noState", 1, MetaType::Business).unwrap();
         let one = Instance::new("one").unwrap();
         let mut input = vec![one.clone()];
-        check_id(&mut input, &Some(last), &from, &mission);
+        let _ = check_id(&mut input, &Some(last), &from, &mission);
         assert_eq!(input[0].id, 0);
     }
 
     #[test]
     fn use_last_id() {
-        let (last, from, mission) = init_input();
+        let mut last = Instance::new("last").unwrap();
+        last.id = 456;
+        let from = FromInstance {
+            id: 123,
+            meta: "from".to_string(),
+            para: "".to_string(),
+            state_version: 1,
+        };
+        let mut meta = Meta::new("to", 1, MetaType::Business).unwrap();
+        let setting = MetaSetting {
+            is_state: true,
+            master: Some("another".to_string()),
+            multi_meta: None,
+            conflict_avoid: false,
+        };
+        let _ = meta.set_setting(&serde_json::to_string(&setting).unwrap());
+        let mission = Mission {
+            to: meta,
+            executor: Default::default(),
+            states_demand: None,
+            use_upstream_id: false,
+            delay: 0,
+        };
         let one = Instance::new("one").unwrap();
         let mut input = vec![one.clone()];
         assert_eq!(input[0].id, 0);
-        check_id(&mut input, &Some(last), &from, &mission);
+        let _ = check_id(&mut input, &Some(last), &from, &mission);
         assert_eq!(input[0].id, 456);
     }
 
@@ -277,7 +304,7 @@ mod check_id_test {
         from.meta = "not_matched".to_string();
         let one = Instance::new("one").unwrap();
         let mut input = vec![one.clone()];
-        check_id(&mut input, &None, &from, &mission);
+        let _ = check_id(&mut input, &None, &from, &mission);
         assert_eq!(input[0].id, 0);
     }
 
@@ -286,7 +313,7 @@ mod check_id_test {
         let (_last, from, mission) = init_input();
         let one = Instance::new("one").unwrap();
         let mut input = vec![one.clone()];
-        check_id(&mut input, &None, &from, &mission);
+        let _ = check_id(&mut input, &None, &from, &mission);
         assert_eq!(input[0].id, 123);
     }
 
@@ -297,7 +324,7 @@ mod check_id_test {
         mission.use_upstream_id = true;
         let one = Instance::new("one").unwrap();
         let mut input = vec![one.clone()];
-        check_id(&mut input, &None, &from, &mission);
+        let _ = check_id(&mut input, &None, &from, &mission);
         assert_eq!(input[0].id, 123);
     }
 

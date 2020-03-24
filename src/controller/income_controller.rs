@@ -2,11 +2,11 @@ use std::convert::TryFrom;
 
 use nature_common::{ConverterReturned, DelayedInstances, Instance, MetaType, NatureError, Result, SelfRouteInstance};
 use nature_db::{InstanceDaoImpl, MetaCacheImpl, MetaDaoImpl, Mission, RawTask, RelationCacheImpl, RelationDaoImpl, TaskDaoImpl, TaskType};
+use nature_db::flow_tool::{context_check, state_check};
 
 use crate::actor::*;
 use crate::controller::*;
 use crate::task::{TaskForConvert, TaskForStore};
-use nature_db::flow_tool::{context_check, state_check};
 
 pub struct IncomeController {}
 
@@ -48,7 +48,8 @@ impl IncomeController {
                             let _ = TaskDaoImpl::raw_to_error(&err, &carrier)?;
                             Ok(())
                         }
-                        ConverterReturned::EnvError => {
+                        ConverterReturned::EnvError(e) => {
+                            warn!("{}", e);
                             Ok(())
                         }
                         ConverterReturned::Delay(_) => {
@@ -78,14 +79,17 @@ impl IncomeController {
         match TaskType::try_from(raw.data_type)? {
             TaskType::Store => {
                 let rtn = serde_json::from_str(&raw.data)?;
+                // debug!("redo store task for task : {:?}", &rtn);
                 ACT_STORED.do_send(MsgForTask(rtn, raw));
             }
             TaskType::Convert => {
-                let rtn = serde_json::from_str(&raw.data)?;
+                let rtn = serde_json::from_str::<TaskForConvert>(&raw.data)?;
+                debug!("--redo convert task: from:{}, to:{}", rtn.from.meta, rtn.target.to.meta_string());
                 ACT_CONVERT.do_send(MsgForTask(rtn, raw));
             }
             TaskType::Batch => {
                 let rtn = serde_json::from_str(&raw.data)?;
+                // debug!("redo batch task for task : {:?}", &rtn);
                 ACT_BATCH.do_send(MsgForTask(rtn, raw));
             }
         }

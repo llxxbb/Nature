@@ -7,13 +7,13 @@ extern crate nature_db;
 use std::collections::{HashMap, HashSet};
 use std::env;
 
-use reqwest::Client;
+use reqwest::blocking::Client;
 
 use nature::controller::IncomeController;
 use nature_common::*;
-use nature_db::*;
 
-use crate::common::{CONN_STR, sleep, test_init};
+use crate::common::{CONN_STR, test_init, sleep};
+use nature_db::InstanceDaoImpl;
 
 pub mod common;
 
@@ -34,7 +34,40 @@ fn convert_is_empty() {
     assert_eq!(rtn.err().unwrap(), NatureError::VerifyError("executor must not empty for dynamic convert!".to_string()));
 }
 
-#[test]
+
+fn query(instance: SelfRouteInstance) -> u128 {
+    let req = WEB_CLIENT.post("http://localhost:8080/self_route").json(&instance).send().unwrap();
+    let rtn = req.json::<Result<u128>>();
+    let rtn = rtn.unwrap().unwrap();
+    rtn
+}
+
+pub fn new_with_type(key: &str, meta: MetaType) -> Result<Instance> {
+    if key.is_empty() {
+        return Err(NatureError::VerifyError("key can not be empty".to_string()));
+    }
+    let key = Meta::key_standardize(key)?;
+    Ok(Instance {
+        id: 0,
+        data: BizObject {
+            meta: format!("{}:{}:1", meta.get_prefix(), key),
+            content: "".to_string(),
+            context: HashMap::new(),
+            sys_context: HashMap::new(),
+            states: HashSet::new(),
+            state_version: 0,
+            from: None,
+            para: String::new(),
+        },
+        execute_time: 0,
+        create_time: 0,
+    })
+}
+
+// ----------- the following test need a db connection and renew for every time-------------------------
+
+// #[test]
+#[allow(dead_code)]
 fn target_is_null() {
     test_init();
     // prepare input para
@@ -48,12 +81,12 @@ fn target_is_null() {
             delay: 0,
         }],
     };
-    sleep(3000);
+    sleep(4000);
     let rtn = query(instance);
-    assert_eq!(rtn, 338344869912127221082806885982185864543);
+    assert_eq!(rtn, 331801733395679954677043458405181585943);
     // check input
     let written = InstanceDaoImpl::get_by_id(&ParaForQueryByID {
-        id: 338344869912127221082806885982185864543,
+        id: 331801733395679954677043458405181585943,
         meta: "/D/dynamic/target/is/null:1".to_string(),
         state_version_from: 0,
         limit: 1,
@@ -61,8 +94,8 @@ fn target_is_null() {
     assert_eq!("/D/dynamic/target/is/null:1", written.data.meta);
 }
 
-
-#[test]
+// #[test]
+#[allow(dead_code)]
 fn write_one_target_to_db() {
     test_init();
     // prepare input para
@@ -78,7 +111,7 @@ fn write_one_target_to_db() {
     };
     sleep(5000);
     let rtn = query(instance);
-    assert_eq!(rtn, 82729090071796891440669834987910301379);
+    assert_eq!(rtn, 134864226241881275556374404860687412363);
 
     // query target
     sleep(3000);
@@ -91,7 +124,8 @@ fn write_one_target_to_db() {
     assert_eq!("/D/dynamic/one_target:1", ins_db.meta);
 }
 
-#[test]
+// #[test]
+#[allow(dead_code)]
 fn write_two_target_to_db() {
     test_init();
     // prepare input para
@@ -115,7 +149,7 @@ fn write_two_target_to_db() {
     sleep(5000);
 
     let rtn = query(instance);
-    assert_eq!(rtn, 302121533483322119686559454437223883973);
+    assert_eq!(rtn, 226523548363893646026242274612477165645);
 
     // query target
     sleep(2500);
@@ -134,36 +168,4 @@ fn write_two_target_to_db() {
     }).unwrap().unwrap();
     assert_eq!("/D/dynamic/two_of_2:1", ins_db.meta);
 }
-
-
-fn query(instance: SelfRouteInstance) -> u128 {
-    let req = WEB_CLIENT.post("http://localhost:8080/self_route").json(&instance).build().unwrap();
-    let mut rtn = WEB_CLIENT.execute(req).unwrap();
-    let rtn = rtn.json::<Result<u128>>();
-    let rtn = rtn.unwrap().unwrap();
-    rtn
-}
-
-pub fn new_with_type(key: &str, meta: MetaType) -> Result<Instance> {
-    if key.is_empty() {
-        return Err(NatureError::VerifyError("key can not be empty".to_string()));
-    }
-    let key = Meta::key_standardize(key)?;
-    Ok(Instance {
-        id: 0,
-        data: BizObject {
-            meta: format!("{}{}:1", meta.get_prefix(), key),
-            content: "".to_string(),
-            context: HashMap::new(),
-            sys_context: HashMap::new(),
-            states: HashSet::new(),
-            state_version: 0,
-            from: None,
-            para: String::new(),
-        },
-        execute_time: 0,
-        create_time: 0,
-    })
-}
-
 

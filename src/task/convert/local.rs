@@ -28,9 +28,14 @@ impl ExecutorTrait for LocalExecutorImpl {
             None => ConverterReturned::None,
             Some(entry) => {
                 // get config of lib
-                let mut lib_cache = CACHE_LIB.lock().unwrap();
+                let lib_cache = CACHE_LIB.lock();
+                if lib_cache.is_err() {
+                    let msg = format!("can't get lock for executor: {}", executor);
+                    return ConverterReturned::EnvError(msg);
+                }
+                let mut lib_cache = lib_cache.unwrap();
                 let path = entry.path.clone();
-//                debug!("load library for :[{}]", path);
+                // debug!("load library for :[{}]", path);
                 let cfg_lib = lib_cache.entry(entry.path).or_insert_with(move || {
                     match lib::Library::new(path.clone()) {
                         Err(e) => {
@@ -48,7 +53,9 @@ impl ExecutorTrait for LocalExecutorImpl {
                             local_lib.get(entry.entry.as_bytes()).unwrap()
                         };
                         match catch_unwind(|| { fun(para) }) {
-                            Ok(rtn) => rtn,
+                            Ok(rtn) => {
+                                rtn
+                            }
                             Err(e) => {
                                 warn!("{:?} return error: {:?}", &entry.entry, e);
                                 ConverterReturned::LogicalError("executor implement error".to_string())

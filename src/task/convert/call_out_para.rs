@@ -31,8 +31,8 @@ impl ConverterParameterWrapper {
             master,
             cfg: None,
         };
-
         let executor = Self::get_executer(&mission.executor.protocol)?;
+        // debug!("----execute: from: {}, to : {}, executor: {}", task.from.meta, task.target.to.meta_string(), &mission.executor.url);
         let rtn = executor.execute(&mission.executor.url, &para);
         Ok(rtn)
     }

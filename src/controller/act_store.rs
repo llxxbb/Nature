@@ -13,6 +13,13 @@ pub fn save_instance(task: TaskForStore, carrier: RawTask) -> Result<()> {
         Ok(_) => {
             let need_cache = task.need_cache;
             let key = &task.instance.get_unique();
+            if let Some(m) = &task.next_mission {
+                for o in m {
+                    debug!("--saved instance: from:{},to:{}", task.instance.meta, o.to.meta_string());
+                }
+            } else {
+                debug!("----saved instance for meta : {} have no missions", task.instance.meta);
+            }
             ACT_STORED.try_send(MsgForTask(task, carrier))?;
             if need_cache {
                 CachedKey::set(key);
