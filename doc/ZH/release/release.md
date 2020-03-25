@@ -1,6 +1,17 @@
 
 # 发布的功能
 
+## Release 0.1.0 2020-3-25
+
+
+- instance table add sys_context field
+- `Relation`support [any} option
+- system context : sys.target -> target.id
+- optimize: fetch task witch need to redo
+- change mysql as default db because of sqlite's cb_lock
+- update reqwest to 0.10
+- bug fix: get old plan error “not 1 or 0 but get 2”
+
 ## release 0.0.2 2020-3-15
 
 - 支持的数据库：sqlite, mysql

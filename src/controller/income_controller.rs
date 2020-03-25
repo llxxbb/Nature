@@ -1,6 +1,6 @@
 use std::convert::TryFrom;
 
-use nature_common::{ConverterReturned, DelayedInstances, Instance, MetaType, NatureError, Result, SelfRouteInstance};
+use nature_common::{ConverterReturned, DelayedInstances, generate_id, Instance, MetaType, NatureError, Result, SelfRouteInstance};
 use nature_db::{InstanceDaoImpl, MetaCacheImpl, MetaDaoImpl, Mission, RawTask, RelationCacheImpl, RelationDaoImpl, TaskDaoImpl, TaskType};
 use nature_db::flow_tool::{context_check, state_check};
 
@@ -16,8 +16,8 @@ impl IncomeController {
         let _ = instance.check_and_revise(MetaCacheImpl::get, MetaDaoImpl::get)?;
         let relations = RelationCacheImpl::get(&instance.meta, RelationDaoImpl::get_relations, MetaCacheImpl::get, MetaDaoImpl::get)?;
         let mission = Mission::get_by_instance(&instance, &relations, context_check, state_check);
-        let task = TaskForStore::new(instance.clone(), mission);
-        let raw = RawTask::new(&task, &instance.meta, TaskType::Store as i16)?;
+        let task = TaskForStore::new(instance.clone(), mission, None, false);
+        let raw = RawTask::new(&task, &instance.get_key(), TaskType::Store as i8, &instance.meta)?;
         TaskDaoImpl::insert(&raw)?;
         save_instance(task, raw)?;
         Ok(instance.id)
@@ -30,8 +30,9 @@ impl IncomeController {
         let mut ins = instance.to_instance();
         MetaType::check_type(&ins.meta, MetaType::Dynamic)?;
         let uuid = ins.revise()?.id;
-        let task = TaskForStore::for_dynamic(&ins, instance.converter)?;
-        let raw = RawTask::new(&task, &ins.meta, TaskType::Store as i16)?;
+        let key = instance.get_key();
+        let task = TaskForStore::for_dynamic(&ins, instance.converter, None, false)?;
+        let raw = RawTask::new(&task, &key, TaskType::Store as i8, &ins.meta)?;
         let _ = TaskDaoImpl::insert(&raw)?;
         save_instance(task, raw)?;
         Ok(uuid)
@@ -76,7 +77,7 @@ impl IncomeController {
 
     pub fn redo_task(raw: RawTask) -> Result<()> {
         // TODO check busy first
-        match TaskType::try_from(raw.data_type)? {
+        match TaskType::try_from(raw.task_type)? {
             TaskType::Store => {
                 let rtn = serde_json::from_str(&raw.data)?;
                 // debug!("redo store task for task : {:?}", &rtn);
@@ -98,7 +99,8 @@ impl IncomeController {
 
     pub fn batch(batch: Vec<Instance>) -> Result<()> {
         let _ = Instance::meta_must_same(&batch)?;
-        let raw = RawTask::new(&batch, &batch[0].meta, TaskType::Batch as i16)?;
+        let id = generate_id(&batch)?;
+        let raw = RawTask::new(&batch, &id.to_string(), TaskType::Batch as i8, &batch[0].meta)?;
         let _ = TaskDaoImpl::insert(&raw)?;
         let _ = ACT_BATCH.try_send(MsgForTask(batch, raw));
         Ok(())

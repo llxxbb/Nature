@@ -44,15 +44,16 @@ pub fn prepare_to_store(carrier: &RawTask, plan: PlanInfo, previous_mission: &Mi
     let mut store_infos: Vec<RawTask> = Vec::new();
     let mut t_d: Vec<(TaskForStore, RawTask)> = Vec::new();
     let meta_type = previous_mission.to.get_meta_type();
-    let relations = RelationCacheImpl::get(&carrier.meta, RelationDaoImpl::get_relations, MetaCacheImpl::get, MetaDaoImpl::get)?;
+    let relations = RelationCacheImpl::get(&carrier.task_for, RelationDaoImpl::get_relations, MetaCacheImpl::get, MetaDaoImpl::get)?;
     for instance in plan.plan.iter() {
         let r = match meta_type {
             MetaType::Multi => RelationCacheImpl::get(&instance.meta, RelationDaoImpl::get_relations, MetaCacheImpl::get, MetaDaoImpl::get)?,
             _ => relations.clone(),
         };
         let mission = Mission::get_by_instance(instance, &r, context_check, state_check);
-        let task = TaskForStore::new_with_previous_mission(instance.clone(), mission, previous_mission);
-        match RawTask::new(&task, &plan.to, TaskType::Store as i16) {
+        let meta = MetaCacheImpl::get(&instance.meta, MetaDaoImpl::get)?;
+        let task = TaskForStore::new(instance.clone(), mission, Some(previous_mission.clone()), meta.need_cache());
+        match RawTask::new(&task, &instance.get_key(), TaskType::Store as i8, &plan.to) {
             Ok(x) => {
                 store_infos.push(x.clone());
                 t_d.push((task, x))
@@ -66,13 +67,13 @@ pub fn prepare_to_store(carrier: &RawTask, plan: PlanInfo, previous_mission: &Mi
     }
     if RawTask::save_batch(&store_infos, &carrier.task_id, TaskDaoImpl::insert, TaskDaoImpl::delete).is_ok() {
         for task in t_d {
-            if let Some(m) = &task.0.next_mission {
-                for o in m {
-                    debug!("--store task generated: from:{},to:{}", task.0.instance.meta, o.to.meta_string());
-                }
-            } else {
-                debug!("----meta : {} have no missions", task.0.instance.meta);
-            }
+            // if let Some(m) = &task.0.next_mission {
+            //     for o in m {
+            //         debug!("--store task generated: from:{},to:{}", task.0.instance.meta, o.to.meta_string());
+            //     }
+            // } else {
+            //     debug!("----meta : {} have no missions", task.0.instance.meta);
+            // }
             ACT_STORE.do_send(MsgForTask(task.0, task.1));
         }
     }

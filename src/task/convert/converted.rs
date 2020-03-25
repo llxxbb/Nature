@@ -166,6 +166,7 @@ mod test {
         from_ins.meta = "B:from:1".to_string();
         from_ins.state_version = 2;
         let meta = Meta::new("to", 1, MetaType::Business).unwrap();
+        let task_key = from_ins.get_key();
         let mut task = TaskForConvert {
             from: from_ins,
             target: Mission {
@@ -178,13 +179,14 @@ mod test {
         };
         let raw = RawTask {
             task_id: vec![],
-            meta: "".to_string(),
-            data_type: 0,
+            task_key,
+            task_type: 0,
+            task_for: "".to_string(),
             data: "".to_string(),
-            last_state_version: 0,
             create_time: Local::now().naive_local(),
             execute_time: Local::now().naive_local(),
             retried_times: 0,
+            task_state: 0,
         };
         let mut ins = Instance::default();
         ins.id = 123;

@@ -5,36 +5,30 @@
 - 功能性先于非功能性需求
 - 应用情景支持，支持内部优先支持外部（如网关）
 
-## Release 0.1.0
+## Release 0.2.0
 
-- 文档:丰富业务场景，补充论坛。
-- instance 数据表增加了 sys_context字段
-- `关系`可以支持 any 选择，既满足其中的一个就可以执行。
-- system context : sys.target -> target.id
-- optimize: fetch task witch need to redo
-- change mysql as default db because of sqlite's cb_lock
-- update reqwest to 0.10
-- bug fix: get old plan error “not 1 or 0 but get 2”
+- bug fix: conflict with same source cause error task generated 
 
 ### 未发布
-- 区分系统上下文和业务上下文
- - 数据表
- - BizObject
- - RawInstance
- - FlowSelector 及测试
- - mission 测试补充
 
 ### should commit
 
 
+- task will be remained after executed, and will be delete after a given delay.
+  - modify table
+
+
 ### 未完成
 
-- bug fix: same task parallel input case error instance generate.  
-- bug fix: misused for TaskForStore#previous_mission
-- Do not delete task for executed, which can avoid do it repeatedly.
-- give an clean tool for executed task
-
-- 文档补充迁移 mysql 的说明
+- task will be remained after executed, and will be delete after a given delay.
+  - 设置完成状态
+  - Redo 排除完成状态的任务
+  - Do not delete task for executed.
+  - delete executed task after a given delay
+  
+- 文档
+  - 补充迁移 mysql 的说明
+  - 对 TaskForStore#previous_mission 进行架构说明 
 - 区分系统上下文和业务上下文
  - SerialFinished
  - 选择器
@@ -47,11 +41,11 @@
 - 执行器可设置系统上下文，以定义下一个执行器的延迟时间。这个时间可以覆盖`关系`中预定义的`延迟时间`
 - `Relation`文档补全(完成统计Demo 回过头来写会更好)
 
-## Release 0.1.1
+## Release 0.3.0
 
-- 以react的方式实现对restful`执行器`的调用.以消除下面的警告
-  
-## Release 0.2.0
+batch merged with plan
+
+## Release 1.0.0
 
 - 行使网关只能，充当所以业务系统的入口。
   - 查询外系统接口：queryThird
@@ -63,16 +57,16 @@
   * monitor point
   * traffic limit
 
-## Release 0.3.0
+## Release 1.1.0
 
 - 执行器：使用 `min-max-heap` 来支持优先级
 - 自路由：对`执行器`返回的自路由进行支持。
 - 数据库：mysql 支持 r2d2
 - ID 生成器 snowflake for 128 bit implement.
 - 优化 task.data 的数据存储以节省空间并提升性能。如from 实例，meta 等 只保存必要的数据。
+- 以react的方式实现对restful`执行器`的调用.以消除下面的警告
 
-
-## Release 1.0.0
+## Release 1.2.0
 
 - 提供后台管理界面
   - 更新配置时能够更新多个实例上的缓存

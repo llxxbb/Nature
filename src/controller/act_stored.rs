@@ -4,11 +4,11 @@ use crate::actor::*;
 use crate::task::{TaskForConvert, TaskForStore};
 
 pub fn channel_stored(task: TaskForStore, raw: RawTask) {
-    if let Some(vm) = &task.next_mission {
-        for m in vm {
-            debug!("stored task: from:{}, to:{}", task.instance.meta, m.to.meta_string());
-        }
-    }
+    // if let Some(vm) = &task.next_mission {
+    //     for m in vm {
+    //         debug!("stored task: from:{}, to:{}", task.instance.meta, m.to.meta_string());
+    //     }
+    // }
     if task.next_mission.is_none() {
         let _ = TaskDaoImpl::delete(&&raw.task_id);
         return;

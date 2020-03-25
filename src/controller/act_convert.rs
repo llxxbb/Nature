@@ -5,7 +5,7 @@ use crate::controller::{after_converted, process_null, received_self_route};
 use crate::task::{ConverterParameterWrapper, TaskForConvert};
 
 pub fn channel_convert(task: TaskForConvert, raw: RawTask) {
-    debug!("---task for convert: from:{}, to {}", task.from.meta, task.target.to.meta_string());
+    // debug!("---task for convert: from:{}, to {}", task.from.meta, task.target.to.meta_string());
     let protocol = task.target.executor.protocol.clone();
     let mut from_instance = task.from.clone();
     // -----begin this logic can't move to place where after converted, because it might not get the last state and cause state conflict
@@ -59,7 +59,7 @@ pub fn channel_convert(task: TaskForConvert, raw: RawTask) {
             }
             ConverterReturned::Delay(delay) => {
                 debug!("delay for meta: {}", meta.meta_string());
-                let _ = TaskDaoImpl::update_execute_time(&raw.task_id, i64::from(delay), &last);
+                let _ = TaskDaoImpl::update_execute_time(&raw.task_id, i64::from(delay));
             }
             ConverterReturned::LogicalError(ss) => {
                 let _ = TaskDaoImpl::raw_to_error(&NatureError::LogicalError(ss), &raw);

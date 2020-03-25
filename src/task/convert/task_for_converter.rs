@@ -28,12 +28,14 @@ impl TaskForConvert {
         let mut new_carriers: Vec<(TaskForConvert, RawTask)> = Vec::new();
         let missions = task.next_mission.clone().unwrap();
         for c in missions {
+            let from = task.instance.clone();
+            let key = from.get_key();
             let x = TaskForConvert {
-                from: task.instance.clone(),
+                from,
                 target: c.clone(),
             };
-            debug!("--generate convert task: from:{}, to:{},", x.from.meta, x.target.to.meta_string());
-            let mut car = RawTask::new(&x, &c.to.meta_string(), TaskType::Convert as i16)?;
+            debug!("generate convert task: from:{}, to:{},", x.from.meta, x.target.to.meta_string());
+            let mut car = RawTask::new(&x, &key, TaskType::Convert as i8, &c.to.meta_string())?;
             if c.delay > 0 {
                 car.execute_time = Local::now().add(FixedOffset::east(c.delay)).naive_local()
             }

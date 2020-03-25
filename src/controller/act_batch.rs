@@ -13,12 +13,14 @@ pub fn channel_parallel(task: MsgForTask<Vec<Instance>>) {
 
 fn inner_batch(task: &MsgForTask<Vec<Instance>>) -> Result<()> {
     let mut tuple: Vec<(TaskForStore, RawTask)> = Vec::new();
-    match RelationCacheImpl::get(&task.0[0].meta, RelationDaoImpl::get_relations, MetaCacheImpl::get, MetaDaoImpl::get) {
+    let from = &task.0[0].meta;
+    match RelationCacheImpl::get(from, RelationDaoImpl::get_relations, MetaCacheImpl::get, MetaDaoImpl::get) {
         Ok(relations) => {
             for instance in task.0.iter() {
                 let mission = Mission::get_by_instance(&instance, &relations, context_check, state_check);
-                let task = TaskForStore::new(instance.clone(), mission);
-                let raw = RawTask::new(&task, &instance.meta, TaskType::Store as i16)?;
+                let f_meta = MetaCacheImpl::get(from, MetaDaoImpl::get)?;
+                let task = TaskForStore::new(instance.clone(), mission, None, f_meta.need_cache());
+                let raw = RawTask::new(&task, &instance.get_key(), TaskType::Store as i8, &instance.meta)?;
                 match TaskDaoImpl::insert(&raw) {
                     Ok(_) => tuple.push((task, raw)),
                     Err(NatureError::EnvironmentError(_)) => return Ok(()),

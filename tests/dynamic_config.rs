@@ -11,9 +11,9 @@ use reqwest::blocking::Client;
 
 use nature::controller::IncomeController;
 use nature_common::*;
-
-use crate::common::{CONN_STR, test_init, sleep};
 use nature_db::InstanceDaoImpl;
+
+use crate::common::{CONN_STR, sleep, test_init};
 
 pub mod common;
 
@@ -88,6 +88,7 @@ fn target_is_null() {
     let written = InstanceDaoImpl::get_by_id(&ParaForQueryByID {
         id: 331801733395679954677043458405181585943,
         meta: "/D/dynamic/target/is/null:1".to_string(),
+        para: "".to_string(),
         state_version_from: 0,
         limit: 1,
     }).unwrap().unwrap();
@@ -118,6 +119,7 @@ fn write_one_target_to_db() {
     let ins_db = InstanceDaoImpl::get_by_id(&ParaForQueryByID {
         id: 303195405634045585338298858306929603801,
         meta: "/D/dynamic/one_target:1".to_string(),
+        para: "".to_string(),
         state_version_from: 0,
         limit: 1,
     }).unwrap().unwrap();
@@ -156,6 +158,7 @@ fn write_two_target_to_db() {
     let ins_db = InstanceDaoImpl::get_by_id(&ParaForQueryByID {
         id: 251184288685302246237493378684975241377,
         meta: "/D/dynamic/two_of_1:1".to_string(),
+        para: "".to_string(),
         state_version_from: 0,
         limit: 1,
     }).unwrap().unwrap();
@@ -163,6 +166,7 @@ fn write_two_target_to_db() {
     let ins_db = InstanceDaoImpl::get_by_id(&ParaForQueryByID {
         id: 280748872477529468003584044421765998976,
         meta: "/D/dynamic/two_of_2:1".to_string(),
+        para: "".to_string(),
         state_version_from: 0,
         limit: 1,
     }).unwrap().unwrap();
