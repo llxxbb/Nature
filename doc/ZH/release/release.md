@@ -1,8 +1,14 @@
 
 # 发布的功能
 
-## Release 0.1.0 2020-3-25
+## Release 0.2.0 2020-3-26
 
+- task will be remained after executed,
+- delete executed task after a given delay
+- bug fix: conflict with same source cause error task generated 
+- bug fix: retry module update times and time failed.  
+
+## Release 0.1.0 2020-3-25
 
 - instance table add sys_context field
 - `Relation`support [any} option

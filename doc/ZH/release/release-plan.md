@@ -5,12 +5,8 @@
 - 功能性先于非功能性需求
 - 应用情景支持，支持内部优先支持外部（如网关）
 
-## Release 0.2.0
+## Release 0.3.0
 
-- task will be remained after executed,
-- delete executed task after a given delay
-- bug fix: conflict with same source cause error task generated 
-- bug fix: retry module update times and time failed.  
 
 ### 未发布
 
@@ -20,14 +16,14 @@
 
 ### 未完成
 
-- 文档
-  - 补充迁移 mysql 的说明
-  - 对 TaskForStore#previous_mission 进行架构说明 
 - 区分系统上下文和业务上下文
  - SerialFinished
  - 选择器
  - context_check
  - /S/serial
+- 文档
+  - 补充迁移 mysql 的说明
+  - 对 TaskForStore#previous_mission 进行架构说明 
 - 内置执行器
   - 内置执行器有自己的配置
   - `Executor`支持内置执行器
