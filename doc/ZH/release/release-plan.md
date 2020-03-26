@@ -7,18 +7,19 @@
 
 ## Release 0.2.0
 
-- bug fix: conflict with same source cause error task generated 
 - task will be remained after executed,
+- delete executed task after a given delay
+- bug fix: conflict with same source cause error task generated 
+- bug fix: retry module update times and time failed.  
 
 ### 未发布
 
 ### should commit
 
 
+
 ### 未完成
 
-- delete executed task after a given delay
-- bug : retry module update times and time failed. （先不用修改这个错误，模拟并发访问） 
 - 文档
   - 补充迁移 mysql 的说明
   - 对 TaskForStore#previous_mission 进行架构说明 
