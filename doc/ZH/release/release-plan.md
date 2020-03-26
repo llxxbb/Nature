@@ -8,24 +8,17 @@
 ## Release 0.2.0
 
 - bug fix: conflict with same source cause error task generated 
+- task will be remained after executed,
 
 ### 未发布
 
 ### should commit
 
 
-- task will be remained after executed, and will be delete after a given delay.
-  - modify table
-
-
 ### 未完成
 
-- task will be remained after executed, and will be delete after a given delay.
-  - 设置完成状态
-  - Redo 排除完成状态的任务
-  - Do not delete task for executed.
-  - delete executed task after a given delay
-  
+- delete executed task after a given delay
+- bug : retry module update times and time failed. （先不用修改这个错误，模拟并发访问） 
 - 文档
   - 补充迁移 mysql 的说明
   - 对 TaskForStore#previous_mission 进行架构说明 

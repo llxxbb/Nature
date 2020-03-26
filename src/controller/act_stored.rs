@@ -10,13 +10,13 @@ pub fn channel_stored(task: TaskForStore, raw: RawTask) {
     //     }
     // }
     if task.next_mission.is_none() {
-        let _ = TaskDaoImpl::delete(&&raw.task_id);
+        let _ = TaskDaoImpl::finish_task(&&raw.task_id);
         return;
     }
     match TaskForConvert::gen_task(&task) {
         Ok(converters) => {
             let raws: Vec<RawTask> = converters.iter().map(|x| x.1.clone()).collect();
-            if RawTask::save_batch(&raws, &raw.task_id, TaskDaoImpl::insert, TaskDaoImpl::delete).is_err() {
+            if RawTask::save_batch(&raws, &raw.task_id, TaskDaoImpl::insert, TaskDaoImpl::finish_task).is_err() {
                 return;
             }
             for t in converters {

@@ -28,7 +28,7 @@ pub fn after_converted(task: &TaskForConvert, raw: &RawTask, instances: Vec<Inst
 pub fn process_null(meta_type: MetaType, task_id: &[u8]) -> Result<()> {
     match meta_type {
         MetaType::Null => {
-            let _ = TaskDaoImpl::delete(task_id)?;
+            let _ = TaskDaoImpl::finish_task(task_id)?;
             Ok(())
         }
         _ => Err(NatureError::VerifyError("need return [ConverterReturned::None]".to_string()))
@@ -65,7 +65,7 @@ pub fn prepare_to_store(carrier: &RawTask, plan: PlanInfo, previous_mission: &Mi
             }
         }
     }
-    if RawTask::save_batch(&store_infos, &carrier.task_id, TaskDaoImpl::insert, TaskDaoImpl::delete).is_ok() {
+    if RawTask::save_batch(&store_infos, &carrier.task_id, TaskDaoImpl::insert, TaskDaoImpl::finish_task).is_ok() {
         for task in t_d {
             // if let Some(m) = &task.0.next_mission {
             //     for o in m {

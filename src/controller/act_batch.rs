@@ -30,7 +30,7 @@ fn inner_batch(task: &MsgForTask<Vec<Instance>>) -> Result<()> {
             for c in tuple {
                 ACT_STORE.do_send(MsgForTask(c.0, c.1));
             }
-            let _ = TaskDaoImpl::delete(&task.1.task_id);
+            let _ = TaskDaoImpl::finish_task(&task.1.task_id);
             Ok(())
         }
         Err(NatureError::EnvironmentError(_)) => Ok(()),

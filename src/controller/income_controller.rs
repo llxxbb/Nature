@@ -110,7 +110,7 @@ impl IncomeController {
 fn get_task_and_last(task: &str) -> Result<(TaskForConvert, Option<Instance>)> {
     let task: TaskForConvert = serde_json::from_str(task)?;
     let last = match task.target.to.is_state() {
-        true => task.from.get_last_taget(&task.target.to.meta_string(), InstanceDaoImpl::get_by_id)?,
+        true => task.from.get_last_taget(&task.target.to.meta_string(), InstanceDaoImpl::get_last_state)?,
         false => None
     };
     Ok((task, last))

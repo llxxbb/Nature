@@ -14,7 +14,7 @@ pub fn channel_convert(task: TaskForConvert, raw: RawTask) {
     }
     // -----end
     let last = match task.target.to.is_state() {
-        true => match from_instance.get_last_taget(&task.target.to.meta_string(), InstanceDaoImpl::get_by_id) {
+        true => match from_instance.get_last_taget(&task.target.to.meta_string(), InstanceDaoImpl::get_last_state) {
             Err(_) => { return; }
             Ok(last) => last
         }
