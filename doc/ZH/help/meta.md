@@ -95,7 +95,7 @@ pub struct MetaSetting {
 
 下面为“订单” `Meta` 的示例：
 
-```sqlite
+```mysql
 INSERT INTO meta
 (full_key, description, version, states, fields, config)
 VALUES('B:sale/order', 'order', 1, '', '', '{}');

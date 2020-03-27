@@ -73,7 +73,7 @@ Your can save your settings by JSON format to config field of meta-table .
 
 For example, if we would register an __Order__, the sql  might be :
 
-```sqlite
+```mysql
 INSERT INTO meta
 (full_key, description, version, states, fields, config)
 VALUES('B:sale/order', 'order', 1, '', '', '{}');

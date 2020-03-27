@@ -7,14 +7,15 @@
 
 ## Release 0.3.0
 
-
-### 未发布
+- documents
+  - replace sqlite with mysql in documents
 
 ### should commit
 
 
 
 ### 未完成
+- batch merged with plan
 
 - 区分系统上下文和业务上下文
  - SerialFinished
@@ -22,7 +23,7 @@
  - context_check
  - /S/serial
 - 文档
-  - 补充迁移 mysql 的说明
+  - 架构文档，移除对plan的声明
   - 对 TaskForStore#previous_mission 进行架构说明 
 - 内置执行器
   - 内置执行器有自己的配置
@@ -31,9 +32,6 @@
 - 执行器可设置系统上下文，以定义下一个执行器的延迟时间。这个时间可以覆盖`关系`中预定义的`延迟时间`
 - `Relation`文档补全(完成统计Demo 回过头来写会更好)
 
-## Release 0.3.0
-
-batch merged with plan
 
 ## Release 1.0.0
 
