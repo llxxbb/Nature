@@ -34,7 +34,7 @@ impl TaskForConvert {
                 from,
                 target: c.clone(),
             };
-            debug!("generate convert task: from:{}, to:{},", x.from.meta, x.target.to.meta_string());
+            // debug!("generate convert task: from:{}, to:{},", x.from.meta, x.target.to.meta_string());
             let mut car = RawTask::new(&x, &key, TaskType::Convert as i8, &c.to.meta_string())?;
             if c.delay > 0 {
                 car.execute_time = Local::now().add(FixedOffset::east(c.delay)).naive_local()

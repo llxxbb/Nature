@@ -1,8 +1,8 @@
-use nature_common::{NatureError, ParaForIDAndFrom, ParaForQueryByID, Result};
-use nature_db::{InstanceDaoImpl, RawTask, StorePlanDaoImpl, TaskDaoImpl};
+use nature_common::{NatureError, ParaForIDAndFrom, Result};
+use nature_db::{InstanceDaoImpl, RawTask};
 
-use crate::actor::{ACT_STORED, MsgForTask};
-use crate::task::{CachedKey, TaskForStore};
+use crate::actor::{ACT_CONVERT, ACT_STORED, MsgForTask};
+use crate::task::{CachedKey, TaskForConvert, TaskForStore};
 
 pub fn channel_store(store: (TaskForStore, RawTask)) {
     let _ = save_instance(store.0, store.1);
@@ -60,19 +60,8 @@ fn duplicated_instance(task: TaskForStore, carrier: RawTask) -> Result<()> {
         return Ok(());
     } else {
         warn!("conflict for state-meta: [{}] on version : {}", &task.instance.meta, task.instance.state_version);
-        let _ = StorePlanDaoImpl::delete(&ins_from.get_upstream(), &task.instance.meta)?;
-        let ins = InstanceDaoImpl::get_by_id(&ParaForQueryByID::from(&ins_from))?;
-        return match ins {
-            Some(ins) => {
-                let task = TaskForStore::new(ins, Some(vec![task.previous_mission.clone().unwrap()]), None, false);
-                ACT_STORED.try_send(MsgForTask(task, carrier.clone()))?;
-                Ok(())
-            }
-            None => {
-                let error = NatureError::VerifyError("from-instance does not found".to_string());
-                let _ = TaskDaoImpl::raw_to_error(&error, &carrier);
-                Err(error)
-            }
-        };
+        let rtn = serde_json::from_str::<TaskForConvert>(&carrier.data)?;
+        ACT_CONVERT.do_send(MsgForTask(rtn, carrier));
+        Ok(())
     }
 }

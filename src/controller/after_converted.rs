@@ -1,28 +1,43 @@
 use nature_common::{Instance, MetaType, NatureError, Result, SelfRouteInstance};
-use nature_db::{MetaCacheImpl, MetaDaoImpl, Mission, RawTask, RelationCacheImpl, RelationDaoImpl, StorePlanDaoImpl, TaskDaoImpl, TaskType};
+use nature_db::{MetaCacheImpl, MetaDaoImpl, Mission, RawTask, RelationCacheImpl, RelationDaoImpl, TaskDaoImpl, TaskType};
 use nature_db::flow_tool::{context_check, state_check};
 
 use crate::actor::*;
 use crate::actor::MsgForTask;
-use crate::task::{Converted, PlanInfo, TaskForConvert, TaskForStore};
+use crate::task::{Converted, TaskForConvert, TaskForStore};
 
-pub fn after_converted(task: &TaskForConvert, raw: &RawTask, instances: Vec<Instance>, last_state: &Option<Instance>) -> Result<()> {
-    debug!("converted {} instances for `Meta`: {:?}", instances.len(), &task.target.to.meta_string());
-    match Converted::gen(&task, &raw, instances, last_state) {
-        Ok(rtn) => {
-            match PlanInfo::save(&task, &rtn.converted, StorePlanDaoImpl::save, StorePlanDaoImpl::get) {
-                Ok(plan) => prepare_to_store(&rtn.done_task, plan, &task.target),
-                Err(err) => {
-                    warn!("unhandled error : {}", &err);
-                    Err(err)
-                }
-            }
+pub fn after_converted(task: &TaskForConvert, convert_task: &RawTask, instances: Vec<Instance>, last_state: &Option<Instance>) -> Result<()> {
+    debug!("converted {} instances for `Meta`: {:?}, from {}", instances.len(), &task.target.to.meta_string(), task.from.get_key());
+    match Converted::gen(&task, &convert_task, instances, last_state) {
+        Ok(rtn) => match rtn.converted.len() {
+            0 => match TaskDaoImpl::finish_task(&convert_task.task_id) {
+                Ok(_) => Ok(()),
+                Err(e) => Err(e)
+            },
+            1 => save_one(rtn, &task.target),
+            _ => save_batch(rtn),
         }
         Err(err) => {
-            let _ = TaskDaoImpl::raw_to_error(&err, &raw);
+            let _ = TaskDaoImpl::raw_to_error(&err, &convert_task);
             Err(err)
         }
     }
+}
+
+pub fn save_one(converted: Converted, previous_mission: &Mission) -> Result<()> {
+    let instance = &converted.converted[0];
+    let relations = RelationCacheImpl::get(&instance.meta, RelationDaoImpl::get_relations, MetaCacheImpl::get, MetaDaoImpl::get)?;
+    let mission = Mission::get_by_instance(instance, &relations, context_check, state_check);
+    let meta = MetaCacheImpl::get(&instance.meta, MetaDaoImpl::get)?;
+    let task = TaskForStore::new(instance.clone(), mission, Some(previous_mission.clone()), meta.need_cache());
+    Ok(ACT_STORE.try_send(MsgForTask(task, converted.done_task))?)
+}
+
+pub fn save_batch(converted: Converted) -> Result<()> {
+    let raw = RawTask::new(&converted.converted, &converted.done_task.task_key, TaskType::Batch as i8, "")?;
+    let _ = TaskDaoImpl::insert(&raw)?;
+    let _ = TaskDaoImpl::finish_task(&converted.done_task.task_id)?;
+    Ok(ACT_BATCH.try_send(MsgForTask(converted.converted, raw))?)
 }
 
 pub fn process_null(meta_type: MetaType, task_id: &[u8]) -> Result<()> {
@@ -38,44 +53,4 @@ pub fn process_null(meta_type: MetaType, task_id: &[u8]) -> Result<()> {
 pub fn received_self_route(_task: &TaskForConvert, _raw: &RawTask, _instances: Vec<SelfRouteInstance>) -> Result<()> {
     // TODO unimplemented
     unimplemented!()
-}
-
-pub fn prepare_to_store(carrier: &RawTask, plan: PlanInfo, previous_mission: &Mission) -> Result<()> {
-    let mut store_infos: Vec<RawTask> = Vec::new();
-    let mut t_d: Vec<(TaskForStore, RawTask)> = Vec::new();
-    let meta_type = previous_mission.to.get_meta_type();
-    let relations = RelationCacheImpl::get(&carrier.task_for, RelationDaoImpl::get_relations, MetaCacheImpl::get, MetaDaoImpl::get)?;
-    for instance in plan.plan.iter() {
-        let r = match meta_type {
-            MetaType::Multi => RelationCacheImpl::get(&instance.meta, RelationDaoImpl::get_relations, MetaCacheImpl::get, MetaDaoImpl::get)?,
-            _ => relations.clone(),
-        };
-        let mission = Mission::get_by_instance(instance, &r, context_check, state_check);
-        let meta = MetaCacheImpl::get(&instance.meta, MetaDaoImpl::get)?;
-        let task = TaskForStore::new(instance.clone(), mission, Some(previous_mission.clone()), meta.need_cache());
-        match RawTask::new(&task, &instance.get_key(), TaskType::Store as i8, &plan.to) {
-            Ok(x) => {
-                store_infos.push(x.clone());
-                t_d.push((task, x))
-            }
-            Err(e) => {
-                error!("{}", e);
-                let _ = TaskDaoImpl::raw_to_error(&e, carrier);
-                return Ok(());
-            }
-        }
-    }
-    if RawTask::save_batch(&store_infos, &carrier.task_id, TaskDaoImpl::insert, TaskDaoImpl::finish_task).is_ok() {
-        for task in t_d {
-            // if let Some(m) = &task.0.next_mission {
-            //     for o in m {
-            //         debug!("--store task generated: from:{},to:{}", task.0.instance.meta, o.to.meta_string());
-            //     }
-            // } else {
-            //     debug!("----meta : {} have no missions", task.0.instance.meta);
-            // }
-            ACT_STORE.do_send(MsgForTask(task.0, task.1));
-        }
-    }
-    Ok(())
 }

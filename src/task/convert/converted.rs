@@ -11,7 +11,7 @@ pub struct Converted {
 }
 
 impl Converted {
-    pub fn gen(task: &TaskForConvert, carrier: &RawTask, instances: Vec<Instance>, last_state: &Option<Instance>) -> Result<Converted> {
+    pub fn gen(task: &TaskForConvert, convert_task: &RawTask, instances: Vec<Instance>, last_state: &Option<Instance>) -> Result<Converted> {
         // filter from cache
         let mut instances: Vec<Instance> = if task.check_cache() {
             instances.into_iter().filter(|one| !CachedKey::get(&one.get_unique())).collect()
@@ -20,7 +20,7 @@ impl Converted {
         };
 
         if instances.is_empty() {
-            return Ok(converted_none(carrier));
+            return Ok(converted_none(convert_task));
         }
 
         // init meta and [from]
@@ -33,7 +33,7 @@ impl Converted {
         // verify
         let _ = verify_state(&task, &mut instances, last_state)?;
         let rtn = Converted {
-            done_task: carrier.to_owned(),
+            done_task: convert_task.to_owned(),
             converted: instances,
         };
         Ok(rtn)

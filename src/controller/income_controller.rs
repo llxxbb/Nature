@@ -98,12 +98,10 @@ impl IncomeController {
     }
 
     pub fn batch(batch: Vec<Instance>) -> Result<()> {
-        let _ = Instance::meta_must_same(&batch)?;
         let id = generate_id(&batch)?;
         let raw = RawTask::new(&batch, &id.to_string(), TaskType::Batch as i8, &batch[0].meta)?;
         let _ = TaskDaoImpl::insert(&raw)?;
-        let _ = ACT_BATCH.try_send(MsgForTask(batch, raw));
-        Ok(())
+        Ok(ACT_BATCH.try_send(MsgForTask(batch, raw))?)
     }
 }
 

@@ -7,24 +7,14 @@
 
 ## Release 0.3.0
 
-- documents
-  - replace sqlite with mysql in documents
+- merge `parallel task`, `plan` and `Sequential` to `batch`
+- fix bug: parallel input cause state version error increment
 
 ### should commit
 
 
-
 ### 未完成
-- batch merged with plan
 
-- 区分系统上下文和业务上下文
- - SerialFinished
- - 选择器
- - context_check
- - /S/serial
-- 文档
-  - 架构文档，移除对plan的声明
-  - 对 TaskForStore#previous_mission 进行架构说明 
 - 内置执行器
   - 内置执行器有自己的配置
   - `Executor`支持内置执行器
