@@ -5,10 +5,9 @@
 - 功能性先于非功能性需求
 - 应用情景支持，支持内部优先支持外部（如网关）
 
-## Release 0.3.0
+## Release 0.3.1
 
-- merge `parallel task`, `plan` and `Sequential` to `batch`
-- fix bug: parallel input cause state version error increment
+- update actix-web to 2.0 version
 
 ### should commit
 

@@ -5,6 +5,7 @@ use std::thread;
 use std::time::Duration;
 
 use nature::system::sys_init;
+use futures::executor::block_on;
 
 #[allow(dead_code)]
 //pub static CONN_STR : &str = "mysql://root@localhost/nature";
@@ -12,7 +13,7 @@ pub static CONN_STR: &str = "nature.sqlite";
 
 pub fn test_init() {
     env::set_var("DATABASE_URL", CONN_STR);
-    thread::spawn(|| sys_init());
+    thread::spawn(|| block_on(sys_init()));
 }
 
 pub fn sleep(how_long: u64) {

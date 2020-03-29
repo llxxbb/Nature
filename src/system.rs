@@ -8,9 +8,10 @@ use std::thread::JoinHandle;
 use actix_web::{App, HttpServer};
 use dotenv::dotenv;
 
+use nature_common::setup_logger;
+
 use crate::actor::*;
 use crate::rpc::actix::*;
-use nature_common::setup_logger;
 
 // for product and mock
 lazy_static! {
@@ -44,18 +45,18 @@ lazy_static! {
 }
 
 
-pub fn sys_init() {
+pub async fn sys_init() -> std::io::Result<()> {
     dotenv().ok();
     let _ = setup_logger();
-    start_actor();
+    start_actor().await
 }
 
-fn start_actor() {
+async fn start_actor() -> std::io::Result<()> {
     init_actors();
     // web actor
     HttpServer::new(|| App::new().configure(web_config))
         .bind("127.0.0.1:".to_owned() + &SERVER_PORT).unwrap()
-        .run().unwrap();
+        .run().await
 }
 
 pub fn finish_threads<T>(threads: Vec<JoinHandle<T>>) {

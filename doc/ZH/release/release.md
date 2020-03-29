@@ -1,6 +1,11 @@
 
 # 发布的功能
 
+## Release 0.3.0 2020-3-29
+
+- merge `parallel task`, `plan` and `Sequential` to `batch`
+- fix bug: parallel input cause state version error increment
+
 ## Release 0.2.0 2020-3-26
 
 - task will be remained after executed,

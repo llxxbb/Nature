@@ -10,33 +10,33 @@ use nature_db::{InstanceDaoImpl, RawTask};
 use crate::controller::IncomeController;
 
 /// **Note** This do not receive System `Meta`'s instances
-fn input(instance: Json<Instance>) -> HttpResponse {
+async fn input(instance: Json<Instance>) -> HttpResponse {
     let x = IncomeController::input(instance.0);
     return_result(x)
 }
 
 /// Instance with route info
-fn self_route(instance: Json<SelfRouteInstance>) -> HttpResponse {
+async fn self_route(instance: Json<SelfRouteInstance>) -> HttpResponse {
     let x = IncomeController::self_route(instance.0);
     return_result(x)
 }
 
-fn callback(delayed: Json<DelayedInstances>) -> HttpResponse {
+async fn callback(delayed: Json<DelayedInstances>) -> HttpResponse {
     let x = IncomeController::callback(delayed.0);
     return_result(x)
 }
 
-fn batch(parallel_batch: Json<Vec<Instance>>) -> HttpResponse {
+async fn batch(parallel_batch: Json<Vec<Instance>>) -> HttpResponse {
     let x = IncomeController::batch(parallel_batch.0);
     return_result(x)
 }
 
-fn redo_task(task: Json<RawTask>) -> HttpResponse {
+async fn redo_task(task: Json<RawTask>) -> HttpResponse {
     let x = IncomeController::redo_task(task.0);
     return_result(x)
 }
 
-fn get_by_id(para: Json<ParaForQueryByID>) -> HttpResponse {
+async fn get_by_id(para: Json<ParaForQueryByID>) -> HttpResponse {
     let x = InstanceDaoImpl::get_by_id(&para.0);
     return_result(x)
 }
