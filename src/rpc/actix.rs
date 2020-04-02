@@ -11,28 +11,28 @@ use crate::controller::IncomeController;
 
 /// **Note** This do not receive System `Meta`'s instances
 async fn input(instance: Json<Instance>) -> HttpResponse {
-    let x = IncomeController::input(instance.0);
+    let x = IncomeController::input(instance.0).await;
     return_result(x)
 }
 
 /// Instance with route info
 async fn self_route(instance: Json<SelfRouteInstance>) -> HttpResponse {
-    let x = IncomeController::self_route(instance.0);
+    let x = IncomeController::self_route(instance.0).await;
     return_result(x)
 }
 
 async fn callback(delayed: Json<DelayedInstances>) -> HttpResponse {
-    let x = IncomeController::callback(delayed.0);
+    let x = IncomeController::callback(delayed.0).await;
     return_result(x)
 }
 
 async fn batch(parallel_batch: Json<Vec<Instance>>) -> HttpResponse {
-    let x = IncomeController::batch(parallel_batch.0);
+    let x = IncomeController::batch(parallel_batch.0).await;
     return_result(x)
 }
 
 async fn redo_task(task: Json<RawTask>) -> HttpResponse {
-    let x = IncomeController::redo_task(task.0);
+    let x = IncomeController::redo_task(task.0).await;
     return_result(x)
 }
 

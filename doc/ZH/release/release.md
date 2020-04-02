@@ -1,6 +1,12 @@
 
 # 发布的功能
 
+## Release 0.4.0 2020-4-2
+
+- update actix-web to 2.0 version
+- use async replace actor to simplify code
+- execute `Executor` asynchronously 
+
 ## Release 0.3.0 2020-3-29
 
 - merge `parallel task`, `plan` and `Sequential` to `batch`

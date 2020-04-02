@@ -2,8 +2,6 @@ use std::ops::Range;
 
 use nature_common::{ConverterParameter, ConverterReturned};
 
-use crate::task::ExecutorTrait;
-
 /// Data must be from Nature.
 /// The `Instance` format required
 /// - must be parametric, so that can be query out your need from the pile
@@ -25,22 +23,3 @@ struct MapItem {
     pub context_filter: Vec<String>,
     pub meta: String,
 }
-
-impl ExecutorTrait for SimpleCounter {
-    fn execute(&self, _executor: &str, _para: &ConverterParameter) -> ConverterReturned {
-//        let mut rtn: Vec<Instance> = Vec::new();
-//        let mut meta_cnt: HashMap<String, u32> = HashMap::new();
-//        loop {
-//
-//
-//            // get instance from meta
-//
-//            // increase counter
-//
-//            //
-//        }
-//        ConverterReturned::Instances(rtn);
-        unimplemented!()
-    }
-}
-

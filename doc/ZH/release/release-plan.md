@@ -5,9 +5,8 @@
 - 功能性先于非功能性需求
 - 应用情景支持，支持内部优先支持外部（如网关）
 
-## Release 0.3.1
+## Release 0.4.1
 
-- update actix-web to 2.0 version
 
 ### should commit
 
@@ -41,7 +40,6 @@
 - 数据库：mysql 支持 r2d2
 - ID 生成器 snowflake for 128 bit implement.
 - 优化 task.data 的数据存储以节省空间并提升性能。如from 实例，meta 等 只保存必要的数据。
-- 以react的方式实现对restful`执行器`的调用.以消除下面的警告
 
 ## Release 1.2.0
 

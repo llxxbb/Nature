@@ -1,22 +1,18 @@
 use nature_common::{NatureError, ParaForIDAndFrom, Result};
 use nature_db::{InstanceDaoImpl, RawTask};
 
-use crate::actor::{ACT_CONVERT, ACT_STORED, MsgForTask};
+use crate::controller::{channel_convert, channel_stored};
 use crate::task::{CachedKey, TaskForConvert, TaskForStore};
 
-pub fn channel_store(store: (TaskForStore, RawTask)) {
-    let _ = save_instance(store.0, store.1);
-}
-
-pub fn save_instance(task: TaskForStore, carrier: RawTask) -> Result<()> {
+pub async fn channel_store(task: TaskForStore, carrier: RawTask) -> Result<()> {
     match InstanceDaoImpl::insert(&task.instance) {
-        Ok(_) => do_instance_save(task, carrier),
-        Err(NatureError::DaoDuplicated(_)) => duplicated_instance(task, carrier),
+        Ok(_) => do_instance_save(task, carrier).await,
+        Err(NatureError::DaoDuplicated(_)) => duplicated_instance(task, carrier).await,
         Err(e) => Err(e)
     }
 }
 
-fn do_instance_save(task: TaskForStore, carrier: RawTask) -> Result<()> {
+async fn do_instance_save(task: TaskForStore, carrier: RawTask) -> Result<()> {
     let need_cache = task.need_cache;
     let key = &task.instance.get_unique();
     // if let Some(m) = &task.next_mission {
@@ -26,18 +22,18 @@ fn do_instance_save(task: TaskForStore, carrier: RawTask) -> Result<()> {
     // } else {
     //     debug!("----saved instance for meta : {} have no missions", task.instance.meta);
     // }
-    ACT_STORED.try_send(MsgForTask(task, carrier))?;
+    channel_stored(task, carrier).await;
     if need_cache {
         CachedKey::set(key);
     }
     Ok(())
 }
 
-fn duplicated_instance(task: TaskForStore, carrier: RawTask) -> Result<()> {
+async fn duplicated_instance(task: TaskForStore, carrier: RawTask) -> Result<()> {
     // process meta which is not status----------------
     if task.instance.state_version == 0 {
         warn!("instance already exists, meta: {}, id: {}", task.instance.meta, task.instance.id);
-        return do_instance_save(task, carrier);
+        return do_instance_save(task, carrier).await;
     }
     // process status-meta-------------------
 
@@ -56,12 +52,12 @@ fn duplicated_instance(task: TaskForStore, carrier: RawTask) -> Result<()> {
         warn!("same source for meta: {}, replaced with old instance", &task.instance.meta);
         let task = TaskForStore::new(ins, task.next_mission.clone(), None, false);
         // maybe send failed for the previous process, so send it again, otherwise can't send it any more
-        ACT_STORED.try_send(MsgForTask(task, carrier.clone()))?;
+        channel_stored(task, carrier.clone()).await;
         return Ok(());
     } else {
         warn!("conflict for state-meta: [{}] on version : {}", &task.instance.meta, task.instance.state_version);
         let rtn = serde_json::from_str::<TaskForConvert>(&carrier.data)?;
-        ACT_CONVERT.do_send(MsgForTask(rtn, carrier));
+        channel_convert(rtn, carrier).await;
         Ok(())
     }
 }

@@ -7,6 +7,7 @@ extern crate nature_db;
 use std::collections::{HashMap, HashSet};
 use std::env;
 
+use futures::executor::block_on;
 use reqwest::blocking::Client;
 
 use nature::controller::IncomeController;
@@ -30,7 +31,7 @@ fn convert_is_empty() {
         instance,
         converter: vec![],
     };
-    let rtn = IncomeController::self_route(instance);
+    let rtn = block_on(IncomeController::self_route(instance));
     assert_eq!(rtn.err().unwrap(), NatureError::VerifyError("executor must not empty for dynamic convert!".to_string()));
 }
 
@@ -90,7 +91,7 @@ fn target_is_null() {
         meta: "/D/dynamic/target/is/null:1".to_string(),
         para: "".to_string(),
         limit: 1,
-        state_version: 0
+        state_version: 0,
     }).unwrap().unwrap();
     assert_eq!("/D/dynamic/target/is/null:1", written.data.meta);
 }
@@ -121,7 +122,7 @@ fn write_one_target_to_db() {
         meta: "/D/dynamic/one_target:1".to_string(),
         para: "".to_string(),
         limit: 1,
-        state_version: 0
+        state_version: 0,
     }).unwrap().unwrap();
     assert_eq!("/D/dynamic/one_target:1", ins_db.meta);
 }
@@ -160,7 +161,7 @@ fn write_two_target_to_db() {
         meta: "/D/dynamic/two_of_1:1".to_string(),
         para: "".to_string(),
         limit: 1,
-        state_version: 0
+        state_version: 0,
     }).unwrap().unwrap();
     assert_eq!("/D/dynamic/two_of_1:1", ins_db.meta);
     let ins_db = InstanceDaoImpl::get_by_id(&ParaForQueryByID {
@@ -168,7 +169,7 @@ fn write_two_target_to_db() {
         meta: "/D/dynamic/two_of_2:1".to_string(),
         para: "".to_string(),
         limit: 1,
-        state_version: 0
+        state_version: 0,
     }).unwrap().unwrap();
     assert_eq!("/D/dynamic/two_of_2:1", ins_db.meta);
 }

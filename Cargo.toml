@@ -1,6 +1,6 @@
 [package]
 name = "nature"
-version = "0.3.0"
+version = "0.4.0"
 authors = ["XueBin Li <llxxbb@yeah.net>"]
 edition = "2018"
 description = "Nature is a data-driven, business-oriented, decentralized platform for building big system."
@@ -16,30 +16,30 @@ serde_json = "1.0"
 serde = "1.0"
 serde_derive = "1.0"
 lazy_static = "1.4"
-uuid = { version = "0.7", features = ["v3"] }
-lru_time_cache = "0.8"
+uuid = { version = "0.8", features = ["v3"] }
+lru_time_cache = "0.10"
 futures = "0.3"
 
 # for local executor implement
-libloading = "0.5.0"
+libloading = "0.5"
 
 
 # log
 log = "0.4"
-fern = "0.5"        # Simple, efficient logging
+fern = "0.6"        # Simple, efficient logging
 
 #config
-dotenv = "0.11"
+dotenv = "0.15"
 
 # web
-reqwest = { version = "0.10", features = ["blocking", "json"] }
+reqwest = { version = "0.10", features = ["blocking","json"] }
 actix-web = "2.0"
-actix = "0.8"
 actix-rt = "1.0"
+tokio = { version = "0.2", features = ["full"] }
 
 # self project group
-nature_common = {path = "../Nature-Common", version = "0.3.0"}
-nature_db = {path = "../Nature-DB", features = ["mysql"], version = "0.3.0"}
+nature_common = {path = "../Nature-Common", version = "0.4.0"}
+nature_db = {path = "../Nature-DB", features = ["mysql"], version = "0.4.0"}
 
 [workspace]
 members = ["../Nature-Common",

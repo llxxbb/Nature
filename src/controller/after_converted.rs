@@ -2,11 +2,10 @@ use nature_common::{Instance, MetaType, NatureError, Result, SelfRouteInstance};
 use nature_db::{MetaCacheImpl, MetaDaoImpl, Mission, RawTask, RelationCacheImpl, RelationDaoImpl, TaskDaoImpl, TaskType};
 use nature_db::flow_tool::{context_check, state_check};
 
-use crate::actor::*;
-use crate::actor::MsgForTask;
+use crate::controller::{channel_batch, channel_store};
 use crate::task::{Converted, TaskForConvert, TaskForStore};
 
-pub fn after_converted(task: &TaskForConvert, convert_task: &RawTask, instances: Vec<Instance>, last_state: &Option<Instance>) -> Result<()> {
+pub async fn after_converted(task: &TaskForConvert, convert_task: &RawTask, instances: Vec<Instance>, last_state: &Option<Instance>) -> Result<()> {
     debug!("converted {} instances for `Meta`: {:?}, from {}", instances.len(), &task.target.to.meta_string(), task.from.get_key());
     match Converted::gen(&task, &convert_task, instances, last_state) {
         Ok(rtn) => match rtn.converted.len() {
@@ -14,7 +13,7 @@ pub fn after_converted(task: &TaskForConvert, convert_task: &RawTask, instances:
                 Ok(_) => Ok(()),
                 Err(e) => Err(e)
             },
-            1 => save_one(rtn, &task.target),
+            1 => save_one(rtn, &task.target).await,
             _ => save_batch(rtn),
         }
         Err(err) => {
@@ -24,20 +23,22 @@ pub fn after_converted(task: &TaskForConvert, convert_task: &RawTask, instances:
     }
 }
 
-pub fn save_one(converted: Converted, previous_mission: &Mission) -> Result<()> {
+pub async fn save_one(converted: Converted, previous_mission: &Mission) -> Result<()> {
     let instance = &converted.converted[0];
     let relations = RelationCacheImpl::get(&instance.meta, RelationDaoImpl::get_relations, MetaCacheImpl::get, MetaDaoImpl::get)?;
     let mission = Mission::get_by_instance(instance, &relations, context_check, state_check);
     let meta = MetaCacheImpl::get(&instance.meta, MetaDaoImpl::get)?;
     let task = TaskForStore::new(instance.clone(), mission, Some(previous_mission.clone()), meta.need_cache());
-    Ok(ACT_STORE.try_send(MsgForTask(task, converted.done_task))?)
+    let rtn = channel_store(task, converted.done_task).await?;
+    Ok(rtn)
 }
 
 pub fn save_batch(converted: Converted) -> Result<()> {
     let raw = RawTask::new(&converted.converted, &converted.done_task.task_key, TaskType::Batch as i8, "")?;
     let _ = TaskDaoImpl::insert(&raw)?;
     let _ = TaskDaoImpl::finish_task(&converted.done_task.task_id)?;
-    Ok(ACT_BATCH.try_send(MsgForTask(converted.converted, raw))?)
+    let rtn = channel_batch(converted.converted, raw);
+    Ok(rtn)
 }
 
 pub fn process_null(meta_type: MetaType, task_id: &[u8]) -> Result<()> {

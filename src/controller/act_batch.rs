@@ -2,20 +2,20 @@ use nature_common::{Instance, MetaType, Result};
 use nature_db::{MetaCacheImpl, MetaDaoImpl, Mission, RawTask, RelationCacheImpl, RelationDaoImpl, TaskDaoImpl, TaskType};
 use nature_db::flow_tool::{context_check, state_check};
 
-use crate::actor::{ACT_STORE, MsgForTask};
+use crate::controller::channel_store;
 use crate::task::TaskForStore;
 
-pub fn channel_batch(task: MsgForTask<Vec<Instance>>) {
-    if let Err(e) = inner_batch(&task) {
+pub fn channel_batch(instances: Vec<Instance>, raw: RawTask) {
+    if let Err(e) = inner_batch(instances, &raw) {
         error!("{}", e);
-        let _ = TaskDaoImpl::raw_to_error(&e, &task.1);
+        let _ = TaskDaoImpl::raw_to_error(&e, &raw);
     }
 }
 
-fn inner_batch(task: &MsgForTask<Vec<Instance>>) -> Result<()> {
+fn inner_batch(instances: Vec<Instance>, raw: &RawTask) -> Result<()> {
     let mut store_infos: Vec<RawTask> = Vec::new();
     let mut t_d: Vec<(TaskForStore, RawTask)> = Vec::new();
-    for instance in &task.0 {
+    for instance in &instances {
         let meta = MetaCacheImpl::get(&instance.meta, MetaDaoImpl::get)?;
         let meta_type = meta.get_meta_type();
         let relations = RelationCacheImpl::get(&instance.meta, RelationDaoImpl::get_relations, MetaCacheImpl::get, MetaDaoImpl::get)?;
@@ -33,7 +33,7 @@ fn inner_batch(task: &MsgForTask<Vec<Instance>>) -> Result<()> {
             Err(e) => return Err(e)
         }
     }
-    if RawTask::save_batch(&store_infos, &task.1.task_id, TaskDaoImpl::insert, TaskDaoImpl::finish_task).is_ok() {
+    if RawTask::save_batch(&store_infos, &raw.task_id, TaskDaoImpl::insert, TaskDaoImpl::finish_task).is_ok() {
         for task in t_d {
             // if let Some(m) = &task.0.next_mission {
             //     for o in m {
@@ -42,7 +42,7 @@ fn inner_batch(task: &MsgForTask<Vec<Instance>>) -> Result<()> {
             // } else {
             //     debug!("----meta : {} have no missions", task.0.instance.meta);
             // }
-            ACT_STORE.do_send(MsgForTask(task.0, task.1));
+            let _ = channel_store(task.0, task.1);
         }
     }
     Ok(())

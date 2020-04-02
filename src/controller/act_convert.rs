@@ -1,78 +1,74 @@
+use tokio::macros::support::{Future, Pin};
+
 use nature_common::{CONTEXT_TARGET_INSTANCE_ID, ConverterReturned, Instance, NatureError, Protocol, Result};
-use nature_db::{InstanceDaoImpl, MetaCacheImpl, MetaDaoImpl, RawTask, TaskDaoImpl};
+use nature_db::{InstanceDaoImpl, MetaCacheImpl, MetaDaoImpl, Mission, RawTask, TaskDaoImpl};
 
 use crate::controller::{after_converted, process_null, received_self_route};
-use crate::task::{ConverterParameterWrapper, TaskForConvert};
+use crate::task::{gen_and_call_out, TaskForConvert};
 
-pub fn channel_convert(task: TaskForConvert, raw: RawTask) {
-    // debug!("---task for convert: from:{}, to {}", task.from.meta, task.target.to.meta_string());
-    let protocol = task.target.executor.protocol.clone();
-    let mut from_instance = task.from.clone();
-    // -----begin this logic can't move to place where after converted, because it might not get the last state and cause state conflict
-    if protocol == Protocol::Auto {
-        init_target_id_for_sys_context(&task, &raw, &mut from_instance)
-    }
-    // -----end
-    let last = match task.target.to.is_state() {
-        true => match from_instance.get_last_taget(&task.target.to.meta_string(), InstanceDaoImpl::get_last_state) {
-            Err(_) => { return; }
-            Ok(last) => last
+pub fn channel_convert(task: TaskForConvert, raw: RawTask) -> Pin<Box<dyn Future<Output=()>>> {
+    Box::pin(async move {
+        // debug!("---task for convert: from:{}, to {}", task.from.meta, task.target.to.meta_string());
+        let protocol = task.target.executor.protocol.clone();
+        let mut from_instance = task.from.clone();
+        // -----begin this logic can't move to place where after converted, because it might not get the last state and cause state conflict
+        if protocol == Protocol::Auto {
+            init_target_id_for_sys_context(&task, &raw, &mut from_instance)
         }
-        false => None
-    };
-    if Protocol::Auto == protocol {
-        let _ = after_converted(&task, &raw, vec![Instance::default()], &last);
-        return;
-    }
-    // init master
-    let meta = match MetaCacheImpl::get(&task.from.meta, MetaDaoImpl::get) {
-        Ok(m) => m,
-        Err(e) => {
-            let _ = TaskDaoImpl::raw_to_error(&e, &raw);
+        // -----end
+        let last = match task.target.to.is_state() {
+            true => match from_instance.get_last_taget(&task.target.to.meta_string(), InstanceDaoImpl::get_last_state) {
+                Err(_) => { return; }
+                Ok(last) => last
+            }
+            false => None
+        };
+        if Protocol::Auto == protocol {
+            let _ = after_converted(&task, &raw, vec![Instance::default()], &last).await;
             return;
         }
-    };
-    let master = match task.from.get_master(&meta, InstanceDaoImpl::get_by_id) {
-        Ok(m) => m,
-        Err(e) => {
-            let _ = TaskDaoImpl::raw_to_error(&e, &raw);
-            return;
+        // init master
+        let meta = match MetaCacheImpl::get(&task.from.meta, MetaDaoImpl::get) {
+            Ok(m) => m,
+            Err(e) => {
+                let _ = TaskDaoImpl::raw_to_error(&e, &raw);
+                return;
+            }
+        };
+        let master = match task.from.get_master(&meta, InstanceDaoImpl::get_by_id) {
+            Ok(m) => m,
+            Err(e) => {
+                let _ = TaskDaoImpl::raw_to_error(&e, &raw);
+                return;
+            }
+        };
+        let rtn = gen_and_call_out(&task, &raw, &task.target, &last, master).await;
+        handle_converted(rtn, &task, &raw, &task.target, &last).await;
+    })
+}
+
+async fn handle_converted(converted: ConverterReturned, task: &TaskForConvert, raw: &RawTask, mission: &Mission, last: &Option<Instance>) {
+    match converted {
+        ConverterReturned::Instances(instances) => {
+            let _ = after_converted(task, &raw, instances, &last).await;
         }
-    };
-    match ConverterParameterWrapper::gen_and_call_out(&task, raw.task_id.clone(), &task.target, &last, master) {
-        Err(err) => {
-            match err {
-                // only **Environment Error** will be retry
-                NatureError::EnvironmentError(_) => (),
-                // other error will drop into error
-                _ => {
-                    let _ = TaskDaoImpl::raw_to_error(&err, &raw);
-                }
-            }
+        ConverterReturned::SelfRoute(ins) => {
+            let _ = received_self_route(task, &raw, ins);
         }
-        Ok(returned) => match returned {
-            ConverterReturned::Instances(instances) => {
-                let _ = after_converted(&task, &raw, instances, &last);
-            }
-            ConverterReturned::SelfRoute(ins) => {
-                let _ = received_self_route(&task, &raw, ins);
-            }
-            ConverterReturned::Delay(delay) => {
-                debug!("delay for meta: {}", meta.meta_string());
-                let _ = TaskDaoImpl::update_execute_time(&raw.task_id, i64::from(delay));
-            }
-            ConverterReturned::LogicalError(ss) => {
-                let _ = TaskDaoImpl::raw_to_error(&NatureError::LogicalError(ss), &raw);
-            }
-            ConverterReturned::EnvError(e) => {
-                warn!("executor returned err: {}", e);
-                ()
-            }
-            ConverterReturned::None => {
-                let _ = process_null(task.target.to.get_meta_type(), &raw.task_id);
-            }
+        ConverterReturned::Delay(delay) => {
+            debug!("delay task from meta: {}", task.from.meta);
+            let _ = TaskDaoImpl::update_execute_time(&raw.task_id, i64::from(delay));
         }
-    };
+        ConverterReturned::LogicalError(ss) => {
+            let _ = TaskDaoImpl::raw_to_error(&NatureError::LogicalError(ss), &raw);
+        }
+        ConverterReturned::EnvError(e) => {
+            warn!("executor returned err: {}", e);
+        }
+        ConverterReturned::None => {
+            let _ = process_null(mission.to.get_meta_type(), &raw.task_id);
+        }
+    }
 }
 
 fn init_target_id_for_sys_context(task: &TaskForConvert, raw: &RawTask, from_instance: &mut Instance) -> () {
@@ -89,7 +85,7 @@ fn init_target_id_for_sys_context(task: &TaskForConvert, raw: &RawTask, from_ins
     let id: Result<String> = match target {
         Some(t) => Ok(t.clone()),
         None => {
-            // the master must exists, otherwise `Protocol::Auto` would not be generated.
+// the master must exists, otherwise `Protocol::Auto` would not be generated.
             let master = to_meta.get_setting().unwrap().master.unwrap();
             match master.eq(&from_instance.meta) {
                 true => Ok(from_instance.id.to_string()),

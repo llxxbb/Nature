@@ -10,7 +10,6 @@ use dotenv::dotenv;
 
 use nature_common::setup_logger;
 
-use crate::actor::*;
 use crate::rpc::actix::*;
 
 // for product and mock
@@ -44,16 +43,9 @@ lazy_static! {
 
 }
 
-
 pub async fn sys_init() -> std::io::Result<()> {
     dotenv().ok();
     let _ = setup_logger();
-    start_actor().await
-}
-
-async fn start_actor() -> std::io::Result<()> {
-    init_actors();
-    // web actor
     HttpServer::new(|| App::new().configure(web_config))
         .bind("127.0.0.1:".to_owned() + &SERVER_PORT).unwrap()
         .run().await
