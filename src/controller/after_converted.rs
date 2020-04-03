@@ -1,5 +1,5 @@
 use nature_common::{Instance, MetaType, NatureError, Result, SelfRouteInstance};
-use nature_db::{MetaCacheImpl, MetaDaoImpl, Mission, RawTask, RelationCacheImpl, RelationDaoImpl, TaskDaoImpl, TaskType};
+use nature_db::{MetaCacheImpl, MG, Mission, RawTask, RelationCacheImpl, RelationDaoImpl, TaskDaoImpl, TaskType};
 use nature_db::flow_tool::{context_check, state_check};
 
 use crate::controller::{channel_batch, channel_store};
@@ -25,9 +25,9 @@ pub async fn after_converted(task: &TaskForConvert, convert_task: &RawTask, inst
 
 pub async fn save_one(converted: Converted, previous_mission: &Mission) -> Result<()> {
     let instance = &converted.converted[0];
-    let relations = RelationCacheImpl::get(&instance.meta, RelationDaoImpl::get_relations, MetaCacheImpl::get, MetaDaoImpl::get)?;
+    let relations = RelationCacheImpl::get(&instance.meta, RelationDaoImpl::get_relations, MetaCacheImpl::get, MG)?;
     let mission = Mission::get_by_instance(instance, &relations, context_check, state_check);
-    let meta = MetaCacheImpl::get(&instance.meta, MetaDaoImpl::get)?;
+    let meta = MetaCacheImpl::get(&instance.meta, MG)?;
     let task = TaskForStore::new(instance.clone(), mission, Some(previous_mission.clone()), meta.need_cache());
     let rtn = channel_store(task, converted.done_task).await?;
     Ok(rtn)

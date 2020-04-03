@@ -25,7 +25,7 @@ impl Converted {
 
         // init meta and [from]
         let from = FromInstance::from(&task.from);
-        let _ = set_from(&mut instances, &from, &task.target.to)?;
+        let _ = set_source_and_target_meta(&mut instances, &from, &task.target.to)?;
 
         // check id
         let _ = check_id(&mut instances, &last_state, &from, &task.target)?;
@@ -47,23 +47,20 @@ fn converted_none(carrier: &RawTask) -> Converted {
     }
 }
 
-fn set_from(instances: &mut Vec<Instance>, from: &FromInstance, target_meta: &Meta) -> Result<()> {
+fn set_source_and_target_meta(instances: &mut Vec<Instance>, from: &FromInstance, target_meta: &Meta) -> Result<()> {
     match target_meta.get_meta_type() {
         MetaType::Multi => {
             match target_meta.get_setting() {
-                Some(s) => match s.multi_meta {
-                    Some(multi) => multi.check_metas(instances)?,
-                    None => set_from_to_target_meta(instances, from, target_meta),
-                }
-                None => set_from_to_target_meta(instances, from, target_meta),
+                Some(s) => s.check_multi_meta(instances)?,
+                None => set_all_instances(instances, from, target_meta),
             }
         }
-        _ => set_from_to_target_meta(instances, from, target_meta),
+        _ => set_all_instances(instances, from, target_meta),
     }
     Ok(())
 }
 
-fn set_from_to_target_meta(instances: &mut Vec<Instance>, from: &FromInstance, target_meta: &Meta) {
+fn set_all_instances(instances: &mut Vec<Instance>, from: &FromInstance, target_meta: &Meta) {
     instances.iter_mut().for_each(|n| {
         n.data.meta = target_meta.meta_string();
         n.from = Some(from.clone());
@@ -282,7 +279,7 @@ mod check_id_test {
         let setting = MetaSetting {
             is_state: true,
             master: Some("another".to_string()),
-            multi_meta: None,
+            multi_meta: vec![],
             conflict_avoid: false,
         };
         let _ = meta.set_setting(&serde_json::to_string(&setting).unwrap());
@@ -343,7 +340,7 @@ mod check_id_test {
         let setting = MetaSetting {
             is_state: true,
             master: Some("from".to_string()),
-            multi_meta: None,
+            multi_meta: vec![],
             conflict_avoid: false,
         };
         let _ = meta.set_setting(&serde_json::to_string(&setting).unwrap());

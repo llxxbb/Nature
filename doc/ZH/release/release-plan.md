@@ -5,18 +5,21 @@
 - 功能性先于非功能性需求
 - 应用情景支持，支持内部优先支持外部（如网关）
 
-## Release 0.4.1
+## Release 0.5
 
+- support multi-meta output
 
 ### should commit
 
 
 ### 未完成
 
-- 内置执行器
+
+- support embedded executor
   - 内置执行器有自己的配置
   - `Executor`支持内置执行器
   - 实现`simpleCounter`内置执行器。
+- embedded-executor: dimensionSplitter
 - 执行器可设置系统上下文，以定义下一个执行器的延迟时间。这个时间可以覆盖`关系`中预定义的`延迟时间`
 - `Relation`文档补全(完成统计Demo 回过头来写会更好)
 

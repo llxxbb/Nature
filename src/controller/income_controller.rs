@@ -1,7 +1,7 @@
 use std::convert::TryFrom;
 
 use nature_common::{ConverterReturned, DelayedInstances, generate_id, Instance, MetaType, NatureError, Result, SelfRouteInstance};
-use nature_db::{InstanceDaoImpl, MetaCacheImpl, MetaDaoImpl, Mission, RawTask, RelationCacheImpl, RelationDaoImpl, TaskDaoImpl, TaskType};
+use nature_db::{InstanceDaoImpl, MetaCacheImpl, MG, Mission, RawTask, RelationCacheImpl, RelationDaoImpl, TaskDaoImpl, TaskType};
 use nature_db::flow_tool::{context_check, state_check};
 
 use crate::controller::*;
@@ -12,8 +12,8 @@ pub struct IncomeController {}
 impl IncomeController {
     /// born an instance which is the beginning of the changes.
     pub async fn input(mut instance: Instance) -> Result<u128> {
-        let _ = instance.check_and_revise(MetaCacheImpl::get, MetaDaoImpl::get)?;
-        let relations = RelationCacheImpl::get(&instance.meta, RelationDaoImpl::get_relations, MetaCacheImpl::get, MetaDaoImpl::get)?;
+        let _ = instance.check_and_revise(MetaCacheImpl::get, MG)?;
+        let relations = RelationCacheImpl::get(&instance.meta, RelationDaoImpl::get_relations, MetaCacheImpl::get, MG)?;
         let mission = Mission::get_by_instance(&instance, &relations, context_check, state_check);
         let task = TaskForStore::new(instance.clone(), mission, None, false);
         let raw = RawTask::new(&task, &instance.get_key(), TaskType::Store as i8, &instance.meta)?;
