@@ -77,7 +77,7 @@ impl IncomeController {
         // TODO check busy first
         match TaskType::try_from(raw.task_type)? {
             TaskType::Store => {
-                let rtn = TaskForStore::from_raw(&raw, INS_KEY_GETTER, MCG, MG)?;
+                let rtn = TaskForStore::from_raw(&raw, MCG, MG)?;
                 debug!("--redo store task for task : {:?}", &rtn);
                 channel_stored(rtn, raw).await;
             }
