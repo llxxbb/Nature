@@ -9,14 +9,14 @@
 
 - support multi-meta output
 - add MetaSettingTemp for MetaSetting to improve the performance for multi-meta checking
+- optimize RawTask storage size
 
 ### should commit
 
-- optimize RawTask storage size
+
 
 ### 未完成
 
-- optimize RawTask storage size
 - support embedded executor
   - 内置执行器有自己的配置
   - `Executor`支持内置执行器

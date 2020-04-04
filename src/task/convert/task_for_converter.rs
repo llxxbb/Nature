@@ -2,21 +2,15 @@ use std::ops::Add;
 
 use chrono::{FixedOffset, Local};
 
-use nature_common::{FromInstance, Instance, NatureError, ParaForQueryByID, Result};
-use nature_db::{InstanceGetter, MetaCacheGetter, MetaGetter, Mission, MissionRaw, RawTask, TaskType};
+use nature_common::{Instance, NatureError, Result};
+use nature_db::{InstanceKeyGetter, MetaCacheGetter, MetaGetter, Mission, MissionRaw, RawTask, TaskType};
 
-use crate::task::TaskForStore;
+use crate::task::{TASK_KEY_SEPARATOR, TaskForStore};
 
 #[derive(Debug, Clone)]
 pub struct TaskForConvert {
     pub from: Instance,
     pub target: Mission,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-struct TaskForConvertTemp {
-    pub from: FromInstance,
-    pub target: MissionRaw,
 }
 
 impl Default for TaskForConvert {
@@ -28,14 +22,6 @@ impl Default for TaskForConvert {
     }
 }
 
-impl From<TaskForConvert> for TaskForConvertTemp {
-    fn from(input: TaskForConvert) -> Self {
-        TaskForConvertTemp {
-            from: FromInstance::from(&input.from),
-            target: MissionRaw::from(input.target),
-        }
-    }
-}
 
 impl TaskForConvert {
     pub fn gen_task(task: &TaskForStore) -> Result<Vec<(TaskForConvert, RawTask)>>
@@ -50,8 +36,7 @@ impl TaskForConvert {
                 target: c.clone(),
             };
             // debug!("generate convert task: from:{}, to:{},", x.from.meta, x.target.to.meta_string());
-            let temp = TaskForConvertTemp::from(x.clone());
-            let json = serde_json::to_string(&temp)?;
+            let json = MissionRaw::from(x.target.clone()).to_json()?;
             let mut car = RawTask::from_str(&json, &key, TaskType::Convert as i8, &c.to.meta_string())?;
             if c.delay > 0 {
                 car.execute_time = Local::now().add(FixedOffset::east(c.delay)).naive_local()
@@ -66,16 +51,15 @@ impl TaskForConvert {
             None => false,
         }
     }
-    pub fn from_raw(json: &str, ins_g: InstanceGetter, mc_g: MetaCacheGetter, m_g: &MetaGetter) -> Result<Self> {
-        let temp = serde_json::from_str::<TaskForConvertTemp>(json)?;
-        let q_para = ParaForQueryByID::from(&temp.from);
-        let result = ins_g(&q_para)?;
+    pub fn from_raw(raw: &RawTask, ins_g: InstanceKeyGetter, mc_g: MetaCacheGetter, m_g: &MetaGetter) -> Result<Self> {
+        let mr = MissionRaw::from_json(&raw.data)?;
+        let result = ins_g(&raw.task_key, TASK_KEY_SEPARATOR)?;
         let rtn = match result {
             None => return Err(NatureError::EnvironmentError("can't find instance".to_string())),
             Some(ins) => {
                 TaskForConvert {
                     from: ins,
-                    target: Mission::from_raw(&temp.target, mc_g, m_g)?,
+                    target: Mission::from_raw(&mr, mc_g, m_g)?,
                 }
             }
         };

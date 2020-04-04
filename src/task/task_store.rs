@@ -1,7 +1,8 @@
 use std::sync::mpsc::Sender;
 
-use nature_common::{DynamicConverter, FromInstance, Instance, is_false, NatureError, ParaForQueryByID, Result};
-use nature_db::{InstanceGetter, MetaCacheGetter, MetaGetter, Mission, MissionRaw, RawTask, TaskType};
+use nature_common::{DynamicConverter, Instance, is_false, NatureError, Result};
+use nature_db::{InstanceKeyGetter, MetaCacheGetter, MetaGetter, Mission, MissionRaw, RawTask, TaskType};
+use crate::task::TASK_KEY_SEPARATOR;
 
 #[derive(Debug, Clone, Default)]
 pub struct TaskForStore {
@@ -15,7 +16,6 @@ pub struct TaskForStore {
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 struct TaskForStoreTemp {
-    pub instance: FromInstance,
     #[serde(skip_serializing_if = "Vec::is_empty")]
     #[serde(default)]
     pub next_mission: Vec<MissionRaw>,
@@ -30,7 +30,6 @@ struct TaskForStoreTemp {
 impl From<TaskForStore> for TaskForStoreTemp {
     fn from(input: TaskForStore) -> Self {
         TaskForStoreTemp {
-            instance: FromInstance::from(&input.instance),
             next_mission: {
                 let mut rtn: Vec<MissionRaw> = vec![];
                 input.next_mission.into_iter().for_each(|one| rtn.push(MissionRaw::from(one)));
@@ -72,10 +71,9 @@ impl TaskForStore {
         RawTask::from_str(&json, &self.instance.get_key(), TaskType::Store as i8, &self.instance.meta)
     }
 
-    pub fn from_raw(json: &str, ins_g: InstanceGetter, mc_g: MetaCacheGetter, m_g: &MetaGetter) -> Result<Self> {
-        let temp: TaskForStoreTemp = serde_json::from_str(json)?;
-        let q = ParaForQueryByID::from(&temp.instance);
-        let result = ins_g(&q)?;
+    pub fn from_raw(raw: &RawTask, ins_g: InstanceKeyGetter, mc_g: MetaCacheGetter, m_g: &MetaGetter) -> Result<Self> {
+        let temp: TaskForStoreTemp = serde_json::from_str(&raw.data)?;
+        let result = ins_g(&raw.task_key, TASK_KEY_SEPARATOR)?;
         if result.is_some() {
             return Err(NatureError::EnvironmentError("can't find instance".to_string()));
         }
