@@ -1,5 +1,5 @@
 use nature_common::{NatureError, ParaForIDAndFrom, Result};
-use nature_db::{InstanceDaoImpl, RawTask};
+use nature_db::{INS_GETTER, InstanceDaoImpl, MCG, MG, RawTask};
 
 use crate::controller::{channel_convert, channel_stored};
 use crate::task::{CachedKey, TaskForConvert, TaskForStore};
@@ -56,7 +56,7 @@ async fn duplicated_instance(task: TaskForStore, carrier: RawTask) -> Result<()>
         return Ok(());
     } else {
         warn!("conflict for state-meta: [{}] on version : {}", &task.instance.meta, task.instance.state_version);
-        let rtn = serde_json::from_str::<TaskForConvert>(&carrier.data)?;
+        let rtn = TaskForConvert::from_raw(&carrier.data, INS_GETTER, MCG, MG)?;
         channel_convert(rtn, carrier).await;
         Ok(())
     }

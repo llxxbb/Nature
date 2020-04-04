@@ -1,5 +1,5 @@
 use nature_common::{Instance, MetaType, Result};
-use nature_db::{MetaCacheImpl, MG, Mission, RawTask, RelationCacheImpl, RelationDaoImpl, TaskDaoImpl, TaskType};
+use nature_db::{MetaCacheImpl, MG, Mission, RawTask, RelationCacheImpl, RelationDaoImpl, TaskDaoImpl};
 use nature_db::flow_tool::{context_check, state_check};
 
 use crate::controller::channel_store;
@@ -25,7 +25,7 @@ fn inner_batch(instances: Vec<Instance>, raw: &RawTask) -> Result<()> {
         };
         let mission = Mission::get_by_instance(&instance, &r, context_check, state_check);
         let task = TaskForStore::new(instance.clone(), mission, None, meta.need_cache());
-        match RawTask::new(&task, &instance.get_key(), TaskType::Store as i8, &instance.meta) {
+        match task.to_raw() {
             Ok(x) => {
                 store_infos.push(x.clone());
                 t_d.push((task, x))

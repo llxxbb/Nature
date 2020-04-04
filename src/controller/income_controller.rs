@@ -1,7 +1,7 @@
 use std::convert::TryFrom;
 
 use nature_common::{ConverterReturned, DelayedInstances, generate_id, Instance, MetaType, NatureError, Result, SelfRouteInstance};
-use nature_db::{InstanceDaoImpl, MetaCacheImpl, MG, Mission, RawTask, RelationCacheImpl, RelationDaoImpl, TaskDaoImpl, TaskType};
+use nature_db::{INS_GETTER, InstanceDaoImpl, MCG, MetaCacheImpl, MG, Mission, RawTask, RelationCacheImpl, RelationDaoImpl, TaskDaoImpl, TaskType};
 use nature_db::flow_tool::{context_check, state_check};
 
 use crate::controller::*;
@@ -16,7 +16,7 @@ impl IncomeController {
         let relations = RelationCacheImpl::get(&instance.meta, RelationDaoImpl::get_relations, MetaCacheImpl::get, MG)?;
         let mission = Mission::get_by_instance(&instance, &relations, context_check, state_check);
         let task = TaskForStore::new(instance.clone(), mission, None, false);
-        let raw = RawTask::new(&task, &instance.get_key(), TaskType::Store as i8, &instance.meta)?;
+        let raw = task.to_raw()?;
         TaskDaoImpl::insert(&raw)?;
         channel_store(task, raw).await?;
         Ok(instance.id)
@@ -29,9 +29,8 @@ impl IncomeController {
         let mut ins = instance.to_instance();
         MetaType::check_type(&ins.meta, MetaType::Dynamic)?;
         let uuid = ins.revise()?.id;
-        let key = instance.get_key();
         let task = TaskForStore::for_dynamic(&ins, instance.converter, None, false)?;
-        let raw = RawTask::new(&task, &key, TaskType::Store as i8, &ins.meta)?;
+        let raw = task.to_raw()?;
         let _ = TaskDaoImpl::insert(&raw)?;
         channel_store(task, raw).await?;
         Ok(uuid)
@@ -78,18 +77,18 @@ impl IncomeController {
         // TODO check busy first
         match TaskType::try_from(raw.task_type)? {
             TaskType::Store => {
-                let rtn = serde_json::from_str(&raw.data)?;
-                // debug!("redo store task for task : {:?}", &rtn);
+                let rtn = TaskForStore::from_raw(&raw.data, INS_GETTER, MCG, MG)?;
+                debug!("--redo store task for task : {:?}", &rtn);
                 channel_stored(rtn, raw).await;
             }
             TaskType::Convert => {
-                let rtn = serde_json::from_str::<TaskForConvert>(&raw.data)?;
+                let rtn = TaskForConvert::from_raw(&raw.data, INS_GETTER, MCG, MG)?;
                 debug!("--redo convert task: from:{}, to:{}", rtn.from.meta, rtn.target.to.meta_string());
                 channel_convert(rtn, raw).await;
             }
             TaskType::Batch => {
                 let rtn = serde_json::from_str(&raw.data)?;
-                // debug!("redo batch task for task : {:?}", &rtn);
+                debug!("--redo batch task for task : {:?}", &rtn);
                 channel_batch(rtn, raw);
             }
         }
@@ -106,7 +105,7 @@ impl IncomeController {
 }
 
 fn get_task_and_last(task: &str) -> Result<(TaskForConvert, Option<Instance>)> {
-    let task: TaskForConvert = serde_json::from_str(task)?;
+    let task: TaskForConvert = TaskForConvert::from_raw(task, INS_GETTER, MCG, MG)?;
     let last = match task.target.to.is_state() {
         true => task.from.get_last_taget(&task.target.to.meta_string(), InstanceDaoImpl::get_last_state)?,
         false => None

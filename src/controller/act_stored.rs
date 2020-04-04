@@ -9,7 +9,7 @@ pub async fn channel_stored(task: TaskForStore, raw: RawTask) {
     //         debug!("stored task: from:{}, to:{}", task.instance.meta, m.to.meta_string());
     //     }
     // }
-    if task.next_mission.is_none() {
+    if task.next_mission.is_empty() {
         let _ = TaskDaoImpl::finish_task(&&raw.task_id);
         return;
     }

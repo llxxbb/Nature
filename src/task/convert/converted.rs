@@ -279,10 +279,10 @@ mod check_id_test {
         let setting = MetaSetting {
             is_state: true,
             master: Some("another".to_string()),
-            multi_meta: vec![],
+            multi_meta: Default::default(),
             conflict_avoid: false,
         };
-        let _ = meta.set_setting(&serde_json::to_string(&setting).unwrap());
+        let _ = meta.set_setting(&setting.to_json().unwrap());
         let mission = Mission {
             to: meta,
             executor: Default::default(),
@@ -311,7 +311,7 @@ mod check_id_test {
     fn master_matched() {
         let (_last, from, mission) = init_input();
         let one = Instance::new("one").unwrap();
-        let mut input = vec![one.clone()];
+        let mut input = vec![one];
         let _ = check_id(&mut input, &None, &from, &mission);
         assert_eq!(input[0].id, 123);
     }
@@ -340,10 +340,11 @@ mod check_id_test {
         let setting = MetaSetting {
             is_state: true,
             master: Some("from".to_string()),
-            multi_meta: vec![],
+            multi_meta: Default::default(),
             conflict_avoid: false,
         };
-        let _ = meta.set_setting(&serde_json::to_string(&setting).unwrap());
+        let ss = setting.to_json().unwrap();
+        let _sr = meta.set_setting(&ss);
         let mission = Mission {
             to: meta,
             executor: Default::default(),
