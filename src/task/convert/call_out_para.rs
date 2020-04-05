@@ -21,7 +21,7 @@ pub async fn gen_and_call_out(task: &TaskForConvert, raw: &RawTask, mission: &Mi
         last_state: last_target.clone(),
         task_id: raw.task_id.clone(),
         master,
-        cfg: None,
+        cfg: mission.executor.settings.to_string(),
     };
     debug!("execute: from: {}, to : {}, executor: {}", task.from.meta, task.target.to.meta_string(), &mission.executor.url);
     let rtn = match &mission.executor.protocol {

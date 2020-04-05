@@ -2,13 +2,17 @@ use std::ops::Range;
 
 use nature_common::{ConverterParameter, ConverterReturned};
 
-/// The `Instance` format required
-/// - must be parametric, so that can be query out your need from the pile
-/// - the content must be only contain a number, so that the `SimpleCounter` will recognize it and counter it
-/// put the condition to to context include
-/// - B.inPara = a,b,c...     // the sequence is important
-/// - B.meta = some/meta    // if it be ignored then upstream `Meta` will be used
-/// - B.outPara = a,b,c...
+/// Data input format required: Vec<(Key,Value)>
+/// - Key: is String type, include all dimension, separator is defined in Setting
+/// - Value: is Any type, each split dimension will copy this value.
+///
+/// Setting is a json, include the following properties:
+/// - dimension-separator: default is "/"
+/// - wanted-dimension: array of array to store dimension index. for example: [1,2][1,3].
+/// each you defined dimensions will be output as `Instance.para`
+///
+/// Suggestion:
+/// - use-upstream-id to avoid result scatter
 #[derive(Serialize, Deserialize)]
 enum Method {
     Map(MapItem),
@@ -21,6 +25,7 @@ struct MapItem {
     pub meta: String,
 }
 
-pub fn dimension_split(_para: &ConverterParameter) -> ConverterReturned {
+pub fn dimension_split(para: &ConverterParameter) -> ConverterReturned {
+    // para.
     unimplemented!()
 }

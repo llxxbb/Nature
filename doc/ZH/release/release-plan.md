@@ -11,6 +11,7 @@
 - add MetaSettingTemp for MetaSetting to improve the performance for multi-meta checking
 - optimize RawTask storage size
 - support built-in executor
+- add support for executor self setting
 
 ### should commit
 
@@ -18,9 +19,9 @@
 
 ### 未完成
 
-- embedded-executor: dimensionSplitter
 
-- 实现`simpleCounter`内置执行器。
+- add builtin executor: dimensionSplit
+- task数据表中的last_state 字段用法？
 
 - 执行器可设置系统上下文，以定义下一个执行器的延迟时间。这个时间可以覆盖`关系`中预定义的`延迟时间`
 - `Relation`文档补全(完成统计Demo 回过头来写会更好)
