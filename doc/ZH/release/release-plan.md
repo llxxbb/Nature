@@ -10,6 +10,7 @@
 - support multi-meta output
 - add MetaSettingTemp for MetaSetting to improve the performance for multi-meta checking
 - optimize RawTask storage size
+- support built-in executor
 
 ### should commit
 
@@ -17,11 +18,10 @@
 
 ### 未完成
 
-- support embedded executor
-  - 内置执行器有自己的配置
-  - `Executor`支持内置执行器
-  - 实现`simpleCounter`内置执行器。
 - embedded-executor: dimensionSplitter
+
+- 实现`simpleCounter`内置执行器。
+
 - 执行器可设置系统上下文，以定义下一个执行器的延迟时间。这个时间可以覆盖`关系`中预定义的`延迟时间`
 - `Relation`文档补全(完成统计Demo 回过头来写会更好)
 

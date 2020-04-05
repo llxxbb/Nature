@@ -2,7 +2,6 @@ use std::ops::Range;
 
 use nature_common::{ConverterParameter, ConverterReturned};
 
-/// Data must be from Nature.
 /// The `Instance` format required
 /// - must be parametric, so that can be query out your need from the pile
 /// - the content must be only contain a number, so that the `SimpleCounter` will recognize it and counter it
@@ -10,8 +9,6 @@ use nature_common::{ConverterParameter, ConverterReturned};
 /// - B.inPara = a,b,c...     // the sequence is important
 /// - B.meta = some/meta    // if it be ignored then upstream `Meta` will be used
 /// - B.outPara = a,b,c...
-pub struct SimpleCounter;
-
 #[derive(Serialize, Deserialize)]
 enum Method {
     Map(MapItem),
@@ -22,4 +19,8 @@ enum Method {
 struct MapItem {
     pub context_filter: Vec<String>,
     pub meta: String,
+}
+
+pub fn dimension_split(_para: &ConverterParameter) -> ConverterReturned {
+    unimplemented!()
 }
