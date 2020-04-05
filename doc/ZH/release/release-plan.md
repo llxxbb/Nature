@@ -12,6 +12,7 @@
 - optimize RawTask storage size
 - support built-in executor
 - add support for executor self setting
+- add builtin executor: dimensionSplit
 
 ### should commit
 
@@ -20,7 +21,6 @@
 ### 未完成
 
 
-- add builtin executor: dimensionSplit
 - task数据表中的last_state 字段用法？
 
 - 执行器可设置系统上下文，以定义下一个执行器的延迟时间。这个时间可以覆盖`关系`中预定义的`延迟时间`

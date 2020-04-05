@@ -1,8 +1,9 @@
 use std::collections::HashMap;
 
-pub use dimension_splitter::*;
 /// built-in xecutor
 use nature_common::{NatureError, Result};
+
+use dimension_splitter::dimension_split;
 
 use crate::task::Execute;
 
