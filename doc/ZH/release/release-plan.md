@@ -20,6 +20,10 @@
 
 ### 未完成
 
+- add follower executor support for executor 
+- 文档
+  - Meta 使用说明补充 Multi-Meta的用法
+  - 数据不可变，如何修正数据？ 独立做一个对中的数据！ 最终在展示层相加就可以了
 
 - task数据表中的last_state 字段用法？
 
