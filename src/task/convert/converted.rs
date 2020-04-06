@@ -12,6 +12,7 @@ pub struct Converted {
 
 impl Converted {
     pub fn gen(task: &TaskForConvert, convert_task: &RawTask, instances: Vec<Instance>, last_state: &Option<Instance>) -> Result<Converted> {
+
         // filter from cache
         let mut instances: Vec<Instance> = if task.check_cache() {
             instances.into_iter().filter(|one| !CachedKey::get(&one.get_unique())).collect()
@@ -73,6 +74,7 @@ fn check_id(ins: &mut Vec<Instance>, last: &Option<Instance>, from: &FromInstanc
     if ins.is_empty() {
         return Ok(());
     }
+
     let is_master = match &target.to.get_setting() {
         Some(setting) => match &setting.master {
             None => false,
@@ -82,22 +84,20 @@ fn check_id(ins: &mut Vec<Instance>, last: &Option<Instance>, from: &FromInstanc
     };
 
     let id = {
-        if ins.len() != 1 {
-            None
-        } else if target.use_upstream_id || is_master {
+        if target.use_upstream_id || is_master {
             Some(from.id)
         } else if target.to.is_state() && last.is_some() {
             Some(last.as_ref().unwrap().id)
         } else { None }
     };
 
-    let mut first = ins[0].clone();
-    if let Some(id_u) = id {
-        first.id = id_u;
-    } else if let Some(id_s) = first.sys_context.get(&*CONTEXT_TARGET_INSTANCE_ID) {
-        first.id = u128::from_str(id_s)?;
+    for mut one in ins {
+        if let Some(id_u) = id {
+            one.id = id_u;
+        } else if let Some(id_s) = one.sys_context.get(&*CONTEXT_TARGET_INSTANCE_ID) {
+            one.id = u128::from_str(id_s)?;
+        }
     }
-    ins[0] = first;
     Ok(())
 }
 
@@ -251,8 +251,8 @@ mod check_id_test {
         let two = Instance::new("two").unwrap();
         let mut input = vec![one.clone(), two.clone()];
         let _ = check_id(&mut input, &Some(last), &from, &mission);
-        assert_eq!(one, input[0]);
-        assert_eq!(two, input[1]);
+        assert_eq!(input[0].id, 123);
+        assert_eq!(input[1].id, 123);
     }
 
     #[test]

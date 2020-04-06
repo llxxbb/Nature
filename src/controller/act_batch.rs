@@ -5,14 +5,14 @@ use nature_db::flow_tool::{context_check, state_check};
 use crate::controller::channel_store;
 use crate::task::TaskForStore;
 
-pub fn channel_batch(instances: Vec<Instance>, raw: RawTask) {
-    if let Err(e) = inner_batch(instances, &raw) {
+pub async fn channel_batch(instances: Vec<Instance>, raw: RawTask) {
+    if let Err(e) = inner_batch(instances, &raw).await {
         error!("{}", e);
         let _ = TaskDaoImpl::raw_to_error(&e, &raw);
     }
 }
 
-fn inner_batch(instances: Vec<Instance>, raw: &RawTask) -> Result<()> {
+async fn inner_batch(instances: Vec<Instance>, raw: &RawTask) -> Result<()> {
     let mut store_infos: Vec<RawTask> = Vec::new();
     let mut t_d: Vec<(TaskForStore, RawTask)> = Vec::new();
     for instance in &instances {
@@ -42,7 +42,7 @@ fn inner_batch(instances: Vec<Instance>, raw: &RawTask) -> Result<()> {
             // } else {
             //     debug!("----meta : {} have no missions", task.0.instance.meta);
             // }
-            let _ = channel_store(task.0, task.1);
+            let _ = channel_store(task.0, task.1).await;
         }
     }
     Ok(())

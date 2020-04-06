@@ -13,8 +13,9 @@ pub async fn after_converted(task: &TaskForConvert, convert_task: &RawTask, inst
                 Ok(_) => Ok(()),
                 Err(e) => Err(e)
             },
-            1 => save_one(rtn, &task.target).await,
-            _ => save_batch(rtn),
+            // this can cause reentry problem, maybe a switch is ok for user decision in future.
+            // 1 => save_one(rtn, &task.target).await,
+            _ => save_batch(rtn).await
         }
         Err(err) => {
             warn!("pre-process returned instance error:{}, task would be delete", err);
@@ -34,11 +35,11 @@ pub async fn save_one(converted: Converted, previous_mission: &Mission) -> Resul
     Ok(rtn)
 }
 
-pub fn save_batch(converted: Converted) -> Result<()> {
+pub async fn save_batch(converted: Converted) -> Result<()> {
     let raw = RawTask::new(&converted.converted, &converted.done_task.task_key, TaskType::Batch as i8, "")?;
     let _ = TaskDaoImpl::insert(&raw)?;
     let _ = TaskDaoImpl::finish_task(&converted.done_task.task_id)?;
-    let rtn = channel_batch(converted.converted, raw);
+    let rtn = channel_batch(converted.converted, raw).await;
     Ok(rtn)
 }
 

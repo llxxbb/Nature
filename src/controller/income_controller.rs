@@ -89,7 +89,7 @@ impl IncomeController {
             TaskType::Batch => {
                 let rtn = serde_json::from_str(&raw.data)?;
                 debug!("--redo batch task for task : {:?}", &rtn);
-                channel_batch(rtn, raw);
+                channel_batch(rtn, raw).await;
             }
         }
         Ok(())
@@ -99,7 +99,7 @@ impl IncomeController {
         let id = generate_id(&batch)?;
         let raw = RawTask::new(&batch, &id.to_string(), TaskType::Batch as i8, &batch[0].meta)?;
         let _ = TaskDaoImpl::insert(&raw)?;
-        let rtn = channel_batch(batch, raw);
+        let rtn = channel_batch(batch, raw).await;
         Ok(rtn)
     }
 }
