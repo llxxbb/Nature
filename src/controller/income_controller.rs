@@ -15,6 +15,9 @@ impl IncomeController {
         let _ = instance.check_and_revise(MetaCacheImpl::get, MG)?;
         let relations = RelationCacheImpl::get(&instance.meta, RelationDaoImpl::get_relations, MetaCacheImpl::get, MG)?;
         let mission = Mission::get_by_instance(&instance, &relations, context_check, state_check);
+        // for o in &mission {
+        //     debug!("--generate mission from:{},to:{}", &instance.meta, o.to.meta_string());
+        // }
         let task = TaskForStore::new(instance.clone(), mission, None, false);
         let raw = task.to_raw()?;
         TaskDaoImpl::insert(&raw)?;

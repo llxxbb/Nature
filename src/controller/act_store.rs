@@ -15,12 +15,8 @@ pub async fn channel_store(task: TaskForStore, carrier: RawTask) -> Result<()> {
 async fn do_instance_save(task: TaskForStore, carrier: RawTask) -> Result<()> {
     let need_cache = task.need_cache;
     let key = &task.instance.get_unique();
-    // if let Some(m) = &task.next_mission {
-    //     for o in m {
-    //         debug!("--saved instance: from:{},to:{}", task.instance.meta, o.to.meta_string());
-    //     }
-    // } else {
-    //     debug!("----saved instance for meta : {} have no missions", task.instance.meta);
+    // for o in &task.next_mission {
+    //     debug!("--saved instance: from:{},to:{}", task.instance.meta, o.to.meta_string());
     // }
     channel_stored(task, carrier).await;
     if need_cache {

@@ -284,7 +284,7 @@ mod test {
         };
         let rela = RelationSettings {
             selector: None,
-            executor: Some(vec![exe]),
+            executor: vec![exe],
             use_upstream_id: false,
             target_states: None,
             delay: 0,

@@ -24,6 +24,9 @@ async fn inner_batch(instances: Vec<Instance>, raw: &RawTask) -> Result<()> {
             _ => relations.clone(),
         };
         let mission = Mission::get_by_instance(&instance, &r, context_check, state_check);
+        // for o in &mission {
+        //     debug!("--generate mission from:{},to:{}", &instance.meta, o.to.meta_string());
+        // }
         let task = TaskForStore::new(instance.clone(), mission, None, meta.need_cache());
         match task.to_raw() {
             Ok(x) => {
