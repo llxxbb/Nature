@@ -60,10 +60,11 @@ async fn handle_converted(converted: ConverterReturned, task: &TaskForConvert, r
             let _ = TaskDaoImpl::update_execute_time(&raw.task_id, i64::from(delay));
         }
         ConverterReturned::LogicalError(ss) => {
+            warn!("executor returned logic err from : {}, task would be deleted", task.from.meta);
             let _ = TaskDaoImpl::raw_to_error(&NatureError::LogicalError(ss), &raw);
         }
         ConverterReturned::EnvError(e) => {
-            warn!("executor returned err: {}", e);
+            warn!("executor returned env err: {}", e);
         }
         ConverterReturned::None => {
             let _ = process_null(mission.to.get_meta_type(), &raw.task_id);

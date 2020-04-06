@@ -6,7 +6,7 @@ use crate::controller::{channel_batch, channel_store};
 use crate::task::{Converted, TaskForConvert, TaskForStore};
 
 pub async fn after_converted(task: &TaskForConvert, convert_task: &RawTask, instances: Vec<Instance>, last_state: &Option<Instance>) -> Result<()> {
-    debug!("converted {} instances for `Meta`: {:?}, from {}", instances.len(), &task.target.to.meta_string(), task.from.get_key());
+    debug!("executor returned {} instances for `Meta`: {:?}, from {}", instances.len(), &task.target.to.meta_string(), task.from.get_key());
     match Converted::gen(&task, &convert_task, instances, last_state) {
         Ok(rtn) => match rtn.converted.len() {
             0 => match TaskDaoImpl::finish_task(&convert_task.task_id) {
@@ -17,6 +17,7 @@ pub async fn after_converted(task: &TaskForConvert, convert_task: &RawTask, inst
             _ => save_batch(rtn),
         }
         Err(err) => {
+            warn!("pre-process returned instance error:{}, task would be delete", err);
             let _ = TaskDaoImpl::raw_to_error(&err, &convert_task);
             Err(err)
         }

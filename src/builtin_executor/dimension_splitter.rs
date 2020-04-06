@@ -108,7 +108,7 @@ fn make_key_and_para(keys: &Vec<&str>, k_index: &Vec<u8>, sep: &str) -> Result<(
     let mut p: Vec<&str> = vec![];
     for index in k_index {
         let index = *index as usize;
-        if index > keys.len() {
+        if index >= keys.len() {
             return Err(NatureError::VerifyError("outbound index".to_string()));
         }
         p.push(keys[index]);
@@ -134,6 +134,9 @@ fn make_key_and_para(keys: &Vec<&str>, k_index: &Vec<u8>, sep: &str) -> Result<(
 
 #[cfg(test)]
 mod test {
+    use nature_common::{Executor, Protocol};
+    use nature_db::RelationSettings;
+
     use super::*;
 
     #[test]
@@ -260,6 +263,35 @@ mod test {
         assert_eq!(json, cmp);
         let set = serde_json::from_str::<Setting>(&json).unwrap();
         assert_eq!(set.dimension_separator, "/")
+    }
+
+    #[test]
+    fn setting_json_generator() {
+        let set = Setting {
+            dimension_separator: "/".to_string(),
+            wanted_dimension: vec![
+                ("B:score/trainee/original:1".to_string(), vec![0, 1]),
+                ("B:score/subject/original:1".to_string(), vec![0, 2]),
+            ],
+        };
+        let json = serde_json::to_string(&set).unwrap();
+        let exe = Executor {
+            protocol: Protocol::BuiltIn,
+            url: "dimensionSplit".to_string(),
+            group: "".to_string(),
+            weight: 1,
+            settings: json,
+        };
+        let rela = RelationSettings {
+            selector: None,
+            executor: Some(vec![exe]),
+            use_upstream_id: false,
+            target_states: None,
+            delay: 0,
+        };
+        let json = serde_json::to_string(&rela).unwrap();
+        let _rela = serde_json::from_str::<RelationSettings>(&json).unwrap();
+        assert_eq!(json, r#"{"executor":[{"protocol":"builtIn","url":"dimensionSplit","settings":"{\"wanted_dimension\":[[\"B:score/trainee/original:1\",[0,1]],[\"B:score/subject/original:1\",[0,2]]]}"}]}"#);
     }
 
     #[test]

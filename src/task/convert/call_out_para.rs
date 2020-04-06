@@ -1,3 +1,5 @@
+use std::panic::catch_unwind;
+
 use nature_common::{ConverterParameter, ConverterReturned, Instance, Protocol};
 use nature_db::{Mission, RawTask};
 use nature_db::flow_tool::state_check;
@@ -28,7 +30,17 @@ pub async fn gen_and_call_out(task: &TaskForConvert, raw: &RawTask, mission: &Mi
         Protocol::Http => http_execute_async(&mission.executor.url, &para).await,
         Protocol::LocalRust => local_execute(&mission.executor.url, para).await,
         Protocol::BuiltIn => match BuiltIn::get(&mission.executor.url) {
-            Ok(exe) => exe(&para),
+            Ok(exe) => {
+                match catch_unwind(|| { exe(&para) }) {
+                    Ok(rtn) => {
+                        rtn
+                    }
+                    Err(e) => {
+                        warn!("{:?} return error: {:?}", mission.executor.url, e);
+                        ConverterReturned::LogicalError("executor implement error".to_string())
+                    }
+                }
+            }
             Err(_) => ConverterReturned::LogicalError("get built-in executor failed".to_string())
         }
         _ => ConverterReturned::LogicalError(format!("Did not implement for protocal : {:?}", &mission.executor.protocol)),
