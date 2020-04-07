@@ -278,20 +278,13 @@ mod test {
         let exe = Executor {
             protocol: Protocol::BuiltIn,
             url: "dimensionSplit".to_string(),
-            group: "".to_string(),
-            weight: 1,
             settings: json,
         };
-        let rela = RelationSettings {
-            selector: None,
-            executor: vec![exe],
-            use_upstream_id: false,
-            target_states: None,
-            delay: 0,
-        };
+        let mut rela = RelationSettings::default();
+        rela.executor = Some(exe);
         let json = serde_json::to_string(&rela).unwrap();
         let _rela = serde_json::from_str::<RelationSettings>(&json).unwrap();
-        assert_eq!(json, r#"{"executor":[{"protocol":"builtIn","url":"dimensionSplit","settings":"{\"wanted_dimension\":[[\"B:score/trainee/original:1\",[0,1]],[\"B:score/subject/original:1\",[0,2]]]}"}]}"#);
+        assert_eq!(json, r#"{"executor":{"protocol":"builtIn","url":"dimensionSplit","settings":"{\"wanted_dimension\":[[\"B:score/trainee/original:1\",[0,1]],[\"B:score/subject/original:1\",[0,2]]]}"}}"#);
     }
 
     #[test]

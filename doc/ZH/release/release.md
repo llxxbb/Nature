@@ -1,6 +1,15 @@
 
 # 发布的功能
 
+## Release 0.5 2020-4-6
+
+- support multi-meta output
+- add MetaSettingTemp for MetaSetting to improve the performance for multi-meta checking
+- optimize RawTask storage size
+- support built-in executor
+- add support for executor self setting
+- add builtin executor: dimensionSplit
+
 ## Release 0.4.0 2020-4-2
 
 - update actix-web to 2.0 version

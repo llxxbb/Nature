@@ -5,20 +5,16 @@
 - 功能性先于非功能性需求
 - 应用情景支持，支持内部优先支持外部（如网关）
 
-## Release 0.5
+## Release 0.6
 
-- support multi-meta output
-- add MetaSettingTemp for MetaSetting to improve the performance for multi-meta checking
-- optimize RawTask storage size
-- support built-in executor
-- add support for executor self setting
-- add builtin executor: dimensionSplit
+- multi-Executor is replaced with single-Executor for relation.
 
 ### should commit
 
 
 
 ### 未完成
+
 
 - add follower executor support for executor 
 - 文档
