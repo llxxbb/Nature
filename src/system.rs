@@ -18,17 +18,9 @@ lazy_static! {
     env::var("SERVER_PORT").unwrap_or_else(|_| "8080".to_string())
     };
 
-    // sys biz define
-    pub static ref SYS_KEY_SERIAL : String = "/serial".to_string();
-
-    pub static ref QUERY_SIZE_LIMIT : usize = {
-        env::var("QUERY_SIZE_LIMIT").unwrap_or_else(|_| "1000".to_string()).parse::<usize>().unwrap()
-    };
-
     pub static ref SWITCH_SAVE_DIRECTLY_FOR_ONE : bool = {
         env::var("SWITCH_SAVE_DIRECTLY_FOR_ONE").unwrap_or_else(|_| "true".to_string()).parse::<bool>().unwrap()
     };
-
 }
 
 pub async fn sys_init() -> std::io::Result<()> {

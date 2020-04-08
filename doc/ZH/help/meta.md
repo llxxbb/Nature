@@ -1,6 +1,6 @@
 # 使用Meta
 
-## Meta 的构成
+## Meta-String的构成
 
 `Meta` 由三部分构成：`MetaType`， `key` 和 `version` ,可以用一个由 ":" 分隔的字符串来表示。如用“B:sale/order:1” 来表示一个“订单”的 `Meta`，其中 ：
 
@@ -67,7 +67,7 @@ s1[s1-1,s1-2,s1-3|s1-4],s2|s3,s4
 pub struct MetaSetting {
     pub is_state: bool,
     pub master: Option<String>,
-    pub multi_meta: Option<MultiMetaSetting>,
+    pub multi_meta: Vec<String>,
     pub conflict_avoid: bool,
 }
 ```
@@ -76,19 +76,8 @@ pub struct MetaSetting {
 
 - master: 缺省为 None，当前`Meta`依附于指定的`Meta`。当前`Meta`的`instance`会使用`master`对应`instance`的ID。如果 `Executor` 的输入是当前 `Meta`, 则 Nature 会将其对应 `master` 的 `instance` 也一并传入。这也是 Nature 实现自动 `Executor` 魔法的依据。注意：如果 [`Relation`](relation.md) 的配置中使用了 `use_upstream_id` ，则优先使用 上游 `Instance`的ID。
 
-- multi_meta：缺省为 None，意味着 `Executor`将返回多个不同的`Meta`实例，如根据一个输入数据进行多维度统计。这可以减少大量的 `Meta` 定义和 `Executor` 定义。子`Meta`的定义由`MultiMetaSetting`结构进行说明：
-
-  ```rust
-  pub struct MultiMetaSetting {
-      pub prefix: String,
-      pub version: u32,
-      pub keys: Vec<String>,
-      pub meta_type: MetaType,
-  }
-  ```
-
-  每个子 `Meta` 由 `meta_type` + `prefix` + `keys`[i] + `version `来进行定义， 如果 `prefix` 的值为空则用父 `Meta`的 `key` 替代。
-
+- multi_meta： `Executor`可以返回多个不同的`Meta-String`对应`Meta`的实例，如根据一个输入数据进行多维度统计。这可以减少关系定义、统计扫描次数和数据的传输次数等。缺省为 None.
+  
 - conflict_avoid：缺省为 false。想象一个订单销售情况统计的场景，我们希望每分钟有一个统计任务`instance`，而每个新增订单都会产生一个统计任务，这会导致大量重复的`instance`，性能会严重性能。此时我们可以将统计任务的`Meta`的`conflict_avoid`设置为true，Nature 便会记住已经保存的统计任务一段时间，从而避免了资源的浪费，并提升了处理性能。
 
 ## 保存 `Meta`
