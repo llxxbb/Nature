@@ -21,24 +21,12 @@ lazy_static! {
     // sys biz define
     pub static ref SYS_KEY_SERIAL : String = "/serial".to_string();
 
-    pub static ref PLAN_CONTENT_MAX_LENGTH : usize = {
-        env::var("PLAN_CONTENT_MAX_LENGTH").unwrap_or_else(|_| "16777215".to_string()).parse::<usize>().unwrap()
-    };
-
-    pub static ref THREAD_NUM_FOR_STORE_ACTOR : usize = {
-        env::var("THREAD_NUM_FOR_STORE_ACTOR").unwrap_or_else(|_| "3".to_string()).parse::<usize>().unwrap()
-    };
-
-    pub static ref THREAD_NUM_FOR_STORED_ACTOR : usize = {
-        env::var("THREAD_NUM_FOR_STORED_ACTOR").unwrap_or_else(|_| "3".to_string()).parse::<usize>().unwrap()
-    };
-
-    pub static ref THREAD_NUM_FOR_CONVERT_ACTOR : usize = {
-        env::var("THREAD_NUM_FOR_CONVERT_ACTOR").unwrap_or_else(|_| "3".to_string()).parse::<usize>().unwrap()
-    };
-
     pub static ref QUERY_SIZE_LIMIT : usize = {
         env::var("QUERY_SIZE_LIMIT").unwrap_or_else(|_| "1000".to_string()).parse::<usize>().unwrap()
+    };
+
+    pub static ref SWITCH_SAVE_DIRECTLY_FOR_ONE : bool = {
+        env::var("SWITCH_SAVE_DIRECTLY_FOR_ONE").unwrap_or_else(|_| "true".to_string()).parse::<bool>().unwrap()
     };
 
 }

@@ -3,6 +3,7 @@ use nature_db::{MetaCacheImpl, MG, Mission, RawTask, RelationCacheImpl, Relation
 use nature_db::flow_tool::{context_check, state_check};
 
 use crate::controller::{channel_batch, channel_store};
+use crate::system::SWITCH_SAVE_DIRECTLY_FOR_ONE;
 use crate::task::{Converted, TaskForConvert, TaskForStore};
 
 pub async fn after_converted(task: &TaskForConvert, convert_task: &RawTask, instances: Vec<Instance>, last_state: &Option<Instance>) -> Result<()> {
@@ -13,8 +14,10 @@ pub async fn after_converted(task: &TaskForConvert, convert_task: &RawTask, inst
                 Ok(_) => Ok(()),
                 Err(e) => Err(e)
             },
-            // this can cause reentry problem, maybe a switch is ok for user decision in future.
-            // 1 => save_one(rtn, &task.target).await,
+            1 => match *SWITCH_SAVE_DIRECTLY_FOR_ONE {
+                true => save_one(rtn, &task.target).await,
+                false => save_batch(rtn).await
+            },
             _ => save_batch(rtn).await
         }
         Err(err) => {

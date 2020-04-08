@@ -1,8 +1,10 @@
 # Relation
 
+用于实现目标之间的转换，其定义存储到数据表 relation 中
+
 ## 存储 `Relation`
 
-关系数据被存储到 relation 数据表中。示例如下：
+示例如下：
 
 ```sql
 INSERT INTO relation
@@ -17,7 +19,8 @@ VALUES('B:sale/order:1', 'B:sale/orderState:1', '{"target_states":{"add":["new"]
 ```rust
 pub struct RelationSettings {
     pub selector: Option<FlowSelector>,
-    pub executor: Option<Vec<Executor>>,
+    pub executor: Option<Executor>,
+    pub filter: Vec<Executor>,
     pub use_upstream_id: bool,
     pub target_states: Option<TargetState>,
     pub delay: i32,
@@ -25,7 +28,8 @@ pub struct RelationSettings {
 ```
 
 - selector：属性用于选择符合条件的 `Instance` 进入 `Executor` 进入处理，其结构见下方 `FlowSelector`的结构说明。
-- executor：属性用于定义谁来做这个转化处理，其结构见下方 `Executor`的结构说明，之所以是数组是因为每个`执行器`可以有不同的权重。
+- executor：属性用于定义谁来做这个转化处理，其结构见下方 `Executor`的结构说明。
+- filter:在executor之后执行用于对结果进行修正。可以是多个，按给定的顺序执行。
 - use_upstream_id：新生成的 `Instance` 的 ID 将使用上游 `Instance`的 ID。
 - target_states：可以增加或删除转化后的 `Instance` 的状态，状态必须在 `Meta` 中定义过。
 - delay：本次任务需要延迟指定的秒数后执行。
@@ -34,14 +38,25 @@ pub struct RelationSettings {
 
 ```rust
 pub struct FlowSelector {
-    pub source_state_include: HashSet<String>,
-    pub source_state_exclude: HashSet<String>,
-    pub target_state_include: HashSet<String>,
-    pub target_state_exclude: HashSet<String>,
-    pub context_include: HashSet<String>,
-    pub context_exclude: HashSet<String>,
+    pub state_all: HashSet<String>,
+    pub state_any: HashSet<String>,
+    pub state_none: HashSet<String>,
+    pub context_all: HashSet<String>,
+    pub context_any: HashSet<String>,
+    pub context_none: HashSet<String>,
+    pub sys_context_all: HashSet<String>,
+    pub sys_context_any: HashSet<String>,
+    pub sys_context_none: HashSet<String>,
 }
+
 ```
+
+
+all of above are `and` relation
+
+- state_[...]：上游 `Instance` 的状态必须满足[]中的要求。
+- context_[...]：上游 `Instance` 的上下文必须满足[]中的要求。
+- sys_context_[...]：上游`Instance`的系统上下文必须满足[]中的要求。
 
 优先级
 
@@ -50,73 +65,29 @@ pub struct FlowSelector {
 /// all : means must include all
 /// any : means must include one
 ```
-all of above are `and` relation
 
-- source_state_include：上游 `Instance` 的状态中必须包含指定的状态。
-- source_state_exclude：上游 `Instance` 的状态中不能包含指定的状态。
-- target_state_include：上一版本生成的 `Instance`的状态中必须包含指定的状态。
-- target_state_exclude：上一版本生成的 `Instance`的状态中不能包含指定的状态。
-- context_include：上游`Instance` 上下文中必须包含指定的上下文。
-- context_exclude：上游`Instance` 上下文中不能包含指定的上下文。
-
-## 定义用于转化的：Executor
+### 定义用于转化的：Executor
 
 ```rust
 pub struct Executor {
     pub protocol: Protocol,
     pub url: String,
-    pub group: String,
-    pub weight: u32,
+    pub settings: String,
 }
 ```
 
-protocol： Nature 与 `Executor`间的通讯协议，目前支持下面的方式。
+**protocol**： Nature 与 `Executor`间的通讯协议，目前支持下面的方式。
 
 - Http | Https：远程调用一个`Executor`。
-
 - LocalRust：Nature 会加载一个本地 rust 库作为`Executor`
-
-- Auto：不需要显式设置此值。如果 `RelationSettings` 中没有定义`executor`属性则 Nature 会自动进行转换操作。
-
+- Auto：不能显式设置此值。服务于Nature自动创建的`Executor`
 - BuiltIn：使用Nature 内置的转换器进行转换。
 
-  
+**url**：用于定位`Executor`的位置
 
-# Executor
+**settings**:`Executor`专有的配置，由具体的`Executor`给出。
 
-`Executor` 用于实现 `Meta` 间 `Instance` 的转换，一般需要自己实现，Nature 也有内建及自动化的 `Executor` 实现。
-
-[Write a local-Executor](howto_localRustConverter.md)
-
-调用的接口形式：
-
-
-
-
-
-## 如何实现一个 `Executor`
-
-`Executor` 是面向业务的，没有技术上的难点，`Executor`会接收一个``类型的输入 you will only concern about one input-parameter : `meta`'s `instance` and generate one or more output `instance`s
-
-## static Executor (Static Orchestration)
-
-Executor Configuration must be added to `relation` table, so that it can be loaded before process `instance`s .In this way the  `relation` can be cached so it's efficient, 
-
-## dynamic-Executor (Dynamic Orchestration)
-
-You can dispatch you task at runtime for any downstream `meta` undefined. In this way you need provide `Executor` in every inputted `instance`, It would spend more time than `Static Orchestration`, but it's flexible.
-
-__Notice__ dynamic-meta can only use dynamic-Executor and only can generate dynamic-meta (see [Meta](meta.md)).
-
-
-
-```
-LOCALRUST|HTTP|HTTPS
-```
-
-### Protocol example
-
-- Http
+`Executor`的示例
 
 ```json
 {
@@ -125,8 +96,6 @@ LOCALRUST|HTTP|HTTPS
 }
 ```
 
-- LocalRust
-
 ```json
 {
     "protocol":"LocalRust",
@@ -134,7 +103,50 @@ LOCALRUST|HTTP|HTTPS
 }
 ```
 
-## Batch process
+### 对目标状态的处理及要求：TargetState
 
-can set finished context when finished stored.
+```rust
+pub struct TargetState {
+    pub add: Option<Vec<String>>,		// 在上个状态基础上增加新的状态
+    pub remove: Option<Vec<String>>,	// 从上个状态中删除指定的状态
+    pub need_all: HashSet<String>,		// 上个目标状态必须拥有指定的状态
+    pub need_any: HashSet<String>,		// 上个目标状态必须有一个或多个指定的状态
+    pub need_none: HashSet<String>,		// 上个目标状态中不能含有任何一个指定的状态
+}
+```
+
+# Executor
+
+`Executor` 用于实现 `Meta` 间 `Instance` 的转换，一般需要自己实现，Nature 也有内建及自动化的 `Executor` 实现。实现方式请参考[示例及功能讲解](https://github.com/llxxbb/Nature-Demo)。
+
+`Executor`只有一个入参和一个出参。
+
+### 入参：ConverterParameter
+
+```rust
+pub struct ConverterParameter {
+    pub from: Instance,					// 上游数据实例
+    pub last_state: Option<Instance>,	// 最近一次状态目标的数据实例
+    pub task_id: Vec<u8>,				// 此次任务ID，延时处理时回调Nature的凭据。
+    pub master: Option<Instance>,		// 上游 mater的数据实例（ID相同）
+    pub cfg: String,					// json 对象，`Executor`自有的配置。
+}
+```
+
+### 出参：
+
+```rust
+pub enum ConverterReturned {
+    LogicalError(String),				// 逻辑错误，Nature 不会重试
+    EnvError(String),					// 当前条件不满足，Nature 会在将来的某个时刻重试
+    None,								// 没有数据返回
+    Delay(u32),							// 用于延时处理，具体用法请看Demo
+    Instances(Vec<Instance>),			// 产出的目标数据实例
+    SelfRoute(Vec<SelfRouteInstance>),	// 定义动态路由
+}
+```
+
+### 动态`Executor`
+
+动态路由不需要在运行之前预先定义，既在运行时决定自己的去处，非常的灵活，每个实例可以有自己独立的选择。不过不建议使用，一是目前此功能还不完善，二是该功能性能比静态路由要差，三、业务布局的展示会比较困难。
 

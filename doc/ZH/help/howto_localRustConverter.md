@@ -9,7 +9,7 @@ Tell you how to implement a Rust Executor locally
 nature_common = {path = "../Nature-Common"}
 
 [lib]
-crate-type = ["dylib"]
+crate-type = ["cdylib"]
 ```
 
 ## lib.rs
