@@ -9,6 +9,7 @@
 
 - multi-Executor is replaced with single-Executor for relation.
 - add follower executor support for executor 
+- add r2d2 support for mysql.
 
 ### should commit
 
@@ -16,7 +17,6 @@
 
 ### 未完成
 
-- 数据库：mysql 支持 r2d2
 - 文档
   - 有关 env 配置的说明。 
   - 数据不可变，如何修正数据？ 独立做一个对中的数据！ 最终在展示层相加就可以了
