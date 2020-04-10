@@ -1,9 +1,8 @@
 use std::collections::HashMap;
 
+use dimension_splitter::dimension_split;
 /// built-in xecutor
 use nature_common::{NatureError, Result};
-
-use dimension_splitter::dimension_split;
 
 use crate::task::Execute;
 
@@ -37,7 +36,7 @@ mod test {
     #[test]
     fn get_test() {
         assert_eq!(BuiltIn::get("hello").is_err(), true);
-        let rtn = BuiltIn::get("simpleCounter");
+        let rtn = BuiltIn::get("dimensionSplit");
         assert_eq!(rtn.is_ok(), true);
     }
 }

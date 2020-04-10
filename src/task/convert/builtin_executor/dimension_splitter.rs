@@ -284,7 +284,7 @@ mod test {
         rela.executor = Some(exe);
         let json = serde_json::to_string(&rela).unwrap();
         let _rela = serde_json::from_str::<RelationSettings>(&json).unwrap();
-        assert_eq!(json, r#"{"executor":{"protocol":"builtIn","url":"dimensionSplit","settings":"{\"wanted_dimension\":[[\"B:score/trainee/original:1\",[0,1]],[\"B:score/subject/original:1\",[0,2]]]}"}}"#);
+        assert_eq!(json, r#"{"executor":[{"protocol":"builtIn","url":"dimensionSplit","settings":"{\"wanted_dimension\":[[\"B:score/trainee/original:1\",[0,1]],[\"B:score/subject/original:1\",[0,2]]]}"}]}"#);
     }
 
     #[test]

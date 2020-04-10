@@ -4,8 +4,9 @@ use nature_common::{ConverterParameter, ConverterReturned, Instance, Protocol};
 use nature_db::{Mission, RawTask};
 use nature_db::flow_tool::state_check;
 
-use crate::builtin_executor::BuiltIn;
-use crate::task::{http_execute_async, local_execute, TaskForConvert};
+use crate::task::{http_execute_async, TaskForConvert};
+use crate::task::convert::builtin_executor::BuiltIn;
+use crate::task::local_common::local_execute;
 
 pub type Execute = fn(para: &ConverterParameter) -> ConverterReturned;
 
@@ -28,7 +29,10 @@ pub async fn gen_and_call_out(task: &TaskForConvert, raw: &RawTask, mission: &Mi
     debug!("execute: from: {}, to : {}, executor: {}", task.from.meta, task.target.to.meta_string(), &mission.executor.url);
     let rtn = match &mission.executor.protocol {
         Protocol::Http => http_execute_async(&mission.executor.url, &para).await,
-        Protocol::LocalRust => local_execute(&mission.executor.url, para).await,
+        Protocol::LocalRust => match local_execute(&mission.executor.url, &para).await {
+            Ok(rtn) => rtn,
+            Err(err) => ConverterReturned::EnvError(err.to_string())
+        }
         Protocol::BuiltIn => match BuiltIn::get(&mission.executor.url) {
             Ok(exe) => {
                 match catch_unwind(|| { exe(&para) }) {

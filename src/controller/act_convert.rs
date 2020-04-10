@@ -5,6 +5,7 @@ use nature_db::{InstanceDaoImpl, MetaCacheImpl, MG, Mission, RawTask, TaskDaoImp
 
 use crate::controller::{after_converted, process_null, received_self_route};
 use crate::task::{gen_and_call_out, TaskForConvert};
+use crate::task::filter::filter_instance;
 
 pub fn channel_convert(task: TaskForConvert, raw: RawTask) -> Pin<Box<dyn Future<Output=()>>> {
     Box::pin(async move {
@@ -43,13 +44,16 @@ pub fn channel_convert(task: TaskForConvert, raw: RawTask) -> Pin<Box<dyn Future
             }
         };
         let rtn = gen_and_call_out(&task, &raw, &task.target, &last, master).await;
-        handle_converted(rtn, &task, &raw, &task.target, &last).await;
+        let _ = handle_converted(rtn, &task, &raw, &task.target, &last).await;
     })
 }
 
-async fn handle_converted(converted: ConverterReturned, task: &TaskForConvert, raw: &RawTask, mission: &Mission, last: &Option<Instance>) {
+async fn handle_converted(converted: ConverterReturned, task: &TaskForConvert, raw: &RawTask, mission: &Mission, last: &Option<Instance>) -> Result<()> {
     match converted {
-        ConverterReturned::Instances(instances) => {
+        ConverterReturned::Instances(mut instances) => {
+            if instances.len() > 0 && task.target.filter.len() > 0 {
+                filter_instance(&mut instances, &task.target.filter).await?;
+            }
             let _ = after_converted(task, &raw, instances, &last).await;
         }
         ConverterReturned::SelfRoute(ins) => {
@@ -70,6 +74,7 @@ async fn handle_converted(converted: ConverterReturned, task: &TaskForConvert, r
             let _ = process_null(mission.to.get_meta_type(), &raw.task_id);
         }
     }
+    Ok(())
 }
 
 fn init_target_id_for_sys_context(task: &TaskForConvert, raw: &RawTask, from_instance: &mut Instance) -> () {

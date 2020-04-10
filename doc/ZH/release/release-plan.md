@@ -8,6 +8,7 @@
 ## Release 0.6
 
 - multi-Executor is replaced with single-Executor for relation.
+- add follower executor support for executor 
 
 ### should commit
 
@@ -15,7 +16,7 @@
 
 ### 未完成
 
-- add follower executor support for executor 
+- 数据库：mysql 支持 r2d2
 - 文档
   - 有关 env 配置的说明。 
   - 数据不可变，如何修正数据？ 独立做一个对中的数据！ 最终在展示层相加就可以了
@@ -40,7 +41,6 @@
 
 - 执行器：使用 `min-max-heap` 来支持优先级
 - 自路由：对`执行器`返回的自路由进行支持。
-- 数据库：mysql 支持 r2d2
 - ID 生成器 snowflake for 128 bit implement.
 - 优化 task.data 的数据存储以节省空间并提升性能。如from 实例，meta 等 只保存必要的数据。
 
@@ -58,7 +58,3 @@
   - 对 《概念》画一个流程图以说明怎样生成`Instance`
 - 执行重试任务时，检测是否忙碌，如果忙碌，返回忙碌信息。
 
-## 待解决的问题
-
-Nature-Retry once_test 报错
-no such table: task

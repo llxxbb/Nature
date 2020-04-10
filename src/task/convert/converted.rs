@@ -169,6 +169,7 @@ mod test {
             target: Mission {
                 to: meta.clone(),
                 executor: Default::default(),
+                filter: vec![],
                 states_demand: None,
                 use_upstream_id: true,
                 delay: 0,
@@ -215,6 +216,7 @@ mod test {
                     m
                 },
                 executor: Default::default(),
+                filter: vec![],
                 states_demand: Some({
                     let mut sd = TargetState::default();
                     sd.add = Some(vec!["new".to_string()]);
@@ -286,6 +288,7 @@ mod check_id_test {
         let mission = Mission {
             to: meta,
             executor: Default::default(),
+            filter: vec![],
             states_demand: None,
             use_upstream_id: false,
             delay: 0,
@@ -348,6 +351,7 @@ mod check_id_test {
         let mission = Mission {
             to: meta,
             executor: Default::default(),
+            filter: vec![],
             states_demand: None,
             use_upstream_id: false,
             delay: 0,
