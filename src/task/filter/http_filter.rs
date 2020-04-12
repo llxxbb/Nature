@@ -7,7 +7,8 @@ lazy_static! {
 }
 
 pub async fn http_filter(address: &str, para: &mut Vec<Instance>) -> Result<()> {
-    match CLIENT.post(address).json(para).send().await?.json::<Vec<Instance>>().await {
+    let rtn = CLIENT.post(address).json(para).send().await?.json::<Result<Vec<Instance>>>().await?;
+    match rtn {
         Ok(o) => {
             *para = o;
             Ok(())

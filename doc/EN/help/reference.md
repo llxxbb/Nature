@@ -57,7 +57,7 @@ LOCALRUST|HTTP|HTTPS
 ```json
 {
     "protocol":"LocalRust",
-    "url":"some_lib.dll:some_converter"
+    "url":"some_lib:some_converter"
 }
 ```
 
