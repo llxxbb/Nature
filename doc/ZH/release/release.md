@@ -1,6 +1,12 @@
 
 # 发布的功能
 
+## Release 0.6 2020-4-13
+
+- multi-Executor is replaced with single-Executor for relation.
+- add follower executor support for executor 
+- add r2d2 support for mysql.
+
 ## Release 0.5 2020-4-6
 
 - support multi-meta output

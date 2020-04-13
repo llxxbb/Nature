@@ -5,11 +5,8 @@
 - 功能性先于非功能性需求
 - 应用情景支持，支持内部优先支持外部（如网关）
 
-## Release 0.6
+## Release 0.7
 
-- multi-Executor is replaced with single-Executor for relation.
-- add follower executor support for executor 
-- add r2d2 support for mysql.
 
 ### should commit
 
