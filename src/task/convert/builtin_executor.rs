@@ -3,17 +3,22 @@ use std::collections::HashMap;
 use dimension_splitter::dimension_split;
 /// built-in xecutor
 use nature_common::{NatureError, Result};
+use sum::sum;
 
 use crate::task::Execute;
 
 lazy_static! {
-    static ref CACHE: HashMap<String,&'static Execute> = {
-        info!("BuiltIn executor initialized");
-        let mut map: HashMap<String,&'static Execute> = HashMap::new();
-        let cnt : &Execute = &(dimension_split as Execute);
-        map.insert("dimensionSplit".to_string(), cnt);
-        map
-    };
+    static ref CACHE: HashMap<String,&'static Execute> = init_builtin();
+}
+
+fn init_builtin() -> HashMap<String, &'static Execute> {
+    info!("BuiltIn executor initialized");
+    let mut map: HashMap<String, &'static Execute> = HashMap::new();
+    let one: &Execute = &(dimension_split as Execute);
+    map.insert("dimensionSplit".to_string(), one);
+    let one: &Execute = &(sum as Execute);
+    map.insert("sum".to_string(), one);
+    map
 }
 
 pub struct BuiltIn;
@@ -28,6 +33,7 @@ impl BuiltIn {
 }
 
 mod dimension_splitter;
+mod sum;
 
 #[cfg(test)]
 mod test {

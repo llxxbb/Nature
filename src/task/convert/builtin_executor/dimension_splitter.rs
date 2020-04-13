@@ -3,15 +3,15 @@ use std::collections::HashMap;
 use serde::Deserialize;
 use serde_json::value::RawValue;
 
-use nature_common::{ConverterParameter, ConverterReturned, Instance, NatureError, Result};
+use nature_common::{ConverterParameter, ConverterReturned, default_para_separator, Instance, is_default_para_separator, NatureError, Result};
 
 /// Setting is a json, include the following properties:
 /// each you defined dimensions will be output as `Instance.para`
 #[derive(Serialize, Deserialize)]
 pub struct Setting {
     /// - dimension_separator: default is "/"
-    #[serde(skip_serializing_if = "is_default")]
-    #[serde(default = "default_separator")]
+    #[serde(skip_serializing_if = "is_default_para_separator")]
+    #[serde(default = "default_para_separator")]
     pub dimension_separator: String,
     /// - wanted_dimension: array of array to store dimension index. for example: [["meta-a",[1,2]],["meta-b",[1,3]]].
     pub wanted_dimension: Vec<(String, Vec<u8>)>,
@@ -29,13 +29,6 @@ struct Input<'a> {
 
 #[derive(Clone)]
 struct MiddleResult<'a>(String, Vec<Input<'a>>);
-
-pub fn default_separator() -> String { "/".to_string() }
-
-/// This is only used for serialize
-pub fn is_default(sep: &str) -> bool {
-    sep.eq("/")
-}
 
 /// Suggestion:
 /// - use-upstream-id to avoid result scatter

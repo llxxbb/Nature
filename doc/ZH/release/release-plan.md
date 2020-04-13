@@ -7,12 +7,19 @@
 
 ## Release 0.7
 
+- env setting: add default separator for para
 
 ### should commit
 
 
 
 ### 未完成
+
+
+- builtin-executor sum
+  - (ok) add to init list 
+  - define settings for input and output
+  - implement it 
 
 - 文档
   - 有关 env 配置的说明。 

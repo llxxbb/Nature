@@ -12,7 +12,6 @@ use nature_common::setup_logger;
 
 use crate::rpc::actix::*;
 
-// for product and mock
 lazy_static! {
     pub static ref SERVER_PORT:String={
     env::var("SERVER_PORT").unwrap_or_else(|_| "8080".to_string())
