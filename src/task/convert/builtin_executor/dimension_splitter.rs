@@ -9,11 +9,11 @@ use nature_common::{ConverterParameter, ConverterReturned, default_para_separato
 /// each you defined dimensions will be output as `Instance.para`
 #[derive(Serialize, Deserialize)]
 pub struct Setting {
-    /// - dimension_separator: default is "/"
+    /// default is "/"
     #[serde(skip_serializing_if = "is_default_para_separator")]
     #[serde(default = "default_para_separator")]
     pub dimension_separator: String,
-    /// - wanted_dimension: array of array to store dimension index. for example: [["meta-a",[1,2]],["meta-b",[1,3]]].
+    /// array of array to store dimension index. for example: [["meta-a",[1,2]],["meta-b",[1,3]]].
     pub wanted_dimension: Vec<(String, Vec<u8>)>,
 }
 
@@ -277,7 +277,7 @@ mod test {
         rela.executor = Some(exe);
         let json = serde_json::to_string(&rela).unwrap();
         let _rela = serde_json::from_str::<RelationSettings>(&json).unwrap();
-        assert_eq!(json, r#"{"executor":[{"protocol":"builtIn","url":"dimensionSplit","settings":"{\"wanted_dimension\":[[\"B:score/trainee/original:1\",[0,1]],[\"B:score/subject/original:1\",[0,2]]]}"}]}"#);
+        assert_eq!(json, r#"{"executor":{"protocol":"builtIn","url":"dimensionSplit","settings":"{\"wanted_dimension\":[[\"B:score/trainee/original:1\",[0,1]],[\"B:score/subject/original:1\",[0,2]]]}"}}"#);
     }
 
     #[test]

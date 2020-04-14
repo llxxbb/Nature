@@ -8,6 +8,8 @@
 ## Release 0.7
 
 - env setting: add default separator for para
+- optimise: add is_default and replace others for serializing default value 
+- incompatible change: target_states changed to target.state for relation-setting. 
 
 ### should commit
 
@@ -16,10 +18,13 @@
 ### 未完成
 
 
+- Relation Setting: add para selector (fix doc)
+
 - builtin-executor sum
   - (ok) add to init list 
   - define settings for input and output
   - implement it 
+
 
 - 文档
   - 有关 env 配置的说明。 
