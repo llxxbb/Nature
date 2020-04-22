@@ -22,7 +22,7 @@ pub struct RelationSettings {
     pub executor: Option<Executor>,
     pub filter: Vec<Executor>,
     pub use_upstream_id: bool,
-    pub target_states: Option<TargetState>,
+    pub target: RelationTarget,
     pub delay: i32,
 }
 ```
@@ -31,7 +31,7 @@ pub struct RelationSettings {
 - executor：属性用于定义谁来做这个转化处理，其结构见下方 `Executor`的结构说明。
 - filter:在executor之后执行用于对结果进行修正。可以是多个，按给定的顺序执行。
 - use_upstream_id：新生成的 `Instance` 的 ID 将使用上游 `Instance`的 ID。
-- target_states：可以增加或删除转化后的 `Instance` 的状态，状态必须在 `Meta` 中定义过。
+- target：对目标实例的一些要求，下面会有具体解释。
 - delay：本次任务需要延迟指定的秒数后执行。
 
 ### 触发转换的条件： FlowSelector
@@ -102,6 +102,19 @@ pub struct Executor {
     "url":"some_lib:some_converter"
 }
 ```
+
+### RelationTarget
+
+```
+pub struct RelationTarget {
+    pub states: Option<TargetState>,
+    pub upstream_para: Vec<u8>,
+}
+```
+
+target_states：可以增加或删除转化后的 `Instance` 的状态，状态必须在 `Meta` 中定义过。
+
+upstream_para：该属性可指导 Nature 如何生成目标实例的 `para` 属性。示例，如其值为[3,1]， 假设上游para为 “a/b/c/d”，则目标实例的 `para` 值为 “d/b”。
 
 ### 对目标状态的处理及要求：TargetState
 

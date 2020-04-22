@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use serde::Deserialize;
 use serde_json::value::RawValue;
 
-use nature_common::{ConverterParameter, ConverterReturned, default_para_separator, Instance, is_default_para_separator, NatureError, Result};
+use nature_common::{ConverterParameter, ConverterReturned, default_para_separator, Instance, is_default_para_separator, NatureError, Result, make_key_and_para};
 
 /// Setting is a json, include the following properties:
 /// each you defined dimensions will be output as `Instance.para`
@@ -94,35 +94,6 @@ fn make_content(key: String, value: &RawValue) -> Input {
         key,
         value,
     }
-}
-
-fn make_key_and_para(keys: &Vec<&str>, k_index: &Vec<u8>, sep: &str) -> Result<(String, String)> {
-    // make instance's para
-    let mut p: Vec<&str> = vec![];
-    for index in k_index {
-        let index = *index as usize;
-        if index >= keys.len() {
-            return Err(NatureError::VerifyError("outbound index".to_string()));
-        }
-        p.push(keys[index]);
-        p.push(sep);
-    }
-    let p = p[..p.len() - 1].concat();
-
-    // make key
-    let mut k: Vec<&str> = vec![];
-    for i in 0..keys.len() {
-        if k_index.contains(&(i as u8)) {
-            continue;
-        }
-        k.push(keys[i]);
-        k.push(sep);
-    }
-    let k = match k.len() {
-        0 => "".to_string(),
-        _ => k[..k.len() - 1].concat()
-    };
-    Ok((p, k))
 }
 
 #[cfg(test)]
@@ -278,15 +249,6 @@ mod test {
         let json = serde_json::to_string(&rela).unwrap();
         let _rela = serde_json::from_str::<RelationSettings>(&json).unwrap();
         assert_eq!(json, r#"{"executor":{"protocol":"builtIn","url":"dimensionSplit","settings":"{\"wanted_dimension\":[[\"B:score/trainee/original:1\",[0,1]],[\"B:score/subject/original:1\",[0,2]]]}"}}"#);
-    }
-
-    #[test]
-    fn key_para_make() {
-        let keys = vec!["a", "b", "c", "d", "e"];
-        let idx = vec![3, 1];
-        let result = make_key_and_para(&keys, &idx, "-").unwrap();
-        assert_eq!(result.0, "d-b");
-        assert_eq!(result.1, "a-c-e");
     }
 
     #[derive(Serialize)]

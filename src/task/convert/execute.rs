@@ -12,7 +12,7 @@ pub type Execute = fn(para: &ConverterParameter) -> ConverterReturned;
 
 pub async fn gen_and_call_out(task: &TaskForConvert, raw: &RawTask, mission: &Mission, last_target: &Option<Instance>, master: Option<Instance>) -> ConverterReturned {
     if let Some(ref last) = last_target {
-        if let Some(demand) = &mission.states_demand {
+        if let Some(demand) = &mission.target_demand.states {
             if !state_check(&last.states, &demand.need_none, &demand.need_all, &demand.need_any) {
                 return ConverterReturned::None;
             }

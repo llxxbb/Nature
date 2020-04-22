@@ -135,7 +135,7 @@ fn verify_state(task: &TaskForConvert, instances: &mut Vec<Instance>, last_state
         }
     };
 // set status
-    if let Some(lsd) = &task.target.states_demand {
+    if let Some(lsd) = &task.target.target_demand.states {
         ins.modify_state(lsd, &task.target.to);
     } else {
         let (_, mutex) = task.target.to.check_state(&temp_states.clone().into_iter().collect())?;
@@ -153,6 +153,7 @@ mod test {
 
     use nature_common::{Meta, MetaType, State, TargetState};
     use nature_db::Mission;
+    use nature_db::relation_target::RelationTarget;
 
     use super::*;
 
@@ -170,7 +171,7 @@ mod test {
                 to: meta.clone(),
                 executor: Default::default(),
                 filter: vec![],
-                states_demand: None,
+                target_demand: Default::default(),
                 use_upstream_id: true,
                 delay: 0,
             },
@@ -217,11 +218,14 @@ mod test {
                 },
                 executor: Default::default(),
                 filter: vec![],
-                states_demand: Some({
-                    let mut sd = TargetState::default();
-                    sd.add = Some(vec!["new".to_string()]);
-                    sd
-                }),
+                target_demand: RelationTarget {
+                    states: Some({
+                        let mut sd = TargetState::default();
+                        sd.add = Some(vec!["new".to_string()]);
+                        sd
+                    }),
+                    upstream_para: vec![],
+                },
                 use_upstream_id: false,
                 delay: 0,
             },
@@ -289,7 +293,7 @@ mod check_id_test {
             to: meta,
             executor: Default::default(),
             filter: vec![],
-            states_demand: None,
+            target_demand: Default::default(),
             use_upstream_id: false,
             delay: 0,
         };
@@ -352,7 +356,7 @@ mod check_id_test {
             to: meta,
             executor: Default::default(),
             filter: vec![],
-            states_demand: None,
+            target_demand: Default::default(),
             use_upstream_id: false,
             delay: 0,
         };
