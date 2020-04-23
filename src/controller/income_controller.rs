@@ -110,7 +110,7 @@ impl IncomeController {
 fn get_task_and_last(task: &RawTask) -> Result<(TaskForConvert, Option<Instance>)> {
     let task: TaskForConvert = TaskForConvert::from_raw(task, INS_KEY_GETTER, MCG, MG)?;
     let last = match task.target.to.is_state() {
-        true => task.from.get_last_taget(&task.target.to.meta_string(), InstanceDaoImpl::get_last_state)?,
+        true => task.from.get_last_taget(&task.target.to.meta_string(), &task.target.target_demand.upstream_para, InstanceDaoImpl::get_last_state)?,
         false => None
     };
     Ok((task, last))

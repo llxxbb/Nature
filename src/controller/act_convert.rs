@@ -17,9 +17,9 @@ pub fn channel_convert(task: TaskForConvert, raw: RawTask) -> Pin<Box<dyn Future
             init_target_id_for_sys_context(&task, &raw, &mut from_instance)
         }
         // -----end
-        let part = task.target.target_demand.upstream_para;
+        // set sys context for para
         let last = match task.target.to.is_state() {
-            true => match from_instance.get_last_taget(&task.target.to.meta_string(), InstanceDaoImpl::get_last_state) {
+            true => match from_instance.get_last_taget(&task.target.to.meta_string(), &task.target.target_demand.upstream_para, InstanceDaoImpl::get_last_state) {
                 Err(_) => { return; }
                 Ok(last) => last
             }

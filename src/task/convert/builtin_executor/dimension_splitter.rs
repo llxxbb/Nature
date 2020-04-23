@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use serde::Deserialize;
 use serde_json::value::RawValue;
 
-use nature_common::{ConverterParameter, ConverterReturned, default_para_separator, Instance, is_default_para_separator, NatureError, Result, make_key_and_para};
+use nature_common::{ConverterParameter, ConverterReturned, default_para_separator, Instance, is_default_para_separator, make_key_and_para};
 
 /// Setting is a json, include the following properties:
 /// each you defined dimensions will be output as `Instance.para`

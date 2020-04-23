@@ -13,10 +13,10 @@ struct Setting {
     need_detail: bool,
 }
 
-struct Content {
-    detail: Vec<(String, usize)>,
-    total: usize,
-}
+// struct Content {
+//     detail: Vec<(String, usize)>,
+//     total: usize,
+// }
 
 
 /// Requirement:

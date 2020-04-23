@@ -13,19 +13,13 @@
 
 ### should commit
 
-- 文档：
-  - Relation.md 
+
 
 ### 未完成
 
 - 系统上下文支持para
-- channel_convert
-- 实现 get_last_taget
-- 实现 get_para_part
-- 实现 get_task_and_last
 
 - Relation Setting: add para selector (fix doc)
-  - 转换：中获取最新的实例
   - 转换后：生成新实例
 
 - builtin-executor sum
