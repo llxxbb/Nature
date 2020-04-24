@@ -19,13 +19,16 @@
 
 - 系统上下文支持para
 
-- Relation Setting: add para selector (fix doc)
-  - 转换后：生成新实例
+- Relation Setting: add para selector
+
+
 
 - builtin-executor sum
   - (ok) add to init list 
   - define settings for input and output
   - implement it 
+
+- demo 修复relation 相关的sql 以适应 nature 0.7
 
 - 文档
   - 有关 env 配置的说明。 

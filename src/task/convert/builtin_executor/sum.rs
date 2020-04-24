@@ -1,14 +1,10 @@
 use std::collections::HashMap;
 use std::str::FromStr;
 
-use nature_common::{ConverterParameter, ConverterReturned, default_para_separator, Instance, is_default, is_default_para_separator};
+use nature_common::{ConverterParameter, ConverterReturned, get_para_and_key_from_para, Instance, is_default};
 
 #[derive(Serialize, Deserialize)]
 struct Setting {
-    /// default is "/"
-    #[serde(skip_serializing_if = "is_default_para_separator")]
-    #[serde(default = "default_para_separator")]
-    para_separator: String,
     /// array of the `para` index. for example: [2,1].
     wanted_para: Vec<u8>,
     /// new same item will cover the old one
@@ -36,8 +32,11 @@ pub fn sum(cp: &ConverterParameter) -> ConverterReturned {
         Err(err) => return ConverterReturned::LogicalError(err.to_string()),
         Ok(num) => num
     };
-    // TODO get key-para
-    let (key, para) = ("a".to_string(), "b".to_string());
+    // prepare parameter
+    let (key, para) = match get_para_and_key_from_para(&cp.from.para, &cfg.wanted_para) {
+        Ok(rtn) => rtn,
+        Err(err) => return ConverterReturned::LogicalError(err.to_string())
+    };
     // get downstream content
     let content = match &cp.last_state {
         None => new_content(num, &key),
