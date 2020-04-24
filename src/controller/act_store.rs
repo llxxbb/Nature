@@ -51,6 +51,7 @@ async fn duplicated_instance(task: TaskForStore, carrier: RawTask) -> Result<()>
         channel_stored(task, carrier.clone()).await;
         return Ok(());
     } else {
+        // TODO bug: deep conflicts will make actix-rt overflow its stack
         warn!("conflict for state-meta: [{}] on version : {}", &task.instance.meta, task.instance.state_version);
         let rtn = TaskForConvert::from_raw(&carrier, INS_KEY_GETTER, MCG, MG)?;
         channel_convert(rtn, carrier).await;

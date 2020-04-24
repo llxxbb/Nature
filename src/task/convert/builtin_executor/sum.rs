@@ -25,7 +25,10 @@ pub fn sum(cp: &ConverterParameter) -> ConverterReturned {
     // get setting
     let cfg = match serde_json::from_str::<Setting>(&cp.cfg) {
         Ok(cfg) => cfg,
-        Err(err) => return ConverterReturned::LogicalError(err.to_string())
+        Err(err) => {
+            warn!("error setting: {}", &cp.cfg);
+            return ConverterReturned::LogicalError(err.to_string());
+        }
     };
     // get upstream num
     let num = match usize::from_str(&cp.from.content) {
@@ -72,6 +75,20 @@ fn new_content(num: usize, key: &str) -> Content {
     Content {
         detail,
         total: num,
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn test_setting() {
+        let set = Setting {
+            wanted_para: vec![3, 1],
+            item_cover: false,
+        };
+        assert_eq!(serde_json::to_string(&set).unwrap(), r#"{"wanted_para":[3,1]}"#);
     }
 }
 

@@ -21,7 +21,7 @@
 
 - Relation Setting: add para selector
 
-
+- bug: deep conflicts will make actix-rt overflow its stack 
 
 - builtin-executor sum
   - (ok) add to init list 
