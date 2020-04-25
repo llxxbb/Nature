@@ -29,14 +29,10 @@ async fn do_convert(task: TaskForConvert, raw: RawTask) {
         init_target_id_for_sys_context(&task, &raw, &mut from_instance)
     }
     // -----end
-    let last = match task.target.to.is_state() {
-        true => match from_instance.get_last_taget(&task.target.to.meta_string(), &task.target.target_demand.upstream_para, InstanceDaoImpl::get_last_state) {
-            Err(_) => { return; }
-            Ok(last) => last
-        }
-        false => None
+    let last = match InstanceDaoImpl::get_last_taget(&from_instance, &task.target) {
+        Err(_) => { return; }
+        Ok(last) => last
     };
-    dbg!(&last);
     if Protocol::Auto == protocol {
         let _ = after_converted(&task, &raw, vec![Instance::default()], &last).await;
         return;
