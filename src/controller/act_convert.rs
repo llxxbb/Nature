@@ -36,6 +36,7 @@ async fn do_convert(task: TaskForConvert, raw: RawTask) {
         }
         false => None
     };
+    dbg!(&last);
     if Protocol::Auto == protocol {
         let _ = after_converted(&task, &raw, vec![Instance::default()], &last).await;
         return;

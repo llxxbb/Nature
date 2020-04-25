@@ -11,6 +11,7 @@ use crate::task::{TASK_KEY_SEPARATOR, TaskForStore};
 pub struct TaskForConvert {
     pub from: Instance,
     pub target: Mission,
+    pub conflict_version: i32,
 }
 
 impl Default for TaskForConvert {
@@ -18,6 +19,7 @@ impl Default for TaskForConvert {
         TaskForConvert {
             from: Instance::default(),
             target: Mission::default(),
+            conflict_version: 0,
         }
     }
 }
@@ -34,6 +36,7 @@ impl TaskForConvert {
             let x = TaskForConvert {
                 from,
                 target: c.clone(),
+                conflict_version: 0,
             };
             // debug!("generate convert task: from:{}, to:{},", x.from.meta, x.target.to.meta_string());
             let json = MissionRaw::from(x.target.clone()).to_json()?;
@@ -60,6 +63,7 @@ impl TaskForConvert {
                 TaskForConvert {
                     from: ins,
                     target: Mission::from_raw(&mr, mc_g, m_g)?,
+                    conflict_version: 0,
                 }
             }
         };

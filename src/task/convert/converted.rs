@@ -175,6 +175,7 @@ mod test {
                 use_upstream_id: true,
                 delay: 0,
             },
+            conflict_version: 0
         };
         let raw = RawTask {
             task_id: vec![],
@@ -229,6 +230,7 @@ mod test {
                 use_upstream_id: false,
                 delay: 0,
             },
+            conflict_version: 0
         };
         let mut ins = vec![Instance::new("test").unwrap()];
         let _ = verify_state(&task, &mut ins, &None);

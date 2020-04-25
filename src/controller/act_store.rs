@@ -2,7 +2,7 @@ use std::thread::sleep;
 use std::time::Duration;
 
 use nature_common::{NatureError, ParaForIDAndFrom, Result};
-use nature_db::{INS_KEY_GETTER, InstanceDaoImpl, MCG, MG, RawTask, TaskDaoImpl};
+use nature_db::{INS_KEY_GETTER, InstanceDaoImpl, MCG, MG, RawTask};
 
 use crate::channels::CHANNEL_CONVERT;
 use crate::controller::channel_stored;
@@ -19,9 +19,6 @@ pub async fn channel_store(task: TaskForStore, carrier: RawTask) -> Result<()> {
 async fn do_instance_save(task: TaskForStore, carrier: RawTask) -> Result<()> {
     let need_cache = task.need_cache;
     let key = &task.instance.get_unique();
-    // for o in &task.next_mission {
-    //     debug!("--saved instance: from:{},to:{}", task.instance.meta, o.to.meta_string());
-    // }
     channel_stored(task, carrier).await;
     if need_cache {
         CachedKey::set(key);
@@ -55,17 +52,9 @@ async fn duplicated_instance(task: TaskForStore, carrier: RawTask) -> Result<()>
         return Ok(());
     } else {
         warn!("conflict for state-meta: [{}] on version : {}", &task.instance.meta, task.instance.state_version);
-        // begin: check task whether finished ----------------------
-        // **Notice** this can break none-stop loop
-        let db_task = TaskDaoImpl::get(&carrier.task_id)?;
-        if let Some(db) = db_task {
-            if db.task_state == 1 {
-                return Ok(());
-            }
-        }
-        // end ---------------
         sleep(Duration::from_millis(10));
-        let rtn = TaskForConvert::from_raw(&carrier, INS_KEY_GETTER, MCG, MG)?;
+        let mut rtn = TaskForConvert::from_raw(&carrier, INS_KEY_GETTER, MCG, MG)?;
+        rtn.conflict_version = task.instance.state_version;
         CHANNEL_CONVERT.sender.lock().unwrap().send((rtn, carrier))?;
         Ok(())
     }

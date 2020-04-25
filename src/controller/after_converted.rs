@@ -14,21 +14,37 @@ pub async fn after_converted(task: &TaskForConvert, convert_task: &RawTask, inst
                 Ok(_) => Ok(()),
                 Err(e) => Err(e)
             },
-            1 => match *SWITCH_SAVE_DIRECTLY_FOR_ONE {
-                true => save_one(rtn, &task.target).await,
-                false => save_batch(rtn).await
-            },
+            1 => {
+                // break the process if loop
+                if loop_check(task, &rtn.converted[0], convert_task) { return Ok(()); }
+                match *SWITCH_SAVE_DIRECTLY_FOR_ONE {
+                    true => save_one(rtn, &task.target).await,
+                    false => save_batch(rtn).await
+                }
+            }
             _ => save_batch(rtn).await
         }
         Err(err) => {
-            warn!("pre-process returned instance error:{}, task would be delete", err);
+            warn!("pre-process returned instance error:{}, task would be moved to error table", err);
             let _ = TaskDaoImpl::raw_to_error(&err, &convert_task);
             Err(err)
         }
     }
 }
 
-pub async fn save_one(converted: Converted, previous_mission: &Mission) -> Result<()> {
+fn loop_check(task: &TaskForConvert, ins: &Instance, raw: &RawTask) -> bool {
+    if ins.state_version > 0 && ins.state_version == task.conflict_version {
+        warn!("looping for conflict: {}, task would be moved to error table", ins.get_key());
+        let err = NatureError::LogicalError("conflict looping".to_string());
+        let _ = TaskDaoImpl::raw_to_error(&err, &raw);
+        true
+    } else {
+        false
+    }
+}
+
+
+async fn save_one(converted: Converted, previous_mission: &Mission) -> Result<()> {
     let instance = &converted.converted[0];
     let relations = RelationCacheImpl::get(&instance.meta, RelationDaoImpl::get_relations, MetaCacheImpl::get, MG)?;
     let mission = Mission::get_by_instance(instance, &relations, context_check, state_check);
@@ -38,7 +54,7 @@ pub async fn save_one(converted: Converted, previous_mission: &Mission) -> Resul
     Ok(rtn)
 }
 
-pub async fn save_batch(converted: Converted) -> Result<()> {
+async fn save_batch(converted: Converted) -> Result<()> {
     let raw = RawTask::new(&converted.converted, &converted.done_task.task_key, TaskType::Batch as i8, "")?;
     let _ = TaskDaoImpl::insert(&raw)?;
     let _ = TaskDaoImpl::finish_task(&converted.done_task.task_id)?;
