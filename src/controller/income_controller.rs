@@ -89,7 +89,6 @@ impl IncomeController {
                 let rtn = TaskForConvert::from_raw(&raw, INS_KEY_GETTER, MCG, MG)?;
                 debug!("--redo convert task: from:{}, to:{}", rtn.from.meta, rtn.target.to.meta_string());
                 CHANNEL_CONVERT.sender.lock().unwrap().send((rtn, raw))?;
-                // do_convert(rtn, raw).await;
             }
             TaskType::Batch => {
                 let rtn = serde_json::from_str(&raw.data)?;
