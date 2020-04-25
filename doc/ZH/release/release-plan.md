@@ -12,12 +12,13 @@
 - incompatible change: target_states changed to target.state for relation-setting. 
 - bug fix: state instance deep conflicts when save will lead to actix-rt overflow its stack
 - bug fix: conflict and retry loop forever.
-
+- bug fix: task missing problem due to id generation has some problem
 ### should commit
 
 
 
 ### 未完成
+
 
 
 - Relation Setting: add para selector

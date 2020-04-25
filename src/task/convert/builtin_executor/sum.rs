@@ -5,8 +5,8 @@ use nature_common::{ConverterParameter, ConverterReturned, get_para_and_key_from
 
 #[derive(Serialize, Deserialize)]
 struct Setting {
-    /// array of the `para` index. for example: [2,1].
-    wanted_para: Vec<u8>,
+    /// which part of para you want to sum, the value is the index of para.
+    para_part: u8,
     /// new same item will cover the old one
     #[serde(skip_serializing_if = "is_default")]
     #[serde(default)]
@@ -36,7 +36,7 @@ pub fn sum(cp: &ConverterParameter) -> ConverterReturned {
         Ok(num) => num
     };
     // prepare parameter
-    let (key, para) = match get_para_and_key_from_para(&cp.from.para, &cfg.wanted_para) {
+    let (key, para) = match get_para_and_key_from_para(&cp.from.para, &vec![cfg.para_part]) {
         Ok(rtn) => rtn,
         Err(err) => return ConverterReturned::LogicalError(err.to_string())
     };
@@ -85,10 +85,10 @@ mod test {
     #[test]
     fn test_setting() {
         let set = Setting {
-            wanted_para: vec![3, 1],
+            para_part: 2,
             item_cover: false,
         };
-        assert_eq!(serde_json::to_string(&set).unwrap(), r#"{"wanted_para":[3,1]}"#);
+        assert_eq!(serde_json::to_string(&set).unwrap(), r#"{"para_part":2}"#);
     }
 }
 
