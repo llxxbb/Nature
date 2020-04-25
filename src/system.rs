@@ -10,6 +10,7 @@ use dotenv::dotenv;
 
 use nature_common::setup_logger;
 
+use crate::channels::start_receive_threads;
 use crate::rpc::actix::*;
 
 lazy_static! {
@@ -25,6 +26,7 @@ lazy_static! {
 pub async fn sys_init() -> std::io::Result<()> {
     dotenv().ok();
     let _ = setup_logger();
+    let _ = start_receive_threads();
     HttpServer::new(|| App::new().configure(web_config))
         .bind("127.0.0.1:".to_owned() + &SERVER_PORT).unwrap()
         .run().await

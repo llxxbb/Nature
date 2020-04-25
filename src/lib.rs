@@ -23,3 +23,4 @@ pub mod system;
 pub mod rpc;
 pub mod task;
 pub mod controller;
+pub mod channels;

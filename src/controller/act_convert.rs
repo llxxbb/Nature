@@ -1,4 +1,4 @@
-use tokio::macros::support::{Future, Pin};
+use actix_rt::Runtime;
 
 use nature_common::{CONTEXT_TARGET_INSTANCE_ID, ConverterReturned, Instance, NatureError, Protocol, Result};
 use nature_db::{InstanceDaoImpl, MetaCacheImpl, MG, Mission, RawTask, TaskDaoImpl};
@@ -7,45 +7,56 @@ use crate::controller::{after_converted, process_null, received_self_route};
 use crate::task::{gen_and_call_out, TaskForConvert};
 use crate::task::filter::filter_instance;
 
-pub fn channel_convert(task: TaskForConvert, raw: RawTask) -> Pin<Box<dyn Future<Output=()>>> {
-    Box::pin(async move {
-        // debug!("---task for convert: from:{}, to {}", task.from.meta, task.target.to.meta_string());
-        let protocol = task.target.executor.protocol.clone();
-        let mut from_instance = task.from.clone();
-        // -----begin this logic can't move to place where after converted, because it might not get the last state and cause state conflict
-        if protocol == Protocol::Auto {
-            init_target_id_for_sys_context(&task, &raw, &mut from_instance)
-        }
-        // -----end
-        let last = match task.target.to.is_state() {
-            true => match from_instance.get_last_taget(&task.target.to.meta_string(), &task.target.target_demand.upstream_para, InstanceDaoImpl::get_last_state) {
-                Err(_) => { return; }
-                Ok(last) => last
-            }
-            false => None
-        };
-        if Protocol::Auto == protocol {
-            let _ = after_converted(&task, &raw, vec![Instance::default()], &last).await;
+/// **Notice**: Can't use async under actix-rt directly, otherwise it can lead to "actix-rt overflow its stack".
+/// So changed it to traditional mpsc
+pub fn channel_convert(store: (TaskForConvert, RawTask)) {
+    let mut runtime = match Runtime::new() {
+        Ok(r) => r,
+        Err(e) => {
+            warn!("get tokio runtime error : {}", e.to_string());
             return;
         }
-        // init master
-        let meta = match MetaCacheImpl::get(&task.from.meta, MG) {
-            Ok(m) => m,
-            Err(e) => {
-                let _ = TaskDaoImpl::raw_to_error(&e, &raw);
-                return;
-            }
-        };
-        let master = match task.from.get_master(&meta, InstanceDaoImpl::get_by_id) {
-            Ok(m) => m,
-            Err(e) => {
-                let _ = TaskDaoImpl::raw_to_error(&e, &raw);
-                return;
-            }
-        };
-        let rtn = gen_and_call_out(&task, &raw, &task.target, &last, master).await;
-        let _ = handle_converted(rtn, &task, &raw, &task.target, &last).await;
-    })
+    };
+    runtime.block_on(do_convert(store.0, store.1));
+}
+
+async fn do_convert(task: TaskForConvert, raw: RawTask) {
+    // debug!("---task for convert: from:{}, to {}", task.from.meta, task.target.to.meta_string());
+    let protocol = task.target.executor.protocol.clone();
+    let mut from_instance = task.from.clone();
+    // -----begin this logic can't move to place where after converted, because it might not get the last state and cause state conflict
+    if protocol == Protocol::Auto {
+        init_target_id_for_sys_context(&task, &raw, &mut from_instance)
+    }
+    // -----end
+    let last = match task.target.to.is_state() {
+        true => match from_instance.get_last_taget(&task.target.to.meta_string(), &task.target.target_demand.upstream_para, InstanceDaoImpl::get_last_state) {
+            Err(_) => { return; }
+            Ok(last) => last
+        }
+        false => None
+    };
+    if Protocol::Auto == protocol {
+        let _ = after_converted(&task, &raw, vec![Instance::default()], &last).await;
+        return;
+    }
+    // init master
+    let meta = match MetaCacheImpl::get(&task.from.meta, MG) {
+        Ok(m) => m,
+        Err(e) => {
+            let _ = TaskDaoImpl::raw_to_error(&e, &raw);
+            return;
+        }
+    };
+    let master = match task.from.get_master(&meta, InstanceDaoImpl::get_by_id) {
+        Ok(m) => m,
+        Err(e) => {
+            let _ = TaskDaoImpl::raw_to_error(&e, &raw);
+            return;
+        }
+    };
+    let rtn = gen_and_call_out(&task, &raw, &task.target, &last, master).await;
+    let _ = handle_converted(rtn, &task, &raw, &task.target, &last).await;
 }
 
 async fn handle_converted(converted: ConverterReturned, task: &TaskForConvert, raw: &RawTask, mission: &Mission, last: &Option<Instance>) -> Result<()> {

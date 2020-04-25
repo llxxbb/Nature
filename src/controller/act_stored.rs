@@ -1,6 +1,6 @@
 use nature_db::{RawTask, TaskDaoImpl};
 
-use crate::controller::channel_convert;
+use crate::channels::CHANNEL_CONVERT;
 use crate::task::{TaskForConvert, TaskForStore};
 
 pub async fn channel_stored(task: TaskForStore, raw: RawTask) {
@@ -22,7 +22,8 @@ pub async fn channel_stored(task: TaskForStore, raw: RawTask) {
             for t in converters {
                 if t.0.target.delay == 0 {
                     // debug!("--generated convert task: from:{}, to:{}", t.0.from.meta, t.0.target.to.meta_string());
-                    channel_convert(t.0, t.1).await;
+                    let _ = CHANNEL_CONVERT.sender.lock().unwrap().send(t);
+                    // do_convert(t.0, t.1).await;
                 }
             }
         }

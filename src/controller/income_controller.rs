@@ -4,6 +4,7 @@ use nature_common::{ConverterReturned, DelayedInstances, generate_id, Instance, 
 use nature_db::{INS_KEY_GETTER, InstanceDaoImpl, MCG, MetaCacheImpl, MG, Mission, RawTask, RelationCacheImpl, RelationDaoImpl, TaskDaoImpl, TaskType};
 use nature_db::flow_tool::{context_check, state_check};
 
+use crate::channels::CHANNEL_CONVERT;
 use crate::controller::*;
 use crate::task::{TaskForConvert, TaskForStore};
 
@@ -87,7 +88,8 @@ impl IncomeController {
             TaskType::Convert => {
                 let rtn = TaskForConvert::from_raw(&raw, INS_KEY_GETTER, MCG, MG)?;
                 debug!("--redo convert task: from:{}, to:{}", rtn.from.meta, rtn.target.to.meta_string());
-                channel_convert(rtn, raw).await;
+                CHANNEL_CONVERT.sender.lock().unwrap().send((rtn, raw))?;
+                // do_convert(rtn, raw).await;
             }
             TaskType::Batch => {
                 let rtn = serde_json::from_str(&raw.data)?;

@@ -1,7 +1,8 @@
 use nature_common::{NatureError, ParaForIDAndFrom, Result};
 use nature_db::{INS_KEY_GETTER, InstanceDaoImpl, MCG, MG, RawTask};
 
-use crate::controller::{channel_convert, channel_stored};
+use crate::channels::CHANNEL_CONVERT;
+use crate::controller::channel_stored;
 use crate::task::{CachedKey, TaskForConvert, TaskForStore};
 
 pub async fn channel_store(task: TaskForStore, carrier: RawTask) -> Result<()> {
@@ -51,10 +52,10 @@ async fn duplicated_instance(task: TaskForStore, carrier: RawTask) -> Result<()>
         channel_stored(task, carrier.clone()).await;
         return Ok(());
     } else {
-        // TODO bug: deep conflicts will make actix-rt overflow its stack
         warn!("conflict for state-meta: [{}] on version : {}", &task.instance.meta, task.instance.state_version);
         let rtn = TaskForConvert::from_raw(&carrier, INS_KEY_GETTER, MCG, MG)?;
-        channel_convert(rtn, carrier).await;
+        CHANNEL_CONVERT.sender.lock().unwrap().send((rtn, carrier))?;
+        // do_convert(rtn, carrier).await;
         Ok(())
     }
 }

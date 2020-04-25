@@ -10,6 +10,7 @@
 - env setting: add default separator for para
 - optimise: add is_default and replace others for serializing default value 
 - incompatible change: target_states changed to target.state for relation-setting. 
+- bug fix: state instance deep conflicts when save will lead to actix-rt overflow its stack
 
 ### should commit
 
@@ -17,18 +18,14 @@
 
 ### 未完成
 
-- 系统上下文支持para
+- bug fix: conflict and retry loop forever.
 
 - Relation Setting: add para selector
 
-- bug: deep conflicts will make actix-rt overflow its stack 
-
 - builtin-executor sum
   - (ok) add to init list 
-  - define settings for input and output
+  - (Ok) define settings for input and output
   - implement it 
-
-- demo 修复relation 相关的sql 以适应 nature 0.7
 
 - 文档
   - 有关 env 配置的说明。 
