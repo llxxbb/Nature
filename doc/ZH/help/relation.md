@@ -20,7 +20,8 @@ VALUES('B:sale/order:1', 'B:sale/orderState:1', '{"target_states":{"add":["new"]
 pub struct RelationSettings {
     pub selector: Option<FlowSelector>,
     pub executor: Option<Executor>,
-    pub filter: Vec<Executor>,
+    pub filter_before: Vec<Executor>,
+    pub filter_after: Vec<Executor>,
     pub use_upstream_id: bool,
     pub target: RelationTarget,
     pub delay: i32,
@@ -29,7 +30,8 @@ pub struct RelationSettings {
 
 - selector：属性用于选择符合条件的 `Instance` 进入 `Executor` 进入处理，其结构见下方 `FlowSelector`的结构说明。
 - executor：属性用于定义谁来做这个转化处理，其结构见下方 `Executor`的结构说明。
-- filter:在executor之后执行用于对结果进行修正。可以是多个，按给定的顺序执行。
+- filter_before: 在executor之前执行用于对输入实例进行修正。可以是多个，按给定的顺序执行。
+- filter_after: 在executor之后执行用于对结果进行修正。可以是多个，按给定的顺序执行。
 - use_upstream_id：新生成的 `Instance` 的 ID 将使用上游 `Instance`的 ID。
 - target：对目标实例的一些要求，下面会有具体解释。
 - delay：本次任务需要延迟指定的秒数后执行。

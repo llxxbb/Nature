@@ -10,6 +10,7 @@
 - env setting: add default separator for para
 - optimise: add is_default and replace others for serializing default value 
 - incompatible change: target_states changed to target.state for relation-setting. 
+- incompatible change: original `executor.filter` will rename to `executor.filter_after`
 - bug fix: state instance deep conflicts when save will lead to actix-rt overflow its stack
 - bug fix: task missing problem due to id generation has some problem
 - bug fix: none-end loop, by add conflict version to `convert-task` to avoid it
@@ -20,6 +21,7 @@
 
 ### 未完成
 
+- add `executor.filter_before` support. 
 - optimize system context for target.id && `Meta.master`
 
 - Relation Setting: add para selector
@@ -32,6 +34,7 @@
 - 文档
   - 有关 env 配置的说明。 
   - 数据不可变，如何修正数据？ 独立做一个对中的数据！ 最终在展示层相加就可以了
+  - 内建执行器的参考文档
 
 - 执行器可设置系统上下文，以定义下一个执行器的延迟时间。这个时间可以覆盖`关系`中预定义的`延迟时间`
 - `Relation`文档补全(完成统计Demo 回过头来写会更好)

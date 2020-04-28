@@ -170,12 +170,12 @@ mod test {
             target: Mission {
                 to: meta.clone(),
                 executor: Default::default(),
-                filter: vec![],
+                filter_after: vec![],
                 target_demand: Default::default(),
                 use_upstream_id: true,
                 delay: 0,
             },
-            conflict_version: 0
+            conflict_version: 0,
         };
         let raw = RawTask {
             task_id: vec![],
@@ -218,7 +218,7 @@ mod test {
                     m
                 },
                 executor: Default::default(),
-                filter: vec![],
+                filter_after: vec![],
                 target_demand: RelationTarget {
                     states: Some({
                         let mut sd = TargetState::default();
@@ -230,7 +230,7 @@ mod test {
                 use_upstream_id: false,
                 delay: 0,
             },
-            conflict_version: 0
+            conflict_version: 0,
         };
         let mut ins = vec![Instance::new("test").unwrap()];
         let _ = verify_state(&task, &mut ins, &None);
@@ -294,7 +294,7 @@ mod check_id_test {
         let mission = Mission {
             to: meta,
             executor: Default::default(),
-            filter: vec![],
+            filter_after: vec![],
             target_demand: Default::default(),
             use_upstream_id: false,
             delay: 0,
@@ -357,7 +357,7 @@ mod check_id_test {
         let mission = Mission {
             to: meta,
             executor: Default::default(),
-            filter: vec![],
+            filter_after: vec![],
             target_demand: Default::default(),
             use_upstream_id: false,
             delay: 0,

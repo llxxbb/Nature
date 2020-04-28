@@ -1,13 +1,13 @@
-use http_filter::http_filter;
+use http_filter_after::http_filter_after;
 use nature_common::{Executor, Instance, NatureError, Protocol, Result};
 
 use crate::task::local_common::local_execute;
 
-pub async fn filter_instance(para: &mut Vec<Instance>, filter: &Vec<Executor>) -> Result<()> {
+pub async fn filter_after(para: &mut Vec<Instance>, filter: &Vec<Executor>) -> Result<()> {
     for f in filter {
         match f.protocol {
             Protocol::Http => {
-                let _ = http_filter(&f.url, para).await;
+                let _ = http_filter_after(&f.url, para).await;
             }
             Protocol::LocalRust => {
                 match local_execute(&f.url, para).await {
@@ -24,4 +24,4 @@ pub async fn filter_instance(para: &mut Vec<Instance>, filter: &Vec<Executor>) -
     Ok(())
 }
 
-mod http_filter;
+mod http_filter_after;
