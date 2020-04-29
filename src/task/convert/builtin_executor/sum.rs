@@ -10,7 +10,7 @@ struct Setting {
     /// new same item will cover the old one
     #[serde(skip_serializing_if = "is_default")]
     #[serde(default)]
-    item_cover: bool,
+    write_over: bool,
 }
 
 #[derive(Deserialize, Serialize)]
@@ -21,27 +21,27 @@ struct Content {
 
 /// items can't be repeated
 /// detail always save due to recognize the repeated item.
-pub fn sum(cp: &ConverterParameter) -> ConverterReturned {
+pub fn sum(input: &ConverterParameter) -> ConverterReturned {
     // get setting
-    let cfg = match serde_json::from_str::<Setting>(&cp.cfg) {
+    let cfg = match serde_json::from_str::<Setting>(&input.cfg) {
         Ok(cfg) => cfg,
         Err(err) => {
-            warn!("error setting: {}", &cp.cfg);
+            warn!("error setting: {}", &input.cfg);
             return ConverterReturned::LogicalError(err.to_string());
         }
     };
     // get upstream num
-    let num = match usize::from_str(&cp.from.content) {
+    let num = match usize::from_str(&input.from.content) {
         Err(err) => return ConverterReturned::LogicalError(err.to_string()),
         Ok(num) => num
     };
     // prepare parameter
-    let (key, para) = match get_para_and_key_from_para(&cp.from.para, &vec![cfg.para_part]) {
+    let (key, para) = match get_para_and_key_from_para(&input.from.para, &vec![cfg.para_part]) {
         Ok(rtn) => rtn,
         Err(err) => return ConverterReturned::LogicalError(err.to_string())
     };
     // get downstream content
-    let content = match &cp.last_state {
+    let content = match &input.last_state {
         None => new_content(num, &key),
         Some(o_i) => {
             let mut content = match serde_json::from_str::<Content>(&o_i.content) {
@@ -50,9 +50,11 @@ pub fn sum(cp: &ConverterParameter) -> ConverterReturned {
             };
             match content.detail.insert(key.to_string(), num) {
                 None => { content.total += num; }
-                Some(o_v) => match cfg.item_cover {
-                    true => (),
-                    false => { content.detail.insert(key, o_v); }
+                Some(o_v) => {
+                    match cfg.write_over {
+                        true => content.total += num - o_v,
+                        false => { content.detail.insert(key, o_v); }
+                    }
                 }
             }
             content
@@ -65,7 +67,7 @@ pub fn sum(cp: &ConverterParameter) -> ConverterReturned {
         Err(err) => return ConverterReturned::LogicalError(err.to_string())
     };
     ins.para = para;
-    ins.id = cp.from.id;
+    ins.id = input.from.id;
     ConverterReturned::Instances(vec![ins])
 }
 
@@ -79,16 +81,133 @@ fn new_content(num: usize, key: &str) -> Content {
 }
 
 #[cfg(test)]
-mod test {
+mod sum_setting_test {
     use super::*;
 
     #[test]
-    fn test_setting() {
+    fn para_part() {
         let set = Setting {
             para_part: 2,
-            item_cover: false,
+            write_over: false,
         };
         assert_eq!(serde_json::to_string(&set).unwrap(), r#"{"para_part":2}"#);
+    }
+
+    #[test]
+    fn write_over() {
+        let set = Setting {
+            para_part: 2,
+            write_over: true,
+        };
+        assert_eq!(serde_json::to_string(&set).unwrap(), r#"{"para_part":2,"write_over":true}"#);
+    }
+}
+
+#[cfg(test)]
+mod sum_test {
+    use super::*;
+
+    #[test]
+    fn input_nothing() {
+        let input = ConverterParameter {
+            from: Default::default(),
+            last_state: None,
+            task_id: vec![],
+            master: None,
+            cfg: "".to_string(),
+        };
+        if let ConverterReturned::LogicalError(e) = sum(&input) {
+            assert_eq!(e, "EOF while parsing a value at line 1 column 0");
+        } else {
+            panic!("return error result");
+        }
+    }
+
+    #[test]
+    fn normal() {
+        // one input
+        let mut from = Instance::default();
+        from.data.content = "5".to_string();
+        from.para = "a/b/c".to_string();
+        let input = ConverterParameter {
+            from,
+            last_state: None,
+            task_id: vec![],
+            master: None,
+            cfg: r#"{"para_part":1}"#.to_string(),
+        };
+        let last = if let ConverterReturned::Instances(rtn) = sum(&input) {
+            let rtn = &rtn[0];
+            assert_eq!(rtn.para, "a/c");
+            assert_eq!(rtn.content, r#"{"detail":{"b":5},"total":5}"#);
+            rtn.clone()
+        } else {
+            panic!("return error result");
+        };
+
+        // another input
+        let mut from = Instance::default();
+        from.data.content = "6".to_string();
+        from.para = "a/e/c".to_string();
+        let input = ConverterParameter {
+            from,
+            last_state: Some(last.clone()),
+            task_id: vec![],
+            master: None,
+            cfg: r#"{"para_part":1}"#.to_string(),
+        };
+        let last = if let ConverterReturned::Instances(rtn) = sum(&input) {
+            let rtn = &rtn[0];
+            assert_eq!(rtn.para, "a/c");
+            dbg!(&rtn.content);
+            assert!(rtn.content.contains(r#""total":11"#));
+            rtn.clone()
+        } else {
+            panic!("return error result");
+        };
+
+        // repeat should not cover the old
+        let mut from = Instance::default();
+        from.data.content = "7".to_string();
+        from.para = "a/e/c".to_string();
+        let input = ConverterParameter {
+            from,
+            last_state: Some(last.clone()),
+            task_id: vec![],
+            master: None,
+            cfg: r#"{"para_part":1}"#.to_string(),
+        };
+        let last = if let ConverterReturned::Instances(rtn) = sum(&input) {
+            let rtn = &rtn[0];
+            assert_eq!(rtn.para, "a/c");
+            dbg!(&rtn.content);
+            assert!(rtn.content.contains(r#""e":6"#));
+            assert!(rtn.content.contains(r#""total":11"#));
+            rtn.clone()
+        } else {
+            panic!("return error result");
+        };
+
+        // repeat should over write the old
+        let mut from = Instance::default();
+        from.data.content = "7".to_string();
+        from.para = "a/e/c".to_string();
+        let input = ConverterParameter {
+            from,
+            last_state: Some(last.clone()),
+            task_id: vec![],
+            master: None,
+            cfg: r#"{"para_part":1,"write_over":true}"#.to_string(),
+        };
+        if let ConverterReturned::Instances(rtn) = sum(&input) {
+            let rtn = &rtn[0];
+            assert_eq!(rtn.para, "a/c");
+            dbg!(&rtn.content);
+            assert!(rtn.content.contains(r#""e":7"#));
+            assert!(rtn.content.contains(r#""total":12"#));
+        } else {
+            panic!("return error result");
+        };
     }
 }
 

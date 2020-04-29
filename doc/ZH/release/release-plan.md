@@ -7,6 +7,8 @@
 
 ## Release 0.7
 
+- builtin-executor sum
+- Relation Setting: add `target.upstream_para` support
 - incompatible change: target_states changed to target.state for relation-setting. 
 - incompatible change: original `executor.filter` will rename to `executor.filter_after`
 - add `executor.filter_before` support.
@@ -20,16 +22,6 @@
 
 
 ### 未完成
-
- 
-- optimize system context for target.id && `Meta.master`
-
-- Relation Setting: add para selector
-
-- builtin-executor sum
-  - (ok) add to init list 
-  - (Ok) define settings for input and output
-  - implement it 
 
 - 文档
   - 有关 env 配置的说明。 
