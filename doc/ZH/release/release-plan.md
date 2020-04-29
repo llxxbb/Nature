@@ -7,10 +7,9 @@
 
 ## Release 0.7
 
-- env setting: add default separator for para
-- optimise: add is_default and replace others for serializing default value 
 - incompatible change: target_states changed to target.state for relation-setting. 
 - incompatible change: original `executor.filter` will rename to `executor.filter_after`
+- add `executor.filter_before` support.
 - bug fix: state instance deep conflicts when save will lead to actix-rt overflow its stack
 - bug fix: task missing problem due to id generation has some problem
 - bug fix: none-end loop, by add conflict version to `convert-task` to avoid it
@@ -22,7 +21,7 @@
 
 ### 未完成
 
-- add `executor.filter_before` support. 
+ 
 - optimize system context for target.id && `Meta.master`
 
 - Relation Setting: add para selector

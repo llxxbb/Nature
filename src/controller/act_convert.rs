@@ -63,9 +63,7 @@ async fn do_convert(task: TaskForConvert, raw: RawTask) {
 async fn handle_converted(converted: ConverterReturned, task: &TaskForConvert, raw: &RawTask, mission: &Mission, last: &Option<Instance>) -> Result<()> {
     match converted {
         ConverterReturned::Instances(mut instances) => {
-            if instances.len() > 0 && task.target.filter_after.len() > 0 {
-                filter(&mut instances, &task.target.filter_after).await?;
-            }
+            filter(&mut instances, &task.target.filter_after).await?;
             after_converted(task, &raw, instances, &last).await?;
         }
         ConverterReturned::SelfRoute(ins) => {

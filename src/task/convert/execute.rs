@@ -1,11 +1,12 @@
 use std::panic::catch_unwind;
 
-use nature_common::{ConverterParameter, ConverterReturned, Instance, Protocol};
+use nature_common::{ConverterParameter, ConverterReturned, Instance, NatureError, Protocol};
 use nature_db::{Mission, RawTask};
 use nature_db::flow_tool::state_check;
 
 use crate::task::{http_execute_async, TaskForConvert};
 use crate::task::convert::builtin_executor::BuiltIn;
+use crate::task::filter::filter;
 use crate::task::local_common::local_execute;
 
 pub type Execute = fn(para: &ConverterParameter) -> ConverterReturned;
@@ -18,9 +19,14 @@ pub async fn gen_and_call_out(task: &TaskForConvert, raw: &RawTask, mission: &Mi
             }
         }
     };
-
+    let mut from = task.from.clone();
+    match filter(&mut from, &task.target.filter_before).await {
+        Err(NatureError::EnvironmentError(e)) => return ConverterReturned::EnvError(e),
+        Err(e) => return ConverterReturned::LogicalError(e.to_string()),
+        _ => ()
+    };
     let para = ConverterParameter {
-        from: task.from.clone(),
+        from,
         last_state: last_target.clone(),
         task_id: raw.task_id.clone(),
         master,
