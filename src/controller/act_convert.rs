@@ -5,7 +5,7 @@ use nature_db::{InstanceDaoImpl, MetaCacheImpl, MG, Mission, RawTask, TaskDaoImp
 
 use crate::controller::{after_converted, process_null, received_self_route};
 use crate::task::{gen_and_call_out, TaskForConvert};
-use crate::task::filter::filter_after;
+use crate::task::filter::filter;
 
 /// **Notice**: Can't use async under actix-rt directly, otherwise it can lead to "actix-rt overflow its stack".
 /// So changed it to traditional mpsc
@@ -64,7 +64,7 @@ async fn handle_converted(converted: ConverterReturned, task: &TaskForConvert, r
     match converted {
         ConverterReturned::Instances(mut instances) => {
             if instances.len() > 0 && task.target.filter_after.len() > 0 {
-                filter_after(&mut instances, &task.target.filter_after).await?;
+                filter(&mut instances, &task.target.filter_after).await?;
             }
             after_converted(task, &raw, instances, &last).await?;
         }
