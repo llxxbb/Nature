@@ -53,7 +53,11 @@ async fn do_convert(task: TaskForConvert, raw: RawTask) {
         }
     };
     let rtn = gen_and_call_out(&task, &raw, &task.target, &last, master).await;
-    let _ = handle_converted(rtn, &task, &raw, &task.target, &last).await;
+    match handle_converted(rtn, &task, &raw, &task.target, &last).await {
+        Ok(()) => (),
+        Err(NatureError::EnvironmentError(msg)) => warn!("{}", msg.to_string()),
+        Err(e) => { let _ = TaskDaoImpl::raw_to_error(&e, &raw); }
+    }
 }
 
 async fn handle_converted(converted: ConverterReturned, task: &TaskForConvert, raw: &RawTask, mission: &Mission, last: &Option<Instance>) -> Result<()> {
@@ -62,7 +66,7 @@ async fn handle_converted(converted: ConverterReturned, task: &TaskForConvert, r
             if instances.len() > 0 && task.target.filter_after.len() > 0 {
                 filter_after(&mut instances, &task.target.filter_after).await?;
             }
-            let _ = after_converted(task, &raw, instances, &last).await;
+            after_converted(task, &raw, instances, &last).await?;
         }
         ConverterReturned::SelfRoute(ins) => {
             let _ = received_self_route(task, &raw, ins);

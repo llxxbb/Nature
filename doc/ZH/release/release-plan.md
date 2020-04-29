@@ -14,6 +14,7 @@
 - bug fix: state instance deep conflicts when save will lead to actix-rt overflow its stack
 - bug fix: task missing problem due to id generation has some problem
 - bug fix: none-end loop, by add conflict version to `convert-task` to avoid it
+- bug fix: should break process when filter_after run into error;
 
 ### should commit
 

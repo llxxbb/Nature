@@ -170,6 +170,7 @@ mod test {
             target: Mission {
                 to: meta.clone(),
                 executor: Default::default(),
+                filter_before: vec![],
                 filter_after: vec![],
                 target_demand: Default::default(),
                 use_upstream_id: true,
@@ -218,6 +219,7 @@ mod test {
                     m
                 },
                 executor: Default::default(),
+                filter_before: vec![],
                 filter_after: vec![],
                 target_demand: RelationTarget {
                     states: Some({
@@ -294,6 +296,7 @@ mod check_id_test {
         let mission = Mission {
             to: meta,
             executor: Default::default(),
+            filter_before: vec![],
             filter_after: vec![],
             target_demand: Default::default(),
             use_upstream_id: false,
@@ -357,6 +360,7 @@ mod check_id_test {
         let mission = Mission {
             to: meta,
             executor: Default::default(),
+            filter_before: vec![],
             filter_after: vec![],
             target_demand: Default::default(),
             use_upstream_id: false,
