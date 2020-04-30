@@ -5,17 +5,7 @@
 - 功能性先于非功能性需求
 - 应用情景支持，支持内部优先支持外部（如网关）
 
-## Release 0.7
-
-- builtin-executor sum
-- Relation Setting: add `target.upstream_para` support
-- incompatible change: target_states changed to target.state for relation-setting. 
-- incompatible change: original `executor.filter` will rename to `executor.filter_after`
-- add `executor.filter_before` support.
-- bug fix: state instance deep conflicts when save will lead to actix-rt overflow its stack
-- bug fix: task missing problem due to id generation has some problem
-- bug fix: none-end loop, by add conflict version to `convert-task` to avoid it
-- bug fix: should break process when filter_after run into error;
+## Release 0.8
 
 ### should commit
 
