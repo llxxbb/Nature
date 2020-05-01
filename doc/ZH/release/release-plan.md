@@ -8,14 +8,16 @@
 ## Release 0.8
 
 - incompatible change: `conflict_avoid` rename to `cache_saved` 
+- builtin executor: timer
 
 ### should commit
 
 
 ### 未完成
 
+- remove Instance.execute_time
 
-- builtin executor: timer
+- demo: 销量统计， 使用 builtin-executor sum_allow_repeat
 
 - 文档
   - 有关 env 配置的说明。 
