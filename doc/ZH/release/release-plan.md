@@ -50,6 +50,7 @@
 - 优化 task.data 的数据存储以节省空间并提升性能。如from 实例，meta 等 只保存必要的数据。
 - builtin-executor sum :
   - for stream sum
+- builtin executor timer : support week, month and year 
 
 ## Release 1.2.0
 
