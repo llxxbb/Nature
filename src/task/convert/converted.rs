@@ -290,7 +290,7 @@ mod check_id_test {
             is_state: true,
             master: Some("another".to_string()),
             multi_meta: Default::default(),
-            conflict_avoid: false,
+            cache_saved: false,
         };
         let _ = meta.set_setting(&setting.to_json().unwrap());
         let mission = Mission {
@@ -353,7 +353,7 @@ mod check_id_test {
             is_state: true,
             master: Some("from".to_string()),
             multi_meta: Default::default(),
-            conflict_avoid: false,
+            cache_saved: false,
         };
         let ss = setting.to_json().unwrap();
         let _sr = meta.set_setting(&ss);

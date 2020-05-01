@@ -68,7 +68,7 @@ pub struct MetaSetting {
     pub is_state: bool,
     pub master: Option<String>,
     pub multi_meta: Vec<String>,
-    pub conflict_avoid: bool,
+    pub cache_saved: bool,
 }
 ```
 
@@ -78,7 +78,7 @@ pub struct MetaSetting {
 
 - multi_meta： `Executor`可以返回多个不同的`Meta-String`对应`Meta`的实例，如根据一个输入数据进行多维度统计。这可以减少关系定义、统计扫描次数和数据的传输次数等。缺省为 None.
   
-- conflict_avoid：缺省为 false。想象一个订单销售情况统计的场景，我们希望每分钟有一个统计任务`instance`，而每个新增订单都会产生一个统计任务，这会导致大量重复的`instance`，性能会严重性能。此时我们可以将统计任务的`Meta`的`conflict_avoid`设置为true，Nature 便会记住已经保存的统计任务一段时间，从而避免了资源的浪费，并提升了处理性能。
+- cache_saved：缺省为 false。为 true 则将生成的实例缓存一段时间，对于短时间内生成相同实例的情况(如生成一个定时器实例)能够显著提升性能。
 
 ## 保存 `Meta`
 
