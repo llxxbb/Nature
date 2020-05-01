@@ -2,9 +2,10 @@ use std::sync::Mutex;
 use std::time::Duration;
 
 use lru_time_cache::LruCache;
+use crate::system::CACHE_SAVED_TIME;
 
 lazy_static! {
-    static ref CACHE: Mutex<LruCache<String, u32>> = Mutex::new(LruCache::<String, u32>::with_expiry_duration(Duration::from_secs(360)));
+    static ref CACHE: Mutex<LruCache<String, u32>> = Mutex::new(LruCache::<String, u32>::with_expiry_duration(Duration::from_secs(*CACHE_SAVED_TIME)));
 }
 
 /// used to avoid save conflict

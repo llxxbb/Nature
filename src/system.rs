@@ -21,6 +21,10 @@ lazy_static! {
     pub static ref SWITCH_SAVE_DIRECTLY_FOR_ONE : bool = {
         env::var("SWITCH_SAVE_DIRECTLY_FOR_ONE").unwrap_or_else(|_| "true".to_string()).parse::<bool>().unwrap()
     };
+
+    pub static ref CACHE_SAVED_TIME : u64 = {
+        env::var("CACHE_SAVED_TIME").unwrap_or_else(|_| "90".to_string()).parse::<u64>().unwrap()
+    };
 }
 
 pub async fn sys_init() -> std::io::Result<()> {
