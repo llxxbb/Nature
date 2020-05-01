@@ -1,4 +1,6 @@
-use chrono::{Datelike, Local, NaiveDateTime, Timelike, TimeZone};
+use std::ops::Sub;
+
+use chrono::{Datelike, Duration, Local, NaiveDateTime, Timelike, TimeZone};
 
 use nature_common::{ConverterParameter, ConverterReturned, Instance, is_default, NatureError, Result};
 
@@ -9,7 +11,11 @@ struct Setting {
     #[serde(default = "string_s")]
     unit: String,
     /// When unit is s,m,h,d the value great than 1, it mean interval
-    /// When unit is w,M,y the value mean offset. It could be negative, means offset from the end. 0 is the first day of the unit.
+    /// When unit is w,M,y the value mean offset. It could be negative, means offset from the end.
+    /// - 0 is the first day of the unit.
+    /// - week : value must in [-7, 6]
+    /// - month : value must in [-20, 19]
+    /// - year : value must in [-200, 199]
     #[serde(skip_serializing_if = "is_default")]
     #[serde(default)]
     value: i16,
@@ -29,7 +35,8 @@ impl Setting {
             "m" => ins_time - time.second() as i64 * SECOND - time.timestamp_subsec_millis() as i64,
             "h" => ins_time - time.minute() as i64 * MINUTE - time.second() as i64 * SECOND - time.timestamp_subsec_millis() as i64,
             "d" => ins_time - time.hour() as i64 * HOUR - time.minute() as i64 * MINUTE - time.second() as i64 * SECOND - time.timestamp_subsec_millis() as i64,
-            "w" => return self.get_week(ins_time, &time),
+            "w" => return self.get_week(&time),
+            "M" => return self.get_month(&time),
             _ => {
                 let err = format!("timer setting error: unknown unit '{}'", self.unit);
                 return Err(NatureError::LogicalError(err));
@@ -64,7 +71,7 @@ impl Setting {
         Ok(rtn)
     }
 
-    fn get_week(&self, real: i64, nd: &NaiveDateTime) -> Result<i64> {
+    fn get_week(&self, nd: &NaiveDateTime) -> Result<i64> {
         if self.value > 6 || self.value < -7 {
             return Err(NatureError::LogicalError("value must in [-7,6]".to_string()));
         }
@@ -73,29 +80,35 @@ impl Setting {
         if value < 0 {
             value += 7
         }
-        let diff_day = if value < offset {
+        let diff_day = if value <= offset {
             offset - value
         } else {
             7 - value + offset
         };
-        let rtn = real - diff_day as i64 * DAY - nd.hour() as i64 * HOUR - nd.minute() as i64 * MINUTE - nd.second() as i64 * SECOND - nd.timestamp_subsec_millis() as i64;
+        let rtn = Local.ymd(nd.year(), nd.month(), nd.day()).sub(Duration::days(diff_day as i64)).and_hms(0, 0, 0).timestamp_millis();
         Ok(rtn)
     }
 
-    // fn get_month(&self, real: i64, nd: &NaiveDateTime) -> Result<i64> {
-    //     let offset = nd.day0();
-    //     let mut value = self.value;
-    //     if value < 0 {
-    //         value += nd.m
-    //     }
-    //     let diff_day = if value < offset {
-    //         offset - value
-    //     } else {
-    //         7 - value + offset
-    //     };
-    //     let rtn = real - diff_day as i64 * DAY - nd.hour() as i64 * HOUR - nd.minute() as i64 * MINUTE - nd.second() as i64 * SECOND - nd.timestamp_subsec_millis() as i64;
-    //     Ok(rtn)
-    // }
+    fn get_month(&self, nd: &NaiveDateTime) -> Result<i64> {
+        // check value
+        if self.value > 19 || self.value < -20 {
+            return Err(NatureError::LogicalError("the `value` must in [-20,19]".to_string()));
+        }
+        let offset = nd.day0() as i16;
+        let this_month = Local.ymd(nd.year(), nd.month(), 1);
+        let mut value = self.value;
+        if value < 0 {
+            let next_month = Local.ymd(nd.year(), nd.month() + 1, 1);
+            let days = next_month.sub(this_month).num_days();
+            value += days as i16;
+        }
+        let rtn = if value <= offset {
+            Local.ymd(nd.year(), nd.month(), (value + 1) as u32).and_hms(0, 0, 0).timestamp_millis()
+        } else {
+            this_month.sub(Duration::days(-self.value as i64)).and_hms(0, 0, 0).timestamp_millis()
+        };
+        Ok(rtn)
+    }
 }
 
 
@@ -250,6 +263,34 @@ mod timer_setting_test {
         setting.value = -8;
         let rtn = setting.get_time(time);
         assert!(rtn.is_err());
+    }
+
+    #[test]
+    fn month_test() {
+        // the `value` is positive and before the real time
+        let time = Local.ymd(2020, 5, 28).and_hms_milli(18, 36, 23, 123).timestamp_millis();
+        let mut setting = Setting {
+            unit: "M".to_string(),
+            value: 0,
+        };
+        let rtn = setting.get_time(time).unwrap();
+        let cmp = Local.ymd(2020, 5, 1).and_hms(0, 0, 0).timestamp_millis();
+        assert_eq!(rtn, cmp);
+        // the `value` is positive and after the real time
+        setting.value = 6;
+        let rtn = setting.get_time(time).unwrap();
+        let cmp = Local.ymd(2020, 5, 7).and_hms(0, 0, 0).timestamp_millis();
+        assert_eq!(rtn, cmp);
+        // the `value` is negative and before the real time
+        setting.value = -5;
+        let rtn = setting.get_time(time).unwrap();
+        let cmp = Local.ymd(2020, 5, 27).and_hms(0, 0, 0).timestamp_millis();
+        assert_eq!(rtn, cmp);
+        // the `value` is negative and after the real time
+        setting.value = -1;
+        let rtn = setting.get_time(time).unwrap();
+        let cmp = Local.ymd(2020, 4, 30).and_hms(0, 0, 0).timestamp_millis();
+        assert_eq!(rtn, cmp);
     }
 }
 

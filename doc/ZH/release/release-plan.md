@@ -16,6 +16,7 @@
 ### 未完成
 
 - remove Instance.execute_time
+- add `RelationSetting.delay_on_timer`
 
 - demo: 销量统计， 使用 builtin-executor sum_allow_repeat
 
@@ -30,12 +31,11 @@
 
 ## Release 1.0.0
 
-
 - 行使网关只能，充当所以业务系统的入口。
   - 查询外系统接口：queryThird
   - Demo : 获取平均分（）
 - 读取优化
-  - Executor 支持内置缓存
+  - Executor 支持内置缓存 适用于网关
   - 提供一致性哈希，以分散缓存的压力
 
 - 支持第三方插件
@@ -47,12 +47,10 @@
 - 执行器：使用 `min-max-heap` 来支持优先级
 - 自路由：对`执行器`返回的自路由进行支持。
 - ID 生成器 snowflake for 128 bit implement.
-- 优化 task.data 的数据存储以节省空间并提升性能。如from 实例，meta 等 只保存必要的数据。
 - builtin-executor sum :
   - for stream sum
-- builtin executor timer : support week, month and year 
 
-## Release 1.2.0
+## Release 2.0
 
 - 提供后台管理界面
   - 更新配置时能够更新多个实例上的缓存
