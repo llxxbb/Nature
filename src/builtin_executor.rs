@@ -5,7 +5,7 @@ use dimension_splitter::dimension_split;
 use nature_common::{NatureError, Result};
 use sum::sum;
 use sum_allow_repeat::sum_allow_repeat;
-use timer::time_range;
+use time_range::time_range;
 
 use crate::task::Execute;
 
@@ -41,7 +41,7 @@ impl BuiltIn {
 mod dimension_splitter;
 mod sum;
 mod sum_allow_repeat;
-mod timer;
+mod time_range;
 
 #[cfg(test)]
 mod test {

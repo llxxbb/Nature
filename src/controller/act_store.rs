@@ -18,7 +18,7 @@ pub async fn channel_store(task: TaskForStore, carrier: RawTask) -> Result<()> {
 
 async fn do_instance_save(task: TaskForStore, carrier: RawTask) -> Result<()> {
     let need_cache = task.need_cache;
-    let key = &task.instance.get_unique();
+    let key = &task.instance.get_key();
     channel_stored(task, carrier).await;
     if need_cache {
         CachedKey::set(key);

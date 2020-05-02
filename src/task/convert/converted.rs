@@ -12,17 +12,11 @@ pub struct Converted {
 
 impl Converted {
     pub fn gen(task: &TaskForConvert, convert_task: &RawTask, instances: Vec<Instance>, last_state: &Option<Instance>) -> Result<Converted> {
-
-        // filter from cache
-        let mut instances: Vec<Instance> = if task.check_cache() {
-            instances.into_iter().filter(|one| !CachedKey::get(&one.get_unique())).collect()
-        } else {
-            instances
-        };
-
         if instances.is_empty() {
             return Ok(converted_none(convert_task));
         }
+
+        let mut instances = instances;
 
         // init meta and [from]
         let from = FromInstance::from(&task.from);
@@ -31,7 +25,14 @@ impl Converted {
         // check id
         let _ = check_id(&mut instances, &last_state, &from, &task.target)?;
 
-        // verify
+        // filter from cache
+        let mut instances: Vec<Instance> = if task.check_cache() {
+            instances.into_iter().filter(|one| !CachedKey::get(&one.get_key())).collect()
+        } else {
+            instances
+        };
+
+        // verify state
         let _ = verify_state(&task, &mut instances, last_state)?;
         let rtn = Converted {
             done_task: convert_task.to_owned(),

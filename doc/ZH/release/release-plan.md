@@ -10,6 +10,7 @@
 - incompatible change: `conflict_avoid` rename to `cache_saved` 
 - incompatible change: remove Instance.execute_time field from table
 - builtin executor: timer
+- bug fix: cache_saved is invalid
 
 ### should commit
 

@@ -2,6 +2,7 @@ use std::sync::Mutex;
 use std::time::Duration;
 
 use lru_time_cache::LruCache;
+
 use crate::system::CACHE_SAVED_TIME;
 
 lazy_static! {
@@ -15,7 +16,10 @@ impl CachedKey {
     pub fn get(key: &str) -> bool {
         let mut c = CACHE.lock().unwrap();
         match c.get(key) {
-            Some(_) => true,
+            Some(_) => {
+                debug!("get cached key: {}", key);
+                true
+            },
             None => false
         }
     }

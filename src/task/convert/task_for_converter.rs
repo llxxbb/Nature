@@ -50,7 +50,9 @@ impl TaskForConvert {
     }
     pub fn check_cache(&self) -> bool {
         match self.target.to.get_setting() {
-            Some(s) => s.cache_saved,
+            Some(s) => {
+                s.cache_saved
+            },
             None => false,
         }
     }
