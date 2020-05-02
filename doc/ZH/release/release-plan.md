@@ -8,6 +8,7 @@
 ## Release 0.8
 
 - incompatible change: `conflict_avoid` rename to `cache_saved` 
+- incompatible change: remove Instance.execute_time field from table
 - builtin executor: timer
 
 ### should commit
@@ -15,10 +16,7 @@
 
 ### 未完成
 
-- builtin executor: timer
-  - add year support
-  - add end para
-- remove Instance.execute_time
+
 - add `RelationSetting.delay_on_timer`
 
 - demo: 销量统计， 使用 builtin-executor sum_allow_repeat

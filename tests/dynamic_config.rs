@@ -60,7 +60,6 @@ pub fn new_with_type(key: &str, meta: MetaType) -> Result<Instance> {
             from: None,
             para: String::new(),
         },
-        execute_time: 0,
         create_time: 0,
     })
 }
