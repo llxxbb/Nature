@@ -5,7 +5,7 @@ use dimension_splitter::dimension_split;
 use nature_common::{NatureError, Result};
 use sum::sum;
 use sum_allow_repeat::sum_allow_repeat;
-use timer::timer;
+use timer::time_range;
 
 use crate::task::Execute;
 
@@ -22,8 +22,8 @@ fn init_builtin() -> HashMap<String, &'static Execute> {
     map.insert("sum".to_string(), one);
     let one: &Execute = &(sum_allow_repeat as Execute);
     map.insert("sum_allow_repeat".to_string(), one);
-    let one: &Execute = &(timer as Execute);
-    map.insert("timer".to_string(), one);
+    let one: &Execute = &(time_range as Execute);
+    map.insert("time_range".to_string(), one);
     map
 }
 

@@ -1,8 +1,8 @@
-use std::ops::Sub;
+use std::ops::{Add, Sub};
 
-use chrono::{Datelike, Duration, Local, NaiveDateTime, Timelike, TimeZone};
+use chrono::{Date, Datelike, Duration, Local, NaiveDate, NaiveDateTime, Timelike, TimeZone};
 
-use nature_common::{ConverterParameter, ConverterReturned, Instance, is_default, NatureError, Result};
+use nature_common::{ConverterParameter, ConverterReturned, DEFAULT_PARA_SEPARATOR, Instance, is_default, NatureError, Result};
 
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
 struct Setting {
@@ -27,14 +27,42 @@ static HOUR: i64 = 1000 * 60 * 60;
 static DAY: i64 = 1000 * 60 * 60 * 24;
 
 impl Setting {
-    fn get_time(&self, ins_time: i64) -> Result<i64> {
+    fn get_time(&self, ins_time: i64) -> Result<(i64, i64)> {
         let time = Local.timestamp_millis(ins_time).naive_local();
         let unit = self.unit.as_ref();
-        let rtn = match unit {
-            "s" => ins_time - time.timestamp_subsec_millis() as i64,
-            "m" => ins_time - time.second() as i64 * SECOND - time.timestamp_subsec_millis() as i64,
-            "h" => ins_time - time.minute() as i64 * MINUTE - time.second() as i64 * SECOND - time.timestamp_subsec_millis() as i64,
-            "d" => ins_time - time.hour() as i64 * HOUR - time.minute() as i64 * MINUTE - time.second() as i64 * SECOND - time.timestamp_subsec_millis() as i64,
+        let rtn: (i64, i64) = match unit {
+            "s" => {
+                let mut rtn = ins_time - time.timestamp_subsec_millis() as i64;
+                if self.value > 1 {
+                    let redundant = time.second() % self.value as u32;
+                    rtn = rtn - redundant as i64 * SECOND
+                };
+                (rtn, rtn + SECOND)
+            }
+            "m" => {
+                let mut rtn = ins_time - time.second() as i64 * SECOND - time.timestamp_subsec_millis() as i64;
+                if self.value > 1 {
+                    let redundant = time.minute() % self.value as u32;
+                    rtn = rtn - redundant as i64 * MINUTE
+                };
+                (rtn, rtn + MINUTE)
+            }
+            "h" => {
+                let mut rtn = ins_time - time.minute() as i64 * MINUTE - time.second() as i64 * SECOND - time.timestamp_subsec_millis() as i64;
+                if self.value > 1 {
+                    let redundant = time.hour() % self.value as u32;
+                    rtn = rtn - redundant as i64 * HOUR
+                };
+                (rtn, rtn + HOUR)
+            }
+            "d" => {
+                let mut rtn = ins_time - time.hour() as i64 * HOUR - time.minute() as i64 * MINUTE - time.second() as i64 * SECOND - time.timestamp_subsec_millis() as i64;
+                if self.value > 1 {
+                    let redundant = time.num_days_from_ce() % self.value as i32;
+                    rtn = rtn - redundant as i64 * DAY
+                };
+                (rtn, rtn + DAY)
+            }
             "w" => return self.get_week(&time),
             "M" => return self.get_month(&time),
             "y" => return self.get_year(&time),
@@ -43,36 +71,10 @@ impl Setting {
                 return Err(NatureError::LogicalError(err));
             }
         };
-        let rtn = if self.value > 1 {
-            match unit {
-                "s" => {
-                    let redundant = time.second() % self.value as u32;
-                    rtn - redundant as i64 * SECOND
-                }
-                "m" => {
-                    let redundant = time.minute() % self.value as u32;
-                    rtn - redundant as i64 * MINUTE
-                }
-                "h" => {
-                    let redundant = time.hour() % self.value as u32;
-                    rtn - redundant as i64 * HOUR
-                }
-                "d" => {
-                    let redundant = time.num_days_from_ce() % self.value as i32;
-                    rtn - redundant as i64 * DAY
-                }
-                _ => {
-                    let err = format!("timer setting error: unknown unit '{}'", self.unit);
-                    return Err(NatureError::LogicalError(err));
-                }
-            }
-        } else {
-            rtn
-        };
         Ok(rtn)
     }
 
-    fn get_week(&self, nd: &NaiveDateTime) -> Result<i64> {
+    fn get_week(&self, nd: &NaiveDateTime) -> Result<(i64, i64)> {
         if self.value > 6 || self.value < -7 {
             return Err(NatureError::LogicalError("value must in [-7,6]".to_string()));
         }
@@ -87,31 +89,50 @@ impl Setting {
             7 - value + offset
         };
         let rtn = Local.ymd(nd.year(), nd.month(), nd.day()).sub(Duration::days(diff_day as i64)).and_hms(0, 0, 0).timestamp_millis();
-        Ok(rtn)
+        Ok((rtn, rtn + 7 * DAY))
     }
 
-    fn get_month(&self, nd: &NaiveDateTime) -> Result<i64> {
+    fn get_month(&self, nd: &NaiveDateTime) -> Result<(i64, i64)> {
         // check value
         if self.value > 19 || self.value < -20 {
             return Err(NatureError::LogicalError("the `value` must in [-20,19]".to_string()));
         }
         let offset = nd.day0() as i16;
         let this_month = Local.ymd(nd.year(), nd.month(), 1);
+        let next_month = get_next_month(&this_month.naive_local());
         let mut value = self.value;
         if value < 0 {
-            let next_month = Local.ymd(nd.year(), nd.month() + 1, 1);
             let days = next_month.sub(this_month).num_days();
             value += days as i16;
         }
         let rtn = if value <= offset {
-            Local.ymd(nd.year(), nd.month(), (value + 1) as u32).and_hms(0, 0, 0).timestamp_millis()
+            // `begin` in this month and `end` in next month
+            let begin = Local.ymd(nd.year(), nd.month(), (value + 1) as u32).and_hms(0, 0, 0);
+            let left = begin.timestamp_millis();
+            let right = if self.value >= 0 {
+                next_month.add(Duration::days(self.value as i64)).and_hms(0, 0, 0).timestamp_millis()
+            } else {
+                let next_next = get_next_month(&next_month.naive_local());
+                let end = next_next.sub(Duration::days(-self.value as i64)).and_hms(0, 0, 0);
+                end.timestamp_millis()
+            };
+            (left, right)
         } else {
-            this_month.sub(Duration::days(-self.value as i64)).and_hms(0, 0, 0).timestamp_millis()
+            // `begin` in previous month and `end` in this month
+            if self.value >= 0 {
+                let left = get_previous_month(&this_month.naive_local()).add(Duration::days(self.value as i64)).and_hms(0, 0, 0).timestamp_millis();
+                let right = this_month.add(Duration::days(self.value as i64)).and_hms(0, 0, 0).timestamp_millis();
+                (left, right)
+            } else {
+                let left = this_month.sub(Duration::days(-self.value as i64)).and_hms(0, 0, 0).timestamp_millis();
+                let right = next_month.sub(Duration::days(-self.value as i64)).and_hms(0, 0, 0).timestamp_millis();
+                (left, right)
+            }
         };
         Ok(rtn)
     }
 
-    fn get_year(&self, nd: &NaiveDateTime) -> Result<i64> {
+    fn get_year(&self, nd: &NaiveDateTime) -> Result<(i64, i64)> {
         if self.value > 199 || self.value < -200 {
             return Err(NatureError::LogicalError("value must in [-7,6]".to_string()));
         }
@@ -127,16 +148,36 @@ impl Setting {
         } else {
             365 - value + offset
         };
-        let rtn = today.sub(Duration::days(diff_day as i64)).and_hms(0, 0, 0);
-        dbg!(&rtn);
-        let rtn = rtn.timestamp_millis();
-        Ok(rtn)
+        let left = today.sub(Duration::days(diff_day as i64)).and_hms(0, 0, 0);
+        let right = if self.value >= 0 {
+            Local.ymd(left.year() + 1, left.month(), left.day())
+        } else {
+            let end = Local.ymd(left.year() + 2, 1, 1);
+            end.sub(Duration::days(-self.value as i64))
+        };
+        Ok((left.timestamp_millis(), right.and_hms(0, 0, 0).timestamp_millis()))
+    }
+}
+
+fn get_next_month(nd: &NaiveDate) -> Date<Local> {
+    if nd.month() < 12 {
+        Local.ymd(nd.year(), nd.month() + 1, 1)
+    } else {
+        Local.ymd(nd.year() + 1, 1, 1)
+    }
+}
+
+fn get_previous_month(nd: &NaiveDate) -> Date<Local> {
+    if nd.month() > 1 {
+        Local.ymd(nd.year(), nd.month() - 1, 1)
+    } else {
+        Local.ymd(nd.year() - 1, 12, 1)
     }
 }
 
 
 /// generate a timer para
-pub fn timer(input: &ConverterParameter) -> ConverterReturned {
+pub fn time_range(input: &ConverterParameter) -> ConverterReturned {
     // get setting
     let cfg = match serde_json::from_str::<Setting>(&input.cfg) {
         Ok(cfg) => cfg,
@@ -150,7 +191,7 @@ pub fn timer(input: &ConverterParameter) -> ConverterReturned {
         Err(err) => return ConverterReturned::LogicalError(err.to_string())
     };
     let mut instance = Instance::default();
-    instance.para = result.to_string();
+    instance.para = format!("{}{}{}", result.0, *DEFAULT_PARA_SEPARATOR, result.1);
     ConverterReturned::Instances(vec![instance])
 }
 
@@ -193,12 +234,18 @@ mod timer_setting_test {
             value: 0,
         };
         let rtn = setting.get_time(time).unwrap();
-        let cmp = Local.ymd(2020, 5, 1).and_hms(18, 36, 23).timestamp_millis();
+        let cmp = (
+            Local.ymd(2020, 5, 1).and_hms(18, 36, 23).timestamp_millis(),
+            Local.ymd(2020, 5, 1).and_hms(18, 36, 24).timestamp_millis(),
+        );
         assert_eq!(rtn, cmp);
         // test interval
         setting.value = 15;
         let rtn = setting.get_time(time).unwrap();
-        let cmp = Local.ymd(2020, 5, 1).and_hms(18, 36, 15).timestamp_millis();
+        let cmp = (
+            Local.ymd(2020, 5, 1).and_hms(18, 36, 15).timestamp_millis(),
+            Local.ymd(2020, 5, 1).and_hms(18, 36, 16).timestamp_millis()
+        );
         assert_eq!(rtn, cmp);
     }
 
@@ -210,12 +257,18 @@ mod timer_setting_test {
             value: 0,
         };
         let rtn = setting.get_time(time).unwrap();
-        let cmp = Local.ymd(2020, 5, 1).and_hms(18, 36, 0).timestamp_millis();
+        let cmp = (
+            Local.ymd(2020, 5, 1).and_hms(18, 36, 0).timestamp_millis(),
+            Local.ymd(2020, 5, 1).and_hms(18, 37, 0).timestamp_millis()
+        );
         assert_eq!(rtn, cmp);
         // test interval
         setting.value = 10;
         let rtn = setting.get_time(time).unwrap();
-        let cmp = Local.ymd(2020, 5, 1).and_hms(18, 30, 0).timestamp_millis();
+        let cmp = (
+            Local.ymd(2020, 5, 1).and_hms(18, 30, 0).timestamp_millis(),
+            Local.ymd(2020, 5, 1).and_hms(18, 31, 0).timestamp_millis()
+        );
         assert_eq!(rtn, cmp);
     }
 
@@ -227,12 +280,18 @@ mod timer_setting_test {
             value: 0,
         };
         let rtn = setting.get_time(time).unwrap();
-        let cmp = Local.ymd(2020, 5, 1).and_hms(18, 0, 0).timestamp_millis();
+        let cmp = (
+            Local.ymd(2020, 5, 1).and_hms(18, 0, 0).timestamp_millis(),
+            Local.ymd(2020, 5, 1).and_hms(19, 0, 0).timestamp_millis()
+        );
         assert_eq!(rtn, cmp);
         // test interval
         setting.value = 4;
         let rtn = setting.get_time(time).unwrap();
-        let cmp = Local.ymd(2020, 5, 1).and_hms(16, 0, 0).timestamp_millis();
+        let cmp = (
+            Local.ymd(2020, 5, 1).and_hms(16, 0, 0).timestamp_millis(),
+            Local.ymd(2020, 5, 1).and_hms(17, 0, 0).timestamp_millis()
+        );
         assert_eq!(rtn, cmp);
     }
 
@@ -244,12 +303,18 @@ mod timer_setting_test {
             value: 0,
         };
         let rtn = setting.get_time(time).unwrap();
-        let cmp = Local.ymd(2020, 5, 1).and_hms(0, 0, 0).timestamp_millis();
+        let cmp = (
+            Local.ymd(2020, 5, 1).and_hms(0, 0, 0).timestamp_millis(),
+            Local.ymd(2020, 5, 2).and_hms(0, 0, 0).timestamp_millis()
+        );
         assert_eq!(rtn, cmp);
         // test interval
         setting.value = 3;
         let rtn = setting.get_time(time).unwrap();
-        let cmp = Local.ymd(2020, 4, 29).and_hms(0, 0, 0).timestamp_millis();
+        let cmp = (
+            Local.ymd(2020, 4, 29).and_hms(0, 0, 0).timestamp_millis(),
+            Local.ymd(2020, 4, 30).and_hms(0, 0, 0).timestamp_millis()
+        );
         assert_eq!(rtn, cmp);
     }
 
@@ -262,22 +327,34 @@ mod timer_setting_test {
             value: 0,
         };
         let rtn = setting.get_time(time).unwrap();
-        let cmp = Local.ymd(2020, 4, 27).and_hms(0, 0, 0).timestamp_millis();
+        let cmp = (
+            Local.ymd(2020, 4, 27).and_hms(0, 0, 0).timestamp_millis(),
+            Local.ymd(2020, 5, 4).and_hms(0, 0, 0).timestamp_millis()
+        );
         assert_eq!(rtn, cmp);
         // the `value` is positive and after the real time
         setting.value = 6;
         let rtn = setting.get_time(time).unwrap();
-        let cmp = Local.ymd(2020, 4, 26).and_hms(0, 0, 0).timestamp_millis();
+        let cmp = (
+            Local.ymd(2020, 4, 26).and_hms(0, 0, 0).timestamp_millis(),
+            Local.ymd(2020, 5, 3).and_hms(0, 0, 0).timestamp_millis()
+        );
         assert_eq!(rtn, cmp);
         // the `value` is negative and before the real time
         setting.value = -7;
         let rtn = setting.get_time(time).unwrap();
-        let cmp = Local.ymd(2020, 4, 27).and_hms(0, 0, 0).timestamp_millis();
+        let cmp = (
+            Local.ymd(2020, 4, 27).and_hms(0, 0, 0).timestamp_millis(),
+            Local.ymd(2020, 5, 4).and_hms(0, 0, 0).timestamp_millis()
+        );
         assert_eq!(rtn, cmp);
         // the `value` is negative and after the real time
         setting.value = -1;
         let rtn = setting.get_time(time).unwrap();
-        let cmp = Local.ymd(2020, 4, 26).and_hms(0, 0, 0).timestamp_millis();
+        let cmp = (
+            Local.ymd(2020, 4, 26).and_hms(0, 0, 0).timestamp_millis(),
+            Local.ymd(2020, 5, 3).and_hms(0, 0, 0).timestamp_millis()
+        );
         assert_eq!(rtn, cmp);
         // range test
         setting.value = 7;
@@ -297,22 +374,34 @@ mod timer_setting_test {
             value: 0,
         };
         let rtn = setting.get_time(time).unwrap();
-        let cmp = Local.ymd(2020, 5, 1).and_hms(0, 0, 0).timestamp_millis();
+        let cmp = (
+            Local.ymd(2020, 5, 1).and_hms(0, 0, 0).timestamp_millis(),
+            Local.ymd(2020, 6, 1).and_hms(0, 0, 0).timestamp_millis()
+        );
         assert_eq!(rtn, cmp);
         // the `value` is positive and after the real time
         setting.value = 6;
         let rtn = setting.get_time(time).unwrap();
-        let cmp = Local.ymd(2020, 5, 7).and_hms(0, 0, 0).timestamp_millis();
+        let cmp = (
+            Local.ymd(2020, 5, 7).and_hms(0, 0, 0).timestamp_millis(),
+            Local.ymd(2020, 6, 7).and_hms(0, 0, 0).timestamp_millis()
+        );
         assert_eq!(rtn, cmp);
         // the `value` is negative and before the real time
         setting.value = -5;
         let rtn = setting.get_time(time).unwrap();
-        let cmp = Local.ymd(2020, 5, 27).and_hms(0, 0, 0).timestamp_millis();
+        let cmp = (
+            Local.ymd(2020, 5, 27).and_hms(0, 0, 0).timestamp_millis(),
+            Local.ymd(2020, 6, 26).and_hms(0, 0, 0).timestamp_millis()
+        );
         assert_eq!(rtn, cmp);
         // the `value` is negative and after the real time
         setting.value = -1;
         let rtn = setting.get_time(time).unwrap();
-        let cmp = Local.ymd(2020, 4, 30).and_hms(0, 0, 0).timestamp_millis();
+        let cmp = (
+            Local.ymd(2020, 4, 30).and_hms(0, 0, 0).timestamp_millis(),
+            Local.ymd(2020, 5, 31).and_hms(0, 0, 0).timestamp_millis()
+        );
         assert_eq!(rtn, cmp);
         // range test
         setting.value = 19;
@@ -338,22 +427,34 @@ mod timer_setting_test {
             value: 0,
         };
         let rtn = setting.get_time(time).unwrap();
-        let cmp = Local.ymd(2020, 1, 1).and_hms(0, 0, 0).timestamp_millis();
+        let cmp = (
+            Local.ymd(2020, 1, 1).and_hms(0, 0, 0).timestamp_millis(),
+            Local.ymd(2021, 1, 1).and_hms(0, 0, 0).timestamp_millis()
+        );
         assert_eq!(rtn, cmp);
         // the `value` is positive and after the real time
         setting.value = 6;
         let rtn = setting.get_time(time).unwrap();
-        let cmp = Local.ymd(2020, 1, 7).and_hms(0, 0, 0).timestamp_millis();
+        let cmp = (
+            Local.ymd(2020, 1, 7).and_hms(0, 0, 0).timestamp_millis(),
+            Local.ymd(2021, 1, 7).and_hms(0, 0, 0).timestamp_millis()
+        );
         assert_eq!(rtn, cmp);
         // the `value` is negative and before the real time
         setting.value = -1;
         let rtn = setting.get_time(time).unwrap();
-        let cmp = Local.ymd(2019, 12, 31).and_hms(0, 0, 0).timestamp_millis();
+        let cmp = (
+            Local.ymd(2019, 12, 31).and_hms(0, 0, 0).timestamp_millis(),
+            Local.ymd(2020, 12, 31).and_hms(0, 0, 0).timestamp_millis()
+        );
         assert_eq!(rtn, cmp);
         // the `value` is negative and after the real time
         setting.value = -50;
         let rtn = setting.get_time(time).unwrap();
-        let cmp = Local.ymd(2020, 11, 11).and_hms(0, 0, 0).timestamp_millis();
+        let cmp = (
+            Local.ymd(2020, 11, 11).and_hms(0, 0, 0).timestamp_millis(),
+            Local.ymd(2021, 11, 12).and_hms(0, 0, 0).timestamp_millis()
+        );
         assert_eq!(rtn, cmp);
         // range test
         setting.value = 199;
