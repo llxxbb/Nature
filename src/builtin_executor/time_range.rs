@@ -1,8 +1,9 @@
 use std::ops::{Add, Sub};
+use std::str::FromStr;
 
 use chrono::{Date, Datelike, Duration, Local, NaiveDate, NaiveDateTime, Timelike, TimeZone};
 
-use nature_common::{ConverterParameter, ConverterReturned, DEFAULT_PARA_SEPARATOR, Instance, is_default, NatureError, Result};
+use nature_common::{ConverterParameter, ConverterReturned, DEFAULT_PARA_SEPARATOR, get_para_and_key_from_para, Instance, is_default, NatureError, Result};
 
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
 struct Setting {
@@ -19,6 +20,14 @@ struct Setting {
     #[serde(skip_serializing_if = "is_default")]
     #[serde(default)]
     value: i16,
+    /// time info from `Instance.para`, otherwise from `Instance.create_time`
+    #[serde(skip_serializing_if = "is_default")]
+    #[serde(default)]
+    on_para: bool,
+    /// time info from `Instance.para`, otherwise from `Instance.create_time`
+    #[serde(skip_serializing_if = "is_default")]
+    #[serde(default)]
+    para_part: u8,
 }
 
 static SECOND: i64 = 1000;
@@ -186,7 +195,19 @@ pub fn time_range(input: &ConverterParameter) -> ConverterReturned {
             return ConverterReturned::LogicalError(err.to_string());
         }
     };
-    let result = match cfg.get_time(input.from.create_time) {
+    let time_long = if cfg.on_para {
+        let time_string = match get_para_and_key_from_para(&input.from.para, &vec![cfg.para_part]) {
+            Err(err) => return ConverterReturned::LogicalError(err.to_string()),
+            Ok((p, _k)) => p
+        };
+        match i64::from_str(&time_string) {
+            Err(err) => return ConverterReturned::LogicalError(err.to_string()),
+            Ok(rtn) => rtn
+        }
+    } else {
+        input.from.create_time
+    };
+    let result = match cfg.get_time(time_long) {
         Ok(rtn) => rtn,
         Err(err) => return ConverterReturned::LogicalError(err.to_string())
     };
@@ -208,10 +229,12 @@ mod timer_setting_test {
     use super::*;
 
     #[test]
-    fn test() {
+    fn cfg_test() {
         let mut setting = Setting {
             unit: "s".to_string(),
             value: 0,
+            on_para: false,
+            para_part: 0,
         };
         let rtn = serde_json::to_string(&setting).unwrap();
         assert_eq!(rtn, "{}");
@@ -232,6 +255,8 @@ mod timer_setting_test {
         let mut setting = Setting {
             unit: "s".to_string(),
             value: 0,
+            on_para: false,
+            para_part: 0,
         };
         let rtn = setting.get_time(time).unwrap();
         let cmp = (
@@ -255,6 +280,8 @@ mod timer_setting_test {
         let mut setting = Setting {
             unit: "m".to_string(),
             value: 0,
+            on_para: false,
+            para_part: 0,
         };
         let rtn = setting.get_time(time).unwrap();
         let cmp = (
@@ -278,6 +305,8 @@ mod timer_setting_test {
         let mut setting = Setting {
             unit: "h".to_string(),
             value: 0,
+            on_para: false,
+            para_part: 0,
         };
         let rtn = setting.get_time(time).unwrap();
         let cmp = (
@@ -301,6 +330,8 @@ mod timer_setting_test {
         let mut setting = Setting {
             unit: "d".to_string(),
             value: 0,
+            on_para: false,
+            para_part: 0,
         };
         let rtn = setting.get_time(time).unwrap();
         let cmp = (
@@ -325,6 +356,8 @@ mod timer_setting_test {
         let mut setting = Setting {
             unit: "w".to_string(),
             value: 0,
+            on_para: false,
+            para_part: 0,
         };
         let rtn = setting.get_time(time).unwrap();
         let cmp = (
@@ -372,6 +405,8 @@ mod timer_setting_test {
         let mut setting = Setting {
             unit: "M".to_string(),
             value: 0,
+            on_para: false,
+            para_part: 0,
         };
         let rtn = setting.get_time(time).unwrap();
         let cmp = (
@@ -425,6 +460,8 @@ mod timer_setting_test {
         let mut setting = Setting {
             unit: "y".to_string(),
             value: 0,
+            on_para: false,
+            para_part: 0,
         };
         let rtn = setting.get_time(time).unwrap();
         let cmp = (

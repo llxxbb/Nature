@@ -7,7 +7,7 @@ use crate::system::SWITCH_SAVE_DIRECTLY_FOR_ONE;
 use crate::task::{Converted, TaskForConvert, TaskForStore};
 
 pub async fn after_converted(task: &TaskForConvert, convert_task: &RawTask, instances: Vec<Instance>, last_state: &Option<Instance>) -> Result<()> {
-    debug!("executor returned {} instances for `Meta`: {:?}, from {}", instances.len(), &task.target.to.meta_string(), task.from.get_key());
+    // debug!("executor returned {} instances for `Meta`: {:?}, from {}", instances.len(), &task.target.to.meta_string(), task.from.get_key());
     match Converted::gen(&task, &convert_task, instances, last_state) {
         Ok(rtn) => match rtn.converted.len() {
             0 => match TaskDaoImpl::finish_task(&convert_task.task_id) {
