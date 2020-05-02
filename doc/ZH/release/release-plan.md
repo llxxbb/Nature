@@ -15,6 +15,9 @@
 
 ### 未完成
 
+- builtin executor: timer
+  - add year support
+  - add end para
 - remove Instance.execute_time
 - add `RelationSetting.delay_on_timer`
 

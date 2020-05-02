@@ -37,6 +37,7 @@ impl Setting {
             "d" => ins_time - time.hour() as i64 * HOUR - time.minute() as i64 * MINUTE - time.second() as i64 * SECOND - time.timestamp_subsec_millis() as i64,
             "w" => return self.get_week(&time),
             "M" => return self.get_month(&time),
+            "y" => return self.get_year(&time),
             _ => {
                 let err = format!("timer setting error: unknown unit '{}'", self.unit);
                 return Err(NatureError::LogicalError(err));
@@ -107,6 +108,28 @@ impl Setting {
         } else {
             this_month.sub(Duration::days(-self.value as i64)).and_hms(0, 0, 0).timestamp_millis()
         };
+        Ok(rtn)
+    }
+
+    fn get_year(&self, nd: &NaiveDateTime) -> Result<i64> {
+        if self.value > 199 || self.value < -200 {
+            return Err(NatureError::LogicalError("value must in [-7,6]".to_string()));
+        }
+        let year_begin = Local.ymd(nd.year(), 1, 1);
+        let today = Local.ymd(nd.year(), nd.month(), nd.day());
+        let offset = today.sub(year_begin).num_days() as i16;
+        let mut value = self.value;
+        if value < 0 {
+            value += 365
+        }
+        let diff_day = if value <= offset {
+            offset - value
+        } else {
+            365 - value + offset
+        };
+        let rtn = today.sub(Duration::days(diff_day as i64)).and_hms(0, 0, 0);
+        dbg!(&rtn);
+        let rtn = rtn.timestamp_millis();
         Ok(rtn)
     }
 }
@@ -256,7 +279,7 @@ mod timer_setting_test {
         let rtn = setting.get_time(time).unwrap();
         let cmp = Local.ymd(2020, 4, 26).and_hms(0, 0, 0).timestamp_millis();
         assert_eq!(rtn, cmp);
-        // error input
+        // range test
         setting.value = 7;
         let rtn = setting.get_time(time);
         assert!(rtn.is_err());
@@ -291,6 +314,60 @@ mod timer_setting_test {
         let rtn = setting.get_time(time).unwrap();
         let cmp = Local.ymd(2020, 4, 30).and_hms(0, 0, 0).timestamp_millis();
         assert_eq!(rtn, cmp);
+        // range test
+        setting.value = 19;
+        let rtn = setting.get_time(time);
+        assert!(rtn.is_ok());
+        setting.value = 20;
+        let rtn = setting.get_time(time);
+        assert!(rtn.is_err());
+        setting.value = -20;
+        let rtn = setting.get_time(time);
+        assert!(rtn.is_ok());
+        setting.value = -21;
+        let rtn = setting.get_time(time);
+        assert!(rtn.is_err());
+    }
+
+    #[test]
+    fn year_test() {
+        // the `value` is positive and before the real time
+        let time = Local.ymd(2020, 11, 21).and_hms_milli(18, 36, 23, 123).timestamp_millis();
+        let mut setting = Setting {
+            unit: "y".to_string(),
+            value: 0,
+        };
+        let rtn = setting.get_time(time).unwrap();
+        let cmp = Local.ymd(2020, 1, 1).and_hms(0, 0, 0).timestamp_millis();
+        assert_eq!(rtn, cmp);
+        // the `value` is positive and after the real time
+        setting.value = 6;
+        let rtn = setting.get_time(time).unwrap();
+        let cmp = Local.ymd(2020, 1, 7).and_hms(0, 0, 0).timestamp_millis();
+        assert_eq!(rtn, cmp);
+        // the `value` is negative and before the real time
+        setting.value = -1;
+        let rtn = setting.get_time(time).unwrap();
+        let cmp = Local.ymd(2019, 12, 31).and_hms(0, 0, 0).timestamp_millis();
+        assert_eq!(rtn, cmp);
+        // the `value` is negative and after the real time
+        setting.value = -50;
+        let rtn = setting.get_time(time).unwrap();
+        let cmp = Local.ymd(2020, 11, 11).and_hms(0, 0, 0).timestamp_millis();
+        assert_eq!(rtn, cmp);
+        // range test
+        setting.value = 199;
+        let rtn = setting.get_time(time);
+        assert!(rtn.is_ok());
+        setting.value = 200;
+        let rtn = setting.get_time(time);
+        assert!(rtn.is_err());
+        setting.value = -200;
+        let rtn = setting.get_time(time);
+        assert!(rtn.is_ok());
+        setting.value = -201;
+        let rtn = setting.get_time(time);
+        assert!(rtn.is_err());
     }
 }
 
