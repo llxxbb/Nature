@@ -180,7 +180,7 @@ mod test {
             conflict_version: 0,
         };
         let raw = RawTask {
-            task_id: vec![],
+            task_id: "".to_string(),
             task_key,
             task_type: 0,
             task_for: "".to_string(),

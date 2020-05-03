@@ -7,10 +7,12 @@
 
 ## Release 0.8
 
-- incompatible change: `conflict_avoid` rename to `cache_saved` 
-- incompatible change: remove Instance.execute_time field from table
 - incompatible change: change `Instance` table design
-- incompatible change: ParaForQueryByID rename to QueryByID 
+- incompatible change: change `task` table design
+- incompatible change: `conflict_avoid` rename to `cache_saved` 
+- incompatible change: `DelayedInstances` and `ConverterParameter`
+- incompatible change: rename `ParaForIDAndFrom` to `IDAndFrom`
+- incompatible change: rename `QueryByID` to `ByID`
 - builtin executor: timer
 - bug fix: cache_saved is invalid
 

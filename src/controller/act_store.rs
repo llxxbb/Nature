@@ -1,7 +1,7 @@
 use std::thread::sleep;
 use std::time::Duration;
 
-use nature_common::{NatureError, ParaForIDAndFrom, Result};
+use nature_common::{NatureError, IDAndFrom, Result};
 use nature_db::{INS_KEY_GETTER, InstanceDaoImpl, MCG, MG, RawTask};
 
 use crate::channels::CHANNEL_CONVERT;
@@ -34,7 +34,7 @@ async fn duplicated_instance(task: TaskForStore, carrier: RawTask) -> Result<()>
     }
     // process status-meta-------------------
     let ins_from = task.instance.from.clone().unwrap();
-    let para = ParaForIDAndFrom {
+    let para = IDAndFrom {
         id: task.instance.id,
         meta: task.instance.meta.clone(),
         from_key: ins_from.to_string(),

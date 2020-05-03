@@ -128,7 +128,7 @@ mod test {
         let para = ConverterParameter {
             from: input_instance,
             last_state: None,
-            task_id: vec![],
+            task_id: "".to_string(),
             master: None,
             cfg: serde_json::to_string(&setting).unwrap(),
         };
@@ -165,7 +165,7 @@ mod test {
         let para = ConverterParameter {
             from: input_instance,
             last_state: None,
-            task_id: vec![],
+            task_id: "".to_string(),
             master: None,
             cfg: serde_json::to_string(&setting).unwrap(),
         };
@@ -205,7 +205,7 @@ mod test {
         let para = ConverterParameter {
             from: input_instance,
             last_state: None,
-            task_id: vec![],
+            task_id: "".to_string(),
             master: None,
             cfg: serde_json::to_string(&setting).unwrap(),
         };

@@ -104,7 +104,7 @@ mod test {
         let para = ConverterParameter {
             from: Default::default(),
             last_state: None,
-            task_id: vec![],
+            task_id: "".to_string(),
             master: None,
             cfg: "".to_string(),
         };

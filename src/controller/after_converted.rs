@@ -62,7 +62,7 @@ async fn save_batch(converted: Converted) -> Result<()> {
     Ok(rtn)
 }
 
-pub fn process_null(meta_type: MetaType, task_id: &[u8]) -> Result<()> {
+pub fn process_null(meta_type: MetaType, task_id: &str) -> Result<()> {
     match meta_type {
         MetaType::Null => {
             let _ = TaskDaoImpl::finish_task(task_id)?;
