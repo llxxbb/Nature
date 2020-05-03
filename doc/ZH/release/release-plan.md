@@ -7,12 +7,13 @@
 
 ## Release 0.8
 
+- add interface `query_by_meta` for outside call
 - incompatible change: change `Instance` table design
 - incompatible change: change `task` table design
 - incompatible change: `conflict_avoid` rename to `cache_saved` 
 - incompatible change: `DelayedInstances` and `ConverterParameter`
 - incompatible change: rename `ParaForIDAndFrom` to `IDAndFrom`
-- incompatible change: rename `QueryByID` to `ByID`
+- incompatible change: rename `QueryByID` to `KeyCondition`
 - builtin executor: timer
 - bug fix: cache_saved is invalid
 
@@ -20,8 +21,6 @@
 
 
 ### 未完成
-
-
 
 - add `RelationSetting.delay_on_timer`
 
