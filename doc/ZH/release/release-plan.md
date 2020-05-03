@@ -9,6 +9,8 @@
 
 - incompatible change: `conflict_avoid` rename to `cache_saved` 
 - incompatible change: remove Instance.execute_time field from table
+- incompatible change: change `Instance` table design
+- incompatible change: ParaForQueryByID rename to QueryByID 
 - builtin executor: timer
 - bug fix: cache_saved is invalid
 
@@ -16,6 +18,8 @@
 
 
 ### 未完成
+
+
 
 - add `RelationSetting.delay_on_timer`
 

@@ -37,10 +37,7 @@ async fn duplicated_instance(task: TaskForStore, carrier: RawTask) -> Result<()>
     let para = ParaForIDAndFrom {
         id: task.instance.id,
         meta: task.instance.meta.clone(),
-        from_id: ins_from.id,
-        from_meta: ins_from.meta.clone(),
-        from_state_version: ins_from.state_version,
-        from_para: ins_from.para.clone(),
+        from_key: ins_from.to_string(),
     };
     let old = InstanceDaoImpl::get_by_from(&para)?;
     if let Some(ins) = old {

@@ -3,9 +3,9 @@ use std::str::FromStr;
 
 use chrono::{Date, Datelike, Duration, Local, NaiveDate, NaiveDateTime, Timelike, TimeZone};
 
-use nature_common::{ConverterParameter, ConverterReturned, DEFAULT_PARA_SEPARATOR, get_para_and_key_from_para, Instance, is_default, NatureError, Result};
+use nature_common::{ConverterParameter, ConverterReturned, SEPARATOR_INS_PARA, get_para_and_key_from_para, Instance, is_default, NatureError, Result};
 
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, Default)]
 struct Setting {
     /// s(econd), m(inute), h(our), d(ay)
     #[serde(skip_serializing_if = "is_s")]
@@ -188,11 +188,15 @@ fn get_previous_month(nd: &NaiveDate) -> Date<Local> {
 /// generate a timer para
 pub fn time_range(input: &ConverterParameter) -> ConverterReturned {
     // get setting
-    let cfg = match serde_json::from_str::<Setting>(&input.cfg) {
-        Ok(cfg) => cfg,
-        Err(err) => {
-            warn!("error setting: {}", &input.cfg);
-            return ConverterReturned::LogicalError(err.to_string());
+    let cfg = if input.cfg == "" {
+        Setting::default()
+    } else {
+        match serde_json::from_str::<Setting>(&input.cfg) {
+            Ok(cfg) => cfg,
+            Err(err) => {
+                warn!("error setting: {}", &input.cfg);
+                return ConverterReturned::LogicalError(err.to_string());
+            }
         }
     };
     let time_long = if cfg.on_para {
@@ -212,7 +216,7 @@ pub fn time_range(input: &ConverterParameter) -> ConverterReturned {
         Err(err) => return ConverterReturned::LogicalError(err.to_string())
     };
     let mut instance = Instance::default();
-    instance.para = format!("{}{}{}", result.0, *DEFAULT_PARA_SEPARATOR, result.1);
+    instance.para = format!("{}{}{}", result.0, *SEPARATOR_INS_PARA, result.1);
     ConverterReturned::Instances(vec![instance])
 }
 

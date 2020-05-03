@@ -85,8 +85,8 @@ fn target_is_null() {
     let rtn = query(instance);
     assert_eq!(rtn, 331801733395679954677043458405181585943);
     // check input
-    let written = InstanceDaoImpl::get_by_id(&ParaForQueryByID {
-        id: 331801733395679954677043458405181585943,
+    let written = InstanceDaoImpl::get_by_id(&QueryByID {
+        id: format!("{:x}", 331801733395679954677043458405181585943 as u128),
         meta: "/D/dynamic/target/is/null:1".to_string(),
         para: "".to_string(),
         limit: 1,
@@ -116,8 +116,8 @@ fn write_one_target_to_db() {
 
     // query target
     sleep(3000);
-    let ins_db = InstanceDaoImpl::get_by_id(&ParaForQueryByID {
-        id: 303195405634045585338298858306929603801,
+    let ins_db = InstanceDaoImpl::get_by_id(&QueryByID {
+        id: format!("{:x}", 303195405634045585338298858306929603801 as u128),
         meta: "/D/dynamic/one_target:1".to_string(),
         para: "".to_string(),
         limit: 1,
@@ -155,16 +155,16 @@ fn write_two_target_to_db() {
 
     // query target
     sleep(2500);
-    let ins_db = InstanceDaoImpl::get_by_id(&ParaForQueryByID {
-        id: 251184288685302246237493378684975241377,
+    let ins_db = InstanceDaoImpl::get_by_id(&QueryByID {
+        id: format!("{:x}", 251184288685302246237493378684975241377 as u128),
         meta: "/D/dynamic/two_of_1:1".to_string(),
         para: "".to_string(),
         limit: 1,
         state_version: 0,
     }).unwrap().unwrap();
     assert_eq!("/D/dynamic/two_of_1:1", ins_db.meta);
-    let ins_db = InstanceDaoImpl::get_by_id(&ParaForQueryByID {
-        id: 280748872477529468003584044421765998976,
+    let ins_db = InstanceDaoImpl::get_by_id(&QueryByID {
+        id: format!("{:x}", 280748872477529468003584044421765998976 as u128),
         meta: "/D/dynamic/two_of_2:1".to_string(),
         para: "".to_string(),
         limit: 1,
@@ -172,4 +172,3 @@ fn write_two_target_to_db() {
     }).unwrap().unwrap();
     assert_eq!("/D/dynamic/two_of_2:1", ins_db.meta);
 }
-

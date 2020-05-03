@@ -4,7 +4,7 @@ use actix_web::{HttpResponse, ResponseError, web};
 use actix_web::web::Json;
 use serde::export::fmt::Debug;
 
-use nature_common::{DelayedInstances, Instance, NatureError, ParaForQueryByID, SelfRouteInstance};
+use nature_common::{DelayedInstances, Instance, NatureError, QueryByID, SelfRouteInstance};
 use nature_db::{InstanceDaoImpl, RawTask};
 
 use crate::controller::IncomeController;
@@ -36,7 +36,7 @@ async fn redo_task(task: Json<RawTask>) -> HttpResponse {
     return_result(x)
 }
 
-async fn get_by_id(para: Json<ParaForQueryByID>) -> HttpResponse {
+async fn get_by_id(para: Json<QueryByID>) -> HttpResponse {
     let x = InstanceDaoImpl::get_by_id(&para.0);
     return_result(x)
 }
