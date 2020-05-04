@@ -7,6 +7,7 @@
 
 ## Release 0.8
 
+- add `RelationSetting.delay_on_para`
 - add interface `query_by_meta` for outside call
 - incompatible change: change `Instance` table design
 - incompatible change: change `task` table design
@@ -22,7 +23,13 @@
 
 ### 未完成
 
-- add `RelationSetting.delay_on_timer`
+- add `RelationSetting.delay_on_para`
+  - 功能实现(Ok)
+  - 文档 (结合time-range 一起使用)
+  - 验证数据的正确性
+  - 验证 delay 时间是否正确
+  
+- clean time uncorrectable 
 
 - demo: 销量统计， 使用 builtin-executor sum_allow_repeat
 
