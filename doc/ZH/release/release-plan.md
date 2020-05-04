@@ -16,12 +16,14 @@
 - incompatible change: rename `ParaForIDAndFrom` to `IDAndFrom`
 - incompatible change: rename `QueryByID` to `KeyCondition`
 - builtin executor: timer
-- bug fix: cache_saved is invalid
+- bug fixed: cache_saved is invalid
+- bug fixed: create_time unset for `MetaType::Multi`
 
 ### should commit
 
 
 ### 未完成
+
 
 - add `RelationSetting.delay_on_para`
   - 功能实现(Ok)
