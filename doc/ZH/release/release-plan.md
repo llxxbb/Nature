@@ -18,6 +18,7 @@
 - builtin executor: timer
 - bug fixed: cache_saved is invalid
 - bug fixed: create_time unset for `MetaType::Multi`
+- bug fixed: task clean time is invalid 
 
 ### should commit
 
@@ -25,13 +26,11 @@
 ### 未完成
 
 
+
 - add `RelationSetting.delay_on_para`
-  - 功能实现(Ok)
   - 文档 (结合time-range 一起使用)
   - 验证数据的正确性
   - 验证 delay 时间是否正确
-  
-- clean time uncorrectable 
 
 - demo: 销量统计， 使用 builtin-executor sum_allow_repeat
 
