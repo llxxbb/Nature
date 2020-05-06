@@ -25,14 +25,12 @@
 
 ### 未完成
 
+- dimension_separator 优化，
+  - 不需要filter就能完成任务。
+  - 增加filter1（localRust）: 将姓名替换成学号
+  - 增加filter2(http): 将班级去掉
 
-
-- add `RelationSetting.delay_on_para`
-  - 文档 (结合time-range 一起使用)
-  - 验证数据的正确性
-  - 验证 delay 时间是否正确
-
-- demo: 销量统计， 使用 builtin-executor sum_allow_repeat
+- demo: 销量统计， 使用 builtin-executor sum
 
 - 文档
   - 内建执行器的参考文档(搞优先级，有利于推广)

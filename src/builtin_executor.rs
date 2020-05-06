@@ -1,11 +1,10 @@
 use std::collections::HashMap;
 
-use dimension_splitter::dimension_split;
 /// built-in xecutor
 use nature_common::{NatureError, Result};
 use sum::sum;
-use sum_allow_repeat::sum_allow_repeat;
 use time_range::time_range;
+use scatter::scatter;
 
 use crate::task::Execute;
 
@@ -16,12 +15,12 @@ lazy_static! {
 fn init_builtin() -> HashMap<String, &'static Execute> {
     info!("BuiltIn executor initialized");
     let mut map: HashMap<String, &'static Execute> = HashMap::new();
-    let one: &Execute = &(dimension_split as Execute);
-    map.insert("dimensionSplit".to_string(), one);
+    let one: &Execute = &(scatter as Execute);
+    map.insert("scatter".to_string(), one);
     let one: &Execute = &(sum as Execute);
     map.insert("sum".to_string(), one);
-    let one: &Execute = &(sum_allow_repeat as Execute);
-    map.insert("sum_allow_repeat".to_string(), one);
+    // let one: &Execute = &(sum_allow_repeat as Execute);
+    // map.insert("sum_allow_repeat".to_string(), one);
     let one: &Execute = &(time_range as Execute);
     map.insert("time_range".to_string(), one);
     map
@@ -38,9 +37,9 @@ impl BuiltIn {
     }
 }
 
-mod dimension_splitter;
+// mod dimension_splitter;
+mod scatter;
 mod sum;
-mod sum_allow_repeat;
 mod time_range;
 
 #[cfg(test)]

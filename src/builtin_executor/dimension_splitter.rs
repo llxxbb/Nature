@@ -19,7 +19,7 @@ pub struct Setting {
 
 /// Data input format required: Vec<Input>
 #[derive(Serialize, Deserialize, Clone)]
-struct Input<'a> {
+struct Output<'a> {
     /// include all dimension, separator is defined in Setting
     key: String,
     /// each split dimension will copy this value.
@@ -28,7 +28,7 @@ struct Input<'a> {
 }
 
 #[derive(Clone)]
-struct MiddleResult<'a>(String, Vec<Input<'a>>);
+struct MiddleResult<'a>(String, Vec<Output<'a>>);
 
 /// Suggestion:
 /// - use-upstream-id to avoid result scatter
@@ -45,7 +45,7 @@ pub fn dimension_split(para: &ConverterParameter) -> ConverterReturned {
     }
 
     // check input content
-    let input = serde_json::from_str::<Vec<Input>>(&para.from.content);
+    let input = serde_json::from_str::<Vec<Output>>(&para.from.content);
     if let Err(e) = input {
         let msg = format!("instance content error : {:?}", e.to_string());
         return ConverterReturned::LogicalError(msg);
@@ -89,8 +89,8 @@ pub fn dimension_split(para: &ConverterParameter) -> ConverterReturned {
     ConverterReturned::Instances(rtn)
 }
 
-fn make_content(key: String, value: &RawValue) -> Input {
-    Input {
+fn make_content(key: String, value: &RawValue) -> Output {
+    Output {
         key,
         value,
     }
