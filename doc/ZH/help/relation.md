@@ -163,6 +163,30 @@ pub enum ConverterReturned {
 }
 ```
 
+## filter_before 接口形式
+
+filter_before 需要使用者自行实现,下面为LocalRust的实现形式
+
+```rust
+#[no_mangle]
+#[allow(improper_ctypes)]
+pub extern fn your_func(para: &Instance) -> Result<Instance> {
+	// TODO your logic
+}
+```
+
+## filter_after 接口形式
+
+filter_after 需要使用者自行实现,下面为LocalRust的实现形式
+
+```rust
+#[no_mangle]
+#[allow(improper_ctypes)]
+pub extern fn your_func(para: &Vec<Instance>) -> Result<Vec<Instance>> {
+	// TODO your logic
+}
+```
+
 ### 动态`Executor`
 
 动态路由不需要在运行之前预先定义，既在运行时决定自己的去处，非常的灵活，每个实例可以有自己独立的选择。不过不建议使用，一是目前此功能还不完善，二是该功能性能比静态路由要差，三、业务布局的展示会比较困难。

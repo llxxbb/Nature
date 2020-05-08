@@ -15,6 +15,7 @@
 - incompatible change: `DelayedInstances` and `ConverterParameter`
 - incompatible change: rename `ParaForIDAndFrom` to `IDAndFrom`
 - incompatible change: rename `QueryByID` to `KeyCondition`
+- incompatible change: builtin-executor dimensionSplit renamed to scatter and make it clearer for its usage
 - builtin executor: timer
 - bug fixed: cache_saved is invalid
 - bug fixed: create_time unset for `MetaType::Multi`
@@ -23,10 +24,11 @@
 ### should commit
 
 
+
 ### 未完成
 
+
 - dimension_separator 优化，
-  - 不需要filter就能完成任务。
   - 增加filter1（localRust）: 将姓名替换成学号
   - 增加filter2(http): 将班级去掉
 
