@@ -23,14 +23,11 @@
 
 ### should commit
 
-
+- demo doc: score
 
 ### 未完成
 
-
-- dimension_separator 优化，
-  - 增加filter1（localRust）: 将姓名替换成学号
-  - 增加filter2(http): 将班级去掉
+- demo doc: e-mall
 
 - demo: 销量统计， 使用 builtin-executor sum
 

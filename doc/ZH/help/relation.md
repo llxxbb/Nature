@@ -80,12 +80,12 @@ pub struct Executor {
 }
 ```
 
-**protocol**： Nature 与 `Executor`间的通讯协议，目前支持下面的方式。
+**protocol**： Nature 与 `Executor`间的通讯协议，其内容不区分大小写，目前支持下面的方式。
 
 - Http | Https：远程调用一个`Executor`。
 - LocalRust：Nature 会加载一个本地 rust 库作为`Executor`
-- Auto：不能显式设置此值。服务于Nature自动创建的`Executor`
-- BuiltIn：使用Nature 内置的转换器进行转换。
+- Auto：当使用者不指定`executor`时，Nature在`运行时`会自动构建一个`executor`。因为`auto-executor`不会生成`Instance.content`的内容。所以当我们不需要关心实例的内容而只关心ID，状态等时可以不指定`executor`。
+- BuiltIn：使用Nature 内置的转换器进行转换。通过 `url` 属性来指定要使用哪一个`builtin-executor`
 
 **url**：用于定位`Executor`的位置
 
@@ -104,6 +104,13 @@ pub struct Executor {
 {
     "protocol":"LocalRust",
     "url":"some_lib:some_converter"
+}
+```
+
+```json
+{
+    "protocol":"builtIn",
+    "url":"sum"
 }
 ```
 
