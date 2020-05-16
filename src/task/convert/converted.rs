@@ -1,5 +1,3 @@
-use std::str::FromStr;
-
 use nature_common::{CONTEXT_TARGET_INSTANCE_ID, FromInstance, Instance, Meta, MetaType, NatureError, Result};
 use nature_db::{Mission, RawTask};
 
@@ -96,7 +94,7 @@ fn check_id(ins: &mut Vec<Instance>, last: &Option<Instance>, from: &FromInstanc
         if let Some(id_u) = id {
             one.id = id_u;
         } else if let Some(id_s) = one.sys_context.get(&*CONTEXT_TARGET_INSTANCE_ID) {
-            one.id = u128::from_str(id_s)?;
+            one.id = u128::from_str_radix(id_s, 16)?;
         }
     }
     Ok(())

@@ -104,13 +104,13 @@ fn init_target_id_for_sys_context(task: &TaskForConvert, raw: &RawTask, from_ins
 // the master must exists, otherwise `Protocol::Auto` would not be generated.
             let master = to_meta.get_setting().unwrap().master.unwrap();
             match master.eq(&from_instance.meta) {
-                true => Ok(from_instance.id.to_string()),
+                true => Ok(format!("{:x}", from_instance.id)),
                 false => {
                     match f_meta.get_setting() {
                         Some(f_setting) => match f_setting.master {
                             None => Err(err.clone()),
                             Some(f_master) => match f_master.eq(&master) {
-                                true => Ok(from_instance.id.to_string()),
+                                true => Ok(format!("{:x}", from_instance.id)),
                                 false => Err(err.clone()),
                             },
                         }

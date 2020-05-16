@@ -16,6 +16,7 @@
 - incompatible change: rename `ParaForIDAndFrom` to `IDAndFrom`
 - incompatible change: rename `QueryByID` to `KeyCondition`
 - incompatible change: builtin-executor dimensionSplit renamed to scatter and make it clearer for its usage
+- incompatible change: target.id changed from decimal to hexadecimal
 - builtin executor: timer
 - bug fixed: cache_saved is invalid
 - bug fixed: create_time unset for `MetaType::Multi`
@@ -39,6 +40,10 @@
 - 执行器可设置系统上下文，以定义下一个执行器的延迟时间。这个时间可以覆盖`关系`中预定义的`延迟时间`
 - `Relation`文档补全(完成统计Demo 回过头来写会更好)
 
+## Release 0.9.0
+
+- token 发放、验证
+- context : executor setting 中可复制，可增加，可移除
 
 ## Release 1.0.0
 
