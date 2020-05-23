@@ -28,8 +28,12 @@
 
 ### 未完成
 
-- demo doc: e-mall
+- demo doc: e-mall-4
 
+  - MetaType::Null
+
+- demo doc: e-mall-7
+  
 - demo: 销量统计， 使用 builtin-executor sum
 
 - 文档

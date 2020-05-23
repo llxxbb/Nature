@@ -70,6 +70,42 @@ all of above are `and` relation
 /// any : means must include one
 ```
 
+**注意**：
+
+尽管`上下文`和`系统上下文`都是 KV 类型，但当做流程选择条件时，Nature 只处理“K”不处理“V”，这是从简化设计角度来考虑的。V的形式是业务决定的，可能是一个URL，也可能“a|b|c”，也可能是个json，所以是不规范的。Nature 也不想对此进行规范，这样可能既限制了业务的灵活性又降低了处理性能。而“K”则是非常规范的，就是一个标签，非常便于 Nature 进行处理。当然这种方式也有问题，当`上下文`和`系统上下文`用作流程选择时就失去了KV的意义。
+
+所以在一开始使用`上下文`和`系统上下文`时可能会出现错误的使用方式，如根据性别选择不同的处理流程：
+
+- 错误的方式：K:gender,  V: boy | girl
+
+  | KEY    | VALUE           |
+  | ------ | --------------- |
+  | gender | "boy" \| "girl" |
+
+- 正确方式1：
+
+  | KEY                       | VALUE |
+  | ------------------------- | ----- |
+  | gender.boy \| gender.girl | ""    |
+
+  流程控制设置类似于：
+
+  - 男孩流程：relation1.selector.**context_all** = ["gender.boy"]
+
+  - 女孩流程：relation2.selector.**context_all** = ["gender.girl"]
+
+- 正确方式2：
+
+  | KEY          | VALUE |
+  | ------------ | ----- |
+  | gender.isBoy | ""    |
+  
+  流程控制设置类似于：
+  
+  - 男孩流程：relation1.selector.**context_all** = ["gender.isBoy"]
+  
+  - 女孩流程：relation2.selector.**context_none** = ["gender.isBoy"]
+
 ### 定义用于转化的：Executor
 
 ```rust
