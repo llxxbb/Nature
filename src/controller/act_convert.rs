@@ -29,7 +29,7 @@ async fn do_convert(task: TaskForConvert, raw: RawTask) {
         init_target_id_for_sys_context(&task, &raw, &mut from_instance)
     }
     // -----end
-    let last = match InstanceDaoImpl::get_last_taget(&from_instance, &task.target) {
+    let last = match InstanceDaoImpl::get_last_taget(&from_instance, &task.target).await {
         Err(_) => { return; }
         Ok(last) => last
     };
@@ -45,7 +45,7 @@ async fn do_convert(task: TaskForConvert, raw: RawTask) {
             return;
         }
     };
-    let master = match task.from.get_master(&meta, InstanceDaoImpl::get_by_id) {
+    let master = match task.from.get_master(&meta, InstanceDaoImpl::get_by_id).await {
         Ok(m) => m,
         Err(e) => {
             let _ = TaskDaoImpl::raw_to_error(&e, &raw);

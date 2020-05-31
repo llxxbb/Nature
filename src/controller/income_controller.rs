@@ -1,7 +1,7 @@
 use std::convert::TryFrom;
 
 use nature_common::{ConverterReturned, DelayedInstances, generate_id, Instance, MetaType, NatureError, Result, SelfRouteInstance};
-use nature_db::{INS_KEY_GETTER, InstanceDaoImpl, MCG, MetaCacheImpl, MG, Mission, RawTask, RelationCacheImpl, RelationDaoImpl, TaskDaoImpl, TaskType};
+use nature_db::{InstanceDaoImpl, MCG, MetaCacheImpl, MG, Mission, RawTask, RelationCacheImpl, RelationDaoImpl, TaskDaoImpl, TaskType};
 use nature_db::flow_tool::{context_check, state_check};
 
 use crate::channels::CHANNEL_CONVERT;
@@ -59,15 +59,15 @@ impl IncomeController {
                             Err(NatureError::VerifyError("callback can not process [ConverterReturned::Delay]".to_string()))
                         }
                         ConverterReturned::Instances(ins) => {
-                            let (task, last) = get_task_and_last(&carrier)?;
+                            let (task, last) = get_task_and_last(&carrier).await?;
                             after_converted(&task, &carrier, ins, &last).await
                         }
                         ConverterReturned::SelfRoute(sf) => {
-                            let (task, _last) = get_task_and_last(&carrier)?;
+                            let (task, _last) = get_task_and_last(&carrier).await?;
                             received_self_route(&task, &carrier, sf)
                         }
                         ConverterReturned::None => {
-                            let (task, _last) = get_task_and_last(&carrier)?;
+                            let (task, _last) = get_task_and_last(&carrier).await?;
                             process_null(task.target.to.get_meta_type(), &delayed.task_id)
                         }
                     }
@@ -86,7 +86,7 @@ impl IncomeController {
                 channel_stored(rtn, raw).await;
             }
             TaskType::Convert => {
-                let rtn = TaskForConvert::from_raw(&raw, INS_KEY_GETTER, MCG, MG)?;
+                let rtn = TaskForConvert::from_raw(&raw, InstanceDaoImpl::get_by_key, MCG, MG).await?;
                 debug!("--redo convert task: from:{}, to:{}", rtn.from.meta, rtn.target.to.meta_string());
                 CHANNEL_CONVERT.sender.lock().unwrap().send((rtn, raw))?;
             }
@@ -108,8 +108,8 @@ impl IncomeController {
     }
 }
 
-fn get_task_and_last(task: &RawTask) -> Result<(TaskForConvert, Option<Instance>)> {
-    let task: TaskForConvert = TaskForConvert::from_raw(task, INS_KEY_GETTER, MCG, MG)?;
-    let last = InstanceDaoImpl::get_last_taget(&task.from, &task.target)?;
+async fn get_task_and_last(task: &RawTask) -> Result<(TaskForConvert, Option<Instance>)> {
+    let task: TaskForConvert = TaskForConvert::from_raw(task, InstanceDaoImpl::get_by_key, MCG, MG).await?;
+    let last = InstanceDaoImpl::get_last_taget(&task.from, &task.target).await?;
     Ok((task, last))
 }
