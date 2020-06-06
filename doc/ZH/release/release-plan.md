@@ -28,7 +28,9 @@
 
 ### 未完成
 
-- replace diesel with mysql_async, because of libmysqlclient_sys cannot compile under stable rust toolchain and win10 
+- replace diesel with mysql_async, because of libmysqlclient_sys cannot compile under stable rust toolchain and win10
+- unique violation : async_mysql
+ 
 - demo doc: e-mall-4
 
   - MetaType::Null
