@@ -38,7 +38,7 @@ async fn do_convert(task: TaskForConvert, raw: RawTask) {
         return;
     }
     // init master
-    let meta = match C_M.get(&task.from.meta, &*D_M) {
+    let meta = match C_M.get(&task.from.meta, &*D_M).await {
         Ok(m) => m,
         Err(e) => {
             let _ = D_T.raw_to_error(&e, &raw).await;
@@ -94,7 +94,7 @@ async fn init_target_id_for_sys_context(task: &TaskForConvert, raw: &RawTask, fr
  to.meta.master == from.meta.master
     "#;
     let target = from_instance.sys_context.get(CONTEXT_TARGET_INSTANCE_ID);
-    let f_meta = C_M.get(&task.from.meta, &*D_M).unwrap();
+    let f_meta = C_M.get(&task.from.meta, &*D_M).await.unwrap();
     let to_meta = task.target.to.clone();
     let msg = format!("relation defined error {} to {} . {}", f_meta.meta_string(), to_meta.meta_string(), msg);
     let err = NatureError::VerifyError(msg.to_string());

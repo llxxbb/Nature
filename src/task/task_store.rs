@@ -72,7 +72,7 @@ impl TaskForStore {
         RawTask::from_str(&json, &self.instance.get_key(), TaskType::Store as i8, &self.instance.meta)
     }
 
-    pub fn from_raw<MC, M>(raw: &RawTask, mc_g: &MC, m_g: &M) -> Result<Self>
+    pub async fn from_raw<MC, M>(raw: &RawTask, mc_g: &MC, m_g: &M) -> Result<Self>
         where MC: MetaCache, M: MetaDao
     {
         let temp: TaskForStoreTemp = serde_json::from_str(&raw.data)?;
@@ -81,13 +81,13 @@ impl TaskForStore {
             next_mission: {
                 let mut rtn: Vec<Mission> = vec![];
                 for one in temp.next_mission {
-                    rtn.push(Mission::from(Mission::from_raw(&one, mc_g, m_g)?))
+                    rtn.push(Mission::from(Mission::from_raw(&one, mc_g, m_g).await?))
                 }
                 rtn
             },
             previous_mission: match temp.previous_mission {
                 None => None,
-                Some(m) => Some(Mission::from(Mission::from_raw(&m, mc_g, m_g)?))
+                Some(m) => Some(Mission::from(Mission::from_raw(&m, mc_g, m_g).await?))
             },
             need_cache: temp.need_cache,
         };

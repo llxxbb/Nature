@@ -7,6 +7,7 @@
 
 ## Release 0.8
 
+- replace diesel with mysql_async, because of libmysqlclient_sys cannot compile under stable rust toolchain and win10
 - add `RelationSetting.delay_on_para`
 - add interface `query_by_meta` for outside call
 - incompatible change: change `Instance` table design
@@ -28,8 +29,7 @@
 
 ### 未完成
 
-- replace diesel with mysql_async, because of libmysqlclient_sys cannot compile under stable rust toolchain and win10
-- unique violation : async_mysql
+- db unique violation : async_mysql
  
 - demo doc: e-mall-4
 

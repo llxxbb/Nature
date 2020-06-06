@@ -16,7 +16,7 @@ async fn inner_batch(instances: Vec<Instance>, raw: &RawTask) -> Result<()> {
     let mut store_infos: Vec<RawTask> = Vec::new();
     let mut t_d: Vec<(TaskForStore, RawTask)> = Vec::new();
     for instance in &instances {
-        let meta = C_M.get(&instance.meta, &*D_M)?;
+        let meta = C_M.get(&instance.meta, &*D_M).await?;
         let meta_type = meta.get_meta_type();
         let relations = C_R.get(&instance.meta, &*D_R, &*C_M, &*D_M)?;
         let r = match meta_type {

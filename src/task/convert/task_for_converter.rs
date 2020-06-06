@@ -67,7 +67,7 @@ impl TaskForConvert {
             Some(ins) => {
                 TaskForConvert {
                     from: ins,
-                    target: Mission::from_raw(&mr, mc_g, m_g)?,
+                    target: Mission::from_raw(&mr, mc_g, m_g).await?,
                     conflict_version: 0,
                 }
             }

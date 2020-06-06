@@ -13,7 +13,7 @@ pub struct IncomeController {}
 impl IncomeController {
     /// born an instance which is the beginning of the changes.
     pub async fn input(mut instance: Instance) -> Result<u128> {
-        let _ = check_and_revise(&mut instance)?;
+        let _ = check_and_revise(&mut instance).await?;
         let relations = C_R.get(&instance.meta, &*D_R, &*C_M, &*D_M)?;
         let mission = Mission::get_by_instance(&instance, &relations, context_check, state_check);
         // for o in &mission {
@@ -82,7 +82,7 @@ impl IncomeController {
         // TODO check busy first
         match TaskType::try_from(raw.task_type)? {
             TaskType::Store => {
-                let rtn = TaskForStore::from_raw(&raw, &*C_M, &*D_M)?;
+                let rtn = TaskForStore::from_raw(&raw, &*C_M, &*D_M).await?;
                 debug!("--redo store task for task : {:?}", &rtn);
                 channel_stored(rtn, raw).await;
             }
@@ -115,14 +115,16 @@ async fn get_task_and_last(task: &RawTask) -> Result<(TaskForConvert, Option<Ins
     Ok((task, last))
 }
 
-fn check_and_revise(instance: &mut Instance) -> Result<&mut Instance> {
-    let _ = C_M.get(&instance.meta, &*D_M)?;    // verify meta
+async fn check_and_revise(instance: &mut Instance) -> Result<&mut Instance> {
+    let _ = C_M.get(&instance.meta, &*D_M).await?;    // verify meta
     instance.revise()
 }
 
 
 #[cfg(test)]
 mod test {
+    use tokio::runtime::Runtime;
+
     use super::*;
 
     #[test]
@@ -130,7 +132,8 @@ mod test {
         let mut instance = Instance::new("hello").unwrap();
         assert_eq!(instance.id, 0);
         assert_eq!(instance.create_time, 0);
-        let _ = check_and_revise(&mut instance);
+        let mut rt = Runtime::new().unwrap();
+        let _ = rt.block_on(check_and_revise(&mut instance));
         assert_eq!(instance.create_time > 0, true);
     }
 }

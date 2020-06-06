@@ -48,7 +48,7 @@ async fn save_one(converted: Converted, previous_mission: &Mission) -> Result<()
     let instance = &converted.converted[0];
     let relations = C_R.get(&instance.meta, &*D_R, &*C_M, &*D_M)?;
     let mission = Mission::get_by_instance(instance, &relations, context_check, state_check);
-    let meta = C_M.get(&instance.meta, &*D_M)?;
+    let meta = C_M.get(&instance.meta, &*D_M).await?;
     let task = TaskForStore::new(instance.clone(), mission, Some(previous_mission.clone()), meta.need_cache());
     let rtn = channel_store(task, converted.done_task).await?;
     Ok(rtn)
