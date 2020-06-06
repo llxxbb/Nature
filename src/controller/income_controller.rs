@@ -14,7 +14,7 @@ impl IncomeController {
     /// born an instance which is the beginning of the changes.
     pub async fn input(mut instance: Instance) -> Result<u128> {
         let _ = check_and_revise(&mut instance).await?;
-        let relations = C_R.get(&instance.meta, &*D_R, &*C_M, &*D_M)?;
+        let relations = C_R.get(&instance.meta, &*D_R, &*C_M, &*D_M).await?;
         let mission = Mission::get_by_instance(&instance, &relations, context_check, state_check);
         // for o in &mission {
         //     debug!("--generate mission from:{},to:{}", &instance.meta, o.to.meta_string());

@@ -46,7 +46,7 @@ async fn loop_check(task: &TaskForConvert, ins: &Instance, raw: &RawTask) -> boo
 
 async fn save_one(converted: Converted, previous_mission: &Mission) -> Result<()> {
     let instance = &converted.converted[0];
-    let relations = C_R.get(&instance.meta, &*D_R, &*C_M, &*D_M)?;
+    let relations = C_R.get(&instance.meta, &*D_R, &*C_M, &*D_M).await?;
     let mission = Mission::get_by_instance(instance, &relations, context_check, state_check);
     let meta = C_M.get(&instance.meta, &*D_M).await?;
     let task = TaskForStore::new(instance.clone(), mission, Some(previous_mission.clone()), meta.need_cache());

@@ -18,9 +18,9 @@ async fn inner_batch(instances: Vec<Instance>, raw: &RawTask) -> Result<()> {
     for instance in &instances {
         let meta = C_M.get(&instance.meta, &*D_M).await?;
         let meta_type = meta.get_meta_type();
-        let relations = C_R.get(&instance.meta, &*D_R, &*C_M, &*D_M)?;
+        let relations = C_R.get(&instance.meta, &*D_R, &*C_M, &*D_M).await?;
         let r = match meta_type {
-            MetaType::Multi => C_R.get(&instance.meta, &*D_R, &*C_M, &*D_M)?,
+            MetaType::Multi => C_R.get(&instance.meta, &*D_R, &*C_M, &*D_M).await?,
             _ => relations.clone(),
         };
         let mission = Mission::get_by_instance(&instance, &r, context_check, state_check);
