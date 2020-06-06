@@ -4,7 +4,7 @@ use chrono::{FixedOffset, Local};
 use futures::Future;
 
 use nature_common::{Instance, NatureError, Result};
-use nature_db::{MetaCacheGetter, MetaGetter, Mission, MissionRaw, RawTask, TaskType};
+use nature_db::{MetaCache, MetaDao, Mission, MissionRaw, RawTask, TaskType};
 
 use crate::task::{TASK_KEY_SEPARATOR, TaskForStore};
 
@@ -57,8 +57,8 @@ impl TaskForConvert {
             None => false,
         }
     }
-    pub async fn from_raw<T>(raw: &RawTask, ins_g: fn(String, String) -> T, mc_g: MetaCacheGetter, m_g: &MetaGetter) -> Result<Self>
-        where T: Future<Output=Result<Option<Instance>>>
+    pub async fn from_raw<T, MC, M>(raw: &RawTask, ins_g: fn(String, String) -> T, mc_g: &MC, m_g: &M) -> Result<Self>
+        where T: Future<Output=Result<Option<Instance>>>, MC: MetaCache, M: MetaDao
     {
         let mr = MissionRaw::from_json(&raw.data)?;
         let result = ins_g(raw.task_key.to_string(), TASK_KEY_SEPARATOR.to_string()).await?;

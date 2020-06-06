@@ -2,7 +2,7 @@ use std::thread::sleep;
 use std::time::Duration;
 
 use nature_common::{IDAndFrom, NatureError, Result};
-use nature_db::{InstanceDaoImpl, MCG, MG, RawTask};
+use nature_db::{C_M, D_M, InstanceDaoImpl, RawTask};
 
 use crate::channels::CHANNEL_CONVERT;
 use crate::controller::channel_stored;
@@ -50,7 +50,7 @@ async fn duplicated_instance(task: TaskForStore, carrier: RawTask) -> Result<()>
     } else {
         warn!("conflict for state-meta: [{}] on version : {}", &task.instance.meta, task.instance.state_version);
         sleep(Duration::from_millis(10));
-        let mut rtn = TaskForConvert::from_raw(&carrier, InstanceDaoImpl::get_by_key, MCG, MG).await?;
+        let mut rtn = TaskForConvert::from_raw(&carrier, InstanceDaoImpl::get_by_key, &*C_M, &*D_M).await?;
         rtn.conflict_version = task.instance.state_version;
         CHANNEL_CONVERT.sender.lock().unwrap().send((rtn, carrier))?;
         Ok(())

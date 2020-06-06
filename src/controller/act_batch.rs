@@ -1,5 +1,5 @@
 use nature_common::{Instance, MetaType, Result};
-use nature_db::{MetaCacheImpl, MG, Mission, RawTask, RelationCacheImpl, RelationDaoImpl, TaskDaoImpl};
+use nature_db::{C_M, C_R, D_M, D_R, MetaCache, Mission, RawTask, RelationCache, TaskDaoImpl};
 use nature_db::flow_tool::{context_check, state_check};
 
 use crate::controller::channel_store;
@@ -16,11 +16,11 @@ async fn inner_batch(instances: Vec<Instance>, raw: &RawTask) -> Result<()> {
     let mut store_infos: Vec<RawTask> = Vec::new();
     let mut t_d: Vec<(TaskForStore, RawTask)> = Vec::new();
     for instance in &instances {
-        let meta = MetaCacheImpl::get(&instance.meta, MG)?;
+        let meta = C_M.get(&instance.meta, &*D_M)?;
         let meta_type = meta.get_meta_type();
-        let relations = RelationCacheImpl::get(&instance.meta, RelationDaoImpl::get_relations, MetaCacheImpl::get, MG)?;
+        let relations = C_R.get(&instance.meta, &*D_R, &*C_M, &*D_M)?;
         let r = match meta_type {
-            MetaType::Multi => RelationCacheImpl::get(&instance.meta, RelationDaoImpl::get_relations, MetaCacheImpl::get, MG)?,
+            MetaType::Multi => C_R.get(&instance.meta, &*D_R, &*C_M, &*D_M)?,
             _ => relations.clone(),
         };
         let mission = Mission::get_by_instance(&instance, &r, context_check, state_check);

@@ -1,7 +1,7 @@
 use std::convert::TryFrom;
 
-use nature_common::{ConverterReturned, DelayedInstances, generate_id, Instance, Meta, MetaType, NatureError, Result, SelfRouteInstance};
-use nature_db::{InstanceDaoImpl, MetaCacheImpl, MetaDaoImpl, Mission, RawTask, RelationCacheImpl, RelationDaoImpl, TaskDaoImpl, TaskType};
+use nature_common::{ConverterReturned, DelayedInstances, generate_id, Instance, MetaType, NatureError, Result, SelfRouteInstance};
+use nature_db::{C_M, C_R, D_M, D_R, InstanceDaoImpl, MetaCache, Mission, RawTask, RelationCache, TaskDaoImpl, TaskType};
 use nature_db::flow_tool::{context_check, state_check};
 
 use crate::channels::CHANNEL_CONVERT;
@@ -13,8 +13,8 @@ pub struct IncomeController {}
 impl IncomeController {
     /// born an instance which is the beginning of the changes.
     pub async fn input(mut instance: Instance) -> Result<u128> {
-        let _ = Self::check_and_revise(&mut instance)?;
-        let relations = RelationCacheImpl::get(&instance.meta, RelationDaoImpl::get_relations, MetaCacheImpl::get, MetaDaoImpl::get)?;
+        let _ = check_and_revise(&mut instance)?;
+        let relations = C_R.get(&instance.meta, &*D_R, &*C_M, &*D_M)?;
         let mission = Mission::get_by_instance(&instance, &relations, context_check, state_check);
         // for o in &mission {
         //     debug!("--generate mission from:{},to:{}", &instance.meta, o.to.meta_string());
@@ -82,12 +82,12 @@ impl IncomeController {
         // TODO check busy first
         match TaskType::try_from(raw.task_type)? {
             TaskType::Store => {
-                let rtn = TaskForStore::from_raw(&raw, MetaCacheImpl::get, MetaDaoImpl::get)?;
+                let rtn = TaskForStore::from_raw(&raw, &*C_M, &*D_M)?;
                 debug!("--redo store task for task : {:?}", &rtn);
                 channel_stored(rtn, raw).await;
             }
             TaskType::Convert => {
-                let rtn = TaskForConvert::from_raw(&raw, InstanceDaoImpl::get_by_key, MetaCacheImpl::get, MetaDaoImpl::get).await?;
+                let rtn = TaskForConvert::from_raw(&raw, InstanceDaoImpl::get_by_key, &*C_M, &*D_M).await?;
                 debug!("--redo convert task: from:{}, to:{}", rtn.from.meta, rtn.target.to.meta_string());
                 CHANNEL_CONVERT.sender.lock().unwrap().send((rtn, raw))?;
             }
@@ -110,13 +110,13 @@ impl IncomeController {
 }
 
 async fn get_task_and_last(task: &RawTask) -> Result<(TaskForConvert, Option<Instance>)> {
-    let task: TaskForConvert = TaskForConvert::from_raw(task, InstanceDaoImpl::get_by_key, MetaCacheImpl::get, MetaDaoImpl::get).await?;
+    let task: TaskForConvert = TaskForConvert::from_raw(task, InstanceDaoImpl::get_by_key, &*C_M, &*D_M).await?;
     let last = InstanceDaoImpl::get_last_taget(&task.from, &task.target).await?;
     Ok((task, last))
 }
 
 fn check_and_revise(instance: &mut Instance) -> Result<&mut Instance> {
-    let _ = Meta::get(&instance.meta, MetaCacheImpl::get, MetaDaoImpl::get)?;
+    let _ = C_M.get(&instance.meta, &*D_M)?;    // verify meta
     instance.revise()
 }
 
@@ -130,7 +130,6 @@ mod test {
         let mut instance = Instance::new("hello").unwrap();
         assert_eq!(instance.id, 0);
         assert_eq!(instance.create_time, 0);
-        let m_g: fn(&str) -> Result<String> = meta_getter;
         let _ = check_and_revise(&mut instance);
         assert_eq!(instance.create_time > 0, true);
     }

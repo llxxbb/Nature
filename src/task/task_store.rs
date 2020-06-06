@@ -1,7 +1,7 @@
 use std::sync::mpsc::Sender;
 
 use nature_common::{DynamicConverter, Instance, is_default, Result};
-use nature_db::{MetaCacheGetter, MetaGetter, Mission, MissionRaw, RawTask, TaskType};
+use nature_db::{MetaCache, MetaDao, Mission, MissionRaw, RawTask, TaskType};
 
 #[derive(Debug, Clone, Default)]
 pub struct TaskForStore {
@@ -72,7 +72,9 @@ impl TaskForStore {
         RawTask::from_str(&json, &self.instance.get_key(), TaskType::Store as i8, &self.instance.meta)
     }
 
-    pub fn from_raw(raw: &RawTask, mc_g: MetaCacheGetter, m_g: &MetaGetter) -> Result<Self> {
+    pub fn from_raw<MC, M>(raw: &RawTask, mc_g: &MC, m_g: &M) -> Result<Self>
+        where MC: MetaCache, M: MetaDao
+    {
         let temp: TaskForStoreTemp = serde_json::from_str(&raw.data)?;
         let rtn = TaskForStore {
             instance: temp.instance,

@@ -1,7 +1,7 @@
 use actix_rt::Runtime;
 
 use nature_common::{CONTEXT_TARGET_INSTANCE_ID, ConverterReturned, Instance, NatureError, Protocol, Result};
-use nature_db::{InstanceDaoImpl, MetaCacheImpl, MG, Mission, RawTask, TaskDaoImpl};
+use nature_db::{C_M, D_M, InstanceDaoImpl, MetaCache, Mission, RawTask, TaskDaoImpl};
 
 use crate::controller::{after_converted, process_null, received_self_route};
 use crate::task::{gen_and_call_out, TaskForConvert};
@@ -38,7 +38,7 @@ async fn do_convert(task: TaskForConvert, raw: RawTask) {
         return;
     }
     // init master
-    let meta = match MetaCacheImpl::get(&task.from.meta, MG) {
+    let meta = match C_M.get(&task.from.meta, &*D_M) {
         Ok(m) => m,
         Err(e) => {
             let _ = TaskDaoImpl::raw_to_error(&e, &raw);
@@ -94,7 +94,7 @@ fn init_target_id_for_sys_context(task: &TaskForConvert, raw: &RawTask, from_ins
  to.meta.master == from.meta.master
     "#;
     let target = from_instance.sys_context.get(CONTEXT_TARGET_INSTANCE_ID);
-    let f_meta = MetaCacheImpl::get(&task.from.meta, MG).unwrap();
+    let f_meta = C_M.get(&task.from.meta, &*D_M).unwrap();
     let to_meta = task.target.to.clone();
     let msg = format!("relation defined error {} to {} . {}", f_meta.meta_string(), to_meta.meta_string(), msg);
     let err = NatureError::VerifyError(msg.to_string());
