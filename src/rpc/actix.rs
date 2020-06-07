@@ -4,7 +4,7 @@ use actix_web::{HttpResponse, ResponseError, web};
 use actix_web::web::Json;
 use serde::export::fmt::Debug;
 
-use nature_common::{DelayedInstances, Instance, NatureError, ParaForQueryByID, SelfRouteInstance};
+use nature_common::{DelayedInstances, Instance, NatureError, KeyCondition, SelfRouteInstance};
 use nature_db::{InstanceDaoImpl, RawTask};
 
 use crate::controller::IncomeController;
@@ -36,11 +36,15 @@ async fn redo_task(task: Json<RawTask>) -> HttpResponse {
     return_result(x)
 }
 
-async fn get_by_id(para: Json<ParaForQueryByID>) -> HttpResponse {
-    let x = InstanceDaoImpl::get_by_id(&para.0);
+async fn get_by_id(para: Json<KeyCondition>) -> HttpResponse {
+    let x = InstanceDaoImpl::get_by_id(para.0).await;
     return_result(x)
 }
 
+async fn get_by_meta(para: Json<KeyCondition>) -> HttpResponse {
+    let x = InstanceDaoImpl::get_by_meta(&para.0).await;
+    return_result(x)
+}
 
 pub fn web_config(cfg: &mut web::ServiceConfig) {
     cfg
@@ -49,7 +53,8 @@ pub fn web_config(cfg: &mut web::ServiceConfig) {
         .route("/callback", web::post().to(callback))
         .route("/batch", web::post().to(batch))
         .route("/redo_task", web::post().to(redo_task))
-        .route("/get_by_id", web::post().to(get_by_id));
+        .route("/get_by_id", web::post().to(get_by_id))
+        .route("/get_by_meta", web::post().to(get_by_meta));
 }
 
 

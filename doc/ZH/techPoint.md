@@ -5,6 +5,7 @@
 rustup toolchain install nightly-2018-12-08
 
 使用 x86_64 版本的， 不能使用i686版本的，否则 mysqlclient-sys 会发生 link 错误。
+不能使用 stable 胡 toolchain, mysqlclient-sys 编译不过去 
 
 ## switch toolchain
 

@@ -95,7 +95,7 @@ fn entry_from_str(path: &str) -> Result<LibraryEntry> {
 mod test {
     use futures::executor::block_on;
 
-    use nature_common::{ConverterParameter, ConverterReturned};
+    use nature_common::{ConverterParameter, ConverterReturned, Instance};
 
     use super::*;
 
@@ -104,7 +104,7 @@ mod test {
         let para = ConverterParameter {
             from: Default::default(),
             last_state: None,
-            task_id: vec![],
+            task_id: "".to_string(),
             master: None,
             cfg: "".to_string(),
         };
@@ -119,5 +119,11 @@ mod test {
         // ok
         let rtn: ConverterReturned = block_on(local_execute("nature_integrate_test_executor:rtn_none", &para)).unwrap();
         assert_eq!(rtn, ConverterReturned::None);
+        // filter_before
+        let rtn: Result<Instance> = block_on(local_execute("nature_integrate_test_executor:filter_before_test", &Instance::default())).unwrap();
+        assert_eq!(rtn.is_ok(), true);
+        // filter_after
+        let rtn: Result<Vec<Instance>> = block_on(local_execute("nature_integrate_test_executor:filter_after_test", &vec![Instance::default()])).unwrap();
+        assert_eq!(rtn.is_ok(), true);
     }
 }

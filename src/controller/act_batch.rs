@@ -1,5 +1,5 @@
 use nature_common::{Instance, MetaType, Result};
-use nature_db::{MetaCacheImpl, MG, Mission, RawTask, RelationCacheImpl, RelationDaoImpl, TaskDaoImpl};
+use nature_db::{C_M, C_R, D_M, D_R, D_T, MetaCache, Mission, RawTask, RelationCache, TaskDao};
 use nature_db::flow_tool::{context_check, state_check};
 
 use crate::controller::channel_store;
@@ -8,7 +8,7 @@ use crate::task::TaskForStore;
 pub async fn channel_batch(instances: Vec<Instance>, raw: RawTask) {
     if let Err(e) = inner_batch(instances, &raw).await {
         error!("{}", e);
-        let _ = TaskDaoImpl::raw_to_error(&e, &raw);
+        let _ = D_T.raw_to_error(&e, &raw).await;
     }
 }
 
@@ -16,11 +16,11 @@ async fn inner_batch(instances: Vec<Instance>, raw: &RawTask) -> Result<()> {
     let mut store_infos: Vec<RawTask> = Vec::new();
     let mut t_d: Vec<(TaskForStore, RawTask)> = Vec::new();
     for instance in &instances {
-        let meta = MetaCacheImpl::get(&instance.meta, MG)?;
+        let meta = C_M.get(&instance.meta, &*D_M).await?;
         let meta_type = meta.get_meta_type();
-        let relations = RelationCacheImpl::get(&instance.meta, RelationDaoImpl::get_relations, MetaCacheImpl::get, MG)?;
+        let relations = C_R.get(&instance.meta, &*D_R, &*C_M, &*D_M).await?;
         let r = match meta_type {
-            MetaType::Multi => RelationCacheImpl::get(&instance.meta, RelationDaoImpl::get_relations, MetaCacheImpl::get, MG)?,
+            MetaType::Multi => C_R.get(&instance.meta, &*D_R, &*C_M, &*D_M).await?,
             _ => relations.clone(),
         };
         let mission = Mission::get_by_instance(&instance, &r, context_check, state_check);
@@ -36,7 +36,7 @@ async fn inner_batch(instances: Vec<Instance>, raw: &RawTask) -> Result<()> {
             Err(e) => return Err(e)
         }
     }
-    if RawTask::save_batch(&store_infos, &raw.task_id, TaskDaoImpl::insert, TaskDaoImpl::finish_task).is_ok() {
+    if RawTask::save_batch(&store_infos, &raw.task_id, &*D_T).await.is_ok() {
         for task in t_d {
             // if let Some(m) = &task.0.next_mission {
             //     for o in m {

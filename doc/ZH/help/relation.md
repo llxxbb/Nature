@@ -25,6 +25,7 @@ pub struct RelationSettings {
     pub use_upstream_id: bool,
     pub target: RelationTarget,
     pub delay: i32,
+    pub delay_on_para: (i32, u8),
 }
 ```
 
@@ -35,6 +36,7 @@ pub struct RelationSettings {
 - use_upstream_id：新生成的 `Instance` 的 ID 将使用上游 `Instance`的 ID。
 - target：对目标实例的一些要求，下面会有具体解释。
 - delay：本次任务需要延迟指定的秒数后执行。
+- delay_on_para：延迟本次任务的执行，延迟的时间=上游`Instance.para`中指定的位置的时间（元组中的第二个值）+给定的延时时间（元组中的第一个值）
 
 ### 触发转换的条件： FlowSelector
 
@@ -68,6 +70,42 @@ all of above are `and` relation
 /// any : means must include one
 ```
 
+**注意**：
+
+尽管`上下文`和`系统上下文`都是 KV 类型，但当做流程选择条件时，Nature 只处理“K”不处理“V”，这是从简化设计角度来考虑的。V的形式是业务决定的，可能是一个URL，也可能“a|b|c”，也可能是个json，所以是不规范的。Nature 也不想对此进行规范，这样可能既限制了业务的灵活性又降低了处理性能。而“K”则是非常规范的，就是一个标签，非常便于 Nature 进行处理。当然这种方式也有问题，当`上下文`和`系统上下文`用作流程选择时就失去了KV的意义。
+
+所以在一开始使用`上下文`和`系统上下文`时可能会出现错误的使用方式，如根据性别选择不同的处理流程：
+
+- 错误的方式：K:gender,  V: boy | girl
+
+  | KEY    | VALUE           |
+  | ------ | --------------- |
+  | gender | "boy" \| "girl" |
+
+- 正确方式1：
+
+  | KEY                       | VALUE |
+  | ------------------------- | ----- |
+  | gender.boy \| gender.girl | ""    |
+
+  流程控制设置类似于：
+
+  - 男孩流程：relation1.selector.**context_all** = ["gender.boy"]
+
+  - 女孩流程：relation2.selector.**context_all** = ["gender.girl"]
+
+- 正确方式2：
+
+  | KEY          | VALUE |
+  | ------------ | ----- |
+  | gender.isBoy | ""    |
+  
+  流程控制设置类似于：
+  
+  - 男孩流程：relation1.selector.**context_all** = ["gender.isBoy"]
+  
+  - 女孩流程：relation2.selector.**context_none** = ["gender.isBoy"]
+
 ### 定义用于转化的：Executor
 
 ```rust
@@ -78,12 +116,12 @@ pub struct Executor {
 }
 ```
 
-**protocol**： Nature 与 `Executor`间的通讯协议，目前支持下面的方式。
+**protocol**： Nature 与 `Executor`间的通讯协议，其内容不区分大小写，目前支持下面的方式。
 
 - Http | Https：远程调用一个`Executor`。
 - LocalRust：Nature 会加载一个本地 rust 库作为`Executor`
-- Auto：不能显式设置此值。服务于Nature自动创建的`Executor`
-- BuiltIn：使用Nature 内置的转换器进行转换。
+- Auto：当使用者不指定`executor`时，Nature在`运行时`会自动构建一个`executor`。因为`auto-executor`不会生成`Instance.content`的内容。所以当我们不需要关心实例的内容而只关心ID，状态等时可以不指定`executor`。
+- BuiltIn：使用Nature 内置的转换器进行转换。通过 `url` 属性来指定要使用哪一个`builtin-executor`
 
 **url**：用于定位`Executor`的位置
 
@@ -102,6 +140,13 @@ pub struct Executor {
 {
     "protocol":"LocalRust",
     "url":"some_lib:some_converter"
+}
+```
+
+```json
+{
+    "protocol":"builtIn",
+    "url":"sum"
 }
 ```
 
@@ -158,6 +203,30 @@ pub enum ConverterReturned {
     Delay(u32),							// 用于延时处理，具体用法请看Demo
     Instances(Vec<Instance>),			// 产出的目标数据实例
     SelfRoute(Vec<SelfRouteInstance>),	// 定义动态路由
+}
+```
+
+## filter_before 接口形式
+
+filter_before 需要使用者自行实现,下面为LocalRust的实现形式
+
+```rust
+#[no_mangle]
+#[allow(improper_ctypes)]
+pub extern fn your_func(para: &Instance) -> Result<Instance> {
+	// TODO your logic
+}
+```
+
+## filter_after 接口形式
+
+filter_after 需要使用者自行实现,下面为LocalRust的实现形式
+
+```rust
+#[no_mangle]
+#[allow(improper_ctypes)]
+pub extern fn your_func(para: &Vec<Instance>) -> Result<Vec<Instance>> {
+	// TODO your logic
 }
 ```
 

@@ -9,3 +9,4 @@ target/
 nature.sqlite
 nature.sqlite-journal
 /out
+.run

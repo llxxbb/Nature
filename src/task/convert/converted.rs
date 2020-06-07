@@ -1,5 +1,3 @@
-use std::str::FromStr;
-
 use nature_common::{CONTEXT_TARGET_INSTANCE_ID, FromInstance, Instance, Meta, MetaType, NatureError, Result};
 use nature_db::{Mission, RawTask};
 
@@ -12,17 +10,11 @@ pub struct Converted {
 
 impl Converted {
     pub fn gen(task: &TaskForConvert, convert_task: &RawTask, instances: Vec<Instance>, last_state: &Option<Instance>) -> Result<Converted> {
-
-        // filter from cache
-        let mut instances: Vec<Instance> = if task.check_cache() {
-            instances.into_iter().filter(|one| !CachedKey::get(&one.get_unique())).collect()
-        } else {
-            instances
-        };
-
         if instances.is_empty() {
             return Ok(converted_none(convert_task));
         }
+
+        let mut instances = instances;
 
         // init meta and [from]
         let from = FromInstance::from(&task.from);
@@ -31,7 +23,14 @@ impl Converted {
         // check id
         let _ = check_id(&mut instances, &last_state, &from, &task.target)?;
 
-        // verify
+        // filter from cache
+        let mut instances: Vec<Instance> = if task.check_cache() {
+            instances.into_iter().filter(|one| !CachedKey::get(&one.get_key())).collect()
+        } else {
+            instances
+        };
+
+        // verify state
         let _ = verify_state(&task, &mut instances, last_state)?;
         let rtn = Converted {
             done_task: convert_task.to_owned(),
@@ -95,7 +94,7 @@ fn check_id(ins: &mut Vec<Instance>, last: &Option<Instance>, from: &FromInstanc
         if let Some(id_u) = id {
             one.id = id_u;
         } else if let Some(id_s) = one.sys_context.get(&*CONTEXT_TARGET_INSTANCE_ID) {
-            one.id = u128::from_str(id_s)?;
+            one.id = u128::from_str_radix(id_s, 16)?;
         }
     }
     Ok(())
@@ -179,7 +178,7 @@ mod test {
             conflict_version: 0,
         };
         let raw = RawTask {
-            task_id: vec![],
+            task_id: "".to_string(),
             task_key,
             task_type: 0,
             task_for: "".to_string(),
@@ -290,7 +289,7 @@ mod check_id_test {
             is_state: true,
             master: Some("another".to_string()),
             multi_meta: Default::default(),
-            conflict_avoid: false,
+            cache_saved: false,
         };
         let _ = meta.set_setting(&setting.to_json().unwrap());
         let mission = Mission {
@@ -353,7 +352,7 @@ mod check_id_test {
             is_state: true,
             master: Some("from".to_string()),
             multi_meta: Default::default(),
-            conflict_avoid: false,
+            cache_saved: false,
         };
         let ss = setting.to_json().unwrap();
         let _sr = meta.set_setting(&ss);

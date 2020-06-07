@@ -1,24 +1,26 @@
 use std::thread::sleep;
 use std::time::Duration;
 
-use nature_common::{NatureError, ParaForIDAndFrom, Result};
-use nature_db::{INS_KEY_GETTER, InstanceDaoImpl, MCG, MG, RawTask};
+use nature_common::{IDAndFrom, NatureError, Result};
+use nature_db::{C_M, D_M, InstanceDaoImpl, RawTask};
 
 use crate::channels::CHANNEL_CONVERT;
 use crate::controller::channel_stored;
 use crate::task::{CachedKey, TaskForConvert, TaskForStore};
 
 pub async fn channel_store(task: TaskForStore, carrier: RawTask) -> Result<()> {
-    match InstanceDaoImpl::insert(&task.instance) {
-        Ok(_) => do_instance_save(task, carrier).await,
-        Err(NatureError::DaoDuplicated(_)) => duplicated_instance(task, carrier).await,
+    match InstanceDaoImpl::insert(&task.instance).await {
+        Ok(_) => after_saved(task, carrier).await,
+        Err(NatureError::DaoDuplicated(_)) => {
+            duplicated_instance(task, carrier).await
+        }
         Err(e) => Err(e)
     }
 }
 
-async fn do_instance_save(task: TaskForStore, carrier: RawTask) -> Result<()> {
+async fn after_saved(task: TaskForStore, carrier: RawTask) -> Result<()> {
     let need_cache = task.need_cache;
-    let key = &task.instance.get_unique();
+    let key = &task.instance.get_key();
     channel_stored(task, carrier).await;
     if need_cache {
         CachedKey::set(key);
@@ -30,19 +32,16 @@ async fn duplicated_instance(task: TaskForStore, carrier: RawTask) -> Result<()>
     // process meta which is not status----------------
     if task.instance.state_version == 0 {
         warn!("instance already exists, meta: {}, id: {}", task.instance.meta, task.instance.id);
-        return do_instance_save(task, carrier).await;
+        return after_saved(task, carrier).await;
     }
     // process status-meta-------------------
     let ins_from = task.instance.from.clone().unwrap();
-    let para = ParaForIDAndFrom {
+    let para = IDAndFrom {
         id: task.instance.id,
         meta: task.instance.meta.clone(),
-        from_id: ins_from.id,
-        from_meta: ins_from.meta.clone(),
-        from_state_version: ins_from.state_version,
-        from_para: ins_from.para.clone(),
+        from_key: ins_from.to_string(),
     };
-    let old = InstanceDaoImpl::get_by_from(&para)?;
+    let old = InstanceDaoImpl::get_by_from(&para).await?;
     if let Some(ins) = old {
         // same frominstance
         warn!("same source for meta: {}, replaced with old instance", &task.instance.meta);
@@ -53,7 +52,7 @@ async fn duplicated_instance(task: TaskForStore, carrier: RawTask) -> Result<()>
     } else {
         warn!("conflict for state-meta: [{}] on version : {}", &task.instance.meta, task.instance.state_version);
         sleep(Duration::from_millis(10));
-        let mut rtn = TaskForConvert::from_raw(&carrier, INS_KEY_GETTER, MCG, MG)?;
+        let mut rtn = TaskForConvert::from_raw(&carrier, InstanceDaoImpl::get_by_key, &*C_M, &*D_M).await?;
         rtn.conflict_version = task.instance.state_version;
         CHANNEL_CONVERT.sender.lock().unwrap().send((rtn, carrier))?;
         Ok(())

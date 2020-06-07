@@ -1,9 +1,10 @@
 use std::ops::Add;
 
 use chrono::{FixedOffset, Local};
+use futures::Future;
 
 use nature_common::{Instance, NatureError, Result};
-use nature_db::{InstanceKeyGetter, MetaCacheGetter, MetaGetter, Mission, MissionRaw, RawTask, TaskType};
+use nature_db::{MetaCache, MetaDao, Mission, MissionRaw, RawTask, TaskType};
 
 use crate::task::{TASK_KEY_SEPARATOR, TaskForStore};
 
@@ -50,19 +51,23 @@ impl TaskForConvert {
     }
     pub fn check_cache(&self) -> bool {
         match self.target.to.get_setting() {
-            Some(s) => s.conflict_avoid,
+            Some(s) => {
+                s.cache_saved
+            }
             None => false,
         }
     }
-    pub fn from_raw(raw: &RawTask, ins_g: InstanceKeyGetter, mc_g: MetaCacheGetter, m_g: &MetaGetter) -> Result<Self> {
+    pub async fn from_raw<T, MC, M>(raw: &RawTask, ins_g: fn(String, String) -> T, mc_g: &MC, m_g: &M) -> Result<Self>
+        where T: Future<Output=Result<Option<Instance>>>, MC: MetaCache, M: MetaDao
+    {
         let mr = MissionRaw::from_json(&raw.data)?;
-        let result = ins_g(&raw.task_key, TASK_KEY_SEPARATOR)?;
+        let result = ins_g(raw.task_key.to_string(), TASK_KEY_SEPARATOR.to_string()).await?;
         let rtn = match result {
             None => return Err(NatureError::EnvironmentError("can't find instance".to_string())),
             Some(ins) => {
                 TaskForConvert {
                     from: ins,
-                    target: Mission::from_raw(&mr, mc_g, m_g)?,
+                    target: Mission::from_raw(&mr, mc_g, m_g).await?,
                     conflict_version: 0,
                 }
             }

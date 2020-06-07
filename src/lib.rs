@@ -1,7 +1,3 @@
-#![feature(plugin)]
-#![feature(trace_macros)]
-#![feature(box_patterns)]
-
 extern crate actix_web;
 extern crate chrono;
 extern crate futures;
@@ -24,3 +20,4 @@ pub mod rpc;
 pub mod task;
 pub mod controller;
 pub mod channels;
+pub mod builtin_executor;

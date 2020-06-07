@@ -7,4 +7,3 @@ mod converted;
 mod http_async;
 mod task_for_converter;
 mod execute;
-pub mod builtin_executor;

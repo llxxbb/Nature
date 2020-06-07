@@ -112,7 +112,7 @@ mod sum_test {
         let input = ConverterParameter {
             from: Default::default(),
             last_state: None,
-            task_id: vec![],
+            task_id: "".to_string(),
             master: None,
             cfg: "".to_string(),
         };
@@ -132,7 +132,7 @@ mod sum_test {
         let input = ConverterParameter {
             from,
             last_state: None,
-            task_id: vec![],
+            task_id: "".to_string(),
             master: None,
             cfg: r#"{"para_part":1}"#.to_string(),
         };
@@ -152,7 +152,7 @@ mod sum_test {
         let input = ConverterParameter {
             from,
             last_state: Some(last.clone()),
-            task_id: vec![],
+            task_id: "".to_string(),
             master: None,
             cfg: r#"{"para_part":1}"#.to_string(),
         };
@@ -173,7 +173,7 @@ mod sum_test {
         let input = ConverterParameter {
             from,
             last_state: Some(last.clone()),
-            task_id: vec![],
+            task_id: "".to_string(),
             master: None,
             cfg: r#"{"para_part":1}"#.to_string(),
         };
@@ -195,7 +195,7 @@ mod sum_test {
         let input = ConverterParameter {
             from,
             last_state: Some(last.clone()),
-            task_id: vec![],
+            task_id: "".to_string(),
             master: None,
             cfg: r#"{"para_part":1,"write_over":true}"#.to_string(),
         };
