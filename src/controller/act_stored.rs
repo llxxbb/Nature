@@ -8,7 +8,7 @@ pub async fn channel_stored(task: TaskForStore, raw: RawTask) {
     //     debug!("-- next mission: from:{}, to:{}", task.instance.meta, m.to.meta_string());
     // }
     if task.next_mission.is_empty() {
-        let _ = D_T.finish_task(&&raw.task_id);
+        let _ = D_T.finish_task(&&raw.task_id).await;
         return;
     }
     match TaskForConvert::gen_task(&task) {
