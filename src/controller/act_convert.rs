@@ -81,7 +81,7 @@ async fn handle_converted(converted: ConverterReturned, task: &TaskForConvert, r
             warn!("executor returned env err: {}", e);
         }
         ConverterReturned::None => {
-            let _ = process_null(mission.to.get_meta_type(), &raw.task_id);
+            let _ = process_null(mission.to.get_meta_type(), &raw.task_id).await;
         }
     }
     Ok(())
