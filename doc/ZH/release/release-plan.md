@@ -32,9 +32,10 @@
 
 - demo doc: e-mall-4
 
-  - MetaType::Null
+- MetaType::Null
 
 - demo doc: e-mall-7
+- demo score: need verify the result.
   
 - demo: 销量统计， 使用 builtin-executor sum
 
