@@ -21,7 +21,7 @@ impl IncomeController {
         // }
         let task = TaskForStore::new(instance.clone(), mission, None, false);
         let raw = task.to_raw()?;
-        D_T.insert(&raw).await?;
+        let _ = D_T.insert(&raw).await?;
         channel_store(task, raw).await?;
         Ok(instance.id)
     }
@@ -118,22 +118,4 @@ async fn get_task_and_last(task: &RawTask) -> Result<(TaskForConvert, Option<Ins
 async fn check_and_revise(instance: &mut Instance) -> Result<&mut Instance> {
     let _ = C_M.get(&instance.meta, &*D_M).await?;    // verify meta
     instance.revise()
-}
-
-
-#[cfg(test)]
-mod test {
-    use tokio::runtime::Runtime;
-
-    use super::*;
-
-    #[test]
-    fn revise_test() {
-        let mut instance = Instance::new("hello").unwrap();
-        assert_eq!(instance.id, 0);
-        assert_eq!(instance.create_time, 0);
-        let mut rt = Runtime::new().unwrap();
-        let _ = rt.block_on(check_and_revise(&mut instance));
-        assert_eq!(instance.create_time > 0, true);
-    }
 }

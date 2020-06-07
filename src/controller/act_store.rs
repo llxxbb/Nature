@@ -10,13 +10,15 @@ use crate::task::{CachedKey, TaskForConvert, TaskForStore};
 
 pub async fn channel_store(task: TaskForStore, carrier: RawTask) -> Result<()> {
     match InstanceDaoImpl::insert(&task.instance).await {
-        Ok(_) => do_instance_save(task, carrier).await,
-        Err(NatureError::DaoDuplicated(_)) => duplicated_instance(task, carrier).await,
+        Ok(_) => after_saved(task, carrier).await,
+        Err(NatureError::DaoDuplicated(_)) => {
+            duplicated_instance(task, carrier).await
+        }
         Err(e) => Err(e)
     }
 }
 
-async fn do_instance_save(task: TaskForStore, carrier: RawTask) -> Result<()> {
+async fn after_saved(task: TaskForStore, carrier: RawTask) -> Result<()> {
     let need_cache = task.need_cache;
     let key = &task.instance.get_key();
     channel_stored(task, carrier).await;
@@ -30,7 +32,7 @@ async fn duplicated_instance(task: TaskForStore, carrier: RawTask) -> Result<()>
     // process meta which is not status----------------
     if task.instance.state_version == 0 {
         warn!("instance already exists, meta: {}, id: {}", task.instance.meta, task.instance.id);
-        return do_instance_save(task, carrier).await;
+        return after_saved(task, carrier).await;
     }
     // process status-meta-------------------
     let ins_from = task.instance.from.clone().unwrap();

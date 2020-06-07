@@ -49,7 +49,7 @@ mod test {
     #[test]
     fn get_test() {
         assert_eq!(BuiltIn::get("hello").is_err(), true);
-        let rtn = BuiltIn::get("dimensionSplit");
+        let rtn = BuiltIn::get("scatter");
         assert_eq!(rtn.is_ok(), true);
     }
 }
