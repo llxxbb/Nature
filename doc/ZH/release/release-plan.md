@@ -28,8 +28,6 @@
 - demo doc: score
 
 ### 未完成
-
-- db unique violation : async_mysql
  
 - demo doc: e-mall-4
 
