@@ -1,6 +1,24 @@
 
 # 发布的功能
 
+## Release 0.8 2020-06-08
+
+- replace diesel with mysql_async, because of libmysqlclient_sys cannot compile under stable rust toolchain for win10
+- add `RelationSetting.delay_on_para`
+- add interface `query_by_meta` for outside call
+- incompatible change: change `Instance` table design
+- incompatible change: change `task` table design
+- incompatible change: `conflict_avoid` rename to `cache_saved` 
+- incompatible change: `DelayedInstances` and `ConverterParameter`
+- incompatible change: rename `ParaForIDAndFrom` to `IDAndFrom`
+- incompatible change: rename `QueryByID` to `KeyCondition`
+- incompatible change: builtin-executor dimensionSplit renamed to scatter and make it clearer for its usage
+- incompatible change: target.id changed from decimal to hexadecimal
+- builtin executor: timer
+- bug fixed: cache_saved is invalid
+- bug fixed: create_time unset for `MetaType::Multi`
+- bug fixed: task clean time is invalid 
+
 ## Release 0.7 2020-4-30
 
 - builtin-executor sum

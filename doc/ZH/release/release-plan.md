@@ -5,29 +5,44 @@
 - 功能性先于非功能性需求
 - 应用情景支持，支持内部优先支持外部（如网关）
 
-## Release 0.8
+## Release 0.9
 
 ### should commit
 
-
+- demo doc: score
 
 ### 未完成
+ 
+
+- demo doc: e-mall-4
+
+- MetaType::Null
+
+- demo doc: e-mall-7
+- demo score: need verify the result.
+  
+- demo: 销量统计， 使用 builtin-executor sum
 
 - 文档
+  - 内建执行器的参考文档(搞优先级，有利于推广)
   - 有关 env 配置的说明。 
   - 数据不可变，如何修正数据？ 独立做一个对中的数据！ 最终在展示层相加就可以了
-  - 内建执行器的参考文档
 
 - 执行器可设置系统上下文，以定义下一个执行器的延迟时间。这个时间可以覆盖`关系`中预定义的`延迟时间`
 - `Relation`文档补全(完成统计Demo 回过头来写会更好)
 
+## Release 0.9.0
+
+- token 发放、验证
+- context : executor setting 中可复制，可增加，可移除
 
 ## Release 1.0.0
 
 - 行使网关只能，充当所以业务系统的入口。
   - 查询外系统接口：queryThird
+  - Demo : 获取平均分（）
 - 读取优化
-  - Executor 支持内置缓存
+  - Executor 支持内置缓存 适用于网关
   - 提供一致性哈希，以分散缓存的压力
 
 - 支持第三方插件
@@ -39,14 +54,18 @@
 - 执行器：使用 `min-max-heap` 来支持优先级
 - 自路由：对`执行器`返回的自路由进行支持。
 - ID 生成器 snowflake for 128 bit implement.
-- 优化 task.data 的数据存储以节省空间并提升性能。如from 实例，meta 等 只保存必要的数据。
+- builtin-executor sum :
+  - for stream sum
 
-## Release 1.2.0
+## Release 2.0
+
+- `Meta`：不同的`Meta` 的 `Instance` 有不同的生命周期
+- `Meta`：支持属性验证，更新时验证是否有`Relation`在使用，如有则发出警告
+
+## Release 3.0
 
 - 提供后台管理界面
   - 更新配置时能够更新多个实例上的缓存
-- `Meta`：支持属性验证，更新时验证是否有`Relation`在使用，如有则发出警告
-- `Meta`：不同的`Meta` 的 `Instance` 有不同的生命周期
 -  密文存储：简单方案，不区分用户，对称加密，公私钥方案见云版
 - 分布式重试服务
 - 文档：
