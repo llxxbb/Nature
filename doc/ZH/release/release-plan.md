@@ -6,15 +6,18 @@
 - 应用情景支持，支持内部优先支持外部（如网关）
 
 ## Release 0.9
+- fix bug: for check_id
 
 ### should commit
 
 - demo doc: score
 
 ### 未完成
- 
 
-- demo doc: e-mall-4
+- relation setting: add next_id_is_from_id property
+
+- demo doc: e-mall-5 
+  - add waybill data check
 
 - MetaType::Null
 

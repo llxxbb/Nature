@@ -74,7 +74,7 @@ fn check_id(ins: &mut Vec<Instance>, last: &Option<Instance>, from: &FromInstanc
         return Ok(());
     }
 
-    let is_master = match &target.to.get_setting() {
+    let from_is_master = match &target.to.get_setting() {
         Some(setting) => match &setting.master {
             None => false,
             Some(master) => master.eq(&from.meta)
@@ -83,7 +83,7 @@ fn check_id(ins: &mut Vec<Instance>, last: &Option<Instance>, from: &FromInstanc
     };
 
     let id = {
-        if target.use_upstream_id || is_master {
+        if target.use_upstream_id || from_is_master {
             Some(from.id)
         } else if target.to.is_state() && last.is_some() {
             Some(last.as_ref().unwrap().id)
@@ -93,8 +93,6 @@ fn check_id(ins: &mut Vec<Instance>, last: &Option<Instance>, from: &FromInstanc
     for mut one in ins {
         if let Some(id_u) = id {
             one.id = id_u;
-        } else if let Some(id_s) = one.sys_context.get(&*CONTEXT_TARGET_INSTANCE_ID) {
-            one.id = u128::from_str_radix(id_s, 16)?;
         }
     }
     Ok(())
@@ -247,14 +245,15 @@ mod check_id_test {
     use super::*;
 
     #[test]
-    fn vec_is_empty() {
+    fn input_is_empty() {
         let (last, from, mission) = init_input();
         let rtn = check_id(&mut vec![], &Some(last), &from, &mission);
         assert_eq!(rtn.is_ok(), true)
     }
 
+    /// the instance that will be saved is child of from
     #[test]
-    fn vec_more_then_one() {
+    fn use_master_id() {
         let (last, from, mission) = init_input();
         let one = Instance::new("one").unwrap();
         let two = Instance::new("two").unwrap();
@@ -338,6 +337,7 @@ mod check_id_test {
         assert_eq!(input[0].id, 123);
     }
 
+    /// master is from
     fn init_input() -> (Instance, FromInstance, Mission) {
         let mut last = Instance::new("last").unwrap();
         last.id = 456;
