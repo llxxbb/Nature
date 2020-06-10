@@ -33,7 +33,7 @@ impl Converted {
         // verify state
         let _ = verify_state(&task, &mut instances, last_state)?;
 
-        sys_context_build(&mut instances, &task.target);
+        sys_context_build(&mut instances, &task.target, &from);
 
         // assemble it
         let rtn = Converted {
@@ -102,13 +102,17 @@ fn check_id(ins: &mut Vec<Instance>, last: &Option<Instance>, from: &FromInstanc
     Ok(())
 }
 
-fn sys_context_build(instances: &mut Vec<Instance>, mission: &Mission) {
+fn sys_context_build(instances: &mut Vec<Instance>, mission: &Mission, from: &FromInstance) {
     if !mission.id_bridge {
         return;
     }
     if let Some(id) = mission.sys_context.get(CONTEXT_TARGET_INSTANCE_ID) {
         for instance in instances {
             instance.data.sys_context.insert(CONTEXT_TARGET_INSTANCE_ID.to_string(), id.to_string());
+        }
+    } else {
+        for instance in instances {
+            instance.data.sys_context.insert(CONTEXT_TARGET_INSTANCE_ID.to_string(), format!("{:x}", from.id));
         }
     }
 }
@@ -166,26 +170,28 @@ mod sys_context_test {
     #[test]
     fn no_bridge_set() {
         let mut ins: Vec<Instance> = vec![Instance::default()];
-        sys_context_build(&mut ins, &Mission::default());
+        sys_context_build(&mut ins, &Mission::default(),&FromInstance::default());
         assert_eq!(0, ins[0].sys_context.len())
     }
 
     #[test]
-    fn bridge_set_but_no_target_set() {
+    fn id_from_previous_id() {
         let mut ins: Vec<Instance> = vec![Instance::default()];
         let mut mission = Mission::default();
         mission.id_bridge = true;
-        sys_context_build(&mut ins, &mission);
-        assert_eq!(0, ins[0].sys_context.len())
+        let mut from = FromInstance::default();
+        from.id = 123;
+        sys_context_build(&mut ins, &mission, &from);
+        assert_eq!("7b", ins[0].sys_context.get("target.id").unwrap());
     }
 
     #[test]
-    fn all_set() {
+    fn id_from_previous_context() {
         let mut ins: Vec<Instance> = vec![Instance::default()];
         let mut mission = Mission::default();
         mission.sys_context.insert("target.id".to_string(), "abc".to_string());
         mission.id_bridge = true;
-        sys_context_build(&mut ins, &mission);
+        sys_context_build(&mut ins, &mission,&FromInstance::default());
         assert_eq!("abc", ins[0].sys_context.get("target.id").unwrap());
     }
 }
