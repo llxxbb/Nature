@@ -6,18 +6,15 @@
 - 应用情景支持，支持内部优先支持外部（如网关）
 
 ## Release 0.9
+- remove sys_context from instance table
 - fix bug: for check_id
+- relation setting: add id_bridge property
 
 ### should commit
 
 - demo doc: score
 
 ### 未完成
-
-- remove sys_context from instance table
-
-- relation setting: add id_bridge property
-  - implement
   
 - demo doc: e-mall-5: add id_bridge support 
 

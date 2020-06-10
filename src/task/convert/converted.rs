@@ -32,9 +32,10 @@ impl Converted {
 
         // verify state
         let _ = verify_state(&task, &mut instances, last_state)?;
-        //  TODO id bridge process
 
-        // asemble it
+        sys_context_build(&mut instances, &task.target);
+
+        // assemble it
         let rtn = Converted {
             done_task: convert_task.to_owned(),
             converted: instances,
@@ -102,14 +103,14 @@ fn check_id(ins: &mut Vec<Instance>, last: &Option<Instance>, from: &FromInstanc
 }
 
 fn sys_context_build(instances: &mut Vec<Instance>, mission: &Mission) {
-    // TODO
-    // if !mission.id_bridge {
-    //     return;
-    // }
-    //
-    // let from = instances[0].clone();
-    // from.
-    // let id = if from
+    if !mission.id_bridge {
+        return;
+    }
+    if let Some(id) = mission.sys_context.get(CONTEXT_TARGET_INSTANCE_ID) {
+        for instance in instances {
+            instance.data.sys_context.insert(CONTEXT_TARGET_INSTANCE_ID.to_string(), id.to_string());
+        }
+    }
 }
 
 fn verify_state(task: &TaskForConvert, instances: &mut Vec<Instance>, last_state: &Option<Instance>) -> Result<()> {
@@ -159,6 +160,37 @@ fn verify_state(task: &TaskForConvert, instances: &mut Vec<Instance>, last_state
 }
 
 #[cfg(test)]
+mod sys_context_test {
+    use super::*;
+
+    #[test]
+    fn no_bridge_set() {
+        let mut ins: Vec<Instance> = vec![Instance::default()];
+        sys_context_build(&mut ins, &Mission::default());
+        assert_eq!(0, ins[0].sys_context.len())
+    }
+
+    #[test]
+    fn bridge_set_but_no_target_set() {
+        let mut ins: Vec<Instance> = vec![Instance::default()];
+        let mut mission = Mission::default();
+        mission.id_bridge = true;
+        sys_context_build(&mut ins, &mission);
+        assert_eq!(0, ins[0].sys_context.len())
+    }
+
+    #[test]
+    fn all_set() {
+        let mut ins: Vec<Instance> = vec![Instance::default()];
+        let mut mission = Mission::default();
+        mission.sys_context.insert("target.id".to_string(), "abc".to_string());
+        mission.id_bridge = true;
+        sys_context_build(&mut ins, &mission);
+        assert_eq!("abc", ins[0].sys_context.get("target.id").unwrap());
+    }
+}
+
+#[cfg(test)]
 mod test {
     use chrono::Local;
 
@@ -186,6 +218,7 @@ mod test {
                 target_demand: Default::default(),
                 use_upstream_id: true,
                 delay: 0,
+                sys_context: Default::default(),
                 id_bridge: false,
             },
             conflict_version: 0,
@@ -243,6 +276,7 @@ mod test {
                 },
                 use_upstream_id: false,
                 delay: 0,
+                sys_context: Default::default(),
                 id_bridge: false,
             },
             conflict_version: 0,
@@ -326,6 +360,7 @@ mod check_id_test {
             target_demand: Default::default(),
             use_upstream_id: false,
             delay: 0,
+            sys_context: Default::default(),
             id_bridge: false,
         };
         let one = Instance::new("one").unwrap();
@@ -392,6 +427,7 @@ mod check_id_test {
             target_demand: Default::default(),
             use_upstream_id: false,
             delay: 0,
+            sys_context: Default::default(),
             id_bridge: false,
         };
         (last, from, mission)

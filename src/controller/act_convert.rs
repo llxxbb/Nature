@@ -24,9 +24,10 @@ async fn do_convert(task: TaskForConvert, raw: RawTask) {
     // debug!("---task for convert: from:{}, to {}", task.from.meta, task.target.to.meta_string());
     let protocol = task.target.executor.protocol.clone();
     let mut from_instance = task.from.clone();
+    let mut task = task;
     // -----begin this logic can't move to place where after converted, because it might not get the last state and cause state conflict
     if protocol == Protocol::Auto {
-        init_target_id_for_sys_context(&task, &raw, &mut from_instance).await
+        init_target_id_for_sys_context(&mut task, &raw, &mut from_instance).await
     }
     // -----end
     let last = match InstanceDaoImpl::get_last_taget(&from_instance, &task.target).await {
@@ -87,13 +88,13 @@ async fn handle_converted(converted: ConverterReturned, task: &TaskForConvert, r
     Ok(())
 }
 
-async fn init_target_id_for_sys_context(task: &TaskForConvert, raw: &RawTask, from_instance: &mut Instance) -> () {
+async fn init_target_id_for_sys_context(task: &mut TaskForConvert, raw: &RawTask, from_instance: &mut Instance) -> () {
     let msg = r#"Auto Executor need statisfy any of the following conditions:
  exists from_instance.sys_context:target.id
  to.meta.master == from.meta
  to.meta.master == from.meta.master
     "#;
-    let target = from_instance.sys_context.get(CONTEXT_TARGET_INSTANCE_ID);
+    let target = task.target.sys_context.get(CONTEXT_TARGET_INSTANCE_ID);
     let f_meta = C_M.get(&task.from.meta, &*D_M).await.unwrap();
     let to_meta = task.target.to.clone();
     let msg = format!("relation defined error {} to {} . {}", f_meta.meta_string(), to_meta.meta_string(), msg);
@@ -122,7 +123,7 @@ async fn init_target_id_for_sys_context(task: &TaskForConvert, raw: &RawTask, fr
     };
     match id {
         Ok(id) => {
-            from_instance.sys_context.insert(CONTEXT_TARGET_INSTANCE_ID.to_string(), id);
+            task.target.sys_context.insert(CONTEXT_TARGET_INSTANCE_ID.to_string(), id);
         }
         Err(_) => {
             warn!("{}", msg);
