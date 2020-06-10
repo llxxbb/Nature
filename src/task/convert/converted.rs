@@ -32,6 +32,9 @@ impl Converted {
 
         // verify state
         let _ = verify_state(&task, &mut instances, last_state)?;
+        //  TODO id bridge process
+
+        // asemble it
         let rtn = Converted {
             done_task: convert_task.to_owned(),
             converted: instances,
@@ -96,6 +99,17 @@ fn check_id(ins: &mut Vec<Instance>, last: &Option<Instance>, from: &FromInstanc
         }
     }
     Ok(())
+}
+
+fn sys_context_build(instances: &mut Vec<Instance>, mission: &Mission) {
+    // TODO
+    // if !mission.id_bridge {
+    //     return;
+    // }
+    //
+    // let from = instances[0].clone();
+    // from.
+    // let id = if from
 }
 
 fn verify_state(task: &TaskForConvert, instances: &mut Vec<Instance>, last_state: &Option<Instance>) -> Result<()> {
@@ -172,6 +186,7 @@ mod test {
                 target_demand: Default::default(),
                 use_upstream_id: true,
                 delay: 0,
+                id_bridge: false,
             },
             conflict_version: 0,
         };
@@ -228,6 +243,7 @@ mod test {
                 },
                 use_upstream_id: false,
                 delay: 0,
+                id_bridge: false,
             },
             conflict_version: 0,
         };
@@ -243,6 +259,17 @@ mod check_id_test {
     use nature_common::{Meta, MetaSetting, MetaType};
 
     use super::*;
+
+    #[test]
+    fn target_id_cannot_use_as_id() {
+        let (last, from, mut mission) = init_input();
+        mission.to = Meta::new("remove master", 1, MetaType::Business).unwrap();
+        let mut one = Instance::new("one").unwrap();
+        one.sys_context.insert(CONTEXT_TARGET_INSTANCE_ID.to_string(), "123".to_string());
+        let mut input = vec![one.clone()];
+        let _ = check_id(&mut input, &Some(last), &from, &mission);
+        assert_eq!(input[0].id, 0);
+    }
 
     #[test]
     fn input_is_empty() {
@@ -299,6 +326,7 @@ mod check_id_test {
             target_demand: Default::default(),
             use_upstream_id: false,
             delay: 0,
+            id_bridge: false,
         };
         let one = Instance::new("one").unwrap();
         let mut input = vec![one.clone()];
@@ -364,6 +392,7 @@ mod check_id_test {
             target_demand: Default::default(),
             use_upstream_id: false,
             delay: 0,
+            id_bridge: false,
         };
         (last, from, mission)
     }

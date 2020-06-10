@@ -26,6 +26,7 @@ pub struct RelationSettings {
     pub target: RelationTarget,
     pub delay: i32,
     pub delay_on_para: (i32, u8),
+    pub id_bridge: bool,
 }
 ```
 
@@ -37,6 +38,7 @@ pub struct RelationSettings {
 - target：对目标实例的一些要求，下面会有具体解释。
 - delay：本次任务需要延迟指定的秒数后执行。
 - delay_on_para：延迟本次任务的执行，延迟的时间=上游`Instance.para`中指定的位置的时间（元组中的第二个值）+给定的延时时间（元组中的第一个值）
+- id_bridge: 如果此关系的下游的下游ID需要置为此关系的上游的ID，请设置此属性为 `true`
 
 ### 触发转换的条件： FlowSelector
 

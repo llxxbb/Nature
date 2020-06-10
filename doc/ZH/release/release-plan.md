@@ -14,10 +14,12 @@
 
 ### 未完成
 
-- relation setting: add next_id_is_from_id property
+- remove sys_context from instance table
 
-- demo doc: e-mall-5 
-  - add waybill data check
+- relation setting: add id_bridge property
+  - implement
+  
+- demo doc: e-mall-5: add id_bridge support 
 
 - MetaType::Null
 
