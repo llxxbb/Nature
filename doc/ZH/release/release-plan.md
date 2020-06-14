@@ -16,9 +16,6 @@
 
 ### 未完成
 
-- restore sys_context which can be traced. 
-- demo doc: e-mall-5: add id_bridge support 
-
 - MetaType::Null
 
 - demo doc: e-mall-7
