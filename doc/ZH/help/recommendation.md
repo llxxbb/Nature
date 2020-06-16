@@ -1,5 +1,9 @@
 # 使用建议
 
+## context 和 para 的区别
+  - context 是K-V 而 para 只有 V
+  - 对 Nature 而言 para 不能用于流程控制， 而 context 则可以。
+
 ## 流程编排方法
 
 - 避免构成死循环，
@@ -7,11 +11,11 @@
 
 ## 下游实例ID
 
-尽可能避免使用`sys_context."target.id"`这是编程方式来控制下游ID。`use_upstream_id`和`Meta.master` 都是以配置的方式来控制下游ID的生成。两者的区别在于`Meta.master` 可以影响多个`关系`而`use_upstream_id`只能影响一个。
+尽可能避免使用`sys_context."target.id"`这是编程方式来控制下游ID。`use_upstream_id`、`Meta.master`和 `id_bridge` 都是以配置的方式来控制下游ID的生成。`Meta.master` 可以影响多个`关系`而`use_upstream_id`只能影响一个，`id_bridge`则可以在中断ID的地方进行搭桥 。
 
 ## `Meta.master`的用法
 
-除了生成下游ID外，master还可以用在上游。Nature 会将上游的master 一并传递给`执行器`，这一点在上游单纯是状态数据时会非常有用。
+除了生成下游ID外，Nature 还会将上游的master 一并传递给`执行器`，这一点在下游单纯是状态数据时会非常有用。
 
 ## 重复生成相同实例
 

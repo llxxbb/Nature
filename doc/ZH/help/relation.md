@@ -157,13 +157,13 @@ pub struct Executor {
 ```
 pub struct RelationTarget {
     pub states: Option<TargetState>,
-    pub upstream_para: Vec<u8>,
+    pub copy_para: Vec<u8>,
 }
 ```
 
 target_states：可以增加或删除转化后的 `Instance` 的状态，状态必须在 `Meta` 中定义过。
 
-upstream_para：该属性可指导 Nature 如何生成目标实例的 `para` 属性。示例，如其值为[3,1]， 假设上游para为 “a/b/c/d”，则目标实例的 `para` 值为 “d/b”。
+copy_para：该属性可指导 Nature 如何生成目标实例的 `para` 属性。示例，如其值为[3,1]， 假设上游para为 “a/b/c/d”，则目标实例的 `para` 值为 “d/b”。
 
 ### 对目标状态的处理及要求：TargetState
 

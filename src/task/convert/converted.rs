@@ -278,7 +278,7 @@ mod test {
                         sd.add = Some(vec!["new".to_string()]);
                         sd
                     }),
-                    upstream_para: vec![],
+                    copy_para: vec![],
                 },
                 use_upstream_id: false,
                 delay: 0,
