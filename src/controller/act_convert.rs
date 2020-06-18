@@ -1,6 +1,6 @@
 use actix_rt::Runtime;
 
-use nature_common::{CONTEXT_TARGET_INSTANCE_ID, ConverterReturned, Instance, NatureError, Protocol, Result};
+use nature_common::{CONTEXT_TARGET_INSTANCE_ID, ConverterReturned, Instance, Meta, NatureError, Protocol, Result};
 use nature_db::{C_M, D_M, D_T, InstanceDaoImpl, MetaCache, Mission, RawTask, TaskDao};
 
 use crate::controller::{after_converted, process_null, received_self_route};
@@ -27,7 +27,7 @@ async fn do_convert(task: TaskForConvert, raw: RawTask) {
     let mut task = task;
     // -----begin this logic can't move to place where after converted, because it might not get the last state and cause state conflict
     if protocol == Protocol::Auto {
-        init_target_id_for_sys_context(&mut task, &raw, &mut from_instance).await
+        init_target_id_for_sys_context(&mut task, &mut from_instance).await
     }
     // -----end
     let last = match InstanceDaoImpl::get_last_taget(&from_instance, &task.target).await {
@@ -88,46 +88,38 @@ async fn handle_converted(converted: ConverterReturned, task: &TaskForConvert, r
     Ok(())
 }
 
-async fn init_target_id_for_sys_context(task: &mut TaskForConvert, raw: &RawTask, from_instance: &mut Instance) -> () {
-    let msg = r#"Auto Executor need statisfy any of the following conditions:
- exists from_instance.sys_context:target.id
- to.meta.master == from.meta
- to.meta.master == from.meta.master
-    "#;
+async fn init_target_id_for_sys_context(task: &mut TaskForConvert, from_instance: &mut Instance) -> () {
     let target = task.target.sys_context.get(CONTEXT_TARGET_INSTANCE_ID);
-    let f_meta = C_M.get(&task.from.meta, &*D_M).await.unwrap();
+    let f_meta: Meta = C_M.get(&task.from.meta, &*D_M).await.unwrap();
     let to_meta = task.target.to.clone();
-    let msg = format!("relation defined error {} to {} . {}", f_meta.meta_string(), to_meta.meta_string(), msg);
-    let err = NatureError::VerifyError(msg.to_string());
-    let id: Result<String> = match target {
-        Some(t) => Ok(t.clone()),
-        None => {
-// the master must exists, otherwise `Protocol::Auto` would not be generated.
-            let master = to_meta.get_setting().unwrap().master.unwrap();
-            match master.eq(&from_instance.meta) {
-                true => Ok(format!("{:x}", from_instance.id)),
-                false => {
-                    match f_meta.get_setting() {
-                        Some(f_setting) => match f_setting.master {
-                            None => Err(err.clone()),
-                            Some(f_master) => match f_master.eq(&master) {
-                                true => Ok(format!("{:x}", from_instance.id)),
-                                false => Err(err.clone()),
-                            },
-                        }
-                        None => Err(err.clone())
-                    }
-                }
-            }
-        }
-    };
-    match id {
-        Ok(id) => {
-            task.target.sys_context.insert(CONTEXT_TARGET_INSTANCE_ID.to_string(), id);
-        }
-        Err(_) => {
-            warn!("{}", msg);
-            let _ = D_T.raw_to_error(&err, &raw).await;
-        }
+    if let Some(id) = target {
+        let id = id.to_string();
+        task.target.sys_context.insert(CONTEXT_TARGET_INSTANCE_ID.to_string(), id);
+        return;
+    }
+    if to_meta.get_setting().is_none() {
+        return;
+    }
+    let setting = to_meta.get_setting().unwrap();
+    if setting.master.is_none() {
+        return;
+    }
+    let master = setting.master.unwrap();
+    if master.eq(&from_instance.meta) {
+        task.target.sys_context.insert(CONTEXT_TARGET_INSTANCE_ID.to_string(), format!("{:x}", from_instance.id));
+        return;
+    }
+    if f_meta.get_setting().is_none() {
+        return;
+    }
+    let f_setting = f_meta.get_setting().unwrap();
+    if f_setting.master.is_none() {
+        return;
+    }
+    let f_master = f_setting.master.unwrap();
+    if f_master.eq(&master) {
+        task.target.sys_context.insert(CONTEXT_TARGET_INSTANCE_ID.to_string(), format!("{:x}", from_instance.id));
     }
 }
+
+

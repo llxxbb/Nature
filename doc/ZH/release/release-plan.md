@@ -9,8 +9,8 @@
 
 - relation setting: add id_bridge property
 - incompatible change: relation setting: rename upstream_para to copy_para
-
 - fix bug: for check_id
+- enhanced Protocol::Auto
 
 ### should commit
 
