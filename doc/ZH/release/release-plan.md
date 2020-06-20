@@ -8,9 +8,9 @@
 ## Release 0.9
 
 - relation setting: add id_bridge property
-- incompatible change: relation setting: rename upstream_para to copy_para
 - fix bug: for check_id
 - enhanced Protocol::Auto
+- incompatible change: relation setting: rename upstream_para to copy_para
 
 ### should commit
 
@@ -18,9 +18,6 @@
 
 ### 未完成
 
-- MetaType::Null
-
-- demo doc: e-mall-7
 - demo score: need verify the result.
   
 - demo: 销量统计， 使用 builtin-executor sum
