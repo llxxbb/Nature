@@ -5,12 +5,7 @@
 - 功能性先于非功能性需求
 - 应用情景支持，支持内部优先支持外部（如网关）
 
-## Release 0.9
-
-- relation setting: add id_bridge property
-- fix bug: for check_id
-- enhanced Protocol::Auto
-- incompatible change: relation setting: rename upstream_para to copy_para
+## Release 0.10
 
 ### should commit
 

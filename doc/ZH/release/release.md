@@ -1,6 +1,13 @@
 
 # 发布的功能
 
+## Release 0.9
+
+- relation setting: add id_bridge property
+- fix bug: for check_id
+- enhanced Protocol::Auto
+- incompatible change: relation setting: rename upstream_para to copy_para
+
 ## Release 0.8 2020-06-08
 
 - replace diesel with mysql_async, because of libmysqlclient_sys cannot compile under stable rust toolchain for win10
