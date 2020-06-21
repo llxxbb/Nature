@@ -36,11 +36,13 @@ async fn redo_task(task: Json<RawTask>) -> HttpResponse {
     return_result(x)
 }
 
+/// exactly query
 async fn get_by_id(para: Json<KeyCondition>) -> HttpResponse {
     let x = InstanceDaoImpl::get_by_id(para.0).await;
     return_result(x)
 }
 
+/// fuzzy query
 async fn get_by_meta(para: Json<KeyCondition>) -> HttpResponse {
     let x = InstanceDaoImpl::get_by_meta(&para.0).await;
     return_result(x)

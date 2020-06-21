@@ -16,7 +16,7 @@ extern crate tokio;
 extern crate uuid;
 
 pub mod system;
-pub mod rpc;
+pub mod web;
 pub mod task;
 pub mod controller;
 pub mod channels;

@@ -1,10 +1,7 @@
 # 有待确认的需求
 
-- 系统上下文不应该由用户关注，在Demo 中进行全面检查，看是否可以避免。 
-- 快速入门示例程序
 - 执行器：可以通过 context 来 申请ID
- 
-- 支持para like 查询 及限定 QUERY_SIZE_LIMIT
+- context : executor setting 中可复制，可增加，可移除context 中的内容
 
 开关：
     出于安全上的考虑，在处理过程中，动态路由不能回归到静态路由。

@@ -11,7 +11,7 @@ use dotenv::dotenv;
 use nature_common::setup_logger;
 
 use crate::channels::start_receive_threads;
-use crate::rpc::actix::*;
+use crate::web::actix::*;
 
 lazy_static! {
     pub static ref SERVER_PORT:String={
