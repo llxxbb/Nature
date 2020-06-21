@@ -35,8 +35,10 @@ async fn duplicated_instance(task: TaskForStore, carrier: RawTask) -> Result<()>
         return after_saved(task, carrier).await;
     }
     // process status-meta-------------------
-    dbg!(&task.instance);
-    let ins_from = task.instance.from.clone().unwrap();
+    let ins_from = match task.instance.from.clone() {
+        None => return Ok(()),
+        Some(from) => from,
+    };
     let para = IDAndFrom {
         id: task.instance.id,
         meta: task.instance.meta.clone(),

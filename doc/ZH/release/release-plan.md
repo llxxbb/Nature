@@ -9,6 +9,7 @@
 
 - prevent sta_version skipping to avoid some invalid input
 - fix bug: copy_para does not work for state-target
+- fix bug: duplicate input status-instance cause error
 
 ### should commit
 
@@ -16,7 +17,7 @@
 
 ### 未完成
 
-- fix bug: duplicate input status-instance cause error
+
 
 - multi-delivery
 - demo score: need verify the result.
