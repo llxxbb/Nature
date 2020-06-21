@@ -1,4 +1,4 @@
-use nature_common::{CONTEXT_TARGET_INSTANCE_ID, FromInstance, Instance, Meta, MetaType, NatureError, Result};
+use nature_common::{CONTEXT_TARGET_INSTANCE_ID, FromInstance, get_para_and_key_from_para, Instance, Meta, MetaType, NatureError, Result};
 use nature_db::{Mission, RawTask};
 
 use crate::task::{CachedKey, TaskForConvert};
@@ -98,6 +98,10 @@ fn check_id(ins: &mut Vec<Instance>, last: &Option<Instance>, from: &FromInstanc
         if let Some(id_u) = id {
             one.id = id_u;
         }
+        if target.target_demand.copy_para.len() > 0 {
+            let result = get_para_and_key_from_para(&from.para, &target.target_demand.copy_para)?;
+            one.para = result.0;
+        }
     }
     Ok(())
 }
@@ -170,7 +174,7 @@ mod sys_context_test {
     #[test]
     fn no_bridge_set() {
         let mut ins: Vec<Instance> = vec![Instance::default()];
-        sys_context_build(&mut ins, &Mission::default(),&FromInstance::default());
+        sys_context_build(&mut ins, &Mission::default(), &FromInstance::default());
         assert_eq!(0, ins[0].sys_context.len())
     }
 
@@ -191,7 +195,7 @@ mod sys_context_test {
         let mut mission = Mission::default();
         mission.sys_context.insert("target.id".to_string(), "abc".to_string());
         mission.id_bridge = true;
-        sys_context_build(&mut ins, &mission,&FromInstance::default());
+        sys_context_build(&mut ins, &mission, &FromInstance::default());
         assert_eq!("abc", ins[0].sys_context.get("target.id").unwrap());
     }
 }
