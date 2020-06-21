@@ -7,6 +7,8 @@
 
 ## Release 0.10
 
+- prevent sta_version skipping to avoid some invalid input
+
 ### should commit
 
 - demo doc: score
@@ -14,7 +16,7 @@
 ### 未完成
 
 
-- prevent sta_version skipping to avoid some invalid input
+
 - fix bug: copy_para does not work for state-target
 
 - multi-delivery

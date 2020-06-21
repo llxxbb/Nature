@@ -1,6 +1,6 @@
 use std::convert::TryFrom;
 
-use nature_common::{ConverterReturned, DelayedInstances, generate_id, Instance, MetaType, NatureError, Result, SelfRouteInstance, Meta, KeyCondition};
+use nature_common::{ConverterReturned, DelayedInstances, generate_id, Instance, KeyCondition, Meta, MetaType, NatureError, Result, SelfRouteInstance};
 use nature_db::{C_M, C_R, D_M, D_R, D_T, InstanceDaoImpl, MetaCache, Mission, RawTask, RelationCache, TaskDao, TaskType};
 use nature_db::flow_tool::{context_check, state_check};
 
@@ -118,19 +118,14 @@ async fn get_task_and_last(task: &RawTask) -> Result<(TaskForConvert, Option<Ins
 async fn check_and_revise(instance: &mut Instance) -> Result<&mut Instance> {
     let meta: Meta = C_M.get(&instance.meta, &*D_M).await?;    // verify meta
     // check previous state version
-    // if meta.is_state() && instance.state_version > 1{
-    //     //
-    //     instance.get_key()
-    //     InstanceDaoImpl::get_by_id(KeyCondition{
-    //         id: "".to_string(),
-    //         meta: "".to_string(),
-    //         key_gt: "".to_string(),
-    //         para: "".to_string(),
-    //         state_version: 0,
-    //         time_ge: None,
-    //         time_lt: None,
-    //         limit: 0
-    //     })
-    // }
+    let version = instance.state_version;
+    if meta.is_state() && version > 1 {
+        let mut kc: KeyCondition = instance.clone().into();
+        kc.state_version = version - 1;
+        let rtn = InstanceDaoImpl::get_by_id(kc).await?;
+        if rtn.is_none() {
+            return Err(NatureError::VerifyError("you can't skip state_version for instance".to_string()));
+        }
+    }
     instance.revise()
 }
