@@ -21,7 +21,10 @@ pub async fn filter<T>(para: &mut T, filter: &Vec<Executor>) -> Result<()>
                         Ok(new) => *para = new,
                         Err(err) => return Err(err)
                     },
-                    Err(err) => return Err(err)
+                    Err(err) => {
+                        warn!("local filter occur error: {}", err);
+                        return Err(err);
+                    }
                 }
             }
             _ => return Err(NatureError::VerifyError("filter does not support this protocol".to_string()))

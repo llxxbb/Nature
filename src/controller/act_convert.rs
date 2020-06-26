@@ -42,6 +42,7 @@ async fn do_convert(task: TaskForConvert, raw: RawTask) {
     let meta = match C_M.get(&task.from.meta, &*D_M).await {
         Ok(m) => m,
         Err(e) => {
+            warn!("get meta error: {}", e);
             let _ = D_T.raw_to_error(&e, &raw).await;
             return;
         }
@@ -49,6 +50,7 @@ async fn do_convert(task: TaskForConvert, raw: RawTask) {
     let master = match task.from.get_master(&meta, InstanceDaoImpl::get_by_id).await {
         Ok(m) => m,
         Err(e) => {
+            warn!("get master instance error: {}", e);
             let _ = D_T.raw_to_error(&e, &raw).await;
             return;
         }
@@ -57,7 +59,10 @@ async fn do_convert(task: TaskForConvert, raw: RawTask) {
     match handle_converted(rtn, &task, &raw, &task.target, &last).await {
         Ok(()) => (),
         Err(NatureError::EnvironmentError(msg)) => warn!("{}", msg.to_string()),
-        Err(e) => { let _ = D_T.raw_to_error(&e, &raw).await; }
+        Err(e) => {
+            warn!("call out error: {}", e);
+            let _ = D_T.raw_to_error(&e, &raw).await;
+        }
     }
 }
 

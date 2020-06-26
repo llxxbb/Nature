@@ -49,6 +49,7 @@ impl IncomeController {
                     Some(carrier) => match delayed.result {
                         ConverterReturned::LogicalError(err) => {
                             let err = NatureError::LogicalError(err);
+                            warn!("{}", err);
                             let _ = D_T.raw_to_error(&err, &carrier).await?;
                             Ok(())
                         }

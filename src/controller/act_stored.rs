@@ -26,6 +26,7 @@ pub async fn channel_stored(task: TaskForStore, raw: RawTask) {
             }
         }
         Err(err) => {
+            warn!("{}", err);
             let _ = D_T.raw_to_error(&err, &raw).await;
             return;
         }

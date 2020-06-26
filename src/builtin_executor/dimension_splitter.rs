@@ -1,3 +1,4 @@
+///! 这个是 scatter 的初始版本，scatter 对此已经做了简化， 但不能保证这个就失去了意义，所以暂时留存。
 use std::collections::HashMap;
 
 use serde::Deserialize;

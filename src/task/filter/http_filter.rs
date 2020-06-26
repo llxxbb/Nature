@@ -15,7 +15,10 @@ pub async fn http_filter<T: Serialize + DeserializeOwned>(address: &str, para: &
             *para = o;
             Ok(())
         }
-        Err(e) => Err(e)
+        Err(e) => {
+            warn!("filter occur error: {}", e);
+            Err(e)
+        }
     }
 }
 

@@ -7,9 +7,12 @@
 
 ## Release 0.10
 
+- built-in executor enhanced for `sum`: support five modes old,new,min,max,sum 
 - prevent sta_version skipping to avoid some invalid input
 - fix bug: copy_para does not work for state-target
 - fix bug: duplicate input status-instance cause error
+- mysql_async::Error::io: changed from LogicalError to EnvError
+- demo: multi-delivery
 
 ### should commit
 
@@ -17,21 +20,20 @@
 
 ### 未完成
 
-
-
-- multi-delivery
-- demo score: need verify the result.
+- 文档
+  - 内建执行器的参考文档(搞优先级，有利于推广)
+  - 有关 env 配置的说明。 
+  
 - remove reqwest dependence
+- built-in executor sum: support batch record
   
 - demo: 销量统计， 使用 builtin-executor sum
 
 - 文档
-  - 内建执行器的参考文档(搞优先级，有利于推广)
-  - 有关 env 配置的说明。 
   - 数据不可变，如何修正数据？ 独立做一个对冲的数据！ 最终在展示层相加就可以了
 
 - 执行器可设置系统上下文，以定义下一个执行器的延迟时间。这个时间可以覆盖`关系`中预定义的`延迟时间`
-- `Relation`文档补全(完成统计Demo 回过头来写会更好)
+
 
 
 ## Release 1.0.0

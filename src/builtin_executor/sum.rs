@@ -6,11 +6,17 @@ use nature_common::{ConverterParameter, ConverterReturned, get_para_and_key_from
 #[derive(Serialize, Deserialize)]
 struct Setting {
     /// which part of para you want to sum, the value is the index of para.
-    para_part: u8,
-    /// new same item will cover the old one
+    key_from_para: Vec<u8>,
+
+    /// hwo to process the same item's value
+    ///     "" | old: remain the old value
+    ///     new: use new value replace the old value
+    ///     sum: use the old + new value to replace the old value
+    ///     min: use min(old,new) value to replace the old value
+    ///     max: use max(old,new) value to replace the old value
     #[serde(skip_serializing_if = "is_default")]
     #[serde(default)]
-    write_over: bool,
+    when_same: String,
 }
 
 #[derive(Deserialize, Serialize)]
@@ -36,7 +42,7 @@ pub fn sum(input: &ConverterParameter) -> ConverterReturned {
         Ok(num) => num
     };
     // prepare parameter
-    let (key, para) = match get_para_and_key_from_para(&input.from.para, &vec![cfg.para_part]) {
+    let (key, para) = match get_para_and_key_from_para(&input.from.para, &cfg.key_from_para) {
         Ok(rtn) => rtn,
         Err(err) => return ConverterReturned::LogicalError(err.to_string())
     };
@@ -51,9 +57,21 @@ pub fn sum(input: &ConverterParameter) -> ConverterReturned {
             match content.detail.insert(key.to_string(), num) {
                 None => { content.total += num; }
                 Some(o_v) => {
-                    match cfg.write_over {
-                        true => content.total += num - o_v,
-                        false => { content.detail.insert(key, o_v); }
+                    let mode: &str = &cfg.when_same;
+                    match mode {
+                        "" => { content.detail.insert(key, o_v); }
+                        "old" => { content.detail.insert(key, o_v); }
+                        "new" => { content.total += num - o_v; }
+                        "sum" => {
+                            content.detail.insert(key, num + o_v);
+                            content.total += num;
+                        }
+                        "min" => if o_v < num { content.detail.insert(key, o_v); } else { content.total += num - o_v; }
+                        "max" => if o_v > num { content.detail.insert(key, o_v); } else { content.total += num - o_v; }
+                        _ => {
+                            let msg = format!("unknown `when_same` property: {}", mode);
+                            return ConverterReturned::LogicalError(msg);
+                        }
                     }
                 }
             }
@@ -85,21 +103,21 @@ mod sum_setting_test {
     use super::*;
 
     #[test]
-    fn para_part() {
+    fn key_from_para() {
         let set = Setting {
-            para_part: 2,
-            write_over: false,
+            key_from_para: vec![2],
+            when_same: "".to_string(),
         };
-        assert_eq!(serde_json::to_string(&set).unwrap(), r#"{"para_part":2}"#);
+        assert_eq!(serde_json::to_string(&set).unwrap(), r#"{"key_from_para":[2]}"#);
     }
 
     #[test]
     fn write_over() {
         let set = Setting {
-            para_part: 2,
-            write_over: true,
+            key_from_para: vec![2],
+            when_same: "new".to_string(),
         };
-        assert_eq!(serde_json::to_string(&set).unwrap(), r#"{"para_part":2,"write_over":true}"#);
+        assert_eq!(serde_json::to_string(&set).unwrap(), r#"{"key_from_para":[2],"when_same":"new"}"#);
     }
 }
 
@@ -134,7 +152,7 @@ mod sum_test {
             last_state: None,
             task_id: "".to_string(),
             master: None,
-            cfg: r#"{"para_part":1}"#.to_string(),
+            cfg: r#"{"key_from_para":[1]}"#.to_string(),
         };
         let last = if let ConverterReturned::Instances(rtn) = sum(&input) {
             let rtn = &rtn[0];
@@ -154,7 +172,7 @@ mod sum_test {
             last_state: Some(last.clone()),
             task_id: "".to_string(),
             master: None,
-            cfg: r#"{"para_part":1}"#.to_string(),
+            cfg: r#"{"key_from_para":[1]}"#.to_string(),
         };
         let last = if let ConverterReturned::Instances(rtn) = sum(&input) {
             let rtn = &rtn[0];
@@ -175,7 +193,7 @@ mod sum_test {
             last_state: Some(last.clone()),
             task_id: "".to_string(),
             master: None,
-            cfg: r#"{"para_part":1}"#.to_string(),
+            cfg: r#"{"key_from_para":[1]}"#.to_string(),
         };
         let last = if let ConverterReturned::Instances(rtn) = sum(&input) {
             let rtn = &rtn[0];
@@ -188,7 +206,7 @@ mod sum_test {
             panic!("return error result");
         };
 
-        // repeat should over write the old
+        // repeat should not cover the min
         let mut from = Instance::default();
         from.data.content = "7".to_string();
         from.para = "a/e/c".to_string();
@@ -197,7 +215,29 @@ mod sum_test {
             last_state: Some(last.clone()),
             task_id: "".to_string(),
             master: None,
-            cfg: r#"{"para_part":1,"write_over":true}"#.to_string(),
+            cfg: r#"{"key_from_para":[1],"when_same":"min"}"#.to_string(),
+        };
+        let last = if let ConverterReturned::Instances(rtn) = sum(&input) {
+            let rtn = &rtn[0];
+            assert_eq!(rtn.para, "a/c");
+            dbg!(&rtn.content);
+            assert!(rtn.content.contains(r#""e":6"#));
+            assert!(rtn.content.contains(r#""total":11"#));
+            rtn.clone()
+        } else {
+            panic!("return error result");
+        };
+
+        // repeat should over write the new
+        let mut from = Instance::default();
+        from.data.content = "7".to_string();
+        from.para = "a/e/c".to_string();
+        let input = ConverterParameter {
+            from,
+            last_state: Some(last.clone()),
+            task_id: "".to_string(),
+            master: None,
+            cfg: r#"{"key_from_para":[1],"when_same":"new"}"#.to_string(),
         };
         if let ConverterReturned::Instances(rtn) = sum(&input) {
             let rtn = &rtn[0];
@@ -205,6 +245,48 @@ mod sum_test {
             dbg!(&rtn.content);
             assert!(rtn.content.contains(r#""e":7"#));
             assert!(rtn.content.contains(r#""total":12"#));
+        } else {
+            panic!("return error result");
+        };
+
+        // repeat should over write the max
+        let mut from = Instance::default();
+        from.data.content = "7".to_string();
+        from.para = "a/e/c".to_string();
+        let input = ConverterParameter {
+            from,
+            last_state: Some(last.clone()),
+            task_id: "".to_string(),
+            master: None,
+            cfg: r#"{"key_from_para":[1],"when_same":"max"}"#.to_string(),
+        };
+        if let ConverterReturned::Instances(rtn) = sum(&input) {
+            let rtn = &rtn[0];
+            assert_eq!(rtn.para, "a/c");
+            dbg!(&rtn.content);
+            assert!(rtn.content.contains(r#""e":7"#));
+            assert!(rtn.content.contains(r#""total":12"#));
+        } else {
+            panic!("return error result");
+        };
+
+        // repeat should sum with the sum
+        let mut from = Instance::default();
+        from.data.content = "7".to_string();
+        from.para = "a/e/c".to_string();
+        let input = ConverterParameter {
+            from,
+            last_state: Some(last.clone()),
+            task_id: "".to_string(),
+            master: None,
+            cfg: r#"{"key_from_para":[1],"when_same":"sum"}"#.to_string(),
+        };
+        if let ConverterReturned::Instances(rtn) = sum(&input) {
+            let rtn = &rtn[0];
+            assert_eq!(rtn.para, "a/c");
+            dbg!(&rtn.content);
+            assert!(rtn.content.contains(r#""e":13"#));
+            assert!(rtn.content.contains(r#""total":18"#));
         } else {
             panic!("return error result");
         };

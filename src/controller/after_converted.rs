@@ -12,7 +12,10 @@ pub async fn after_converted(task: &TaskForConvert, convert_task: &RawTask, inst
         Ok(rtn) => match rtn.converted.len() {
             0 => match D_T.finish_task(&convert_task.task_id).await {
                 Ok(_) => Ok(()),
-                Err(e) => Err(e)
+                Err(e) => {
+                    warn!("finish task occur error: {}", e);
+                    Err(e)
+                }
             },
             1 => {
                 // break the process if loop

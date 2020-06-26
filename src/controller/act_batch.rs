@@ -7,7 +7,7 @@ use crate::task::TaskForStore;
 
 pub async fn channel_batch(instances: Vec<Instance>, raw: RawTask) {
     if let Err(e) = inner_batch(instances, &raw).await {
-        error!("{}", e);
+        warn!("insert batch error: {}", e);
         let _ = D_T.raw_to_error(&e, &raw).await;
     }
 }
