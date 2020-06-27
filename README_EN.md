@@ -2,61 +2,55 @@
 
 English|[中文](README.md)
 
-I have no time to translate it from chinese, sorry!. The following content is quite early to synchronize to chinese. 
+Nature is an innovative product that draws on messaging systems, BPMN, Workflow, FaaS and databases to integrate some of the ideas.
 
-Nature frees data define from program processing. Nature isolate **Business-Goals** from execution clearly, that will make you system adjust quickly , more correctly and easy to maintain. Unlike a `Service`, which bind goals and implements together, commonly, **the service would make data dirty and hardly to maintains**. 
+Nature is an open source solution for building a new class of applications based on **data-driven**, **business-oriented**, and **decentralized**. **Nature organically integrates system architecture and business architecture together**,  to bridge the gap between the two and enable the system to better serve the business.
 
-If you are very understanding of the business but you are not a programmer, by Nature you will be a good leader for the business system.
+Nature builds systems using downstream **Natural Selection** upstream instead of the traditional **upstream control downstream** approach. Changing from centrally controlled **one-to-many** to decentralized **one-to-one**, so that it can reduces transaction complexity significantly. Nature can dramatically streamline the business model and to meet the need for rapid iteration of the business, allowing the system to **evolve through constant selection**. That's what the name of the project implies.
 
-Nature Help you to manage your data from a __High Perspective__.  All your **Business-Domain** can be viewed and be managed globally; and more, all the **relations** between domain can be choreographed globally also. Just like a terrestrial globe, all things on it. 
+Nature allows the business to **have complete control over the code** without being constrained in one way or another by existing systems. You can control business processes in a non-coding way, this will be important in two ways: it will make it easier to shape your system, and it will significantly reduce development investment.
 
-Nature is `FaaS`(Function as a Service) platform technically. But I don't like to use this concept, because I don't want to hype a concept or a fan of it, `FaaS` is not the primary goal for this project. Nonetheless `FaaS` is the key point to make Nature working. Nature break meta-relations into pieces(a function) for developer to implement, and then put them together at runtime.
+## Problems with traditional development approaches
 
-__Important__:  this project is in a very earlier stage, it is far to mature.
+To achieve business goals, the system requires a suite of software engineering to escort it. For staffing, management and time costs, we tend to tailor to varying degrees and combine various development models, such as agile, to achieve a balance between quality and cost. But even this, research and development remains costly, because traditional development methods cannot get around the following problems.
 
-## A big question
+- **The Passing Game**: Large systems generally need to be collaborated through multiple teams of different functions such as requirements, product, design, and R&D, so they often have high latency and inefficiency issues. In order to reduce these losses, we generally also introduce quality control links, which are cost reflective, the more links, the higher the cost.
+- **weak controllability**: The requirements proponent is mostly not a developer, and his ideas can only be embodied on the system indirectly through others, **not directly controlled**. For the iceberg of the system, the requirements proponent is **only able to provide some guidance** for the surface portion, has no absolute control, and has no say over the underwater portion.
+- **Target kidnapped**: The goal is expressed in code, yet the business wants to change and the code is hard to change! **There are always modules in the big system that people are afraid to touch! It's an eternal pain in the system.**
+- **The skeletal reality**: The slogans can be shouted very clearly and loudly, but when it really gets down to the nitty-gritty and settles into the implementation details, it's hard for technicians to make the ideal system when they're in the crosshairs of business, technology, cost and other dimensions. Backed by the belief that **rapid iteration and continuous delivery** is pinned on the next correction.
 
-This project covered a lot of  fields (__Work-Flow__, __Message Queue__, __Stream__, __BPMN__, __Gateway__, __Distributed_System__ and __Database__) , and each field have their own mature and good projects. why do I provide a new one? 
+- **The Lost Target**: Most of our work is functionally oriented, and we only occasionally look back at our goals. Over time, without realizing it, we get caught up in the vortex of function, and **forget what we really want**.
+- **Non-functional requirements**: For a complex business system, non-functional requirements are far more difficult and time-consuming to develop than functional requirements, such as idempotent, retry, consistency, stability, reliability, etc. **These are the black holes that suck money**.
 
-I have no intention of competing with other fields.  it's just involves these field. Sorry for the  __Nature__ name for this project.  Nature means all things,  surely this it can not do that. But I could not think out a suitable name for it. 
+## Nature's solution
 
-Please do not think it too complicated. there are only few things be introduced in this project: __data__ and __relations__ between data. Just like atoms and there relations make up the complex world, in this project, __data__ make up all your business. So I like the name __Nature__. let us to see it deeper.
+The problems faced by traditional development methods are inherent in themselves and cannot be solved by perfecting them. To solve these problems, a whole new mechanism is needed, and Nature provides such a mechanism.
 
-### Functions vs goals
+Nature is business-oriented, she abstracts business at a high latitude, and all complex business worlds can be represented by **business objects** and the **relationships** between them. Business objects are actually **business goals**, and relationships are the springboard that will allow you to **achieve them one by one**. A relationship is not a method or a function, but it is a vehicle for function. It doesn't tell you what to do, but it does tell you what you need.
 
-Work-Flow and BPMN are __function__ oriented solutions, it may let business run, but when business growing too large, you may __lost in functions__, they call tell you how-to-do, but do-for-what is uneasy  to describe. because function can __hide goals(data) inadvertently__, then the business system is hard to understand, and you will find it is difficult to find out what your really want.
+### Business objects have "target" attributes
 
-Message-Queue and Stream face to connection more than data: a connector between functions. Nevertheless I think they are better then Work-Flow and BPMN, because they rise the data's value. But I do not think it is enough yet, it let developers are both a player and a referee. 
+On a macro level, systems are designed to process data. What you see on the monitor and what you interact with between systems is data. So **systems are made for data, and data is the goal of the system**.  Microscopically speaking, a method inputs data and outputs data. **Methods exist for processing data, and data is the goal of the method**. It follows that data is what we want, and in that sense **data is the object**. Business objects are the data that describe the business, so **business objects are the soul of the system**. If the business objects are well managed, the goals are well managed, and Nature was created to manage business objects.
 
-Nature make data(__goals__) clearly and isolate data from functions and hide functions back-end. **data are pure energy** for system running. , so you can get a agiler and powerful business system based on Nature,.
+### Freeing the target from the code, making it implicit to explicit
 
-### Bottom-up management vs top-down management
+In a traditional development approach, business objects are defined by code. In Nature, business objects are called `Meta` and are defined in a configurable way. This is a humanized definition that does not require coding. The `Meta` is digital and is can directly involved in the processing of the system, that can avoid the following problems generated.
 
-__Gateway__, __Distributed_System__ and __Database__ are __bottom-up management__. They are technology oriented, there manage their own affairs in their own way. Because they are different things, so it's hard to unify and simplify the management.
+- There is **no need to transmit the target**. One person can define it just fine, and all the people see the same thing, thus avoiding the problem of distortion, so that the target delivery, translation and control costs are gone.
+- The target has **strong control ability **. The identity of the code changes from definer to follower, there is no longer a constraining capital on the target, and the target has the ability to truly control rather than guiding the code. And need not worry about being kidnapped by code.
+- Refinement work and business changes should just care about the business dimensions, **technical iterations will become meaningless**.
 
-Nature let you declare **business-goals** (not technical things) and **relation** between them and **who** can do transfer between the goals(execute the goals), this is all you need to manage, Nature and developers will take care **How** to execute the goals. This is a **top-down** manner of management, it's simple, directly and effectively.  From the **top** we can glue multiple elements together and make it 1 + 1 > 2.
+### Take away code control over business processes and reduce the complexity of business systems.
 
-- Nature is a __gateway__: Nature can control and route all you business request.
-- Nature is a __distributed system__: you needn't care about data availability and consistently.
-- Nature is a __KV-database__:  you can query data you putted in and  Nature itself transferred, and your data will __never be lost and changed__ when they are written down.
+Traditional business systems are complex when they grow large. Whether it's technical or business, there's a lot of logic woven together like a jumble of interlocking threads. But Nature split it into three parts: the technical part is Nature's responsibility as much as possible, and the functional implementation of Leave it to the developers and leave the most important part, process control, to the business managers, this part is configurable and can be easily controlled, without programming. This would simplify and organize a complex system.
 
-## What's in it for you
 
-Let to see what benefit to you when using Nature
 
-- give a clearly interface between **what** and **how**.  and achieve the goal  **no distortion**, **full restraint**. this will reduce communication costs greatly in your team. 
-- Easy to focus on goals and less detours, you will __never lost your target__ among a big system..
+翻译到：
 
-- Development task is more easier and Nature can __speed up your development iterations__: 
-  - All workpiece is pluggable. developer focus one goals once a time, need not to have a global view and understand the whole thing, though it is easy to present by Nature.
-  - Need not to take care about data consistently, high concurrency, idempotent and other things.  so you can reduce the need of *senior programmer*s and then reduce the cost.
-- More directly, Nature will save you time and money,  __bigger is cheaper__.
+剥夺代码对业务流程的控制权，降低业务系统的复杂度。
 
-## Usage scenarios
 
-Complex business system like web store.
-
-## Want to know more?
 
 [A concrete example](https://github.com/llxxbb/Nature-Demo)
 
