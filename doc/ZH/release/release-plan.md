@@ -5,14 +5,8 @@
 - 功能性先于非功能性需求
 - 应用情景支持，支持内部优先支持外部（如网关）
 
-## Release 0.10
+## Release 0.11
 
-- built-in executor enhanced for `sum`: support five modes old,new,min,max,sum 
-- prevent sta_version skipping to avoid some invalid input
-- fix bug: copy_para does not work for state-target
-- fix bug: duplicate input status-instance cause error
-- mysql_async::Error::io: changed from LogicalError to EnvError
-- demo: multi-delivery
 
 ### should commit
 
@@ -20,11 +14,11 @@
 
 ### 未完成
 
+- optimize: downstream id and para put to sys_context if ready
 - 文档
   - 内建执行器的参考文档(搞优先级，有利于推广)
   - 有关 env 配置的说明。 
   
-- remove reqwest dependence
 - built-in executor sum: support batch record
   
 - demo: 销量统计， 使用 builtin-executor sum

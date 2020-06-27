@@ -1,6 +1,15 @@
 
 # 发布的功能
 
+## Release 0.10 2020-06-27
+
+- built-in executor enhanced for `sum`: support five modes old,new,min,max,sum 
+- prevent sta_version skipping to avoid some invalid input
+- fix bug: copy_para does not work for state-target
+- fix bug: duplicate input status-instance cause error
+- mysql_async::Error::io: changed from LogicalError to EnvError
+- demo: multi-delivery
+
 ## Release 0.9
 
 - relation setting: add id_bridge property

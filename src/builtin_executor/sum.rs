@@ -42,7 +42,7 @@ pub fn sum(input: &ConverterParameter) -> ConverterReturned {
         Ok(num) => num
     };
     // prepare parameter
-    let (key, para) = match get_para_and_key_from_para(&input.from.para, &cfg.key_from_para) {
+    let (key, _) = match get_para_and_key_from_para(&input.from.para, &cfg.key_from_para) {
         Ok(rtn) => rtn,
         Err(err) => return ConverterReturned::LogicalError(err.to_string())
     };
@@ -84,7 +84,6 @@ pub fn sum(input: &ConverterParameter) -> ConverterReturned {
         Ok(s) => s,
         Err(err) => return ConverterReturned::LogicalError(err.to_string())
     };
-    ins.para = para;
     ins.id = input.from.id;
     ConverterReturned::Instances(vec![ins])
 }
@@ -156,7 +155,6 @@ mod sum_test {
         };
         let last = if let ConverterReturned::Instances(rtn) = sum(&input) {
             let rtn = &rtn[0];
-            assert_eq!(rtn.para, "a/c");
             assert_eq!(rtn.content, r#"{"detail":{"b":5},"total":5}"#);
             rtn.clone()
         } else {
@@ -176,7 +174,6 @@ mod sum_test {
         };
         let last = if let ConverterReturned::Instances(rtn) = sum(&input) {
             let rtn = &rtn[0];
-            assert_eq!(rtn.para, "a/c");
             dbg!(&rtn.content);
             assert!(rtn.content.contains(r#""total":11"#));
             rtn.clone()
@@ -197,7 +194,6 @@ mod sum_test {
         };
         let last = if let ConverterReturned::Instances(rtn) = sum(&input) {
             let rtn = &rtn[0];
-            assert_eq!(rtn.para, "a/c");
             dbg!(&rtn.content);
             assert!(rtn.content.contains(r#""e":6"#));
             assert!(rtn.content.contains(r#""total":11"#));
@@ -219,7 +215,6 @@ mod sum_test {
         };
         let last = if let ConverterReturned::Instances(rtn) = sum(&input) {
             let rtn = &rtn[0];
-            assert_eq!(rtn.para, "a/c");
             dbg!(&rtn.content);
             assert!(rtn.content.contains(r#""e":6"#));
             assert!(rtn.content.contains(r#""total":11"#));
@@ -241,7 +236,6 @@ mod sum_test {
         };
         if let ConverterReturned::Instances(rtn) = sum(&input) {
             let rtn = &rtn[0];
-            assert_eq!(rtn.para, "a/c");
             dbg!(&rtn.content);
             assert!(rtn.content.contains(r#""e":7"#));
             assert!(rtn.content.contains(r#""total":12"#));
@@ -262,7 +256,6 @@ mod sum_test {
         };
         if let ConverterReturned::Instances(rtn) = sum(&input) {
             let rtn = &rtn[0];
-            assert_eq!(rtn.para, "a/c");
             dbg!(&rtn.content);
             assert!(rtn.content.contains(r#""e":7"#));
             assert!(rtn.content.contains(r#""total":12"#));
@@ -283,7 +276,6 @@ mod sum_test {
         };
         if let ConverterReturned::Instances(rtn) = sum(&input) {
             let rtn = &rtn[0];
-            assert_eq!(rtn.para, "a/c");
             dbg!(&rtn.content);
             assert!(rtn.content.contains(r#""e":13"#));
             assert!(rtn.content.contains(r#""total":18"#));

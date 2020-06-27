@@ -1,4 +1,4 @@
-use nature_common::{CONTEXT_TARGET_INSTANCE_ID, FromInstance, get_para_and_key_from_para, Instance, Meta, MetaType, NatureError, Result};
+use nature_common::{CONTEXT_TARGET_INSTANCE_ID, CONTEXT_TARGET_INSTANCE_PARA, FromInstance, get_para_and_key_from_para, Instance, Meta, MetaType, NatureError, Result};
 use nature_db::{Mission, RawTask};
 
 use crate::task::{CachedKey, TaskForConvert};
@@ -21,7 +21,7 @@ impl Converted {
         let _ = set_source_and_target_meta(&mut instances, &from, &task.target.to)?;
 
         // check id
-        let _ = check_id(&mut instances, &last_state, &from, &task.target)?;
+        let _ = check_id(&mut instances, &from, &task.target)?;
 
         // filter from cache
         let mut instances: Vec<Instance> = if task.check_cache() {
@@ -33,7 +33,11 @@ impl Converted {
         // verify state
         let _ = verify_state(&task, &mut instances, last_state)?;
 
-        sys_context_build(&mut instances, &task.target, &from);
+        if task.target.id_bridge {
+            sys_context_id(&mut instances, &task.target, &from);
+            sys_context_para(&mut instances, &task.target, &from);
+        }
+
 
         // assemble it
         let rtn = Converted {
@@ -68,35 +72,46 @@ fn set_all_instances(instances: &mut Vec<Instance>, from: &FromInstance, target_
     instances.iter_mut().for_each(|n| {
         n.data.meta = target_meta.meta_string();
         n.from = Some(from.clone());
-        let _ = n.revise();
     });
 }
 
 
-fn check_id(ins: &mut Vec<Instance>, last: &Option<Instance>, from: &FromInstance, target: &Mission) -> Result<()> {
+fn check_id(ins: &mut Vec<Instance>, from: &FromInstance, target: &Mission) -> Result<()> {
     if ins.is_empty() {
         return Ok(());
     }
-
-    let from_is_master = match &target.to.get_setting() {
-        Some(setting) => match &setting.master {
-            None => false,
-            Some(master) => master.eq(&from.meta)
+    // handle state-instance, the id and para had put to the sys_context before convert
+    if target.to.is_state() {
+        if let Some(id) = target.sys_context.get(CONTEXT_TARGET_INSTANCE_ID) {
+            ins[0].id = match u128::from_str_radix(id, 16) {
+                Ok(rtn) => rtn,
+                Err(e) => {
+                    let msg = format!("sys_context.{}, {} can'nt convert to u128, err:{}", CONTEXT_TARGET_INSTANCE_ID, id, e);
+                    return Err(NatureError::VerifyError(msg));
+                }
+            }
         }
-        _ => false
-    };
+        if let Some(para) = target.sys_context.get(CONTEXT_TARGET_INSTANCE_PARA) {
+            ins[0].para = para.to_string();
+        }
+        if ins[0].id == 0 && ins[0].para.is_empty() {
+            ins[0].revise()?;
+        }
+        return Ok(());
+    }
 
+    // handle normal-instance
     let id = {
-        if target.use_upstream_id || from_is_master {
+        if target.use_upstream_id || target.to.check_master(&from.meta) {
             Some(from.id)
-        } else if target.to.is_state() && last.is_some() {
-            Some(last.as_ref().unwrap().id)
         } else { None }
     };
 
     for mut one in ins {
         if let Some(id_u) = id {
             one.id = id_u;
+        } else {
+            one.revise()?;
         }
         if target.target_demand.copy_para.len() > 0 {
             let result = get_para_and_key_from_para(&from.para, &target.target_demand.copy_para)?;
@@ -106,10 +121,7 @@ fn check_id(ins: &mut Vec<Instance>, last: &Option<Instance>, from: &FromInstanc
     Ok(())
 }
 
-fn sys_context_build(instances: &mut Vec<Instance>, mission: &Mission, from: &FromInstance) {
-    if !mission.id_bridge {
-        return;
-    }
+fn sys_context_id(instances: &mut Vec<Instance>, mission: &Mission, from: &FromInstance) {
     if let Some(id) = mission.sys_context.get(CONTEXT_TARGET_INSTANCE_ID) {
         for instance in instances {
             instance.data.sys_context.insert(CONTEXT_TARGET_INSTANCE_ID.to_string(), id.to_string());
@@ -121,23 +133,29 @@ fn sys_context_build(instances: &mut Vec<Instance>, mission: &Mission, from: &Fr
     }
 }
 
+fn sys_context_para(instances: &mut Vec<Instance>, mission: &Mission, from: &FromInstance) {
+    if let Some(para) = mission.sys_context.get(CONTEXT_TARGET_INSTANCE_PARA) {
+        for instance in instances {
+            instance.data.sys_context.insert(CONTEXT_TARGET_INSTANCE_PARA.to_string(), para.to_string());
+        }
+    } else if !from.para.is_empty() {
+        for instance in instances {
+            instance.data.sys_context.insert(CONTEXT_TARGET_INSTANCE_PARA.to_string(), from.para.to_string());
+        }
+    }
+}
+
 fn verify_state(task: &TaskForConvert, instances: &mut Vec<Instance>, last_state: &Option<Instance>) -> Result<()> {
     let to = &task.target.to;
     if !to.is_state() {
         return Ok(());
     }
-    if task.target.use_upstream_id && instances.len() > 1 {
-        return Err(NatureError::LogicalError("[use_upstream_id] must return less 2 instances!".to_string()));
-    }
     if instances.len() > 1 {
 // only one status instance should return
         return Err(NatureError::LogicalError("[status meta] must return less 2 instances!".to_string()));
     }
-    let mut ins = &mut instances[0];
-// upstream id
-    if task.target.use_upstream_id {
-        ins.id = task.from.id;
-    }
+    let ins = &mut instances[0];
+
 // states and state version
     let temp_states = ins.states.clone();
     match last_state {
@@ -149,7 +167,6 @@ fn verify_state(task: &TaskForConvert, instances: &mut Vec<Instance>, last_state
             }
         }
         Some(x) => {
-            ins.id = x.id;
             ins.state_version = x.state_version + 1;
             ins.states = x.states.clone();
         }
@@ -172,20 +189,13 @@ mod sys_context_test {
     use super::*;
 
     #[test]
-    fn no_bridge_set() {
-        let mut ins: Vec<Instance> = vec![Instance::default()];
-        sys_context_build(&mut ins, &Mission::default(), &FromInstance::default());
-        assert_eq!(0, ins[0].sys_context.len())
-    }
-
-    #[test]
     fn id_from_previous_id() {
         let mut ins: Vec<Instance> = vec![Instance::default()];
         let mut mission = Mission::default();
         mission.id_bridge = true;
         let mut from = FromInstance::default();
         from.id = 123;
-        sys_context_build(&mut ins, &mission, &from);
+        sys_context_id(&mut ins, &mission, &from);
         assert_eq!("7b", ins[0].sys_context.get("target.id").unwrap());
     }
 
@@ -195,7 +205,7 @@ mod sys_context_test {
         let mut mission = Mission::default();
         mission.sys_context.insert("target.id".to_string(), "abc".to_string());
         mission.id_bridge = true;
-        sys_context_build(&mut ins, &mission, &FromInstance::default());
+        sys_context_id(&mut ins, &mission, &FromInstance::default());
         assert_eq!("abc", ins[0].sys_context.get("target.id").unwrap());
     }
 }
@@ -218,7 +228,7 @@ mod test {
         from_ins.state_version = 2;
         let meta = Meta::new("to", 1, MetaType::Business).unwrap();
         let task_key = from_ins.get_key();
-        let mut task = TaskForConvert {
+        let task = TaskForConvert {
             from: from_ins,
             target: Mission {
                 to: meta.clone(),
@@ -248,18 +258,12 @@ mod test {
         ins.id = 123;
         let ins = vec![ins];
 
-// for normal
         let result = Converted::gen(&task, &raw, ins.clone(), &None).unwrap();
         let c = &result.converted[0];
         let from = c.from.as_ref().unwrap();
         assert_eq!(from.id, 567);
         assert_eq!(from.meta, "B:from:1");
         assert_eq!(from.state_version, 2);
-        assert_eq!(result.converted[0].id, 567);
-
-// for state
-        let _ = task.target.to.set_states(Some(vec![State::Normal("hello".to_string())]));
-        let result = Converted::gen(&task, &raw, ins, &None).unwrap();
         assert_eq!(result.converted[0].id, 567);
     }
 
@@ -299,147 +303,126 @@ mod test {
 }
 
 #[cfg(test)]
-mod check_id_test {
+mod check_id_for_state {
     use nature_common::{Meta, MetaSetting, MetaType};
 
     use super::*;
 
     #[test]
-    fn target_id_cannot_use_as_id() {
-        let (last, from, mut mission) = init_input();
-        mission.to = Meta::new("remove master", 1, MetaType::Business).unwrap();
-        let mut one = Instance::new("one").unwrap();
-        one.sys_context.insert(CONTEXT_TARGET_INSTANCE_ID.to_string(), "123".to_string());
-        let mut input = vec![one.clone()];
-        let _ = check_id(&mut input, &Some(last), &from, &mission);
-        assert_eq!(input[0].id, 0);
-    }
-
-    #[test]
     fn input_is_empty() {
-        let (last, from, mission) = init_input();
-        let rtn = check_id(&mut vec![], &Some(last), &from, &mission);
+        let (from, mission) = init_input();
+        let rtn = check_id(&mut vec![], &from, &mission);
         assert_eq!(rtn.is_ok(), true)
     }
 
-    /// the instance that will be saved is child of from
     #[test]
-    fn use_master_id() {
-        let (last, from, mission) = init_input();
-        let one = Instance::new("one").unwrap();
-        let two = Instance::new("two").unwrap();
-        let mut input = vec![one.clone(), two.clone()];
-        let _ = check_id(&mut input, &Some(last), &from, &mission);
-        assert_eq!(input[0].id, 123);
-        assert_eq!(input[1].id, 123);
+    fn sys_context_nothing() {
+        let (from, mission) = init_input();
+        let sta = Instance::default();
+        let vec = &mut vec![sta];
+        assert_eq!(vec[0].id, 0);
+        let rtn = check_id(vec, &from, &mission);
+        assert_eq!(rtn.is_ok(), true);
+        assert_eq!(vec[0].id > 0, true)
     }
 
     #[test]
-    fn no_effect_for_none_state_taget() {
-        let (last, from, mut mission) = init_input();
-        mission.to = Meta::new("noState", 1, MetaType::Business).unwrap();
-        let one = Instance::new("one").unwrap();
-        let mut input = vec![one.clone()];
-        let _ = check_id(&mut input, &Some(last), &from, &mission);
-        assert_eq!(input[0].id, 0);
+    fn sys_context_for_id() {
+        let (from, mut mission) = init_input();
+        let sta = Instance::default();
+        mission.sys_context.insert("target.id".to_string(), "5".to_string());
+        let vec = &mut vec![sta];
+        assert_eq!(vec[0].id, 0);
+        let rtn = check_id(vec, &from, &mission);
+        assert_eq!(rtn.is_ok(), true);
+        assert_eq!(vec[0].id, 5)
     }
 
     #[test]
-    fn use_last_id() {
-        let mut last = Instance::new("last").unwrap();
-        last.id = 456;
-        let from = FromInstance {
-            id: 123,
-            meta: "from".to_string(),
-            para: "".to_string(),
-            state_version: 1,
-        };
+    fn only_para_for_context() {
+        let (from, mut mission) = init_input();
+        let sta = Instance::default();
+        mission.sys_context.insert("target.para".to_string(), "a".to_string());
+        let vec = &mut vec![sta];
+        let rtn = check_id(vec, &from, &mission);
+        assert_eq!(rtn.is_ok(), true);
+        assert_eq!(vec[0].id, 0);
+        assert_eq!(vec[0].para, "a")
+    }
+
+    /// master is from
+    fn init_input() -> (FromInstance, Mission) {
+        let from = FromInstance::default();
+
+        let mut setting = MetaSetting::default();
+        setting.is_state = true;
+
         let mut meta = Meta::new("to", 1, MetaType::Business).unwrap();
-        let setting = MetaSetting {
-            is_state: true,
-            master: Some("another".to_string()),
-            multi_meta: Default::default(),
-            cache_saved: false,
-        };
         let _ = meta.set_setting(&setting.to_json().unwrap());
-        let mission = Mission {
-            to: meta,
-            executor: Default::default(),
-            filter_before: vec![],
-            filter_after: vec![],
-            target_demand: Default::default(),
-            use_upstream_id: false,
-            delay: 0,
-            sys_context: Default::default(),
-            id_bridge: false,
-        };
-        let one = Instance::new("one").unwrap();
-        let mut input = vec![one.clone()];
-        assert_eq!(input[0].id, 0);
-        let _ = check_id(&mut input, &Some(last), &from, &mission);
-        assert_eq!(input[0].id, 456);
+
+        let mut mission = Mission::default();
+        mission.to = meta;
+
+        (from, mission)
     }
+}
+
+#[cfg(test)]
+mod check_id_for_normal {
+    use nature_common::{Meta, MetaSetting, MetaType};
+
+    use super::*;
 
     #[test]
-    fn master_not_matched() {
-        let (_last, mut from, mission) = init_input();
-        from.meta = "not_matched".to_string();
-        let one = Instance::new("one").unwrap();
-        let mut input = vec![one.clone()];
-        let _ = check_id(&mut input, &None, &from, &mission);
-        assert_eq!(input[0].id, 0);
-    }
-
-    #[test]
-    fn master_matched() {
-        let (_last, from, mission) = init_input();
+    fn normal() {
+        let (from, mut mission) = init_input();
+        mission.to = Meta::new("remove master", 1, MetaType::Business).unwrap();
         let one = Instance::new("one").unwrap();
         let mut input = vec![one];
-        let _ = check_id(&mut input, &None, &from, &mission);
-        assert_eq!(input[0].id, 123);
+        let _ = check_id(&mut input, &from, &mission);
+        assert_eq!(input[0].id != 123, true);
+        assert_eq!(input[0].id != 0, true);
     }
 
     #[test]
     fn use_upstream_id() {
-        let (_last, from, mut mission) = init_input();
-        mission.to = Meta::default();
+        let (from, mut mission) = init_input();
+        mission.to = Meta::new("remove master", 1, MetaType::Business).unwrap();
         mission.use_upstream_id = true;
         let one = Instance::new("one").unwrap();
-        let mut input = vec![one.clone()];
-        let _ = check_id(&mut input, &None, &from, &mission);
+        let mut input = vec![one];
+        let _ = check_id(&mut input, &from, &mission);
+        assert_eq!(input[0].id, 123);
+    }
+
+
+    /// the instance that will be saved is child of from
+    #[test]
+    fn use_master_id() {
+        let (from, mission) = init_input();
+        let one = Instance::new("one").unwrap();
+        let mut input = vec![one];
+        let _ = check_id(&mut input, &from, &mission);
         assert_eq!(input[0].id, 123);
     }
 
     /// master is from
-    fn init_input() -> (Instance, FromInstance, Mission) {
-        let mut last = Instance::new("last").unwrap();
-        last.id = 456;
+    fn init_input() -> (FromInstance, Mission) {
         let from = FromInstance {
             id: 123,
             meta: "from".to_string(),
             para: "".to_string(),
             state_version: 1,
         };
+
+        let mut setting = MetaSetting::default();
+        setting.master = Some("from".to_string());
+
         let mut meta = Meta::new("to", 1, MetaType::Business).unwrap();
-        let setting = MetaSetting {
-            is_state: true,
-            master: Some("from".to_string()),
-            multi_meta: Default::default(),
-            cache_saved: false,
-        };
-        let ss = setting.to_json().unwrap();
-        let _sr = meta.set_setting(&ss);
-        let mission = Mission {
-            to: meta,
-            executor: Default::default(),
-            filter_before: vec![],
-            filter_after: vec![],
-            target_demand: Default::default(),
-            use_upstream_id: false,
-            delay: 0,
-            sys_context: Default::default(),
-            id_bridge: false,
-        };
-        (last, from, mission)
+        let _sr = meta.set_setting(&setting.to_json().unwrap());
+
+        let mut mission = Mission::default();
+        mission.to = meta;
+        (from, mission)
     }
 }

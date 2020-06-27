@@ -111,8 +111,8 @@ impl IncomeController {
 }
 
 async fn get_task_and_last(task: &RawTask) -> Result<(TaskForConvert, Option<Instance>)> {
-    let task: TaskForConvert = TaskForConvert::from_raw(task, InstanceDaoImpl::get_by_key, &*C_M, &*D_M).await?;
-    let last = InstanceDaoImpl::get_last_taget(&task.from, &task.target).await?;
+    let mut task: TaskForConvert = TaskForConvert::from_raw(task, InstanceDaoImpl::get_by_key, &*C_M, &*D_M).await?;
+    let last = InstanceDaoImpl::get_last_taget(&task.from, &mut task.target).await?;
     Ok((task, last))
 }
 

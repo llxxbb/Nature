@@ -30,7 +30,8 @@ async fn do_convert(task: TaskForConvert, raw: RawTask) {
         init_target_id_for_sys_context(&mut task, &mut from_instance).await
     }
     // -----end
-    let last = match InstanceDaoImpl::get_last_taget(&from_instance, &task.target).await {
+    let mut task = task;
+    let last = match InstanceDaoImpl::get_last_taget(&from_instance, &mut task.target).await {
         Err(_) => { return; }
         Ok(last) => last
     };
@@ -58,7 +59,7 @@ async fn do_convert(task: TaskForConvert, raw: RawTask) {
     let rtn = gen_and_call_out(&task, &raw, &task.target, &last, master).await;
     match handle_converted(rtn, &task, &raw, &task.target, &last).await {
         Ok(()) => (),
-        Err(NatureError::EnvironmentError(msg)) => warn!("{}", msg.to_string()),
+        Err(NatureError::EnvironmentError(_)) => (),
         Err(e) => {
             warn!("call out error: {}", e);
             let _ = D_T.raw_to_error(&e, &raw).await;
