@@ -7,14 +7,17 @@
 
 ## Release 0.11
 
+- fix bug: built-in executor: time_range: interval calculate error.
 
 ### should commit
 
-- demo doc: score
 
 ### 未完成
 
-- optimize: downstream id and para put to sys_context if ready
+
+
+- demo 销售统计
+
 - 文档
   - 内建执行器的参考文档(搞优先级，有利于推广)
   - 有关 env 配置的说明。 

@@ -1,19 +1,18 @@
 use std::ops::{Add, Sub};
 use std::str::FromStr;
 
-use chrono::{Date, Datelike, Duration, Local, NaiveDate, NaiveDateTime, Timelike, TimeZone};
+use chrono::{Date, Datelike, Duration, Local, NaiveDate, NaiveDateTime, TimeZone};
 
-use nature_common::{ConverterParameter, ConverterReturned, SEPARATOR_INS_PARA, get_para_and_key_from_para, Instance, is_default, NatureError, Result};
+use nature_common::{ConverterParameter, ConverterReturned, get_para_and_key_from_para, Instance, is_default, NatureError, Result, SEPARATOR_INS_PARA};
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Default)]
 struct Setting {
-    /// s(econd), m(inute), h(our), d(ay)
+    /// s(econd), m(inute), h(our), d(ay), w(eek), M(onth), Y(ear)
     #[serde(skip_serializing_if = "is_s")]
     #[serde(default = "string_s")]
     unit: String,
-    /// When unit is s,m,h,d the value great than 1, it mean interval
+    /// When unit is s,m,h,d the value great than 0, it mean interval
     /// When unit is w,M,y the value mean offset. It could be negative, means offset from the end.
-    /// - 0 is the first day of the unit.
     /// - week : value must in [-7, 6]
     /// - month : value must in [-20, 19]
     /// - year : value must in [-200, 199]
@@ -24,7 +23,7 @@ struct Setting {
     #[serde(skip_serializing_if = "is_default")]
     #[serde(default)]
     on_para: bool,
-    /// time info from `Instance.para`, otherwise from `Instance.create_time`
+    /// which part of para is the time info
     #[serde(skip_serializing_if = "is_default")]
     #[serde(default)]
     para_part: u8,
@@ -38,39 +37,32 @@ static DAY: i64 = 1000 * 60 * 60 * 24;
 impl Setting {
     fn get_time(&self, ins_time: i64) -> Result<(i64, i64)> {
         let time = Local.timestamp_millis(ins_time).naive_local();
+
         let unit = self.unit.as_ref();
+        let interval: i64 = if self.value == 0 {
+            1
+        } else {
+            self.value as i64
+        };
         let rtn: (i64, i64) = match unit {
             "s" => {
-                let mut rtn = ins_time - time.timestamp_subsec_millis() as i64;
-                if self.value > 1 {
-                    let redundant = time.second() % self.value as u32;
-                    rtn = rtn - redundant as i64 * SECOND
-                };
-                (rtn, rtn + SECOND)
+                let rtn = ins_time / SECOND / interval * interval * SECOND;
+                (rtn, rtn + interval * SECOND)
             }
             "m" => {
-                let mut rtn = ins_time - time.second() as i64 * SECOND - time.timestamp_subsec_millis() as i64;
-                if self.value > 1 {
-                    let redundant = time.minute() % self.value as u32;
-                    rtn = rtn - redundant as i64 * MINUTE
-                };
-                (rtn, rtn + MINUTE)
+                let rtn = ins_time / MINUTE / interval * interval * MINUTE;
+                (rtn, rtn + interval * MINUTE)
             }
             "h" => {
-                let mut rtn = ins_time - time.minute() as i64 * MINUTE - time.second() as i64 * SECOND - time.timestamp_subsec_millis() as i64;
-                if self.value > 1 {
-                    let redundant = time.hour() % self.value as u32;
-                    rtn = rtn - redundant as i64 * HOUR
-                };
-                (rtn, rtn + HOUR)
+                let rtn = ins_time / HOUR / interval * interval * HOUR;
+                (rtn, rtn + interval * HOUR)
             }
             "d" => {
-                let mut rtn = ins_time - time.hour() as i64 * HOUR - time.minute() as i64 * MINUTE - time.second() as i64 * SECOND - time.timestamp_subsec_millis() as i64;
-                if self.value > 1 {
-                    let redundant = time.num_days_from_ce() % self.value as i32;
-                    rtn = rtn - redundant as i64 * DAY
-                };
-                (rtn, rtn + DAY)
+                let mut rtn = ins_time / DAY / interval * interval * DAY;
+                // time zone process
+                let offset = Local.offset_from_local_date(&time.date()).unwrap().local_minus_utc();
+                rtn = rtn - offset as i64 * SECOND;
+                (rtn, rtn + interval * DAY)
             }
             "w" => return self.get_week(&time),
             "M" => return self.get_month(&time),
@@ -232,6 +224,14 @@ fn string_s() -> String {
 mod timer_setting_test {
     use super::*;
 
+    #[ignore]
+    #[test]
+    fn my_test() {
+        let a = 16078 as i64;
+        let b = a / SECOND / 7 * 7 * SECOND;
+        assert_eq!(b, 14000)
+    }
+
     #[test]
     fn cfg_test() {
         let mut setting = Setting {
@@ -273,7 +273,7 @@ mod timer_setting_test {
         let rtn = setting.get_time(time).unwrap();
         let cmp = (
             Local.ymd(2020, 5, 1).and_hms(18, 36, 15).timestamp_millis(),
-            Local.ymd(2020, 5, 1).and_hms(18, 36, 16).timestamp_millis()
+            Local.ymd(2020, 5, 1).and_hms(18, 36, 30).timestamp_millis()
         );
         assert_eq!(rtn, cmp);
     }
@@ -298,7 +298,7 @@ mod timer_setting_test {
         let rtn = setting.get_time(time).unwrap();
         let cmp = (
             Local.ymd(2020, 5, 1).and_hms(18, 30, 0).timestamp_millis(),
-            Local.ymd(2020, 5, 1).and_hms(18, 31, 0).timestamp_millis()
+            Local.ymd(2020, 5, 1).and_hms(18, 40, 0).timestamp_millis()
         );
         assert_eq!(rtn, cmp);
     }
@@ -323,7 +323,7 @@ mod timer_setting_test {
         let rtn = setting.get_time(time).unwrap();
         let cmp = (
             Local.ymd(2020, 5, 1).and_hms(16, 0, 0).timestamp_millis(),
-            Local.ymd(2020, 5, 1).and_hms(17, 0, 0).timestamp_millis()
+            Local.ymd(2020, 5, 1).and_hms(20, 0, 0).timestamp_millis()
         );
         assert_eq!(rtn, cmp);
     }
@@ -342,13 +342,18 @@ mod timer_setting_test {
             Local.ymd(2020, 5, 1).and_hms(0, 0, 0).timestamp_millis(),
             Local.ymd(2020, 5, 2).and_hms(0, 0, 0).timestamp_millis()
         );
+        // let ttt = Local.timestamp_millis(1588291200000).naive_local();
+        // let offset = Local.offset_from_local_date(&ttt.date());
+        // let i = offset.single().unwrap().local_minus_utc();
+        // dbg!(&i);
+        // assert_eq!("rtn", ttt.to_string());
         assert_eq!(rtn, cmp);
         // test interval
         setting.value = 3;
         let rtn = setting.get_time(time).unwrap();
         let cmp = (
             Local.ymd(2020, 4, 29).and_hms(0, 0, 0).timestamp_millis(),
-            Local.ymd(2020, 4, 30).and_hms(0, 0, 0).timestamp_millis()
+            Local.ymd(2020, 5, 2).and_hms(0, 0, 0).timestamp_millis()
         );
         assert_eq!(rtn, cmp);
     }
