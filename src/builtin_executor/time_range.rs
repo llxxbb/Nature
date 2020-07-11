@@ -5,7 +5,7 @@ use chrono::{Date, Datelike, Duration, Local, NaiveDate, NaiveDateTime, TimeZone
 
 use nature_common::{ConverterParameter, ConverterReturned, get_para_and_key_from_para, Instance, is_default, NatureError, Result, SEPARATOR_INS_PARA};
 
-#[derive(Serialize, Deserialize, Debug, PartialEq, Default)]
+#[derive(Serialize, Deserialize, Debug, PartialEq)]
 struct Setting {
     /// s(econd), m(inute), h(our), d(ay), w(eek), M(onth), Y(ear)
     #[serde(skip_serializing_if = "is_s")]
@@ -28,6 +28,45 @@ struct Setting {
     #[serde(default)]
     para_part: u8,
 }
+
+
+/// generate a timer para
+pub fn time_range(input: &ConverterParameter) -> ConverterReturned {
+    // get setting
+    let cfg = if input.cfg == "" {
+        Setting::default()
+    } else {
+        match serde_json::from_str::<Setting>(&input.cfg) {
+            Ok(cfg) => cfg,
+            Err(err) => {
+                warn!("error setting: {}", &input.cfg);
+                return ConverterReturned::LogicalError(err.to_string());
+            }
+        }
+    };
+    dbg!(&cfg);
+    let time_long = if cfg.on_para {
+        let time_string = match get_para_and_key_from_para(&input.from.para, &vec![cfg.para_part]) {
+            Err(err) => return ConverterReturned::LogicalError(err.to_string()),
+            Ok((p, _k)) => p
+        };
+        match i64::from_str(&time_string) {
+            Err(err) => return ConverterReturned::LogicalError(err.to_string()),
+            Ok(rtn) => rtn
+        }
+    } else {
+        input.from.create_time
+    };
+    let result = match cfg.get_time(time_long) {
+        Ok(rtn) => rtn,
+        Err(err) => return ConverterReturned::LogicalError(err.to_string())
+    };
+    let mut instance = Instance::default();
+    instance.para = format!("{}{}{}", result.0, *SEPARATOR_INS_PARA, result.1);
+    ConverterReturned::Instances(vec![instance])
+}
+
+/// setting----------------------------------------------------
 
 static SECOND: i64 = 1000;
 static MINUTE: i64 = 1000 * 60;
@@ -160,6 +199,17 @@ impl Setting {
     }
 }
 
+impl Default for Setting {
+    fn default() -> Self {
+        Setting {
+            unit: "s".to_string(),
+            value: 1,
+            on_para: false,
+            para_part: 0,
+        }
+    }
+}
+
 fn get_next_month(nd: &NaiveDate) -> Date<Local> {
     if nd.month() < 12 {
         Local.ymd(nd.year(), nd.month() + 1, 1)
@@ -176,41 +226,6 @@ fn get_previous_month(nd: &NaiveDate) -> Date<Local> {
     }
 }
 
-
-/// generate a timer para
-pub fn time_range(input: &ConverterParameter) -> ConverterReturned {
-    // get setting
-    let cfg = if input.cfg == "" {
-        Setting::default()
-    } else {
-        match serde_json::from_str::<Setting>(&input.cfg) {
-            Ok(cfg) => cfg,
-            Err(err) => {
-                warn!("error setting: {}", &input.cfg);
-                return ConverterReturned::LogicalError(err.to_string());
-            }
-        }
-    };
-    let time_long = if cfg.on_para {
-        let time_string = match get_para_and_key_from_para(&input.from.para, &vec![cfg.para_part]) {
-            Err(err) => return ConverterReturned::LogicalError(err.to_string()),
-            Ok((p, _k)) => p
-        };
-        match i64::from_str(&time_string) {
-            Err(err) => return ConverterReturned::LogicalError(err.to_string()),
-            Ok(rtn) => rtn
-        }
-    } else {
-        input.from.create_time
-    };
-    let result = match cfg.get_time(time_long) {
-        Ok(rtn) => rtn,
-        Err(err) => return ConverterReturned::LogicalError(err.to_string())
-    };
-    let mut instance = Instance::default();
-    instance.para = format!("{}{}{}", result.0, *SEPARATOR_INS_PARA, result.1);
-    ConverterReturned::Instances(vec![instance])
-}
 
 fn is_s(cmp: &str) -> bool {
     cmp.eq("s")

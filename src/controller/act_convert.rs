@@ -4,7 +4,7 @@ use nature_common::{CONTEXT_TARGET_INSTANCE_ID, ConverterReturned, Instance, Met
 use nature_db::{C_M, D_M, D_T, InstanceDaoImpl, MetaCache, Mission, RawTask, TaskDao};
 
 use crate::controller::{after_converted, process_null, received_self_route};
-use crate::task::{gen_and_call_out, TaskForConvert};
+use crate::task::{call_executor, TaskForConvert};
 use crate::task::filter::filter;
 
 /// **Notice**: Can't use async under actix-rt directly, otherwise it can lead to "actix-rt overflow its stack".
@@ -56,7 +56,7 @@ async fn do_convert(task: TaskForConvert, raw: RawTask) {
             return;
         }
     };
-    let rtn = gen_and_call_out(&task, &raw, &task.target, &last, master).await;
+    let rtn = call_executor(&task, &raw, &task.target, &last, master).await;
     match handle_converted(rtn, &task, &raw, &task.target, &last).await {
         Ok(()) => (),
         Err(NatureError::EnvironmentError(_)) => (),
