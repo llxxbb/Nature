@@ -43,8 +43,8 @@ async fn get_by_id(para: Json<KeyCondition>) -> HttpResponse {
 }
 
 /// fuzzy query
-async fn get_by_meta(para: Json<KeyCondition>) -> HttpResponse {
-    let x = InstanceDaoImpl::get_by_meta(&para.0).await;
+async fn get_by_key_gt(para: Json<KeyCondition>) -> HttpResponse {
+    let x = InstanceDaoImpl::get_by_key_gt(&para.0).await;
     return_result(x)
 }
 
@@ -56,7 +56,7 @@ pub fn web_config(cfg: &mut web::ServiceConfig) {
         .route("/batch", web::post().to(batch))
         .route("/redo_task", web::post().to(redo_task))
         .route("/get_by_id", web::post().to(get_by_id))
-        .route("/get_by_meta", web::post().to(get_by_meta));
+        .route("/get_by_key_gt", web::post().to(get_by_key_gt));
 }
 
 

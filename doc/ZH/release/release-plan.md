@@ -8,13 +8,15 @@
 ## Release 0.11
 
 - fix bug: built-in executor: time_range: interval calculate error.
+- add built-in filter support
+- incompatible change: `get_by_meta` changed to `get_by_key_gt`
 
 ### should commit
 
 
 ### 未完成
 
-- built-in filter support
+
 - built-in filter: add loader to load data from Instance Table. 
 - doc: instance-loader
 

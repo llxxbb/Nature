@@ -5,7 +5,8 @@ use nature_common::{ConverterParameter, ConverterReturned, get_para_and_key_from
 
 #[derive(Serialize, Deserialize)]
 struct Setting {
-    /// which part of para you want to sum, the value is the index of para.
+    /// which part of para is key that you want to sum, the value is the index of para.
+    /// the `Instance.content` only content Number
     key_from_para: Vec<u8>,
 
     /// hwo to process the same item's value
