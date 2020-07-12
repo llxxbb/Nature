@@ -1,3 +1,5 @@
+mod sum2;
+
 use std::collections::HashMap;
 
 /// built-in xecutor

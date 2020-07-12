@@ -44,7 +44,6 @@ pub fn time_range(input: &ConverterParameter) -> ConverterReturned {
             }
         }
     };
-    dbg!(&cfg);
     let time_long = if cfg.on_para {
         let time_string = match get_para_and_key_from_para(&input.from.para, &vec![cfg.para_part]) {
             Err(err) => return ConverterReturned::LogicalError(err.to_string()),

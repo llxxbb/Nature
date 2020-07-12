@@ -7,5 +7,4 @@ pub static TASK_KEY_SEPARATOR: &str = "|";
 mod convert;
 mod task_store;
 mod cached_key;
-pub mod filter;
 pub mod local_common;

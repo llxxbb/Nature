@@ -21,3 +21,4 @@ pub mod task;
 pub mod controller;
 pub mod channels;
 pub mod builtin_executor;
+pub mod filter;

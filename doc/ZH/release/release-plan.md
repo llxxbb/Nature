@@ -14,11 +14,18 @@
 
 ### 未完成
 
+- built-in filter support
+- built-in filter: add loader to load data from Instance Table. 
+- doc: instance-loader
+
+- built-in executor sum: support batch mode
 
 - demo 销售统计
 
+- redo check busy first
+
 - 文档
-  - 内建执行器的参考文档(搞优先级，有利于推广)
+  - 内建执行器的参考文档(高优先级，有利于推广)
   
 - built-in executor sum: support batch record
   
