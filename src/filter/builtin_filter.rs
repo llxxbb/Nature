@@ -1,29 +1,35 @@
 use std::collections::HashMap;
+use std::sync::Arc;
 
+use loader::Loader;
 /// built-in xecutor
 use nature_common::{Instance, NatureError, Result};
 
-pub type Filter = fn(para: &mut Instance, cfg: &str) -> Result<()>;
+use crate::system::INS_KEY_GT;
 
-
-lazy_static! {
-    static ref CACHE: HashMap<String,&'static Filter> = init_builtin();
+#[async_trait]
+pub trait FilterBefore: Sync + Send {
+    async fn filter(&self, ins: &mut Instance, cfg: &str) -> Result<()>;
 }
 
-fn init_builtin() -> HashMap<String, &'static Filter> {
+lazy_static! {
+    static ref CACHE: HashMap<String, Arc<dyn FilterBefore>> = init_builtin();
+}
+
+fn init_builtin() -> HashMap<String, Arc<dyn FilterBefore>> {
     info!("BuiltIn filter initialized");
-    let mut map: HashMap<String, &'static Filter> = HashMap::new();
-    let one: &Filter = &(loader::loader as Filter);
-    map.insert("instance-loader".to_string(), one);
+    let mut map: HashMap<String, Arc<dyn FilterBefore>> = HashMap::new();
+    let one = Loader { dao: INS_KEY_GT.clone() };
+    map.insert("instance-loader".to_string(), Arc::new(one));
     map
 }
 
 pub struct BuiltIn;
 
 impl BuiltIn {
-    pub fn get(name: &str) -> Result<&'static Filter> {
+    pub fn get(name: &str) -> Result<Arc<dyn FilterBefore>> {
         match CACHE.get(name) {
-            Some(x) => Ok(*x),
+            Some(x) => Ok(x.clone()),
             None => Err(NatureError::VerifyError(format!("not exists built-in executor for name : {}", name))),
         }
     }

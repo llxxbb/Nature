@@ -4,10 +4,11 @@ use actix_web::{HttpResponse, ResponseError, web};
 use actix_web::web::Json;
 use serde::export::fmt::Debug;
 
-use nature_common::{DelayedInstances, Instance, NatureError, KeyCondition, SelfRouteInstance};
+use nature_common::{DelayedInstances, Instance, KeyCondition, NatureError, SelfRouteInstance};
 use nature_db::{InstanceDaoImpl, RawTask};
 
 use crate::controller::IncomeController;
+use crate::system::INS_KEY_GT;
 
 /// **Note** This do not receive System `Meta`'s instances
 async fn input(instance: Json<Instance>) -> HttpResponse {
@@ -44,7 +45,7 @@ async fn get_by_id(para: Json<KeyCondition>) -> HttpResponse {
 
 /// fuzzy query
 async fn get_by_key_gt(para: Json<KeyCondition>) -> HttpResponse {
-    let x = InstanceDaoImpl::get_by_key_gt(&para.0).await;
+    let x = INS_KEY_GT.clone().get_by_key_gt(&para.0).await;
     return_result(x)
 }
 

@@ -19,6 +19,7 @@ lazy_static = "1.4"
 uuid = { version = "0.8", features = ["v3"] }
 lru_time_cache = "0.10"
 futures = "0.3"
+async-trait="0.1"
 
 # for local executor implement
 libloading = "0.5"

@@ -24,8 +24,7 @@ pub async fn filter_before(para: &mut Instance, filter: &Vec<Executor>) -> Resul
             }
             Protocol::BuiltIn => {
                 let bf = BuiltIn::get(&f.url)?;
-                bf(para, &f.settings)?;
-                unimplemented!()
+                bf.filter(para, &f.settings).await?;
             }
             _ => return Err(NatureError::VerifyError("filter does not support this protocol".to_string()))
         }

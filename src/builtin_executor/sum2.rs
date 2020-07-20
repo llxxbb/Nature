@@ -58,6 +58,9 @@ fn is_100(size: &u16) -> bool {
 
 fn default_100() -> u16 { 100 }
 
+/// the needed target data format is : [key],[value1],[value2],[value3],...
+/// for example: item1,2,100  // the custom bought 2 item1 and paid $100.
+
 
 #[derive(Deserialize, Serialize)]
 struct Content {

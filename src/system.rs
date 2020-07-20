@@ -3,15 +3,21 @@ extern crate dotenv;
 extern crate uuid;
 
 use std::env;
+use std::sync::Arc;
 use std::thread::JoinHandle;
 
 use actix_web::{App, HttpServer};
 use dotenv::dotenv;
 
 use nature_common::setup_logger;
+use nature_db::{InstanceDaoImpl, KeyGT};
 
 use crate::channels::start_receive_threads;
 use crate::web::actix::*;
+
+lazy_static! {
+    pub static ref INS_KEY_GT : Arc<dyn KeyGT> = Arc::new(InstanceDaoImpl{});
+}
 
 lazy_static! {
     pub static ref SERVER_PORT:String={

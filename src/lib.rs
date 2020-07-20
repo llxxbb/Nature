@@ -1,4 +1,6 @@
 extern crate actix_web;
+#[macro_use]
+extern crate async_trait;
 extern crate chrono;
 extern crate futures;
 #[macro_use]

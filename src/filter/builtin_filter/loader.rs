@@ -1,19 +1,45 @@
-use nature_common::{Executor, Instance, KeyCondition, NatureError, Result};
+use std::str::FromStr;
+use std::sync::Arc;
 
-pub fn loader(_para: &mut Instance, cfg: &str) -> Result<()> {
-    let setting = Setting::get(cfg)?;
-    let condition = KeyCondition {
-        id: "".to_string(),
-        meta: "".to_string(),
-        key_gt: setting.key_like,
-        para: "".to_string(),
-        state_version: 0,
-        time_ge: None,
-        time_lt: None,
-        limit: 0,
-    };
+use nature_common::{Executor, get_para_part, Instance, KeyCondition, NatureError, Result};
+use nature_db::KeyGT;
 
-    Ok(())
+use crate::filter::builtin_filter::FilterBefore;
+
+pub struct Loader {
+    pub dao: Arc<dyn KeyGT>
+}
+
+#[async_trait]
+impl FilterBefore for Loader {
+    async fn filter(&self, ins: &mut Instance, cfg: &str) -> Result<()> {
+        let setting = Setting::get(&cfg)?;
+        let time_range = get_para_part(&ins.para, &setting.time_part)?;
+        let condition = KeyCondition {
+            id: "".to_string(),
+            meta: "".to_string(),
+            key_gt: setting.key_like,
+            para: "".to_string(),
+            state_version: 0,
+            time_ge: Some(i64::from_str(&time_range[0])?),
+            time_lt: Some(i64::from_str(&time_range[1])?),
+            limit: setting.page_size as i32,
+        };
+        let mut content: Vec<String> = vec![];
+        loop {
+            let rtn: Vec<Instance> = self.dao.get_by_key_gt(&condition).await?;
+            let len = rtn.len();
+            for one in rtn {
+                // TODO embedded filter
+                content.push(one.content.to_string());
+            }
+            if len < setting.page_size as usize {
+                break;
+            }
+        }
+        // change the content
+        Ok(())
+    }
 }
 
 
@@ -26,10 +52,9 @@ struct Setting {
     #[serde(default = "default_100")]
     page_size: u16,
     /// where to get the time range from the `Instance'para` which used to load data from Instance table
+    /// it only accept two element, one for Begin Time and the other for End Time
     time_part: Vec<u8>,
     /// correct the format of the data loaded.
-    /// the needed target data format is : [key],[value1],[value2],[value3],...
-    /// for example: item1,2,100  // the custom bought 2 item1 and paid $100.
     filters: Vec<Executor>,
 }
 
@@ -38,7 +63,10 @@ impl Setting {
         if cfg.is_empty() {
             return Err(NatureError::VerifyError("builtin-filter loader `settings` can't be empty".to_string()));
         };
-        let result = serde_json::from_str(cfg)?;
+        let result: Setting = serde_json::from_str(cfg)?;
+        if result.time_part.len() != 2 {
+            return Err(NatureError::VerifyError("builtin-filter loader `settings.time_part` need exactly 2 elements".to_string()));
+        }
         Ok(result)
     }
 }
