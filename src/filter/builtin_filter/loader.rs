@@ -15,10 +15,13 @@ impl FilterBefore for Loader {
     async fn filter(&self, ins: &mut Instance, cfg: &str) -> Result<()> {
         let setting = Setting::get(&cfg)?;
         let time_range = get_para_part(&ins.para, &setting.time_part)?;
-        let condition = KeyCondition {
+        let mut condition = KeyCondition {
             id: "".to_string(),
             meta: "".to_string(),
-            key_gt: setting.key_like,
+            key_gt: setting.key_gt,
+            key_ge: "".to_string(),
+            key_lt: setting.key_lt,
+            key_le: "".to_string(),
             para: "".to_string(),
             state_version: 0,
             time_ge: Some(i64::from_str(&time_range[0])?),
@@ -29,8 +32,12 @@ impl FilterBefore for Loader {
         loop {
             let rtn: Vec<Instance> = self.dao.get_by_key_gt(&condition).await?;
             let len = rtn.len();
+            if len == setting.page_size as usize {
+                condition.key_gt = rtn[len - 1].get_key();
+            }
             for one in rtn {
                 // TODO embedded filter
+
                 content.push(one.content.to_string());
             }
             if len < setting.page_size as usize {
@@ -46,8 +53,10 @@ impl FilterBefore for Loader {
 /// when used this mode the target `MetaType` must be `Multi`
 #[derive(Serialize, Deserialize)]
 struct Setting {
-    /// the prefix of `ins_key`
-    key_like: String,
+    /// great than `ins_key`
+    key_gt: String,
+    /// less equal `ins_key`
+    key_lt: String,
     #[serde(skip_serializing_if = "is_100")]
     #[serde(default = "default_100")]
     page_size: u16,

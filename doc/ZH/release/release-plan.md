@@ -10,12 +10,15 @@
 - fix bug: built-in executor: time_range: interval calculate error.
 - add built-in filter support
 - incompatible change: `get_by_meta` changed to `get_by_key_gt`
+- enhance keyCondition
 
 ### should commit
 
 
 ### 未完成
 
+
+- add range end for fetching instance
 
 - built-in filter: add loader to load data from Instance Table. 
 - doc: instance-loader
