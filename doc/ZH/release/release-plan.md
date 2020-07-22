@@ -9,7 +9,7 @@
 
 - fix bug: built-in executor: time_range: interval calculate error.
 - add built-in filter support
-- incompatible change: `get_by_meta` changed to `get_by_key_gt`
+- incompatible change: `get_by_meta` changed to `get_by_key_range`
 - enhance keyCondition
 
 ### should commit

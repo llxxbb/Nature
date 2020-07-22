@@ -10,13 +10,13 @@ use actix_web::{App, HttpServer};
 use dotenv::dotenv;
 
 use nature_common::setup_logger;
-use nature_db::{InstanceDaoImpl, KeyGT};
+use nature_db::{InstanceDaoImpl, KeyRange};
 
 use crate::channels::start_receive_threads;
 use crate::web::actix::*;
 
 lazy_static! {
-    pub static ref INS_KEY_GT : Arc<dyn KeyGT> = Arc::new(InstanceDaoImpl{});
+    pub static ref INS_KEY_GT : Arc<dyn KeyRange> = Arc::new(InstanceDaoImpl{});
 }
 
 lazy_static! {

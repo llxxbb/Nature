@@ -31,7 +31,7 @@ async fn do_convert(task: TaskForConvert, raw: RawTask) {
     }
     // -----end
     let mut task = task;
-    let last = match InstanceDaoImpl::get_last_taget(&from_instance, &mut task.target).await {
+    let last = match InstanceDaoImpl::get_last_target(&from_instance, &mut task.target).await {
         Err(_) => { return; }
         Ok(last) => last
     };

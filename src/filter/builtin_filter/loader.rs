@@ -2,12 +2,12 @@ use std::str::FromStr;
 use std::sync::Arc;
 
 use nature_common::{Executor, get_para_part, Instance, KeyCondition, NatureError, Result};
-use nature_db::KeyGT;
+use nature_db::KeyRange;
 
 use crate::filter::builtin_filter::FilterBefore;
 
 pub struct Loader {
-    pub dao: Arc<dyn KeyGT>
+    pub dao: Arc<dyn KeyRange>
 }
 
 #[async_trait]
@@ -30,7 +30,7 @@ impl FilterBefore for Loader {
         };
         let mut content: Vec<String> = vec![];
         loop {
-            let rtn: Vec<Instance> = self.dao.get_by_key_gt(&condition).await?;
+            let rtn: Vec<Instance> = self.dao.get_by_key_range(&condition).await?;
             let len = rtn.len();
             if len == setting.page_size as usize {
                 condition.key_gt = rtn[len - 1].get_key();
