@@ -11,6 +11,7 @@
 - add built-in filter support
 - incompatible change: `get_by_meta` changed to `get_by_key_range`
 - enhance keyCondition
+- enhance instance_dao
 
 ### should commit
 
@@ -18,7 +19,7 @@
 ### 未完成
 
 
-- add range end for fetching instance
+
 
 - built-in filter: add loader to load data from Instance Table. 
 - doc: instance-loader
