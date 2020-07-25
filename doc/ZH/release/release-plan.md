@@ -12,16 +12,13 @@
 - incompatible change: `get_by_meta` changed to `get_by_key_range`
 - enhance keyCondition
 - enhance instance_dao
+- built-in filter: add loader to load data from Instance Table. 
 
 ### should commit
 
 
 ### 未完成
 
-
-
-
-- built-in filter: add loader to load data from Instance Table. 
 - doc: instance-loader
 
 - built-in executor sum: support batch mode

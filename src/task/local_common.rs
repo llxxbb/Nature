@@ -68,7 +68,7 @@ pub async fn local_execute<T: RefUnwindSafe, R>(executor: &str, para: &T) -> Res
 
 fn get_lib_entry(path: &str) -> Option<LibraryEntry> {
     let mut cache = CACHE_ENTRY.lock().unwrap();
-    cache.entry(path.to_string()).or_insert_with(|| {
+    let rtn = cache.entry(path.to_string()).or_insert_with(|| {
         match entry_from_str(path) {
             Ok(e) => Some(e),
             Err(_) => {
@@ -76,7 +76,8 @@ fn get_lib_entry(path: &str) -> Option<LibraryEntry> {
                 None
             }
         }
-    }).clone()
+    });
+    rtn.clone()
 }
 
 fn entry_from_str(path: &str) -> Result<LibraryEntry> {
