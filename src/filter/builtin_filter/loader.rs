@@ -11,6 +11,7 @@ pub struct Loader {
     pub dao: Arc<dyn KeyRange>
 }
 
+/// **notice** can only load one page data! more page consider use with `MetaType::Loop`
 #[async_trait]
 impl FilterBefore for Loader {
     async fn filter(&self, ins: &mut Instance, cfg: &str) -> Result<()> {
@@ -36,22 +37,16 @@ impl FilterBefore for Loader {
             limit: setting.page_size as i32,
         };
         let mut content: Vec<String> = vec![];
-        loop {
-            let rtn: Vec<Instance> = self.dao.get_by_key_range(&condition).await?;
-            let len = rtn.len();
-            if len == setting.page_size as usize {
-                condition.key_gt = rtn[len - 1].get_key();
-            }
-            for mut one in rtn {
-                filter_before(&mut one, setting.filters.clone()).await?;
-                content.push(one.content.to_string());
-            }
-            if len < setting.page_size as usize {
-                ins.content = serde_json::to_string(&content)?;
-                break;
-            }
+        let rtn: Vec<Instance> = self.dao.get_by_key_range(&condition).await?;
+        let len = rtn.len();
+        if len == setting.page_size as usize {
+            condition.key_gt = rtn[len - 1].get_key();
         }
-        // change the content
+        for mut one in rtn {
+            filter_before(&mut one, setting.filters.clone()).await?;
+            content.push(one.content.to_string());
+        }
+        ins.content = serde_json::to_string(&content)?;
         Ok(())
     }
 }

@@ -1,14 +1,14 @@
-mod sum2;
-
 use std::collections::HashMap;
 
 /// built-in xecutor
 use nature_common::{NatureError, Result};
+use scatter::scatter;
 use sum::sum;
 use time_range::time_range;
-use scatter::scatter;
 
 use crate::task::Execute;
+
+mod sum2;
 
 lazy_static! {
     static ref CACHE: HashMap<String,&'static Execute> = init_builtin();
@@ -21,8 +21,6 @@ fn init_builtin() -> HashMap<String, &'static Execute> {
     map.insert("scatter".to_string(), one);
     let one: &Execute = &(sum as Execute);
     map.insert("sum".to_string(), one);
-    // let one: &Execute = &(sum_allow_repeat as Execute);
-    // map.insert("sum_allow_repeat".to_string(), one);
     let one: &Execute = &(time_range as Execute);
     map.insert("time_range".to_string(), one);
     map
