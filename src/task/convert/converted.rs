@@ -1,4 +1,4 @@
-use nature_common::{CONTEXT_TARGET_INSTANCE_ID, CONTEXT_TARGET_INSTANCE_PARA, FromInstance, get_para_and_key_from_para, Instance, Meta, MetaType, NatureError, Result};
+use nature_common::{CONTEXT_LOOP, CONTEXT_LOOP_FINISHED, CONTEXT_TARGET_INSTANCE_ID, CONTEXT_TARGET_INSTANCE_PARA, FromInstance, get_para_and_key_from_para, Instance, Meta, MetaType, NatureError, Result};
 use nature_db::{Mission, RawTask};
 
 use crate::task::{CachedKey, TaskForConvert};
@@ -38,6 +38,10 @@ impl Converted {
             sys_context_para(&mut instances, &task.target, &from);
         }
 
+        // for `MetaType::Loop`
+        if task.target.to.get_meta_type() == MetaType::Loop {
+            instances.push(gen_instance_for_loop(task));
+        }
 
         // assemble it
         let rtn = Converted {
@@ -46,6 +50,21 @@ impl Converted {
         };
         Ok(rtn)
     }
+}
+
+/// **Notice** need get sys_context from upstream
+fn gen_instance_for_loop(task: &TaskForConvert) -> Instance {
+    let mut rtn = Instance::default();
+    rtn.meta = task.target.to.meta_string();
+    rtn.id = task.from.id;
+    rtn.para = task.from.para.clone();
+    if let Some(v) = task.from.sys_context.get(CONTEXT_LOOP) {
+        rtn.sys_context.insert(CONTEXT_LOOP.to_string(), v.to_string());
+    }
+    if let Some(v) = task.from.sys_context.get(CONTEXT_LOOP_FINISHED) {
+        rtn.sys_context.insert(CONTEXT_LOOP_FINISHED.to_string(), v.to_string());
+    }
+    rtn
 }
 
 fn converted_none(carrier: &RawTask) -> Converted {
@@ -58,6 +77,12 @@ fn converted_none(carrier: &RawTask) -> Converted {
 fn set_source_and_target_meta(instances: &mut Vec<Instance>, from: &FromInstance, target_meta: &Meta) -> Result<()> {
     match target_meta.get_meta_type() {
         MetaType::Multi => {
+            match target_meta.get_setting() {
+                Some(s) => s.check_multi_meta(instances)?,
+                None => set_all_instances(instances, from, target_meta),
+            }
+        }
+        MetaType::Loop => {
             match target_meta.get_setting() {
                 Some(s) => s.check_multi_meta(instances)?,
                 None => set_all_instances(instances, from, target_meta),

@@ -19,8 +19,10 @@
 
 ### 未完成
 
+- loader add sys_context for
     
 - converted support `MetaType::Loop` 
+
 - concurrent task number limit 
 
 - built-in batch-job: split large range instance to pieces.

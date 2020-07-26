@@ -9,23 +9,24 @@ use crate::task::{Converted, TaskForConvert, TaskForStore};
 pub async fn after_converted(task: &TaskForConvert, convert_task: &RawTask, instances: Vec<Instance>, last_state: &Option<Instance>) -> Result<()> {
     // debug!("executor returned {} instances for `Meta`: {:?}, from {}", instances.len(), &task.target.to.meta_string(), task.from.get_key());
     match Converted::gen(&task, &convert_task, instances, last_state) {
-        Ok(rtn) => match rtn.converted.len() {
-            0 => match D_T.finish_task(&convert_task.task_id).await {
-                Ok(_) => Ok(()),
-                Err(e) => {
-                    warn!("finish task occur error: {}", e);
-                    Err(e)
+        Ok(rtn) => {
+            match rtn.converted.len() {
+                0 => match D_T.finish_task(&convert_task.task_id).await {
+                    Ok(_) => Ok(()),
+                    Err(e) => {
+                        warn!("finish task occur error: {}", e);
+                        Err(e)
+                    }
+                },
+                1 => {
+                    if loop_check(task, &rtn.converted[0], convert_task).await { return Ok(()); }
+                    match *SWITCH_SAVE_DIRECTLY_FOR_ONE {
+                        true => save_one(rtn, &task.target).await,
+                        false => save_batch(rtn).await
+                    }
                 }
-            },
-            1 => {
-                // break the process if loop
-                if conflict_check(task, &rtn.converted[0], convert_task).await { return Ok(()); }
-                match *SWITCH_SAVE_DIRECTLY_FOR_ONE {
-                    true => save_one(rtn, &task.target).await,
-                    false => save_batch(rtn).await
-                }
+                _ => save_batch(rtn).await
             }
-            _ => save_batch(rtn).await
         }
         Err(err) => {
             warn!("pre-process returned instance error:{}, task would be moved to error table", err);
@@ -35,7 +36,7 @@ pub async fn after_converted(task: &TaskForConvert, convert_task: &RawTask, inst
     }
 }
 
-async fn conflict_check(task: &TaskForConvert, ins: &Instance, raw: &RawTask) -> bool {
+async fn loop_check(task: &TaskForConvert, ins: &Instance, raw: &RawTask) -> bool {
     if ins.state_version > 0 && ins.state_version == task.conflict_version {
         warn!("looping for conflict: {}, task would be moved to error table", ins.get_key());
         let err = NatureError::LogicalError("conflict looping".to_string());
