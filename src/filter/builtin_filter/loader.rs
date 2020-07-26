@@ -1,7 +1,7 @@
 use std::str::FromStr;
 use std::sync::Arc;
 
-use nature_common::{Executor, get_para_part, Instance, KeyCondition, NatureError, Result};
+use nature_common::{CONTEXT_LOOP, Executor, get_para_part, Instance, KeyCondition, LoopContext, NatureError, Result};
 use nature_db::KeyRange;
 
 use crate::filter::builtin_filter::FilterBefore;
@@ -47,6 +47,15 @@ impl FilterBefore for Loader {
             content.push(one.content.to_string());
         }
         ins.content = serde_json::to_string(&content)?;
+        // make sys_context
+        let lc = LoopContext {
+            from: "".to_string(),
+            to: "".to_string(),
+            len,
+            page: 0,
+            cfg: cfg.to_string(),
+        };
+        ins.sys_context.insert(CONTEXT_LOOP.to_string(), serde_json::to_string(&lc)?);
         Ok(())
     }
 }
