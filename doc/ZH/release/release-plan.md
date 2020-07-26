@@ -9,10 +9,12 @@
 
 - add `MetaType::Loop` 
 - enhance meta_cache
-    - set state to false for Multi
-    - set state to true for Loop
+  - set state to false for Multi
+  - set state to true for Loop
 - enhance MetaSetting
-- builtin-loader: set instance.sys_context with `LoopContext`
+- builtin-loader:
+  - set instance.sys_context with `loop.next`
+  - gen next loop from `from.sys_context`
 
 ### should commit
 
@@ -22,7 +24,6 @@
 
 
 - gen task for loop-instance
-- converted support `MetaType::Loop` 
 
 - concurrent task number limit 
 

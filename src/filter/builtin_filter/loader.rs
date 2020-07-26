@@ -1,7 +1,7 @@
 use std::str::FromStr;
 use std::sync::Arc;
 
-use nature_common::{CONTEXT_LOOP, Executor, get_para_part, Instance, KeyCondition, LoopContext, NatureError, Result};
+use nature_common::{CONTEXT_LOOP_FINISHED, CONTEXT_LOOP_NEXT, Executor, get_para_part, Instance, KeyCondition, NatureError, Result};
 use nature_db::KeyRange;
 
 use crate::filter::builtin_filter::FilterBefore;
@@ -23,10 +23,14 @@ impl FilterBefore for Loader {
                 return Err(NatureError::VerifyError(msg));
             }
         };
-        let mut condition = KeyCondition {
+        let first = match ins.sys_context.get(CONTEXT_LOOP_NEXT) {
+            Some(first) => first.to_string(),
+            None => setting.key_gt,
+        };
+        let condition = KeyCondition {
             id: "".to_string(),
             meta: "".to_string(),
-            key_gt: setting.key_gt,
+            key_gt: first,
             key_ge: "".to_string(),
             key_lt: setting.key_lt,
             key_le: "".to_string(),
@@ -39,23 +43,18 @@ impl FilterBefore for Loader {
         let mut content: Vec<String> = vec![];
         let rtn: Vec<Instance> = self.dao.get_by_key_range(&condition).await?;
         let len = rtn.len();
+        // set context
         if len == setting.page_size as usize {
-            condition.key_gt = rtn[len - 1].get_key();
+            ins.sys_context.insert(CONTEXT_LOOP_NEXT.to_string(), rtn[len - 1].get_key());
+        } else {
+            ins.sys_context.insert(CONTEXT_LOOP_FINISHED.to_string(), "".to_string());
         }
+        // filter
         for mut one in rtn {
             filter_before(&mut one, setting.filters.clone()).await?;
             content.push(one.content.to_string());
         }
         ins.content = serde_json::to_string(&content)?;
-        // make sys_context
-        let lc = LoopContext {
-            from: "".to_string(),
-            to: "".to_string(),
-            len,
-            page: 0,
-            cfg: cfg.to_string(),
-        };
-        ins.sys_context.insert(CONTEXT_LOOP.to_string(), serde_json::to_string(&lc)?);
         Ok(())
     }
 }
