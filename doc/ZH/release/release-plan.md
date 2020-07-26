@@ -5,14 +5,8 @@
 - 功能性先于非功能性需求
 - 应用情景支持，内部优先于外部（如网关）
 
-## Release 0.11
+## Release 0.12
 
-- fix bug: built-in executor: time_range: interval calculate error.
-- add built-in filter support
-- incompatible change: `get_by_meta` changed to `get_by_key_range`
-- enhance keyCondition
-- enhance instance_dao
-- new built-in filter: loader. It can load data from Instance Table. 
 
 ### should commit
 
