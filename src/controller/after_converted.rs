@@ -19,7 +19,7 @@ pub async fn after_converted(task: &TaskForConvert, convert_task: &RawTask, inst
             },
             1 => {
                 // break the process if loop
-                if loop_check(task, &rtn.converted[0], convert_task).await { return Ok(()); }
+                if conflict_check(task, &rtn.converted[0], convert_task).await { return Ok(()); }
                 match *SWITCH_SAVE_DIRECTLY_FOR_ONE {
                     true => save_one(rtn, &task.target).await,
                     false => save_batch(rtn).await
@@ -35,7 +35,7 @@ pub async fn after_converted(task: &TaskForConvert, convert_task: &RawTask, inst
     }
 }
 
-async fn loop_check(task: &TaskForConvert, ins: &Instance, raw: &RawTask) -> bool {
+async fn conflict_check(task: &TaskForConvert, ins: &Instance, raw: &RawTask) -> bool {
     if ins.state_version > 0 && ins.state_version == task.conflict_version {
         warn!("looping for conflict: {}, task would be moved to error table", ins.get_key());
         let err = NatureError::LogicalError("conflict looping".to_string());
