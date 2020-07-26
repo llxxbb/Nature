@@ -11,6 +11,7 @@
 - enhance meta_cache
     - set state to false for Multi
     - set state to true for Loop
+- enhance MetaSetting
 
 ### should commit
 
@@ -18,10 +19,8 @@
 
 ### 未完成
 
-
     
-- meta_catch support `MetaType::Loop` 
-- converted 
+- converted support `MetaType::Loop` 
 - concurrent task number limit 
 
 - built-in batch-job: split large range instance to pieces.
