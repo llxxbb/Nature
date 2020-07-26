@@ -97,6 +97,7 @@ mod loader_test {
     use super::*;
 
     #[tokio::test]
+    // #[ignore]
     async fn with_sub_filter() {
         let loader = Loader { dao: Arc::new(Mocker {}) };
         let mut instance = Instance::default();
