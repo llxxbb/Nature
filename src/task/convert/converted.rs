@@ -1,5 +1,5 @@
-use nature_common::{CONTEXT_LOOP_FINISHED, CONTEXT_LOOP_NEXT, CONTEXT_TARGET_INSTANCE_ID, CONTEXT_TARGET_INSTANCE_PARA, FromInstance, get_para_and_key_from_para, Instance, Meta, MetaType, NatureError, Result};
-use nature_db::{Mission, RawTask};
+use nature_common::{CONTEXT_LOOP_FINISHED, CONTEXT_LOOP_NEXT, CONTEXT_LOOP_TASK, CONTEXT_TARGET_INSTANCE_ID, CONTEXT_TARGET_INSTANCE_PARA, FromInstance, get_para_and_key_from_para, Instance, Meta, MetaType, NatureError, Result};
+use nature_db::{Mission, MissionRaw, RawTask};
 
 use crate::task::{CachedKey, TaskForConvert};
 
@@ -40,7 +40,7 @@ impl Converted {
 
         // for `MetaType::Loop`
         if task.target.to.get_meta_type() == MetaType::Loop {
-            instances.push(gen_instance_for_loop(task));
+            instances.push(gen_instance_for_loop(task)?);
         }
 
         // assemble it
@@ -53,7 +53,7 @@ impl Converted {
 }
 
 /// **Notice** need get sys_context from upstream
-fn gen_instance_for_loop(task: &TaskForConvert) -> Instance {
+fn gen_instance_for_loop(task: &TaskForConvert) -> Result<Instance> {
     let mut rtn = Instance::default();
     rtn.meta = task.target.to.meta_string();
     rtn.id = task.from.id;
@@ -64,7 +64,9 @@ fn gen_instance_for_loop(task: &TaskForConvert) -> Instance {
     if let Some(v) = task.from.sys_context.get(CONTEXT_LOOP_FINISHED) {
         rtn.sys_context.insert(CONTEXT_LOOP_FINISHED.to_string(), v.to_string());
     }
-    rtn
+    let raw = MissionRaw::from(task.target.clone()).to_json()?;
+    rtn.sys_context.insert(CONTEXT_LOOP_TASK.to_string(), raw);
+    Ok(rtn)
 }
 
 fn converted_none(carrier: &RawTask) -> Converted {

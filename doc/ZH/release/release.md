@@ -1,6 +1,15 @@
 
 # 发布的功能
 
+## Release 0.11 2020-07-26
+
+- add built-in filter support
+- new built-in filter: loader. It can load data from Instance Table.
+- fix bug: built-in executor: time_range: interval calculate error.
+- incompatible change: get_by_meta changed to get_by_key_range
+- enhance keyCondition
+- enhance instance_dao
+
 ## Release 0.10 2020-06-27
 
 - built-in executor enhanced for `sum`: support five modes old,new,min,max,sum 

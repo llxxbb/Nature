@@ -7,7 +7,7 @@
 
 ## Release 0.12
 
-- add `MetaType::Loop` 
+- add `MetaType::Loop` support
 - enhance meta_cache
   - set state to false for Multi
   - set state to true for Loop
@@ -23,7 +23,7 @@
 ### 未完成
 
 
-- gen task for loop-instance
+
 
 - concurrent task number limit 
 

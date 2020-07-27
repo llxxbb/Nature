@@ -4,7 +4,7 @@ use nature_db::flow_tool::{context_check, state_check};
 
 use crate::controller::{channel_batch, channel_store};
 use crate::system::SWITCH_SAVE_DIRECTLY_FOR_ONE;
-use crate::task::{Converted, TaskForConvert, TaskForStore};
+use crate::task::{Converted, gen_loop_mission, TaskForConvert, TaskForStore};
 
 pub async fn after_converted(task: &TaskForConvert, convert_task: &RawTask, instances: Vec<Instance>, last_state: &Option<Instance>) -> Result<()> {
     // debug!("executor returned {} instances for `Meta`: {:?}, from {}", instances.len(), &task.target.to.meta_string(), task.from.get_key());
@@ -50,8 +50,15 @@ async fn loop_check(task: &TaskForConvert, ins: &Instance, raw: &RawTask) -> boo
 
 async fn save_one(converted: Converted, previous_mission: &Mission) -> Result<()> {
     let instance = &converted.converted[0];
-    let relations = C_R.get(&instance.meta, &*D_R, &*C_M, &*D_M).await?;
-    let mission = Mission::get_by_instance(instance, &relations, context_check, state_check);
+    let mission = match previous_mission.to.get_meta_type() {
+        MetaType::Loop => {
+            gen_loop_mission(instance, &*C_M, &*D_M).await?
+        }
+        _ => {
+            let relations = C_R.get(&instance.meta, &*D_R, &*C_M, &*D_M).await?;
+            Mission::get_by_instance(instance, &relations, context_check, state_check)
+        }
+    };
     let meta = C_M.get(&instance.meta, &*D_M).await?;
     let task = TaskForStore::new(instance.clone(), mission, Some(previous_mission.clone()), meta.need_cache());
     let rtn = channel_store(task, converted.done_task).await?;
