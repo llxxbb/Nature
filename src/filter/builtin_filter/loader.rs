@@ -1,7 +1,7 @@
 use std::str::FromStr;
 use std::sync::Arc;
 
-use nature_common::{CONTEXT_LOOP_FINISHED, CONTEXT_LOOP_NEXT, Executor, get_para_part, Instance, KeyCondition, NatureError, Result};
+use nature_common::{CONTEXT_LOOP_FINISHED, CONTEXT_LOOP_NEXT, Executor, get_para_part, Instance, is_default, KeyCondition, NatureError, Result};
 use nature_db::KeyRange;
 
 use crate::filter::builtin_filter::FilterBefore;
@@ -23,10 +23,12 @@ impl FilterBefore for Loader {
                 return Err(NatureError::VerifyError(msg));
             }
         };
+        dbg!("-----------1------------");
         let first = match ins.sys_context.get(CONTEXT_LOOP_NEXT) {
             Some(first) => first.to_string(),
             None => setting.key_gt,
         };
+        dbg!("-----------2------------");
         let condition = KeyCondition {
             id: "".to_string(),
             meta: "".to_string(),
@@ -41,7 +43,9 @@ impl FilterBefore for Loader {
             limit: setting.page_size as i32,
         };
         let mut content: Vec<String> = vec![];
+        dbg!(&condition);
         let rtn: Vec<Instance> = self.dao.get_by_key_range(&condition).await?;
+        dbg!(rtn.len());
         let len = rtn.len();
         // set context
         if len == setting.page_size as usize {
@@ -67,13 +71,15 @@ struct Setting {
     key_gt: String,
     /// less equal `ins_key`
     key_lt: String,
-    #[serde(skip_serializing_if = "is_100")]
-    #[serde(default = "default_100")]
+    #[serde(skip_serializing_if = "is_20")]
+    #[serde(default = "default_20")]
     page_size: u16,
     /// where to get the time range from the `Instance'para` which used to load data from Instance table
     /// it only accept two element, one for Begin Time and the other for End Time
     time_part: Vec<u8>,
     /// correct the format of the data loaded.
+    #[serde(default)]
+    #[serde(skip_serializing_if = "is_default")]
     filters: Vec<Executor>,
 }
 
@@ -90,15 +96,15 @@ impl Setting {
     }
 }
 
-fn is_100(size: &u16) -> bool {
-    if *size == 100 {
+fn is_20(size: &u16) -> bool {
+    if *size == 20 {
         true
     } else {
         false
     }
 }
 
-fn default_100() -> u16 { 100 }
+fn default_20() -> u16 { 20 }
 
 #[cfg(test)]
 mod loader_test {

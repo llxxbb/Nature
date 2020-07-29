@@ -15,6 +15,8 @@
 - builtin-loader:
   - set instance.sys_context with `loop.next`
   - gen next loop from `from.sys_context`
+- fix bug for instance_dao::get_by_key_range
+- fix bug for task_dao::raw_to_error
 
 ### should commit
 
@@ -22,28 +24,15 @@
 
 ### 未完成
 
+- 修正，订单->区间统计任务
+  - 将分钟数据转移到其他小节中去。
 
-
-
-- concurrent task number limit 
-
-- built-in batch-job: split large range instance to pieces.
-
-
+- demo: sale-statistic
+- built-in executor sum: optimize for single value  
 - doc: instance-loader
-- built-in executor sum: support batch mode
-
-- demo 销售统计
-
-
+- concurrent task number limit 
 - redo check busy first
 
-- 文档
-  - 内建执行器的参考文档(高优先级，有利于推广)
-  
-- built-in executor sum: support batch record
-  
-- demo: 销量统计， 使用 builtin-executor sum
 
 - 文档
   - 数据不可变，如何修正数据？ 独立做一个对冲的数据！ 最终在展示层相加就可以了
@@ -68,7 +57,7 @@
 
 ## Release 1.1.0
 
-- 执行器：使用 `min-max-heap` 来支持优先级
+
 - 自路由：对`执行器`返回的自路由进行支持。
 - ID 生成器 snowflake for 128 bit implement.
 - builtin-executor sum :
