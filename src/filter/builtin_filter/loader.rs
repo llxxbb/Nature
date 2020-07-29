@@ -23,12 +23,10 @@ impl FilterBefore for Loader {
                 return Err(NatureError::VerifyError(msg));
             }
         };
-        dbg!("-----------1------------");
         let first = match ins.sys_context.get(CONTEXT_LOOP_NEXT) {
             Some(first) => first.to_string(),
             None => setting.key_gt,
         };
-        dbg!("-----------2------------");
         let condition = KeyCondition {
             id: "".to_string(),
             meta: "".to_string(),

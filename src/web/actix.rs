@@ -57,7 +57,7 @@ pub fn web_config(cfg: &mut web::ServiceConfig) {
         .route("/batch", web::post().to(batch))
         .route("/redo_task", web::post().to(redo_task))
         .route("/get_by_id", web::post().to(get_by_id))
-        .route("/get_by_key_gt", web::post().to(get_by_key_range));
+        .route("/get_by_key_range", web::post().to(get_by_key_range));
 }
 
 
