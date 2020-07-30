@@ -17,6 +17,7 @@
   - gen next loop from `from.sys_context`
 - fix bug for instance_dao::get_by_key_range
 - fix bug for task_dao::raw_to_error
+- fix bug: timeZone problem when load `Instance`
 - optimize: short time expression for time_range
 
 ### should commit
@@ -25,7 +26,7 @@
 
 ### 未完成
 
-- fix bug: mysql timeZone problem
+
 - 修正，订单->区间统计任务
   - 将分钟数据转移到其他小节中去。
 
