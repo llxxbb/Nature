@@ -36,8 +36,8 @@ impl FilterBefore for Loader {
             key_le: "".to_string(),
             para: "".to_string(),
             state_version: 0,
-            time_ge: Some(i64::from_str(&time_range[0])?),
-            time_lt: Some(i64::from_str(&time_range[1])?),
+            time_ge: Some(i64::from_str(&time_range[0])? * 1000),
+            time_lt: Some(i64::from_str(&time_range[1])? * 1000),
             limit: setting.page_size as i32,
         };
         let mut content: Vec<String> = vec![];

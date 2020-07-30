@@ -84,23 +84,23 @@ impl Setting {
         };
         let rtn: (i64, i64) = match unit {
             "s" => {
-                let rtn = ins_time / SECOND / interval * interval * SECOND;
-                (rtn, rtn + interval * SECOND)
+                let rtn = ins_time / SECOND / interval * interval;
+                (rtn, rtn + interval)
             }
             "m" => {
-                let rtn = ins_time / MINUTE / interval * interval * MINUTE;
-                (rtn, rtn + interval * MINUTE)
+                let rtn = ins_time / MINUTE / interval * interval * MINUTE / SECOND;
+                (rtn, rtn + interval * MINUTE / SECOND)
             }
             "h" => {
-                let rtn = ins_time / HOUR / interval * interval * HOUR;
-                (rtn, rtn + interval * HOUR)
+                let rtn = ins_time / HOUR / interval * interval * HOUR / SECOND;
+                (rtn, rtn + interval * HOUR / SECOND)
             }
             "d" => {
-                let mut rtn = ins_time / DAY / interval * interval * DAY;
+                let mut rtn = ins_time / DAY / interval * interval * DAY / SECOND;
                 // time zone process
                 let offset = Local.offset_from_local_date(&time.date()).unwrap().local_minus_utc();
                 rtn = rtn - offset as i64 * SECOND;
-                (rtn, rtn + interval * DAY)
+                (rtn, rtn + interval * DAY / SECOND)
             }
             "w" => return self.get_week(&time),
             "M" => return self.get_month(&time),
