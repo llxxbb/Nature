@@ -3,7 +3,7 @@ use std::collections::HashMap;
 /// built-in xecutor
 use nature_common::{NatureError, Result};
 use scatter::scatter;
-use sum::sum;
+use merge::merge;
 use time_range::time_range;
 
 use crate::task::Execute;
@@ -17,8 +17,8 @@ fn init_builtin() -> HashMap<String, &'static Execute> {
     let mut map: HashMap<String, &'static Execute> = HashMap::new();
     let one: &Execute = &(scatter as Execute);
     map.insert("scatter".to_string(), one);
-    let one: &Execute = &(sum as Execute);
-    map.insert("sum".to_string(), one);
+    let one: &Execute = &(merge as Execute);
+    map.insert("merge".to_string(), one);
     let one: &Execute = &(time_range as Execute);
     map.insert("time_range".to_string(), one);
     map
@@ -37,7 +37,7 @@ impl BuiltIn {
 
 // mod dimension_splitter;
 mod scatter;
-mod sum;
+mod merge;
 mod time_range;
 
 #[cfg(test)]

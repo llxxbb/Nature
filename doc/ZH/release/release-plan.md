@@ -15,7 +15,7 @@
 - builtin-loader:
   - set instance.sys_context with `loop.next`
   - gen next loop from `from.sys_context`
-- builtin-sum: support batch moode.
+- builtin-sum: rename to `merge` and support batch moode.
 - fix bug for instance_dao::get_by_key_range
 - fix bug for task_dao::raw_to_error
 - fix bug: timeZone problem when load `Instance`

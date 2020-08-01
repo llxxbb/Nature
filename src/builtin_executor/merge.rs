@@ -6,7 +6,7 @@ use nature_common::Result;
 
 /// items can't be repeated
 /// detail always save due to recognize the repeated item.
-pub fn sum(input: &ConverterParameter) -> ConverterReturned {
+pub fn merge(input: &ConverterParameter) -> ConverterReturned {
     // get setting
     let cfg = if input.cfg.is_empty() {
         Setting::default()
@@ -206,7 +206,8 @@ mod para_type_test {
                 sum_all: false,
             }).unwrap(),
         };
-        if let ConverterReturned::LogicalError(e) = sum(&input) {
+        dbg!(&input.cfg);
+        if let ConverterReturned::LogicalError(e) = merge(&input) {
             assert!(e.contains("get key from para error"));
         } else {
             panic!("should return error");
@@ -230,7 +231,7 @@ mod para_type_test {
                 sum_all: false,
             }).unwrap(),
         };
-        if let ConverterReturned::LogicalError(e) = sum(&input) {
+        if let ConverterReturned::LogicalError(e) = merge(&input) {
             assert_eq!(true, e.contains("the value be used to sum is not a number"));
         } else {
             panic!("should return error");
@@ -255,7 +256,7 @@ mod para_type_test {
                 sum_all: true,
             }).unwrap(),
         };
-        match sum(&input) {
+        match merge(&input) {
             ConverterReturned::Instances(rtn) => {
                 assert_eq!(rtn[0].content, r#"{"detail":{"b":123},"total":123}"#);
             }
@@ -287,7 +288,7 @@ mod para_type_test {
             when_same: Default::default(),  // sum
             sum_all: true,
         }).unwrap();
-        match sum(&input) {
+        match merge(&input) {
             ConverterReturned::Instances(rtn) => {
                 assert_eq!(rtn[0].content, r#"{"detail":{"b":223},"total":223}"#);
             }
@@ -299,7 +300,8 @@ mod para_type_test {
             when_same: WhenSame::Old,
             sum_all: true,
         }).unwrap();
-        match sum(&input) {
+        dbg!(&input.cfg);
+        match merge(&input) {
             ConverterReturned::Instances(rtn) => {
                 assert_eq!(rtn[0].content, r#"{"detail":{"b":123},"total":123}"#);
             }
@@ -311,7 +313,7 @@ mod para_type_test {
             when_same: WhenSame::New,
             sum_all: true,
         }).unwrap();
-        match sum(&input) {
+        match merge(&input) {
             ConverterReturned::Instances(rtn) => {
                 assert_eq!(rtn[0].content, r#"{"detail":{"b":100},"total":100}"#);
             }
@@ -323,7 +325,7 @@ mod para_type_test {
             when_same: WhenSame::Max,
             sum_all: true,
         }).unwrap();
-        match sum(&input) {
+        match merge(&input) {
             ConverterReturned::Instances(rtn) => {
                 assert_eq!(rtn[0].content, r#"{"detail":{"b":123},"total":123}"#);
             }
@@ -335,7 +337,7 @@ mod para_type_test {
             when_same: WhenSame::Min,
             sum_all: true,
         }).unwrap();
-        match sum(&input) {
+        match merge(&input) {
             ConverterReturned::Instances(rtn) => {
                 assert_eq!(rtn[0].content, r#"{"detail":{"b":100},"total":100}"#);
             }
@@ -357,7 +359,7 @@ mod content_tuple_test {
             master: None,
             cfg: "".to_string(),
         };
-        if let ConverterReturned::LogicalError(e) = sum(&input) {
+        if let ConverterReturned::LogicalError(e) = merge(&input) {
             assert_eq!(e.contains("input format error"), true);
         } else {
             panic!("should return error");
@@ -379,7 +381,7 @@ mod content_tuple_test {
             master: None,
             cfg: "".to_string(),
         };
-        let _ = if let ConverterReturned::Instances(rtn) = sum(&input) {
+        let _ = if let ConverterReturned::Instances(rtn) = merge(&input) {
             let rtn = &rtn[0];
             assert_eq!(rtn.content, r#"{"a":112}"#);
             rtn.clone()
@@ -408,7 +410,7 @@ mod content_tuple_test {
         };
 
         // mode sum
-        let _ = if let ConverterReturned::Instances(rtn) = sum(&input) {
+        let _ = if let ConverterReturned::Instances(rtn) = merge(&input) {
             let rtn = &rtn[0];
             assert_eq!(rtn.content, r#"{"a":212}"#);
             rtn.clone()
@@ -418,7 +420,7 @@ mod content_tuple_test {
 
         // mode old
         input.cfg = r#"{"when_same":"Old"}"#.to_string();
-        let _ = if let ConverterReturned::Instances(rtn) = sum(&input) {
+        let _ = if let ConverterReturned::Instances(rtn) = merge(&input) {
             let rtn = &rtn[0];
             assert_eq!(rtn.content, r#"{"a":112}"#);
             rtn.clone()
@@ -428,7 +430,7 @@ mod content_tuple_test {
 
         // mode New
         input.cfg = r#"{"when_same":"New"}"#.to_string();
-        let _ = if let ConverterReturned::Instances(rtn) = sum(&input) {
+        let _ = if let ConverterReturned::Instances(rtn) = merge(&input) {
             let rtn = &rtn[0];
             assert_eq!(rtn.content, r#"{"a":100}"#);
             rtn.clone()
@@ -438,7 +440,7 @@ mod content_tuple_test {
 
         // mode Max
         input.cfg = r#"{"when_same":"Max"}"#.to_string();
-        let _ = if let ConverterReturned::Instances(rtn) = sum(&input) {
+        let _ = if let ConverterReturned::Instances(rtn) = merge(&input) {
             let rtn = &rtn[0];
             assert_eq!(rtn.content, r#"{"a":112}"#);
             rtn.clone()
@@ -448,7 +450,7 @@ mod content_tuple_test {
 
         // mode Min
         input.cfg = r#"{"when_same":"Min"}"#.to_string();
-        let _ = if let ConverterReturned::Instances(rtn) = sum(&input) {
+        let _ = if let ConverterReturned::Instances(rtn) = merge(&input) {
             let rtn = &rtn[0];
             assert_eq!(rtn.content, r#"{"a":100}"#);
             rtn.clone()
