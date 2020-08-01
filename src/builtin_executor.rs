@@ -8,8 +8,6 @@ use time_range::time_range;
 
 use crate::task::Execute;
 
-mod sum2;
-
 lazy_static! {
     static ref CACHE: HashMap<String,&'static Execute> = init_builtin();
 }

@@ -15,7 +15,13 @@ pub struct Loader {
 #[async_trait]
 impl FilterBefore for Loader {
     async fn filter(&self, ins: &mut Instance, cfg: &str) -> Result<()> {
-        let setting = Setting::get(&cfg)?;
+        let setting = match Setting::get(&cfg){
+            Ok(s) => s,
+            Err(e) => {
+                warn!("loader setting error: {}, \nsetting is: {}",e, cfg);
+                return Err(e);
+            }
+        };
         let time_range = match get_para_part(&ins.para, &setting.time_part) {
             Ok(rtn) => rtn,
             Err(e) => {
@@ -41,9 +47,7 @@ impl FilterBefore for Loader {
             limit: setting.page_size as i32,
         };
         let mut content: Vec<String> = vec![];
-        dbg!(&condition);
         let rtn: Vec<Instance> = self.dao.get_by_key_range(&condition).await?;
-        dbg!(rtn.len());
         let len = rtn.len();
         // set context
         if len == setting.page_size as usize {

@@ -15,6 +15,7 @@
 - builtin-loader:
   - set instance.sys_context with `loop.next`
   - gen next loop from `from.sys_context`
+- builtin-sum: support batch moode.
 - fix bug for instance_dao::get_by_key_range
 - fix bug for task_dao::raw_to_error
 - fix bug: timeZone problem when load `Instance`
@@ -26,10 +27,11 @@
 
 ### 未完成
 
+- use sum2 replace sum for demo-score
+- use Loop replace Multi for demo-sale-statics
 
 - 修正，订单->区间统计任务
   - 将分钟数据转移到其他小节中去。
-
 - demo: sale-statistic
 - built-in executor sum: optimize for single value  
 - doc: instance-loader
