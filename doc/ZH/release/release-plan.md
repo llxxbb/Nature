@@ -20,6 +20,7 @@
 - fix bug for instance_dao::get_by_key_range
 - fix bug for task_dao::raw_to_error
 - fix bug: timeZone problem when load `Instance`
+- bug fix: MetaType::Multi has no from_key generated
 - optimize: short time expression for time_range
 
 ### should commit
@@ -28,8 +29,12 @@
 
 ### 未完成
 
-- 文档
-  - 数据不可变，如何修正数据？ 独立做一个对冲的数据！ 最终在展示层相加就可以了
+
+
+- demo : sale-statistics
+  - second data
+  - 
+    minute : consistent with second data 
 
 - 修正，订单->区间统计任务
   - 将分钟数据转移到其他小节中去。

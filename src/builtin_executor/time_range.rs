@@ -99,7 +99,7 @@ impl Setting {
                 let mut rtn = ins_time / DAY / interval * interval * DAY / SECOND;
                 // time zone process
                 let offset = Local.offset_from_local_date(&time.date()).unwrap().local_minus_utc();
-                rtn = rtn - offset as i64 * SECOND;
+                rtn = rtn - offset as i64;
                 (rtn, rtn + interval * DAY / SECOND)
             }
             "w" => return self.get_week(&time),
@@ -278,16 +278,16 @@ mod timer_setting_test {
         };
         let rtn = setting.get_time(time).unwrap();
         let cmp = (
-            Local.ymd(2020, 5, 1).and_hms(18, 36, 23).timestamp_millis(),
-            Local.ymd(2020, 5, 1).and_hms(18, 36, 24).timestamp_millis(),
+            Local.ymd(2020, 5, 1).and_hms(18, 36, 23).timestamp_millis() / 1000,
+            Local.ymd(2020, 5, 1).and_hms(18, 36, 24).timestamp_millis() / 1000,
         );
         assert_eq!(rtn, cmp);
         // test interval
         setting.value = 15;
         let rtn = setting.get_time(time).unwrap();
         let cmp = (
-            Local.ymd(2020, 5, 1).and_hms(18, 36, 15).timestamp_millis(),
-            Local.ymd(2020, 5, 1).and_hms(18, 36, 30).timestamp_millis()
+            Local.ymd(2020, 5, 1).and_hms(18, 36, 15).timestamp_millis() / 1000,
+            Local.ymd(2020, 5, 1).and_hms(18, 36, 30).timestamp_millis() / 1000
         );
         assert_eq!(rtn, cmp);
     }
@@ -303,16 +303,16 @@ mod timer_setting_test {
         };
         let rtn = setting.get_time(time).unwrap();
         let cmp = (
-            Local.ymd(2020, 5, 1).and_hms(18, 36, 0).timestamp_millis(),
-            Local.ymd(2020, 5, 1).and_hms(18, 37, 0).timestamp_millis()
+            Local.ymd(2020, 5, 1).and_hms(18, 36, 0).timestamp_millis() / 1000,
+            Local.ymd(2020, 5, 1).and_hms(18, 37, 0).timestamp_millis() / 1000
         );
         assert_eq!(rtn, cmp);
         // test interval
         setting.value = 10;
         let rtn = setting.get_time(time).unwrap();
         let cmp = (
-            Local.ymd(2020, 5, 1).and_hms(18, 30, 0).timestamp_millis(),
-            Local.ymd(2020, 5, 1).and_hms(18, 40, 0).timestamp_millis()
+            Local.ymd(2020, 5, 1).and_hms(18, 30, 0).timestamp_millis() / 1000,
+            Local.ymd(2020, 5, 1).and_hms(18, 40, 0).timestamp_millis() / 1000
         );
         assert_eq!(rtn, cmp);
     }
@@ -328,16 +328,16 @@ mod timer_setting_test {
         };
         let rtn = setting.get_time(time).unwrap();
         let cmp = (
-            Local.ymd(2020, 5, 1).and_hms(18, 0, 0).timestamp_millis(),
-            Local.ymd(2020, 5, 1).and_hms(19, 0, 0).timestamp_millis()
+            Local.ymd(2020, 5, 1).and_hms(18, 0, 0).timestamp_millis() / 1000,
+            Local.ymd(2020, 5, 1).and_hms(19, 0, 0).timestamp_millis() / 1000
         );
         assert_eq!(rtn, cmp);
         // test interval
         setting.value = 4;
         let rtn = setting.get_time(time).unwrap();
         let cmp = (
-            Local.ymd(2020, 5, 1).and_hms(16, 0, 0).timestamp_millis(),
-            Local.ymd(2020, 5, 1).and_hms(20, 0, 0).timestamp_millis()
+            Local.ymd(2020, 5, 1).and_hms(16, 0, 0).timestamp_millis() / 1000,
+            Local.ymd(2020, 5, 1).and_hms(20, 0, 0).timestamp_millis() / 1000
         );
         assert_eq!(rtn, cmp);
     }
@@ -353,8 +353,8 @@ mod timer_setting_test {
         };
         let rtn = setting.get_time(time).unwrap();
         let cmp = (
-            Local.ymd(2020, 5, 1).and_hms(0, 0, 0).timestamp_millis(),
-            Local.ymd(2020, 5, 2).and_hms(0, 0, 0).timestamp_millis()
+            Local.ymd(2020, 5, 1).and_hms(0, 0, 0).timestamp_millis() / 1000,
+            Local.ymd(2020, 5, 2).and_hms(0, 0, 0).timestamp_millis() / 1000
         );
         // let ttt = Local.timestamp_millis(1588291200000).naive_local();
         // let offset = Local.offset_from_local_date(&ttt.date());
@@ -366,8 +366,8 @@ mod timer_setting_test {
         setting.value = 3;
         let rtn = setting.get_time(time).unwrap();
         let cmp = (
-            Local.ymd(2020, 4, 29).and_hms(0, 0, 0).timestamp_millis(),
-            Local.ymd(2020, 5, 2).and_hms(0, 0, 0).timestamp_millis()
+            Local.ymd(2020, 4, 29).and_hms(0, 0, 0).timestamp_millis() / 1000,
+            Local.ymd(2020, 5, 2).and_hms(0, 0, 0).timestamp_millis() / 1000
         );
         assert_eq!(rtn, cmp);
     }

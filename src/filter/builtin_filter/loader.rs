@@ -188,13 +188,6 @@ mod setting_test {
     }
 
     #[test]
-    fn filter_not_set() {
-        let s = r#"{"key_gt":"abc","key_lt":"def","time_part":[1]}"#;
-        let err = Setting::get(s).err().unwrap();
-        assert_eq!(NatureError::VerifyError("missing field `filters` at line 1 column 47".to_string()), err);
-    }
-
-    #[test]
     fn time_part_not_set() {
         let s = r#"{"key_gt":"abc","key_lt":"def"}"#;
         let err = Setting::get(s).err().unwrap();

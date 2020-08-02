@@ -17,7 +17,7 @@ impl CachedKey {
         let mut c = CACHE.lock().unwrap();
         match c.get(key) {
             Some(_) => {
-                debug!("get cached key: {}", key);
+                debug!("cached key: {}", key);
                 true
             },
             None => false
