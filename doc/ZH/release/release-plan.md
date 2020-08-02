@@ -8,6 +8,7 @@
 ## Release 0.12
 
 - add `MetaType::Loop` support
+- MetaType::Loop & MetaType::Multi can't be used as `from` in relation
 - enhance meta_cache
   - set state to false for Multi
   - set state to true for Loop
@@ -27,7 +28,8 @@
 
 ### 未完成
 
-- use Loop replace Multi for demo-sale-statics
+- 文档
+  - 数据不可变，如何修正数据？ 独立做一个对冲的数据！ 最终在展示层相加就可以了
 
 - 修正，订单->区间统计任务
   - 将分钟数据转移到其他小节中去。
@@ -37,14 +39,10 @@
 - concurrent task number limit 
 - redo check busy first
 
-
-- 文档
-  - 数据不可变，如何修正数据？ 独立做一个对冲的数据！ 最终在展示层相加就可以了
-
-- 执行器可设置系统上下文，以定义下一个执行器的延迟时间。这个时间可以覆盖`关系`中预定义的`延迟时间`
+- relation setting can be covered by upstream sys_context
+  配置是一个字符串，在传入执行器时，将其中的参数替换掉，
 
 - 压测
-
 
 ## Release 1.0.0
 
