@@ -27,6 +27,17 @@ struct Setting {
     #[serde(skip_serializing_if = "is_default")]
     #[serde(default)]
     time_part: u8,
+    // /// append something from upstream.para to downstream.para and set sys_context by name
+    // #[serde(skip_serializing_if = "is_default")]
+    // #[serde(default)]
+    // append: Vec<Append>,
+}
+
+#[derive(Serialize, Deserialize, Debug, PartialEq)]
+struct Append {
+    part: u8,
+    /// name for downstream.sys_context.DYNAMIC_PARA
+    name: String,
 }
 
 

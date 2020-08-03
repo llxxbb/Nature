@@ -5,6 +5,8 @@
 - 功能性先于非功能性需求
 - 应用情景支持，内部优先于外部（如网关）
 
+## Release 0.13
+
 ## Release 0.12
 
 - add `MetaType::Loop` support
@@ -18,7 +20,7 @@
   - gen next loop from `from.sys_context`
 - builtin-merge: rename from sum to `merge` and support batch mode.
 - builtin-time_range: 
-
+  - para_part -> time_part
 - fix bug for instance_dao::get_by_key_range
 - fix bug for task_dao::raw_to_error
 - fix bug: timeZone problem when load `Instance`
@@ -31,8 +33,8 @@
 
 ### 未完成
 
+- sys_context.DYNAMIC_PARA support
 - builtIn-time-range:
-  - para_part -> time_part
   - support append-para setting.
 - demo : sale-statistics
   - second data
