@@ -109,7 +109,7 @@
 | unit      | 区间尺度：s(econd), m(inute), h(our), d(ay), w(eek), M(onth), Y(ear) | 见下 | "s"    |
 | value     | 如果 unit 的单位是 "s","m","h","d" 则 value 为间隔数（须 > 0）<br />如果 unit 的单位是 "w","M","y" 则 value 为偏移量; value 可以 < 0, 意味着从尾端向前端偏移。取值范围如下：<br />week : [-7, 6]<br /> month : [-20, 19]<br /> year : [-200, 199] | 5    | 1      |
 | on_para   | 从哪里取用于计算的时间，如果为 true 则从上游的 `Instance.para`中取，否则取`Instance.create_time` | true | false  |
-| para_part | 取上游的 `Instance.para`中的哪一个部分作为输入时间           | 1    | 0      |
+| time_part | 取上游的 `Instance.para`中的哪一个部分作为输入时间           | 1    | 0      |
 
 生成示例的 ins_key 示例： B:sale/item/tag_second:1|0|1596207504/1596207505
 

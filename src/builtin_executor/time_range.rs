@@ -26,7 +26,7 @@ struct Setting {
     /// which part of para is the time info
     #[serde(skip_serializing_if = "is_default")]
     #[serde(default)]
-    para_part: u8,
+    time_part: u8,
 }
 
 
@@ -45,7 +45,7 @@ pub fn time_range(input: &ConverterParameter) -> ConverterReturned {
         }
     };
     let time_long = if cfg.on_para {
-        let time_string = match get_para_and_key_from_para(&input.from.para, &vec![cfg.para_part]) {
+        let time_string = match get_para_and_key_from_para(&input.from.para, &vec![cfg.time_part]) {
             Err(err) => return ConverterReturned::LogicalError(err.to_string()),
             Ok((p, _k)) => p
         };
@@ -204,7 +204,7 @@ impl Default for Setting {
             unit: "s".to_string(),
             value: 1,
             on_para: false,
-            para_part: 0,
+            time_part: 0,
         }
     }
 }
@@ -252,7 +252,7 @@ mod timer_setting_test {
             unit: "s".to_string(),
             value: 0,
             on_para: false,
-            para_part: 0,
+            time_part: 0,
         };
         let rtn = serde_json::to_string(&setting).unwrap();
         assert_eq!(rtn, "{}");
@@ -274,7 +274,7 @@ mod timer_setting_test {
             unit: "s".to_string(),
             value: 0,
             on_para: false,
-            para_part: 0,
+            time_part: 0,
         };
         let rtn = setting.get_time(time).unwrap();
         let cmp = (
@@ -299,7 +299,7 @@ mod timer_setting_test {
             unit: "m".to_string(),
             value: 0,
             on_para: false,
-            para_part: 0,
+            time_part: 0,
         };
         let rtn = setting.get_time(time).unwrap();
         let cmp = (
@@ -324,7 +324,7 @@ mod timer_setting_test {
             unit: "h".to_string(),
             value: 0,
             on_para: false,
-            para_part: 0,
+            time_part: 0,
         };
         let rtn = setting.get_time(time).unwrap();
         let cmp = (
@@ -349,7 +349,7 @@ mod timer_setting_test {
             unit: "d".to_string(),
             value: 0,
             on_para: false,
-            para_part: 0,
+            time_part: 0,
         };
         let rtn = setting.get_time(time).unwrap();
         let cmp = (
@@ -380,7 +380,7 @@ mod timer_setting_test {
             unit: "w".to_string(),
             value: 0,
             on_para: false,
-            para_part: 0,
+            time_part: 0,
         };
         let rtn = setting.get_time(time).unwrap();
         let cmp = (
@@ -429,7 +429,7 @@ mod timer_setting_test {
             unit: "M".to_string(),
             value: 0,
             on_para: false,
-            para_part: 0,
+            time_part: 0,
         };
         let rtn = setting.get_time(time).unwrap();
         let cmp = (
@@ -484,7 +484,7 @@ mod timer_setting_test {
             unit: "y".to_string(),
             value: 0,
             on_para: false,
-            para_part: 0,
+            time_part: 0,
         };
         let rtn = setting.get_time(time).unwrap();
         let cmp = (

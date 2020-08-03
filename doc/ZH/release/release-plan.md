@@ -16,7 +16,9 @@
 - builtin-loader:
   - set instance.sys_context with `loop.next`
   - gen next loop from `from.sys_context`
-- builtin-sum: rename to `merge` and support batch mode.
+- builtin-merge: rename from sum to `merge` and support batch mode.
+- builtin-time_range: 
+
 - fix bug for instance_dao::get_by_key_range
 - fix bug for task_dao::raw_to_error
 - fix bug: timeZone problem when load `Instance`
@@ -29,11 +31,12 @@
 
 ### 未完成
 
-
-
+- builtIn-time-range:
+  - para_part -> time_part
+  - support append-para setting.
 - demo : sale-statistics
   - second data
-  - 
+
     minute : consistent with second data 
 
 - 修正，订单->区间统计任务
