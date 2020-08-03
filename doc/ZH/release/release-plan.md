@@ -7,25 +7,7 @@
 
 ## Release 0.13
 
-## Release 0.12
 
-- add `MetaType::Loop` support
-- MetaType::Loop & MetaType::Multi can't be used as `from` in relation
-- enhance meta_cache
-  - set state to false for Multi
-  - set state to true for Loop
-- enhance MetaSetting
-- builtin-loader:
-  - set instance.sys_context with `loop.next`
-  - gen next loop from `from.sys_context`
-- builtin-merge: rename from sum to `merge` and support batch mode.
-- builtin-time_range: 
-  - para_part -> time_part
-- fix bug for instance_dao::get_by_key_range
-- fix bug for task_dao::raw_to_error
-- fix bug: timeZone problem when load `Instance`
-- bug fix: MetaType::Multi has no from_key generated
-- optimize: short time expression for time_range
 
 ### should commit
 
