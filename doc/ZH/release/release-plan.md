@@ -8,6 +8,8 @@
 ## Release 0.13
 
 - sys_context: para.dynamic property supported
+- RelationTarget
+  - rename from copy_para to append_para, and add append support
 
 ### should commit
 
@@ -16,9 +18,8 @@
 ### 未完成
 
 - RelationTarget
-  - copy_para -> append_para
   - add property: para_to_context to form sys_context:para.dynamic
-  - doc
+
   
 - demo : sale-statistics
   - second data

@@ -143,9 +143,13 @@ fn check_id(ins: &mut Vec<Instance>, from: &FromInstance, target: &Mission) -> R
         } else {
             one.revise()?;
         }
-        if target.target_demand.copy_para.len() > 0 {
-            let result = get_para_and_key_from_para(&from.para, &target.target_demand.copy_para)?;
-            one.para = result.0;
+        if target.target_demand.append_para.len() > 0 {
+            let result = get_para_and_key_from_para(&from.para, &target.target_demand.append_para)?;
+            if target.to.is_state() {
+                one.para = result.0;
+            } else {
+                one.para = append_para(&one.para, &result.0);
+            }
         }
     }
     Ok(())
@@ -316,7 +320,7 @@ mod test {
                         sd.add = Some(vec!["new".to_string()]);
                         sd
                     }),
-                    copy_para: vec![],
+                    append_para: vec![],
                 },
                 use_upstream_id: false,
                 delay: 0,

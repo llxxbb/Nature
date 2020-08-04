@@ -172,13 +172,13 @@ para.dynamic = "[[\"(item_id)\":\"123\"]]"
 ```
 pub struct RelationTarget {
     pub states: Option<TargetState>,
-    pub copy_para: Vec<u8>,
+    pub append_para: Vec<u8>,
 }
 ```
 
 target_states：可以增加或删除转化后的 `Instance` 的状态，状态必须在 `Meta` 中定义过。
 
-copy_para：该属性可指导 Nature 如何生成目标实例的 `para` 属性。示例，如其值为[3,1]， 假设上游para为 “a/b/c/d”，则目标实例的 `para` 值为 “d/b”。
+append_para：该属性可指导 Nature 如何生成目标实例的 `para` 属性。示例，如其值为[3,1]， 假设上游para为 “a/b/c/d”，则目标实例的 `para` 值为 “d/b”。如果自身 `para` 已经有值， 则在此值的后面附加。**注意**下游 `Meta` 如果是状态数据则自身 **para**  不能有值，否则提交解析上一版本数据。
 
 ### 对目标状态的处理及要求：TargetState
 
