@@ -173,12 +173,15 @@ para.dynamic = "[[\"(item_id)\":\"123\"]]"
 pub struct RelationTarget {
     pub states: Option<TargetState>,
     pub append_para: Vec<u8>,
+    pub context_name: String,
 }
 ```
 
-target_states：可以增加或删除转化后的 `Instance` 的状态，状态必须在 `Meta` 中定义过。
+**target_states**：可以增加或删除转化后的 `Instance` 的状态，状态必须在 `Meta` 中定义过。
 
-append_para：该属性可指导 Nature 如何生成目标实例的 `para` 属性。示例，如其值为[3,1]， 假设上游para为 “a/b/c/d”，则目标实例的 `para` 值为 “d/b”。如果自身 `para` 已经有值， 则在此值的后面附加。**注意**下游 `Meta` 如果是状态数据则自身 **para**  不能有值，否则提交解析上一版本数据。
+**append_para**：该属性可指导 Nature 如何生成目标实例的 `para` 属性。示例，如其值为[3,1]， 假设上游para为 “a/b/c/d”，则目标实例的 `para` 值为 “d/b”。如果自身 `para` 已经有值， 则在此值的后面附加。**注意**下游 `Meta` 如果是状态数据则自身 **para**  不能有值，否则提交解析上一版本数据。
+
+**context_name**: 这个只有在设置了 `append_para` 后才有效，Nature 会把 `append_para` 对应的值用作后续 `relation`的`Executor` 设置中的参数替换，而 `context_name` 则指明了要替换的那个参数的名字。请见上方的 `Executor.settings` 说明
 
 ### 对目标状态的处理及要求：TargetState
 

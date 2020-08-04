@@ -1,4 +1,4 @@
-use nature_common::{append_para, CONTEXT_LOOP_FINISHED, CONTEXT_LOOP_NEXT, CONTEXT_LOOP_TASK, CONTEXT_TARGET_INSTANCE_ID, CONTEXT_TARGET_INSTANCE_PARA, FromInstance, get_para_and_key_from_para, Instance, Meta, MetaType, NatureError, Result};
+use nature_common::{append_para, CONTEXT_DYNAMIC_PARA, CONTEXT_LOOP_FINISHED, CONTEXT_LOOP_NEXT, CONTEXT_LOOP_TASK, CONTEXT_TARGET_INSTANCE_ID, CONTEXT_TARGET_INSTANCE_PARA, FromInstance, get_para_and_key_from_para, Instance, Meta, MetaType, NatureError, Result};
 use nature_db::{Mission, MissionRaw, RawTask};
 
 use crate::task::{CachedKey, TaskForConvert};
@@ -146,9 +146,19 @@ fn check_id(ins: &mut Vec<Instance>, from: &FromInstance, target: &Mission) -> R
         if target.target_demand.append_para.len() > 0 {
             let result = get_para_and_key_from_para(&from.para, &target.target_demand.append_para)?;
             if target.to.is_state() {
-                one.para = result.0;
+                one.para = result.0.clone();
             } else {
                 one.para = append_para(&one.para, &result.0);
+            }
+            // set sys_context
+            if !target.target_demand.context_name.is_empty() {
+                let option = one.sys_context.get(CONTEXT_DYNAMIC_PARA);
+                let mut paras = match option {
+                    Some(s) => serde_json::from_str::<Vec<(String, String)>>(s)?,
+                    None => vec![]
+                };
+                paras.push((target.target_demand.context_name.clone(), result.0.clone()));
+                one.sys_context.insert(CONTEXT_DYNAMIC_PARA.to_string(), serde_json::to_string(&paras)?);
             }
         }
     }
@@ -321,6 +331,7 @@ mod test {
                         sd
                     }),
                     append_para: vec![],
+                    context_name: "".to_string(),
                 },
                 use_upstream_id: false,
                 delay: 0,
@@ -416,6 +427,21 @@ mod check_id_for_normal {
         let _ = check_id(&mut input, &from, &mission);
         assert_eq!(input[0].id != 123, true);
         assert_eq!(input[0].id != 0, true);
+    }
+
+    #[test]
+    fn append_para() {
+        let (mut from, mut mission) = init_input();
+        from.para = "c/d/e".to_string();
+        mission.to = Meta::new("remove master", 1, MetaType::Business).unwrap();
+        mission.target_demand.append_para = vec![0, 2];
+        mission.target_demand.context_name="(a)".to_string();
+        let mut one = Instance::new("one").unwrap();
+        one.para = "a/b".to_string();
+        let mut input = vec![one];
+        let _ = check_id(&mut input, &from, &mission);
+        assert_eq!(input[0].para, "a/b/c/e");
+        assert_eq!(input[0].sys_context.get(CONTEXT_DYNAMIC_PARA).unwrap(), "[[\"(a)\",\"c/e\"]]");
     }
 
     #[test]
