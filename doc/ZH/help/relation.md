@@ -108,7 +108,9 @@ all of above are `and` relation
   
   - 女孩流程：relation2.selector.**context_none** = ["gender.isBoy"]
 
-### 定义用于转化的：Executor
+### Executor
+
+Executor 目前有三种形态：转换器、前置过滤器、后置过滤器。其配置都采用下面的形式。
 
 ```rust
 pub struct Executor {
@@ -127,9 +129,22 @@ pub struct Executor {
 
 **url**：用于定位`Executor`的位置
 
-**settings**:`Executor`专有的配置，由具体的`Executor`给出。
+**settings**:`Executor`专有的配置，由具体的`Executor`给出。**注意** settings 的内容可以在运行时被 `Instance.sys_context`的`para.dynamic` 属性中的内容替换掉，而这种替换只局限于当前 Instance，不会影响后续 Instance 的替换。举例： 假设一个用于批量加载  Instance 的 beforter_filter 的 settings 配置如下：
 
-`Executor`的示例
+```json
+{
+    "key_gt":"B:sale/item/(item_id):1|",
+    "key_lt":"B:sale/item/(item_id):2|"
+}
+```
+
+我们希望(item_id)在运行时被真正的ID 所替换。此时如果上游 instance.sys_context的 para.dynamic 属性中含有下面的定义，我们的愿望就可以实现了：
+
+```properties
+para.dynamic = "[[\"(item_id)\":\"123\"]]"
+```
+
+**`Executor`的示例**
 
 ```json
 {
@@ -177,13 +192,15 @@ pub struct TargetState {
 }
 ```
 
-# Executor
+## Executor接口形式
+
+### Executor：转换器接口形式
 
 `Executor` 用于实现 `Meta` 间 `Instance` 的转换，一般需要自己实现，Nature 也有内建及自动化的 `Executor` 实现。实现方式请参考[示例及功能讲解](https://github.com/llxxbb/Nature-Demo)。
 
 `Executor`只有一个入参和一个出参。
 
-### 入参：ConverterParameter
+**入参：ConverterParameter**
 
 ```rust
 pub struct ConverterParameter {
@@ -195,7 +212,7 @@ pub struct ConverterParameter {
 }
 ```
 
-### 出参：
+**出参：**
 
 ```rust
 pub enum ConverterReturned {
@@ -208,7 +225,7 @@ pub enum ConverterReturned {
 }
 ```
 
-## filter_before 接口形式
+### Executor：filter_before 接口形式
 
 filter_before 需要使用者自行实现,下面为LocalRust的实现形式
 
@@ -220,7 +237,7 @@ pub extern fn your_func(para: &Instance) -> Result<Instance> {
 }
 ```
 
-## filter_after 接口形式
+### Executor：filter_after 接口形式
 
 filter_after 需要使用者自行实现,下面为LocalRust的实现形式
 
@@ -232,7 +249,7 @@ pub extern fn your_func(para: &Vec<Instance>) -> Result<Vec<Instance>> {
 }
 ```
 
-### 动态`Executor`
+## 动态`Executor`转换器
 
 动态路由不需要在运行之前预先定义，既在运行时决定自己的去处，非常的灵活，每个实例可以有自己独立的选择。不过不建议使用，一是目前此功能还不完善，二是该功能性能比静态路由要差，三、业务布局的展示会比较困难。
 

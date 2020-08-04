@@ -7,7 +7,7 @@
 
 ## Release 0.13
 
-
+- sys_context: para.dynamic property supported
 
 ### should commit
 
@@ -15,9 +15,11 @@
 
 ### 未完成
 
-- sys_context.DYNAMIC_PARA support
-- builtIn-time-range:
-  - support append-para setting.
+- RelationTarget
+  - copy_para -> append_para
+  - add property: para_to_context to form sys_context:para.dynamic
+  - doc
+  
 - demo : sale-statistics
   - second data
 
