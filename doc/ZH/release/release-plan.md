@@ -18,22 +18,18 @@
 
 ### 未完成
 
-
+- bug fix: task_repeat 
 - demo : sale-statistics
   - second data
 
-    minute : consistent with second data 
-
 - 修正，订单->区间统计任务
-  - 将分钟数据转移到其他小节中去。
-- demo: sale-statistic
-- built-in executor sum: optimize for single value  
+    minute : consistent with second data 
+    - 将分钟数据转移到其他小节中去。
+
 - doc: instance-loader
+
 - concurrent task number limit 
 - redo check busy first
-
-- relation setting can be covered by upstream sys_context
-  配置是一个字符串，在传入执行器时，将其中的参数替换掉，
 
 - 压测
 

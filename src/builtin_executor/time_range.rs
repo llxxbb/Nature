@@ -252,9 +252,8 @@ mod timer_setting_test {
     #[ignore]
     #[test]
     fn my_test() {
-        let a = 16078 as i64;
-        let b = a / SECOND / 7 * 7 * SECOND;
-        assert_eq!(b, 14000)
+        let time = Local.timestamp_millis(1596636033000).naive_local();
+        dbg!(&time);
     }
 
     #[test]
