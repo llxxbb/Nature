@@ -18,7 +18,7 @@
 
 ### 未完成
 
-- bug fix: task_repeat 
+- bug fix: break task process when task repeated 
 - demo : sale-statistics
   - second data
 

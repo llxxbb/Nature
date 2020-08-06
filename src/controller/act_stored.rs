@@ -13,8 +13,8 @@ pub async fn channel_stored(task: TaskForStore, raw: RawTask) {
     }
     match TaskForConvert::gen_task(&task) {
         Ok(converters) => {
-            let raws: Vec<RawTask> = converters.iter().map(|x| x.1.clone()).collect();
-            let rtn = RawTask::save_batch(&raws, &raw.task_id, &*D_T).await;
+            let mut raws: Vec<RawTask> = converters.iter().map(|x| x.1.clone()).collect();
+            let rtn = RawTask::save_batch(&mut raws, &raw.task_id, &*D_T).await;
             if rtn.is_err() {
                 warn!("==== converter task saved failed : {}", rtn.err().unwrap().to_string());
                 return;

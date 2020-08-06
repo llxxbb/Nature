@@ -35,7 +35,7 @@ async fn inner_batch(instances: Vec<Instance>, raw: &RawTask) -> Result<()> {
             Err(e) => return Err(e)
         }
     }
-    if RawTask::save_batch(&store_infos, &raw.task_id, &*D_T).await.is_ok() {
+    if RawTask::save_batch(&mut store_infos, &raw.task_id, &*D_T).await.is_ok() {
         for task in t_d {
             // if let Some(m) = &task.0.next_mission {
             //     for o in m {
