@@ -21,8 +21,10 @@ impl IncomeController {
         // }
         let task = TaskForStore::new(instance.clone(), mission, None, false);
         let raw = task.to_raw()?;
-        let _ = D_T.insert(&raw).await?;
-        channel_store(task, raw).await?;
+        let num = D_T.insert(&raw).await?;
+        if num == 1 {
+            channel_store(task, raw).await?;
+        }
         Ok(instance.id)
     }
 
@@ -36,8 +38,10 @@ impl IncomeController {
         let uuid = ins.revise()?.id;
         let task = TaskForStore::for_dynamic(&ins, instance.converter, None, false)?;
         let raw = task.to_raw()?;
-        let _ = D_T.insert(&raw).await?;
-        channel_store(task, raw).await?;
+        let num = D_T.insert(&raw).await?;
+        if num == 1 {
+            channel_store(task, raw).await?;
+        }
         Ok(uuid)
     }
 

@@ -67,10 +67,12 @@ async fn save_one(converted: Converted, previous_mission: &Mission) -> Result<()
 
 async fn save_batch(converted: Converted) -> Result<()> {
     let raw = RawTask::new(&converted.converted, &converted.done_task.task_key, TaskType::Batch as i8, "")?;
-    let _ = D_T.insert(&raw).await?;
+    let num = D_T.insert(&raw).await?;
     let _ = D_T.finish_task(&converted.done_task.task_id).await?;
-    let rtn = channel_batch(converted.converted, raw).await;
-    Ok(rtn)
+    if num == 1 {
+        let _ = channel_batch(converted.converted, raw).await;
+    }
+    Ok(())
 }
 
 pub async fn process_null(meta_type: MetaType, task_id: &str) -> Result<()> {

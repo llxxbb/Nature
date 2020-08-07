@@ -11,6 +11,7 @@
 - RelationTarget
   - rename from copy_para to append_para, and add append support
   - add property: context_name to form sys_context:para.dynamic
+- bug fix: break task process when task repeated 
   
 ### should commit
 
@@ -18,7 +19,7 @@
 
 ### 未完成
 
-- bug fix: break task process when task repeated 
+
 - demo : sale-statistics
   - second data
 
