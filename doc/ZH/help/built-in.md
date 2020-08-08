@@ -128,4 +128,19 @@
 
 ## instance-loader 前置过滤器
 
+**作用**：依据给定的条件检索出一批 Instance，并提取出所以的 content 属性形成数组，并替换掉 执行器入参中的 from.content。
+
+**配置**：
+
+| 选项      | 说明                                                         | 示例                                                         | 缺省值 |
+| --------- | ------------------------------------------------------------ | ------------------------------------------------------------ | ------ |
+| key_gt    | 形成SQL where 条件 ins_key > {key_gt}                        | B:sale/item/count:1\|0\|(item)/                              |        |
+| key_lt    | 形成SQL where 条件 ins_key < {key_lt}                        | B:sale/item/count:1\|0\|(item)0                              |        |
+| page_size | 一页数据的大小                                               | 20                                                           | 100    |
+| time_part | 从上游 `Instance'para` 的哪两个取值作为开始和结束时间        | [0,1]                                                        |        |
+| filters   | 是一个过滤器数组，提出出来的每个 `Instance.content` 都会顺序过滤处理一下，如进行数据格式修正。 | [ {"protocol":"localRust","url":"nature_integrate_test_executor:append_star"},     {"protocol":"localRust","url":"nature_integrate_test_executor:append_plus"} ] |        |
+
+
+
 缺省一页数据的大小为100.
+

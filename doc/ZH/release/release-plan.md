@@ -11,8 +11,10 @@
 
 ### 未完成
 
+- task_checker: make sure the certain tasks are all done before execute a `Executor`
+  担心商品的销量统计的某些任务被卡主了
+
 - demo : sale-statistics
-  - 完善 demo 文档
   - 问题： 如何知道所有的个品都统计完成了？
   - second top 
 

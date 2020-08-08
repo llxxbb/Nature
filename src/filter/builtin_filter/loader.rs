@@ -73,8 +73,8 @@ struct Setting {
     key_gt: String,
     /// less equal `ins_key`
     key_lt: String,
-    #[serde(skip_serializing_if = "is_20")]
-    #[serde(default = "default_20")]
+    #[serde(skip_serializing_if = "is_100")]
+    #[serde(default = "default_100")]
     page_size: u16,
     /// where to get the time range from the `Instance'para` which used to load data from Instance table
     /// it only accept two element, one for Begin Time and the other for End Time
@@ -98,15 +98,15 @@ impl Setting {
     }
 }
 
-fn is_20(size: &u16) -> bool {
-    if *size == 20 {
+fn is_100(size: &u16) -> bool {
+    if *size == 100 {
         true
     } else {
         false
     }
 }
 
-fn default_20() -> u16 { 20 }
+fn default_100() -> u16 { 100 }
 
 #[cfg(test)]
 mod loader_test {
