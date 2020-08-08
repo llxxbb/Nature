@@ -19,7 +19,9 @@
 ### 未完成
 
 - demo : sale-statistics
-  - second data
+  - 完善 demo 文档
+  - 问题： 如何知道所有的个品都统计完成了？
+  - second top 
 
 - 修正，订单->区间统计任务
     minute : consistent with second data 
