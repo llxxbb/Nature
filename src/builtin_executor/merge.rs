@@ -28,14 +28,30 @@ pub fn merge(input: &ConverterParameter) -> ConverterReturned {
         KeyType::VecTuple => match serde_json::from_str::<Vec<Item>>(&input.from.content) {
             Ok(rtn) => rtn,
             Err(e) => {
-                let msg = format!("builtin-sum : input format error. {}", e);
+                let msg = format!("builtin-merge : input format error. {}", e);
+                warn!("{}, content: {}", msg, input.from.content);
                 return ConverterReturned::LogicalError(msg);
             }
         },
-        KeyType::None => match serde_json::from_str::<Vec<i64>>(&input.from.content) {
-            Ok(rtn) => rtn.iter().map(|one| Item { key: "ignore".to_string(), value: *one }).collect(),
+        KeyType::None => match serde_json::from_str::<Vec<String>>(&input.from.content) {
+            Ok(rtn) => {
+                let mut items: Vec<Item> = vec![];
+                for one in rtn {
+                    let value = match i64::from_str(&one) {
+                        Ok(num) => num,
+                        Err(e) => {
+                            let msg = format!("builtin-merge : input format error. {}", e);
+                            warn!("{}, content: {}", msg, input.from.content);
+                            return ConverterReturned::LogicalError(msg);
+                        }
+                    };
+                    items.push(Item { key: "ignore".to_string(), value });
+                }
+                items
+            }
             Err(e) => {
-                let msg = format!("builtin-sum : input format error. {}", e);
+                let msg = format!("builtin-merge : input format error. {}", e);
+                warn!("{}, content: {}", msg, input.from.content);
                 return ConverterReturned::LogicalError(msg);
             }
         }
@@ -107,13 +123,15 @@ fn one_to_vec(para: &str, idx: &Vec<u8>, value: &str) -> Result<Vec<Item>> {
     let (key, _) = match get_para_and_key_from_para(para, idx) {
         Ok(rtn) => rtn,
         Err(err) => {
-            let msg = format!("builtin-sum : get key from para error. {}", err.to_string());
+            let msg = format!("builtin-merge : get key from para error. {}", err.to_string());
+            warn!("{}, para: {}, index:{:?}", msg, para, idx);
             return Err(NatureError::VerifyError(msg));
         }
     };
     let num = match i64::from_str(value) {
         Err(err) => {
-            let msg = format!("builtin-sum : the value be used to sum is not a number. {}", err.to_string());
+            let msg = format!("builtin-merge : the value be used to sum is not a number. {}", err.to_string());
+            warn!("{}, value: {}", msg, value);
             return Err(NatureError::VerifyError(msg));
         }
         Ok(num) => num
@@ -123,7 +141,6 @@ fn one_to_vec(para: &str, idx: &Vec<u8>, value: &str) -> Result<Vec<Item>> {
         value: num,
     }])
 }
-
 
 #[derive(Serialize, Deserialize, Default, Debug, Eq, PartialEq)]
 struct Setting {
@@ -501,7 +518,7 @@ mod content_none_key_test {
         let input = ConverterParameter {
             from: {
                 let mut ins = Instance::default();
-                ins.content = "[112]".to_string();
+                ins.content = r#"["112"]"#.to_string();
                 ins
             },
             last_state: None,
@@ -523,7 +540,7 @@ mod content_none_key_test {
         let mut input = ConverterParameter {
             from: {
                 let mut ins = Instance::default();
-                ins.content = "[112,100]".to_string();
+                ins.content = r#"["112","100"]"#.to_string();
                 ins
             },
             last_state: None,
