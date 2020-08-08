@@ -5,15 +5,8 @@
 - 功能性先于非功能性需求
 - 应用情景支持，内部优先于外部（如网关）
 
-## Release 0.13
+## Release 0.14
 
-- sys_context: para.dynamic property supported
-- RelationTarget
-  - rename from copy_para to append_para, and add append support
-  - add property: context_name to form sys_context:para.dynamic
-- bug fix: break task process when task repeated 
-- builtin-merge: add KeyType::None support
-  
 ### should commit
 
 ### 未完成

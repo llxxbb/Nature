@@ -1,6 +1,15 @@
 
 # 发布的功能
 
+## Release 0.13 2020-08-08
+
+- sys_context: para.dynamic property supported
+- RelationTarget
+  - rename from copy_para to append_para, and add append support
+  - add property: context_name to form sys_context:para.dynamic
+- bug fix: break task process when task repeated 
+- builtin-merge: add KeyType::None support
+
 ## Release 0.12 2020-08-03
 
 - add `MetaType::Loop` support
