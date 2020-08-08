@@ -20,7 +20,7 @@ pub fn merge(input: &ConverterParameter) -> ConverterReturned {
         }
     };
     // make input
-    let items = match cfg.key {
+    let items = match &cfg.key {
         KeyType::Para(part) => match one_to_vec(&input.from.para, &part, &input.from.content) {
             Ok(rtn) => rtn,
             Err(e) => return ConverterReturned::LogicalError(e.to_string())
@@ -32,6 +32,13 @@ pub fn merge(input: &ConverterParameter) -> ConverterReturned {
                 return ConverterReturned::LogicalError(msg);
             }
         },
+        KeyType::None => match serde_json::from_str::<Vec<i64>>(&input.from.content) {
+            Ok(rtn) => rtn.iter().map(|one| Item { key: "ignore".to_string(), value: *one }).collect(),
+            Err(e) => {
+                let msg = format!("builtin-sum : input format error. {}", e);
+                return ConverterReturned::LogicalError(msg);
+            }
+        }
     };
     // init result for return
     let mut content = match &input.last_state {
@@ -72,15 +79,22 @@ pub fn merge(input: &ConverterParameter) -> ConverterReturned {
 
     // make return instance
     let mut ins = Instance::default();
-    ins.content = if cfg.sum_all {
-        match serde_json::to_string(&content) {
-            Ok(s) => s,
-            Err(err) => return ConverterReturned::LogicalError(err.to_string())
+    ins.content = if cfg.key == KeyType::None {
+        match content.detail.get("ignore") {
+            Some(s) => s.to_string(),
+            None => 0.to_string(),
         }
     } else {
-        match serde_json::to_string(&content.detail) {
-            Ok(s) => s,
-            Err(err) => return ConverterReturned::LogicalError(err.to_string())
+        if cfg.sum_all {
+            match serde_json::to_string(&content) {
+                Ok(s) => s,
+                Err(err) => return ConverterReturned::LogicalError(err.to_string())
+            }
+        } else {
+            match serde_json::to_string(&content.detail) {
+                Ok(s) => s,
+                Err(err) => return ConverterReturned::LogicalError(err.to_string())
+            }
         }
     };
     ins.id = input.from.id;
@@ -132,11 +146,13 @@ enum KeyType {
     Para(Vec<u8>),
     /// The `Instance.content` will the json value of `Vec<Item>`
     VecTuple,
+    /// The `Instance.content` will the json value of `Vec<i64>`, no key needed
+    None,
 }
 
 impl Default for KeyType {
     fn default() -> Self {
-        KeyType::VecTuple
+        KeyType::None
     }
 }
 
@@ -357,7 +373,7 @@ mod content_tuple_test {
             last_state: None,
             task_id: "".to_string(),
             master: None,
-            cfg: "".to_string(),
+            cfg: r#"{"key":"VecTuple"}"#.to_string(),
         };
         if let ConverterReturned::LogicalError(e) = merge(&input) {
             assert_eq!(e.contains("input format error"), true);
@@ -379,7 +395,7 @@ mod content_tuple_test {
             last_state: None,
             task_id: "".to_string(),
             master: None,
-            cfg: "".to_string(),
+            cfg: r#"{"key":"VecTuple"}"#.to_string(),
         };
         let _ = if let ConverterReturned::Instances(rtn) = merge(&input) {
             let rtn = &rtn[0];
@@ -406,7 +422,7 @@ mod content_tuple_test {
             last_state: None,
             task_id: "".to_string(),
             master: None,
-            cfg: "".to_string(),
+            cfg: r#"{"key":"VecTuple"}"#.to_string(),
         };
 
         // mode sum
@@ -419,7 +435,7 @@ mod content_tuple_test {
         };
 
         // mode old
-        input.cfg = r#"{"when_same":"Old"}"#.to_string();
+        input.cfg = r#"{"key":"VecTuple","when_same":"Old"}"#.to_string();
         let _ = if let ConverterReturned::Instances(rtn) = merge(&input) {
             let rtn = &rtn[0];
             assert_eq!(rtn.content, r#"{"a":112}"#);
@@ -429,7 +445,7 @@ mod content_tuple_test {
         };
 
         // mode New
-        input.cfg = r#"{"when_same":"New"}"#.to_string();
+        input.cfg = r#"{"key":"VecTuple","when_same":"New"}"#.to_string();
         let _ = if let ConverterReturned::Instances(rtn) = merge(&input) {
             let rtn = &rtn[0];
             assert_eq!(rtn.content, r#"{"a":100}"#);
@@ -439,7 +455,7 @@ mod content_tuple_test {
         };
 
         // mode Max
-        input.cfg = r#"{"when_same":"Max"}"#.to_string();
+        input.cfg = r#"{"key":"VecTuple","when_same":"Max"}"#.to_string();
         let _ = if let ConverterReturned::Instances(rtn) = merge(&input) {
             let rtn = &rtn[0];
             assert_eq!(rtn.content, r#"{"a":112}"#);
@@ -449,7 +465,7 @@ mod content_tuple_test {
         };
 
         // mode Min
-        input.cfg = r#"{"when_same":"Min"}"#.to_string();
+        input.cfg = r#"{"key":"VecTuple","when_same":"Min"}"#.to_string();
         let _ = if let ConverterReturned::Instances(rtn) = merge(&input) {
             let rtn = &rtn[0];
             assert_eq!(rtn.content, r#"{"a":100}"#);
@@ -460,3 +476,109 @@ mod content_tuple_test {
     }
 }
 
+#[cfg(test)]
+mod content_none_key_test {
+    use super::*;
+
+    #[test]
+    fn content_err() {
+        let input = ConverterParameter {
+            from: Default::default(),
+            last_state: None,
+            task_id: "".to_string(),
+            master: None,
+            cfg: "".to_string(),
+        };
+        if let ConverterReturned::LogicalError(e) = merge(&input) {
+            assert_eq!(e.contains("input format error"), true);
+        } else {
+            panic!("should return error");
+        }
+    }
+
+    #[test]
+    fn one() {
+        let input = ConverterParameter {
+            from: {
+                let mut ins = Instance::default();
+                ins.content = "[112]".to_string();
+                ins
+            },
+            last_state: None,
+            task_id: "".to_string(),
+            master: None,
+            cfg: "".to_string(),
+        };
+        let _ = if let ConverterReturned::Instances(rtn) = merge(&input) {
+            let rtn = &rtn[0];
+            assert_eq!(rtn.content, r#"112"#);
+            rtn.clone()
+        } else {
+            panic!("return error result");
+        };
+    }
+
+    #[test]
+    fn mode() {
+        let mut input = ConverterParameter {
+            from: {
+                let mut ins = Instance::default();
+                ins.content = "[112,100]".to_string();
+                ins
+            },
+            last_state: None,
+            task_id: "".to_string(),
+            master: None,
+            cfg: "".to_string(),
+        };
+
+        // mode sum
+        let _ = if let ConverterReturned::Instances(rtn) = merge(&input) {
+            let rtn = &rtn[0];
+            assert_eq!(rtn.content, "212");
+            rtn.clone()
+        } else {
+            panic!("return error result");
+        };
+
+        // mode old
+        input.cfg = r#"{"when_same":"Old"}"#.to_string();
+        let _ = if let ConverterReturned::Instances(rtn) = merge(&input) {
+            let rtn = &rtn[0];
+            assert_eq!(rtn.content, "112");
+            rtn.clone()
+        } else {
+            panic!("return error result");
+        };
+
+        // mode New
+        input.cfg = r#"{"when_same":"New"}"#.to_string();
+        let _ = if let ConverterReturned::Instances(rtn) = merge(&input) {
+            let rtn = &rtn[0];
+            assert_eq!(rtn.content, "100");
+            rtn.clone()
+        } else {
+            panic!("return error result");
+        };
+
+        // mode Max
+        input.cfg = r#"{"when_same":"Max"}"#.to_string();
+        let _ = if let ConverterReturned::Instances(rtn) = merge(&input) {
+            let rtn = &rtn[0];
+            assert_eq!(rtn.content, "112");
+            rtn.clone()
+        } else {
+            panic!("return error result");
+        };
+
+        // mode Min
+        input.cfg = r#"{"when_same":"Min"}"#.to_string();
+        let _ = if let ConverterReturned::Instances(rtn) = merge(&input) {
+            let rtn = &rtn[0];
+            assert_eq!(rtn.content, "100");
+            rtn.clone()
+        } else {
+            panic!("return error result");
+        };
+    }
+}

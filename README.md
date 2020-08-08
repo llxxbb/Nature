@@ -96,7 +96,7 @@ Nature 的本质其实是一款数据管理产品，试图囊括各种业务数�
 
 [使用 Relation](doc/ZH/help/relation.md)
 
-[内置执行器](doc/ZH/help/build-in.md)
+[内置执行器](doc/ZH/help/built-in.md)
 
 [一些业务情景的解决方法](doc/ZH/help/use-case.md)
 
