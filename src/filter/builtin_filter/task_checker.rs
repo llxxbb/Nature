@@ -63,6 +63,7 @@ impl Setting {
             key_lt: self.key_lt.to_string(),
             time_ge: Local.timestamp_millis(t_ge).naive_local(),
             time_lt: Local.timestamp_millis(t_lt).naive_local(),
+            state: 0,
         };
         Ok(rtn)
     }
