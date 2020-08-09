@@ -139,3 +139,15 @@
 | page_size | 一页数据的大小                                               | 20                                                           | 100    |
 | time_part | 从上游 `Instance'para` 的哪两个取值作为开始和结束时间        | [0,1]                                                        |        |
 | filters   | 是一个过滤器数组，提出出来的每个 `Instance.content` 都会顺序过滤处理一下，如进行数据格式修正。 | [ {"protocol":"localRust","url":"nature_integrate_test_executor:append_star"},     {"protocol":"localRust","url":"nature_integrate_test_executor:append_plus"} ] |        |
+
+## task-checker
+
+**作用**：在执行转换器之前，检测相关的 task 是否完成，一般用于批量加载 instance 时判断其是否全面就位。如没有就位则返回环境异常，以等待下次重试。
+
+**配置**：
+
+| 选项      | 说明                                                  | 示例                            | 缺省值 |
+| --------- | ----------------------------------------------------- | ------------------------------- | ------ |
+| key_gt    | 形成SQL where 条件 task_key > {key_gt}                | B:sale/item/count:1\|0\|(item)/ |        |
+| key_lt    | 形成SQL where 条件 task_key< {key_lt}                 | B:sale/item/count:1\|0\|(item)0 |        |
+| time_part | 从上游 `Instance'para` 的哪两个取值作为开始和结束时间 | [0,1]                           |        |
