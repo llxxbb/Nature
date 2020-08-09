@@ -7,6 +7,7 @@
 
 ## Release 0.14
 
+- MetaSetting: add `output_last` property. only used by `MetaType::Loop`, output the instance only when loop finished. This requires the multi_meta has only one item.
 - add builtin:task-checker: make sure the certain tasks are all done before execute a `Executor`
 - bug fix: meta load verify error 
 
@@ -15,7 +16,7 @@
 
 ### 未完成
 
-- MetaSetting: add `output_last` property. only used by `MetaType::Loop`, output the instance only when loop finished. This requires the multi_meta has only one item.
+
 - MetaType::Loop load last state for target meta
   - 对于状态数据， 与Loop 数据合并，只有finished 才释放出来。以简化状态数据的复杂性
 - Optimize and bug fix: MetaType::Loop 
