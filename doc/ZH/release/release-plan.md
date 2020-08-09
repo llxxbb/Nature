@@ -7,11 +7,14 @@
 
 ## Release 0.14
 
+- add builtin:task-checker: make sure the certain tasks are all done before execute a `Executor`
+
 ### should commit
 
 ### 未完成
 
-- task_checker: make sure the certain tasks are all done before execute a `Executor`
+- task_dao: add checker
+
   担心商品的销量统计的某些任务被卡主了
 
 - demo : sale-statistics

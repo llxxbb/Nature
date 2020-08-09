@@ -4,6 +4,7 @@ use std::sync::Arc;
 use loader::Loader;
 /// built-in xecutor
 use nature_common::{Instance, NatureError, Result};
+use task_checker::TaskCheckerFilter;
 
 use crate::system::INS_KEY_GT;
 
@@ -21,6 +22,8 @@ fn init_builtin() -> HashMap<String, Arc<dyn FilterBefore>> {
     let mut map: HashMap<String, Arc<dyn FilterBefore>> = HashMap::new();
     let one = Loader { dao: INS_KEY_GT.clone() };
     map.insert("instance-loader".to_string(), Arc::new(one));
+    let one = TaskCheckerFilter {};
+    map.insert("task-checker".to_string(), Arc::new(one));
     map
 }
 
@@ -37,6 +40,7 @@ impl BuiltIn {
 
 
 pub mod loader;
+pub mod task_checker;
 
 
 #[cfg(test)]
