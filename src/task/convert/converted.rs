@@ -84,13 +84,13 @@ fn set_source_and_target_meta(instances: &mut Vec<Instance>, from: &FromInstance
         MetaType::Multi => {
             match target_meta.get_setting() {
                 Some(s) => s.check_multi_meta(instances, from)?,
-                None => set_all_instances(instances, from, target_meta),
+                None => return Err(NatureError::LogicalError("MetaType::Multi must has settings".to_string())),
             }
         }
         MetaType::Loop => {
             match target_meta.get_setting() {
                 Some(s) => s.check_multi_meta(instances, from)?,
-                None => set_all_instances(instances, from, target_meta),
+                None => return Err(NatureError::LogicalError("MetaType::Loop must has settings".to_string())),
             }
         }
         _ => set_all_instances(instances, from, target_meta),
