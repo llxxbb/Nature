@@ -8,6 +8,7 @@
 ## Release 0.14
 
 - add builtin:task-checker: make sure the certain tasks are all done before execute a `Executor`
+- bug fix: meta load verify error 
 
 ### should commit
 

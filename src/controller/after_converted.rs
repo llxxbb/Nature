@@ -20,12 +20,18 @@ pub async fn after_converted(task: &TaskForConvert, convert_task: &RawTask, inst
                 },
                 1 => {
                     if loop_check(task, &rtn.converted[0], convert_task).await { return Ok(()); }
-                    match *SWITCH_SAVE_DIRECTLY_FOR_ONE {
-                        true => save_one(rtn, &task.target).await,
-                        false => save_batch(rtn).await
-                    }
+                    let _rtn = match *SWITCH_SAVE_DIRECTLY_FOR_ONE {
+                        true => save_one(rtn, &task.target).await?,
+                        false => save_batch(rtn).await?
+                    };
+                    // TODO check loop
+                    Ok(())
                 }
-                _ => save_batch(rtn).await
+                _ => {
+                    save_batch(rtn).await?;
+                    // TODO check loop
+                    Ok(())
+                }
             }
         }
         Err(err) => {

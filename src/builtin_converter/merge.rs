@@ -64,34 +64,19 @@ pub fn merge(input: &ConverterParameter) -> ConverterReturned {
             Ok(content) => content
         }
     };
+    let loop_limit = 1000;
+    let mut counter = 0;
     // summary
     for one in items {
-        let total_change = match content.detail.insert(one.key.to_string(), one.value) {
-            None => one.value,
-            Some(old) => match cfg.when_same {
-                WhenSame::Old => {
-                    content.detail.insert(one.key.to_string(), old);
-                    0
-                }
-                WhenSame::New => one.value - old,
-                WhenSame::Sum => {
-                    content.detail.insert(one.key.to_string(), one.value + old);
-                    one.value
-                }
-                WhenSame::Min => if old < one.value {
-                    content.detail.insert(one.key.to_string(), old);
-                    0
-                } else { one.value - old }
-                WhenSame::Max => if old > one.value {
-                    content.detail.insert(one.key.to_string(), old);
-                    0
-                } else { one.value - old }
-            }
-        };
-        if cfg.sum_all {
-            content.total += total_change;
+        merge_one(&cfg, &mut content, one);
+        counter += 1;
+        if counter == loop_limit {
+            counter = 0;
+            top(&cfg, &mut content);
         }
     }
+    // top it
+    top(&cfg, &mut content);
 
     // make return instance
     let mut ins = Instance::default();
@@ -116,6 +101,44 @@ pub fn merge(input: &ConverterParameter) -> ConverterReturned {
     ins.id = input.from.id;
     ins.para = input.from.para.clone();
     ConverterReturned::Instances(vec![ins])
+}
+
+fn top(cfg: &Setting, mut content: &mut Content) {
+    match cfg.top {
+        TopMode::None => (),
+        TopMode::MaxTop(top) => top_it(top, true, &mut content),
+        TopMode::MinTop(top) => top_it(top, false, &mut content),
+    }
+}
+
+fn top_it(top: u16, max: bool, content: &mut Content) {}
+
+fn merge_one(cfg: &Setting, content: &mut Content, one: Item) {
+    let total_change = match content.detail.insert(one.key.to_string(), one.value) {
+        None => one.value,
+        Some(old) => match cfg.when_same {
+            WhenSame::Old => {
+                content.detail.insert(one.key.to_string(), old);
+                0
+            }
+            WhenSame::New => one.value - old,
+            WhenSame::Sum => {
+                content.detail.insert(one.key.to_string(), one.value + old);
+                one.value
+            }
+            WhenSame::Min => if old < one.value {
+                content.detail.insert(one.key.to_string(), old);
+                0
+            } else { one.value - old }
+            WhenSame::Max => if old > one.value {
+                content.detail.insert(one.key.to_string(), old);
+                0
+            } else { one.value - old }
+        }
+    };
+    if cfg.sum_all {
+        content.total += total_change;
+    }
 }
 
 fn one_to_vec(para: &str, idx: &Vec<u8>, value: &str) -> Result<Vec<Item>> {
