@@ -13,9 +13,7 @@
 
 ### 未完成
 
--
-
-  担心商品的销量统计的某些任务被卡主了
+- builtin:merge support top
 
 - demo : sale-statistics
   - 问题： 如何知道所有的个品都统计完成了？

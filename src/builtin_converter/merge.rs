@@ -155,6 +155,10 @@ struct Setting {
     #[serde(skip_serializing_if = "is_default")]
     #[serde(default)]
     sum_all: bool,
+    // if 0 all items will input to detail,
+    #[serde(skip_serializing_if = "is_default")]
+    #[serde(default)]
+    top: TopMode,
 }
 
 #[derive(Serialize, Deserialize, Eq, PartialEq, Debug)]
@@ -170,6 +174,19 @@ enum KeyType {
 impl Default for KeyType {
     fn default() -> Self {
         KeyType::None
+    }
+}
+
+#[derive(Serialize, Deserialize, Eq, PartialEq, Debug)]
+enum TopMode {
+    MaxTop(u16),
+    MinTop(u16),
+    None,
+}
+
+impl Default for TopMode {
+    fn default() -> Self {
+        TopMode::None
     }
 }
 
@@ -237,6 +254,7 @@ mod para_type_test {
                 key: KeyType::Para(vec![1]),
                 when_same: Default::default(),
                 sum_all: false,
+                top: Default::default(),
             }).unwrap(),
         };
         dbg!(&input.cfg);
@@ -262,6 +280,7 @@ mod para_type_test {
                 key: KeyType::Para(vec![1]),
                 when_same: Default::default(),
                 sum_all: false,
+                top: Default::default(),
             }).unwrap(),
         };
         if let ConverterReturned::LogicalError(e) = merge(&input) {
@@ -287,6 +306,7 @@ mod para_type_test {
                 key: KeyType::Para(vec![1]),
                 when_same: Default::default(),
                 sum_all: true,
+                top: Default::default(),
             }).unwrap(),
         };
         match merge(&input) {
@@ -320,6 +340,7 @@ mod para_type_test {
             key: KeyType::Para(vec![1]),
             when_same: Default::default(),  // sum
             sum_all: true,
+            top: Default::default(),
         }).unwrap();
         match merge(&input) {
             ConverterReturned::Instances(rtn) => {
@@ -332,6 +353,7 @@ mod para_type_test {
             key: KeyType::Para(vec![1]),
             when_same: WhenSame::Old,
             sum_all: true,
+            top: Default::default(),
         }).unwrap();
         dbg!(&input.cfg);
         match merge(&input) {
@@ -345,6 +367,7 @@ mod para_type_test {
             key: KeyType::Para(vec![1]),
             when_same: WhenSame::New,
             sum_all: true,
+            top: Default::default(),
         }).unwrap();
         match merge(&input) {
             ConverterReturned::Instances(rtn) => {
@@ -357,6 +380,7 @@ mod para_type_test {
             key: KeyType::Para(vec![1]),
             when_same: WhenSame::Max,
             sum_all: true,
+            top: Default::default(),
         }).unwrap();
         match merge(&input) {
             ConverterReturned::Instances(rtn) => {
@@ -369,6 +393,7 @@ mod para_type_test {
             key: KeyType::Para(vec![1]),
             when_same: WhenSame::Min,
             sum_all: true,
+            top: Default::default(),
         }).unwrap();
         match merge(&input) {
             ConverterReturned::Instances(rtn) => {
