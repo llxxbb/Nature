@@ -111,7 +111,7 @@ fn top(cfg: &Setting, mut content: &mut Content) {
     }
 }
 
-fn top_it(top: u16, max: bool, content: &mut Content) {}
+fn top_it(_top: u16, _max: bool, _content: &mut Content) {}
 
 fn merge_one(cfg: &Setting, content: &mut Content, one: Item) {
     let total_change = match content.detail.insert(one.key.to_string(), one.value) {

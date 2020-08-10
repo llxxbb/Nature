@@ -1,5 +1,5 @@
-use nature_common::{Instance, MetaType, NatureError, Result, SelfRouteInstance};
-use nature_db::{C_M, C_R, D_M, D_R, D_T, MetaCache, Mission, RawTask, RelationCache, TaskDao, TaskType};
+use nature_common::{append_para, CONTEXT_LOOP_FINISHED, CONTEXT_LOOP_NEXT, CONTEXT_LOOP_TASK, Instance, MetaSetting, MetaType, NatureError, Result, SelfRouteInstance};
+use nature_db::{C_M, C_R, D_M, D_R, D_T, MetaCache, Mission, MissionRaw, RawTask, RelationCache, TaskDao, TaskType};
 use nature_db::flow_tool::{context_check, state_check};
 
 use crate::controller::{channel_batch, channel_store};
@@ -10,6 +10,9 @@ pub async fn after_converted(task: &TaskForConvert, convert_task: &RawTask, inst
     // debug!("executor returned {} instances for `Meta`: {:?}, from {}", instances.len(), &task.target.to.meta_string(), task.from.get_key());
     match Converted::gen(&task, &convert_task, instances, last_state) {
         Ok(rtn) => {
+            // process MetaType::Loop
+            let mut rtn = rtn;
+            meta_loop(task, &mut rtn);
             match rtn.converted.len() {
                 0 => match D_T.finish_task(&convert_task.task_id).await {
                     Ok(_) => Ok(()),
@@ -20,18 +23,12 @@ pub async fn after_converted(task: &TaskForConvert, convert_task: &RawTask, inst
                 },
                 1 => {
                     if loop_check(task, &rtn.converted[0], convert_task).await { return Ok(()); }
-                    let _rtn = match *SWITCH_SAVE_DIRECTLY_FOR_ONE {
-                        true => save_one(rtn, &task.target).await?,
-                        false => save_batch(rtn).await?
-                    };
-                    // TODO check loop
-                    Ok(())
+                    match *SWITCH_SAVE_DIRECTLY_FOR_ONE {
+                        true => save_one(rtn, &task.target).await,
+                        false => save_batch(rtn).await
+                    }
                 }
-                _ => {
-                    save_batch(rtn).await?;
-                    // TODO check loop
-                    Ok(())
-                }
+                _ => save_batch(rtn).await
             }
         }
         Err(err) => {
@@ -40,6 +37,45 @@ pub async fn after_converted(task: &TaskForConvert, convert_task: &RawTask, inst
             Err(err)
         }
     }
+}
+
+fn meta_loop(task: &TaskForConvert, rtn: &mut Converted) {
+    if task.target.to.get_meta_type() == MetaType::Loop {
+        let setting = match task.target.to.get_setting() {
+            Some(set) => set,
+            None => {
+                let mut set = MetaSetting::default();
+                set.output_last = false;
+                set
+            }
+        };
+        if rtn.converted.len() == 1 && setting.output_last {
+            // TODO replace
+            rtn.converted[0].meta = task.target.to.meta_string();
+        } else {
+            // TODO append
+        }
+    }
+}
+
+/// **Notice** need get sys_context from upstream
+fn gen_instance_for_loop(task: &TaskForConvert) -> Result<Instance> {
+    let mut rtn = Instance::default();
+    rtn.meta = task.target.to.meta_string();
+    rtn.id = task.from.id;
+    let para: &str = if let Some(v) = task.from.sys_context.get(CONTEXT_LOOP_NEXT) {
+        rtn.sys_context.insert(CONTEXT_LOOP_NEXT.to_string(), v.to_string());
+        v
+    } else {
+        ""
+    };
+    rtn.para = append_para(&task.from.para, para);
+    if let Some(v) = task.from.sys_context.get(CONTEXT_LOOP_FINISHED) {
+        rtn.sys_context.insert(CONTEXT_LOOP_FINISHED.to_string(), v.to_string());
+    }
+    let raw = MissionRaw::from(task.target.clone()).to_json()?;
+    rtn.sys_context.insert(CONTEXT_LOOP_TASK.to_string(), raw);
+    Ok(rtn)
 }
 
 async fn loop_check(task: &TaskForConvert, ins: &Instance, raw: &RawTask) -> bool {

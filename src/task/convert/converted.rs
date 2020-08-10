@@ -1,5 +1,5 @@
-use nature_common::{append_para, CONTEXT_DYNAMIC_PARA, CONTEXT_LOOP_FINISHED, CONTEXT_LOOP_NEXT, CONTEXT_LOOP_TASK, CONTEXT_TARGET_INSTANCE_ID, CONTEXT_TARGET_INSTANCE_PARA, FromInstance, get_para_and_key_from_para, Instance, Meta, MetaType, NatureError, Result};
-use nature_db::{Mission, MissionRaw, RawTask};
+use nature_common::{append_para, CONTEXT_DYNAMIC_PARA, CONTEXT_TARGET_INSTANCE_ID, CONTEXT_TARGET_INSTANCE_PARA, FromInstance, get_para_and_key_from_para, Instance, Meta, MetaType, NatureError, Result};
+use nature_db::{Mission, RawTask};
 
 use crate::task::{CachedKey, TaskForConvert};
 
@@ -34,13 +34,8 @@ impl Converted {
         let _ = verify_state(&task, &mut instances, last_state)?;
 
         if task.target.id_bridge {
-            sys_context_id(&mut instances, &task.target, &from);
-            sys_context_para(&mut instances, &task.target, &from);
-        }
-
-        // for `MetaType::Loop`
-        if task.target.to.get_meta_type() == MetaType::Loop {
-            instances.push(gen_instance_for_loop(task)?);
+            bridge_context_id(&mut instances, &task.target, &from);
+            bridge_context_para(&mut instances, &task.target, &from);
         }
 
         // assemble it
@@ -50,26 +45,6 @@ impl Converted {
         };
         Ok(rtn)
     }
-}
-
-/// **Notice** need get sys_context from upstream
-fn gen_instance_for_loop(task: &TaskForConvert) -> Result<Instance> {
-    let mut rtn = Instance::default();
-    rtn.meta = task.target.to.meta_string();
-    rtn.id = task.from.id;
-    let para: &str = if let Some(v) = task.from.sys_context.get(CONTEXT_LOOP_NEXT) {
-        rtn.sys_context.insert(CONTEXT_LOOP_NEXT.to_string(), v.to_string());
-        v
-    } else {
-        ""
-    };
-    rtn.para = append_para(&task.from.para, para);
-    if let Some(v) = task.from.sys_context.get(CONTEXT_LOOP_FINISHED) {
-        rtn.sys_context.insert(CONTEXT_LOOP_FINISHED.to_string(), v.to_string());
-    }
-    let raw = MissionRaw::from(task.target.clone()).to_json()?;
-    rtn.sys_context.insert(CONTEXT_LOOP_TASK.to_string(), raw);
-    Ok(rtn)
 }
 
 fn converted_none(carrier: &RawTask) -> Converted {
@@ -105,7 +80,6 @@ fn set_all_instances(instances: &mut Vec<Instance>, from: &FromInstance, target_
     });
 }
 
-
 fn check_id(ins: &mut Vec<Instance>, from: &FromInstance, target: &Mission) -> Result<()> {
     if ins.is_empty() {
         return Ok(());
@@ -130,7 +104,7 @@ fn check_id(ins: &mut Vec<Instance>, from: &FromInstance, target: &Mission) -> R
         // set sys_context
         if !target.target_demand.context_name.is_empty() {
             let para = &ins[0].para.to_string();
-            para_dynavic(target, &mut &mut ins[0], &para)?
+            append_dynamic_para_from_mission(target, &mut &mut ins[0], &para)?
         }
         return Ok(());
     }
@@ -153,14 +127,14 @@ fn check_id(ins: &mut Vec<Instance>, from: &FromInstance, target: &Mission) -> R
             one.para = append_para(&one.para, &result.0);
             // set sys_context
             if !target.target_demand.context_name.is_empty() {
-                para_dynavic(target, &mut one, &result.0)?
+                append_dynamic_para_from_mission(target, &mut one, &result.0)?
             }
         }
     }
     Ok(())
 }
 
-fn para_dynavic(target: &Mission, one: &mut &mut Instance, value: &str) -> Result<()> {
+fn append_dynamic_para_from_mission(target: &Mission, one: &mut &mut Instance, value: &str) -> Result<()> {
     let option = one.sys_context.get(CONTEXT_DYNAMIC_PARA);
     let mut paras = match option {
         Some(s) => serde_json::from_str::<Vec<(String, String)>>(s)?,
@@ -171,7 +145,7 @@ fn para_dynavic(target: &Mission, one: &mut &mut Instance, value: &str) -> Resul
     Ok(())
 }
 
-fn sys_context_id(instances: &mut Vec<Instance>, mission: &Mission, from: &FromInstance) {
+fn bridge_context_id(instances: &mut Vec<Instance>, mission: &Mission, from: &FromInstance) {
     if let Some(id) = mission.sys_context.get(CONTEXT_TARGET_INSTANCE_ID) {
         for instance in instances {
             instance.data.sys_context.insert(CONTEXT_TARGET_INSTANCE_ID.to_string(), id.to_string());
@@ -183,7 +157,7 @@ fn sys_context_id(instances: &mut Vec<Instance>, mission: &Mission, from: &FromI
     }
 }
 
-fn sys_context_para(instances: &mut Vec<Instance>, mission: &Mission, from: &FromInstance) {
+fn bridge_context_para(instances: &mut Vec<Instance>, mission: &Mission, from: &FromInstance) {
     if let Some(para) = mission.sys_context.get(CONTEXT_TARGET_INSTANCE_PARA) {
         for instance in instances {
             instance.data.sys_context.insert(CONTEXT_TARGET_INSTANCE_PARA.to_string(), para.to_string());
@@ -245,7 +219,7 @@ mod sys_context_test {
         mission.id_bridge = true;
         let mut from = FromInstance::default();
         from.id = 123;
-        sys_context_id(&mut ins, &mission, &from);
+        bridge_context_id(&mut ins, &mission, &from);
         assert_eq!("7b", ins[0].sys_context.get("target.id").unwrap());
     }
 
@@ -255,7 +229,7 @@ mod sys_context_test {
         let mut mission = Mission::default();
         mission.sys_context.insert("target.id".to_string(), "abc".to_string());
         mission.id_bridge = true;
-        sys_context_id(&mut ins, &mission, &FromInstance::default());
+        bridge_context_id(&mut ins, &mission, &FromInstance::default());
         assert_eq!("abc", ins[0].sys_context.get("target.id").unwrap());
     }
 }
