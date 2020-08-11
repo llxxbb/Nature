@@ -9,6 +9,7 @@
 
 - MetaSetting: add `output_last` property. only used by `MetaType::Loop`, output the instance only when loop finished. This requires the multi_meta has only one item.
 - add builtin:task-checker: make sure the certain tasks are all done before execute a `Executor`
+- builtin:merge support top
 - bug fix: meta load verify error 
 - Optimize and bug fix: MetaType::Loop
 
@@ -18,7 +19,7 @@
 ### 未完成
 
  
-- builtin:merge support top
+
 
 - demo : sale-statistics
   - 问题： 如何知道所有的个品都统计完成了？

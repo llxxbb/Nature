@@ -1,6 +1,8 @@
 use std::collections::HashMap;
 use std::str::FromStr;
 
+use itertools::Itertools;
+
 use nature_common::{ConverterParameter, ConverterReturned, get_para_and_key_from_para, Instance, is_default, NatureError};
 use nature_common::Result;
 
@@ -64,19 +66,11 @@ pub fn merge(input: &ConverterParameter) -> ConverterReturned {
             Ok(content) => content
         }
     };
-    let loop_limit = 1000;
-    let mut counter = 0;
     // summary
-    for one in items {
-        merge_one(&cfg, &mut content, one);
-        counter += 1;
-        if counter == loop_limit {
-            counter = 0;
-            top(&cfg, &mut content);
-        }
-    }
+    items.into_iter().for_each(|one| merge_one(&cfg, &mut content, one));
+
     // top it
-    top(&cfg, &mut content);
+    top_mode_select(&cfg, &mut content);
 
     // make return instance
     let mut ins = Instance::default();
@@ -103,7 +97,7 @@ pub fn merge(input: &ConverterParameter) -> ConverterReturned {
     ConverterReturned::Instances(vec![ins])
 }
 
-fn top(cfg: &Setting, mut content: &mut Content) {
+fn top_mode_select(cfg: &Setting, mut content: &mut Content) {
     match cfg.top {
         TopMode::None => (),
         TopMode::MaxTop(top) => top_it(top, true, &mut content),
@@ -111,7 +105,18 @@ fn top(cfg: &Setting, mut content: &mut Content) {
     }
 }
 
-fn top_it(_top: u16, _max: bool, _content: &mut Content) {}
+fn top_it(top: u16, max: bool, content: &mut Content) {
+    let sorted: Vec<(&String, &i64)> = content.detail.iter().sorted_by(|a, b| a.1.cmp(b.1)).collect();
+    let top = top as usize;
+    let top: Vec<(&String, &i64)> = if max {
+        sorted[sorted.len() - top..].to_vec()
+    } else {
+        sorted[0..top].to_vec()
+    };
+    let top: Vec<(String, i64)> = top.iter().map(|one| (one.0.to_string(), *one.1)).collect();
+    content.detail.clear();
+    top.into_iter().for_each(|one| { content.detail.insert(one.0, one.1); });
+}
 
 fn merge_one(cfg: &Setting, content: &mut Content, one: Item) {
     let total_change = match content.detail.insert(one.key.to_string(), one.value) {
@@ -250,6 +255,46 @@ struct Content {
     total: i64,
 }
 
+#[cfg(test)]
+mod top_test{
+    use super::*;
+
+    #[test]
+    fn top_max_text(){
+        let mut input = Content{
+            detail: HashMap::default(),
+            total: 500
+        };
+        input.detail.insert("a".to_string(),100);
+        input.detail.insert("b".to_string(),700);
+        input.detail.insert("c".to_string(),10);
+        input.detail.insert("d".to_string(),50);
+        input.detail.insert("e".to_string(),200);
+        top_it(3,true, &mut input);
+        assert_eq!(input.detail.len(), 3);
+        assert_eq!(input.detail.get("b"), Some(&700));
+        assert_eq!(input.detail.get("e"), Some(&200));
+        assert_eq!(input.detail.get("a"), Some(&100));
+    }
+
+    #[test]
+    fn top_min_text(){
+        let mut input = Content{
+            detail: HashMap::default(),
+            total: 500
+        };
+        input.detail.insert("a".to_string(),100);
+        input.detail.insert("b".to_string(),700);
+        input.detail.insert("c".to_string(),10);
+        input.detail.insert("d".to_string(),50);
+        input.detail.insert("e".to_string(),200);
+        top_it(3,false, &mut input);
+        assert_eq!(input.detail.len(), 3);
+        assert_eq!(input.detail.get("c"), Some(&10));
+        assert_eq!(input.detail.get("d"), Some(&50));
+        assert_eq!(input.detail.get("a"), Some(&100));
+    }
+}
 
 #[cfg(test)]
 mod sum_setting_test {
