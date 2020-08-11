@@ -96,17 +96,14 @@ async fn handle_converted(converted: ConverterReturned, task: &TaskForConvert, r
 
 async fn init_target_id_for_sys_context(task: &mut TaskForConvert, from_instance: &mut Instance) -> () {
     let target = task.target.sys_context.get(CONTEXT_TARGET_INSTANCE_ID);
-    let f_meta: Meta = C_M.get(&task.from.meta, &*D_M).await.unwrap();
-    let to_meta = task.target.to.clone();
-    if let Some(id) = target {
-        let id = id.to_string();
-        task.target.sys_context.insert(CONTEXT_TARGET_INSTANCE_ID.to_string(), id);
+    if let Some(_) = target {
         return;
     }
-    if to_meta.get_setting().is_none() {
+    let setting = task.target.to.get_setting();
+    if setting.is_none() {
         return;
     }
-    let setting = to_meta.get_setting().unwrap();
+    let setting = setting.unwrap();
     if setting.master.is_none() {
         return;
     }
@@ -115,6 +112,7 @@ async fn init_target_id_for_sys_context(task: &mut TaskForConvert, from_instance
         task.target.sys_context.insert(CONTEXT_TARGET_INSTANCE_ID.to_string(), format!("{:x}", from_instance.id));
         return;
     }
+    let f_meta: Meta = C_M.get(&task.from.meta, &*D_M).await.unwrap();
     if f_meta.get_setting().is_none() {
         return;
     }

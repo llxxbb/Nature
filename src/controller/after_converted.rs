@@ -12,7 +12,7 @@ pub async fn after_converted(task: &TaskForConvert, convert_task: &RawTask, inst
         Ok(rtn) => {
             // process MetaType::Loop
             let mut rtn = rtn;
-            meta_loop(task, &mut rtn);
+            meta_loop(task, &mut rtn)?;
             match rtn.converted.len() {
                 0 => match D_T.finish_task(&convert_task.task_id).await {
                     Ok(_) => Ok(()),
@@ -22,7 +22,7 @@ pub async fn after_converted(task: &TaskForConvert, convert_task: &RawTask, inst
                     }
                 },
                 1 => {
-                    if loop_check(task, &rtn.converted[0], convert_task).await { return Ok(()); }
+                    if state_loop_check(task, &rtn.converted[0], convert_task).await { return Ok(()); }
                     match *SWITCH_SAVE_DIRECTLY_FOR_ONE {
                         true => save_one(rtn, &task.target).await,
                         false => save_batch(rtn).await
@@ -39,7 +39,7 @@ pub async fn after_converted(task: &TaskForConvert, convert_task: &RawTask, inst
     }
 }
 
-fn meta_loop(task: &TaskForConvert, rtn: &mut Converted) {
+fn meta_loop(task: &TaskForConvert, rtn: &mut Converted) -> Result<()> {
     if task.target.to.get_meta_type() == MetaType::Loop {
         let setting = match task.target.to.get_setting() {
             Some(set) => set,
@@ -49,36 +49,41 @@ fn meta_loop(task: &TaskForConvert, rtn: &mut Converted) {
                 set
             }
         };
+        if let Some(_) = task.from.sys_context.get(CONTEXT_LOOP_FINISHED) {
+            // finished need do nothing
+            return Ok(());
+        }
         if rtn.converted.len() == 1 && setting.output_last {
-            // TODO replace
+            // use MetaType::Loop replace the real one
             rtn.converted[0].meta = task.target.to.meta_string();
+            gen_instance_for_loop(&mut rtn.converted[0], task)?;
         } else {
-            // TODO append
+            // append a MetaType::Loop instance
+            let mut ins = Instance::default();
+            ins.meta = task.target.to.meta_string();
+            gen_instance_for_loop(&mut ins, task)?;
+            rtn.converted.push(ins);
         }
     }
+    Ok(())
 }
 
 /// **Notice** need get sys_context from upstream
-fn gen_instance_for_loop(task: &TaskForConvert) -> Result<Instance> {
-    let mut rtn = Instance::default();
-    rtn.meta = task.target.to.meta_string();
-    rtn.id = task.from.id;
+fn gen_instance_for_loop(ins: &mut Instance, task: &TaskForConvert) -> Result<()> {
+    ins.id = task.from.id;
     let para: &str = if let Some(v) = task.from.sys_context.get(CONTEXT_LOOP_NEXT) {
-        rtn.sys_context.insert(CONTEXT_LOOP_NEXT.to_string(), v.to_string());
+        ins.sys_context.insert(CONTEXT_LOOP_NEXT.to_string(), v.to_string());
         v
     } else {
         ""
     };
-    rtn.para = append_para(&task.from.para, para);
-    if let Some(v) = task.from.sys_context.get(CONTEXT_LOOP_FINISHED) {
-        rtn.sys_context.insert(CONTEXT_LOOP_FINISHED.to_string(), v.to_string());
-    }
+    ins.para = append_para(&task.from.para, para);
     let raw = MissionRaw::from(task.target.clone()).to_json()?;
-    rtn.sys_context.insert(CONTEXT_LOOP_TASK.to_string(), raw);
-    Ok(rtn)
+    ins.sys_context.insert(CONTEXT_LOOP_TASK.to_string(), raw);
+    Ok(())
 }
 
-async fn loop_check(task: &TaskForConvert, ins: &Instance, raw: &RawTask) -> bool {
+async fn state_loop_check(task: &TaskForConvert, ins: &Instance, raw: &RawTask) -> bool {
     if ins.state_version > 0 && ins.state_version == task.conflict_version {
         warn!("looping for conflict: {}, task would be moved to error table", ins.get_key());
         let err = NatureError::LogicalError("conflict looping".to_string());
