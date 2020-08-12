@@ -117,19 +117,20 @@ fn check_id(ins: &mut Vec<Instance>, from: &FromInstance, target: &Mission) -> R
     };
 
     for mut one in ins {
-        if let Some(id_u) = id {
-            one.id = id_u;
-        } else {
-            one.revise()?;
-        }
         if target.target_demand.append_para.len() > 0 {
             let result = get_para_and_key_from_para(&from.para, &target.target_demand.append_para)?;
+            dbg!(&&one.para);
             one.para = append_para(&one.para, &result.0);
+            dbg!(&from.para,&target.target_demand.append_para, &one.para);
             // set sys_context
             if !target.target_demand.context_name.is_empty() {
                 append_dynamic_para_from_mission(target, &mut one, &result.0)?
             }
         }
+        if let Some(id_u) = id {
+            one.id = id_u;
+        }
+        one.revise()?;
     }
     Ok(())
 }

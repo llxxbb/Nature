@@ -12,6 +12,7 @@
 - builtin:merge support top
 - bug fix: meta load verify error 
 - Optimize and bug fix: MetaType::Loop
+- bug fix: exchange the order of generate ID and Para
 
 ### should commit
 
@@ -22,6 +23,7 @@
 
 
 - demo : sale-statistics
+  - 下游如果是归结性的比较重的任务，最好将上游“归一”后在后接这个下游任务，这样可以避免无谓的重复结算！
   - 问题： 如何知道所有的个品都统计完成了？
   - second top 
 
