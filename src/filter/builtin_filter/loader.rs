@@ -15,19 +15,25 @@ pub struct Loader {
 #[async_trait]
 impl FilterBefore for Loader {
     async fn filter(&self, ins: &mut Instance, cfg: &str) -> Result<()> {
-        let setting = match Setting::get(&cfg){
+        let setting = match Setting::get(&cfg) {
             Ok(s) => s,
             Err(e) => {
-                warn!("loader setting error: {}, \nsetting is: {}",e, cfg);
+                warn!("loader setting error: {}, \nsetting is: {}", e, cfg);
                 return Err(e);
             }
         };
-        let time_range = match get_para_part(&ins.para, &setting.time_part) {
-            Ok(rtn) => rtn,
-            Err(e) => {
-                let msg = format!("built-in::Loader instance's para has no time info: {}", e.to_string());
-                return Err(NatureError::VerifyError(msg));
-            }
+        let time_range = match &setting.time_part {
+            Some(part) => match get_para_part(&ins.para, part) {
+                Ok(pair) => (
+                    Some(i64::from_str(&pair[0])? * 1000),
+                    Some(i64::from_str(&pair[1])? * 1000)
+                ),
+                Err(e) => {
+                    let msg = format!("built-in::Loader instance's para has no time info: {}", e.to_string());
+                    return Err(NatureError::VerifyError(msg));
+                }
+            },
+            None => (None, None)
         };
         let first = match ins.sys_context.get(CONTEXT_LOOP_NEXT) {
             Some(first) => first.to_string(),
@@ -42,8 +48,8 @@ impl FilterBefore for Loader {
             key_le: "".to_string(),
             para: "".to_string(),
             state_version: 0,
-            time_ge: Some(i64::from_str(&time_range[0])? * 1000),
-            time_lt: Some(i64::from_str(&time_range[1])? * 1000),
+            time_ge: time_range.0,
+            time_lt: time_range.1,
             limit: setting.page_size as i32,
         };
         let mut content: Vec<String> = vec![];
@@ -78,7 +84,7 @@ struct Setting {
     page_size: u16,
     /// where to get the time range from the `Instance'para` which used to load data from Instance table
     /// it only accept two element, one for Begin Time and the other for End Time
-    time_part: Vec<u8>,
+    time_part: Option<Vec<u8>>,
     /// correct the format of the data loaded.
     #[serde(default)]
     #[serde(skip_serializing_if = "is_default")]
@@ -91,8 +97,10 @@ impl Setting {
             return Err(NatureError::VerifyError("builtin-filter loader `settings` can't be empty".to_string()));
         };
         let result: Setting = serde_json::from_str(cfg)?;
-        if result.time_part.len() != 2 {
-            return Err(NatureError::VerifyError("builtin-filter loader `settings.time_part` need exactly 2 elements".to_string()));
+        if let Some(part) = &result.time_part {
+            if part.len() != 2 {
+                return Err(NatureError::VerifyError("builtin-filter loader `settings.time_part` need exactly 2 elements".to_string()));
+            }
         }
         Ok(result)
     }
@@ -190,8 +198,8 @@ mod setting_test {
     #[test]
     fn time_part_not_set() {
         let s = r#"{"key_gt":"abc","key_lt":"def"}"#;
-        let err = Setting::get(s).err().unwrap();
-        assert_eq!(NatureError::VerifyError("missing field `time_part` at line 1 column 31".to_string()), err);
+        let ok = Setting::get(s);
+        assert_eq!(ok.is_ok(), true);
     }
 
     #[test]

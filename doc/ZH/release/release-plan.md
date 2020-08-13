@@ -13,13 +13,13 @@
 - bug fix: meta load verify error 
 - Optimize and bug fix: MetaType::Loop
 - bug fix: exchange the order of generate ID and Para
+- Optimize: make builtin:loader setting.time_part optional
 
 ### should commit
 
 
 ### 未完成
 
- 
 
 
 - demo : sale-statistics
