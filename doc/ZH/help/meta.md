@@ -78,7 +78,7 @@ pub struct MetaSetting {
 
 - master: 缺省为 None，当前`Meta`依附于指定的`Meta`。当前`Meta`的`instance`会使用`master`对应`instance`的ID。如果 `Executor` 的输入是当前 `Meta`, 则 Nature 会将其对应 `master` 的 `instance` 也一并传入。这也是 Nature 实现自动 `Executor` 魔法的依据。注意：如果 [`Relation`](relation.md) 的配置中使用了 `use_upstream_id` ，则优先使用 上游 `Instance`的ID。
 
-- multi_meta： `Executor`可以返回多个不同的`Meta-String`对应`Meta`的实例。缺省为 None。对于`MetaType::Multi` 来讲，不能含有 state-meta。对于 `MetaTypeLoop` 来讲，如果含有 state-meta, 则 multi_meta只能包含一个元素，既该 state-meta。
+- multi_meta： `Executor`可以返回多个不同的`Meta-String`对应`Meta`的实例。缺省为 None。不能含有 state-meta。**注意**：如果multi_meta 只有一个值（一般常见于MetaType::TLoop），则转换器的实现者无需明确给出 instance.meta， Nature会自动填充；如果multi_meta 多于一个值，则转换器的实现者必须明确给出 instance.meta 的值。
   
 - cache_saved：缺省为 false。为 true 则将生成的实例缓存一段时间，对于短时间内生成相同实例的情况(如生成一个定时器实例)能够显著提升性能。**危险提醒**：如果不是这种使用情景，请务必不要使用此选项，有可能消耗大量内存，甚至溢出！缓存时间由 `.env` 文件中的 `CACHE_SAVED_TIME` 选项指定。
 

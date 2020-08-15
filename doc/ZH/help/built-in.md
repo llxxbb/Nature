@@ -1,12 +1,12 @@
-# 内置模块
+# 内置执行器
 
-内置执行器用于[关系配置](relation.md)中，相对来讲内置执行器是非常通用的，内置于 Natrue 中以方便大家的使用。
+通常情况下，执行器时需要开发人员介入的。对于一些常用的通用职能，Nature 进行了内置，以减轻开发人员的工作。有关执行器请参考[关系](relation.md)。
 
 随着 Nature 应用领域的不断发觉，内置执行器会不断进行丰富和完善，因此此文档可能会经常调整。
 
-此文档将以字母顺序罗列这些组件。
+## 转换器
 
-## scatter 转换器
+### scatter 转换器
 
 **作用**：将关系中的上游数据拆分成多条下游数据。并用 `Instance.para` 来区分这些下游数据
 
@@ -39,7 +39,7 @@
 | ------------------- | ------------------------------------------------------------ | ------ |
 | dimension_separator | 如果上游数据中的 key 对应的值不是用 para 的分隔符进行分隔的，且想转换为 para 的分隔符以利于后续对 para 进行处理，则需要设置此属性。 如 key 对应的值是 “a-1”， 则此属性应设置为 “-”。 | /      |
 
-## merge 转换器
+### merge 转换器
 
 **作用**：对上游多个数据合并，或将上游的一个数据与下游状态数据中的多个数据进行合并。**注意**：merge 只能统计**整型**数据。
 
@@ -112,7 +112,9 @@
 
 如果配置中的 when_same 换成 Min 或 New 则 `instance.content` 的值将会是： {"a":8, "b":2}
 
-## time_range
+## 前置过滤器
+
+### time_range
 
 **作用**：用于生成一个时间区间（单位：秒），并赋值给 `Instance.para` 属性。
 
@@ -127,7 +129,7 @@
 
 生成示例的 ins_key 示例： B:sale/item/tag_second:1|0|1596207504/1596207505
 
-## instance-loader 前置过滤器
+### instance-loader 前置过滤器
 
 **作用**：依据给定的条件检索出一批 Instance，并提取出所以的 content 属性形成数组，并替换掉 执行器入参中的 from.content。
 
@@ -141,7 +143,7 @@
 | time_part | 从上游 `Instance'para` 的哪两个取值作为开始和结束时间        | [0,1]                                                        |        |
 | filters   | 是一个过滤器数组，提出出来的每个 `Instance.content` 都会顺序过滤处理一下，如进行数据格式修正。 | [ {"protocol":"localRust","url":"nature_integrate_test_executor:append_star"},     {"protocol":"localRust","url":"nature_integrate_test_executor:append_plus"} ] |        |
 
-## task-checker
+### task-checker
 
 **作用**：在执行转换器之前，检测相关的 task 是否完成，一般用于批量加载 instance 时判断其是否全面就位。如没有就位则返回环境异常，以等待下次重试。
 

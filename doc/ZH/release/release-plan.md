@@ -14,6 +14,7 @@
 - Optimize and bug fix: MetaType::Loop
 - bug fix: exchange the order of generate ID and Para
 - Optimize: make builtin:loader setting.time_part optional
+- fix bug: retry is over the max times should move to `task_error` table
 
 ### should commit
 
@@ -21,6 +22,9 @@
 
 ### 未完成
 
+- verify loop : per-batch 2 records
+  - redo over 6 times and does not move to error
+  - can't start work
 
 - demo : sale-statistics
 
