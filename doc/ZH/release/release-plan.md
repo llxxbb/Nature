@@ -18,14 +18,11 @@
 ### should commit
 
 
+
 ### 未完成
 
 
-
 - demo : sale-statistics
-  - 下游如果是归结性的比较重的任务，最好将上游“归一”后在后接这个下游任务，这样可以避免无谓的重复结算！
-  - 问题： 如何知道所有的个品都统计完成了？
-  - second top 
 
 - 修正，订单->区间统计任务
     minute : consistent with second data 

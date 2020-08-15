@@ -62,13 +62,16 @@ pub fn merge(input: &ConverterParameter) -> ConverterReturned {
     let mut content = match &input.last_state {
         None => Content::default(),
         Some(o_i) => match serde_json::from_str::<Content>(&o_i.content) {
-            Err(err) => return ConverterReturned::LogicalError(err.to_string()),
+            Err(err) => {
+                let msg = format!("builtin-merge : load last error {}. last: {}", err, o_i.content);
+                warn!("{}", msg);
+                return ConverterReturned::LogicalError(msg);
+            }
             Ok(content) => content
         }
     };
     // summary
     items.into_iter().for_each(|one| merge_one(&cfg, &mut content, one));
-
     // top it
     top_mode_select(&cfg, &mut content);
 
@@ -256,21 +259,21 @@ struct Content {
 }
 
 #[cfg(test)]
-mod top_test{
+mod top_test {
     use super::*;
 
     #[test]
-    fn top_max_text(){
-        let mut input = Content{
+    fn top_max_text() {
+        let mut input = Content {
             detail: HashMap::default(),
-            total: 500
+            total: 500,
         };
-        input.detail.insert("a".to_string(),100);
-        input.detail.insert("b".to_string(),700);
-        input.detail.insert("c".to_string(),10);
-        input.detail.insert("d".to_string(),50);
-        input.detail.insert("e".to_string(),200);
-        top_it(3,true, &mut input);
+        input.detail.insert("a".to_string(), 100);
+        input.detail.insert("b".to_string(), 700);
+        input.detail.insert("c".to_string(), 10);
+        input.detail.insert("d".to_string(), 50);
+        input.detail.insert("e".to_string(), 200);
+        top_it(3, true, &mut input);
         assert_eq!(input.detail.len(), 3);
         assert_eq!(input.detail.get("b"), Some(&700));
         assert_eq!(input.detail.get("e"), Some(&200));
@@ -278,17 +281,17 @@ mod top_test{
     }
 
     #[test]
-    fn top_min_text(){
-        let mut input = Content{
+    fn top_min_text() {
+        let mut input = Content {
             detail: HashMap::default(),
-            total: 500
+            total: 500,
         };
-        input.detail.insert("a".to_string(),100);
-        input.detail.insert("b".to_string(),700);
-        input.detail.insert("c".to_string(),10);
-        input.detail.insert("d".to_string(),50);
-        input.detail.insert("e".to_string(),200);
-        top_it(3,false, &mut input);
+        input.detail.insert("a".to_string(), 100);
+        input.detail.insert("b".to_string(), 700);
+        input.detail.insert("c".to_string(), 10);
+        input.detail.insert("d".to_string(), 50);
+        input.detail.insert("e".to_string(), 200);
+        top_it(3, false, &mut input);
         assert_eq!(input.detail.len(), 3);
         assert_eq!(input.detail.get("c"), Some(&10));
         assert_eq!(input.detail.get("d"), Some(&50));

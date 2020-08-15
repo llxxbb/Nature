@@ -39,6 +39,7 @@ impl FilterBefore for Loader {
             Some(first) => first.to_string(),
             None => setting.key_gt,
         };
+        debug!("loader for: {}, condition first: {}", ins.meta, first);
         let condition = KeyCondition {
             id: "".to_string(),
             meta: "".to_string(),
@@ -55,11 +56,15 @@ impl FilterBefore for Loader {
         let mut content: Vec<String> = vec![];
         let rtn: Vec<Instance> = self.dao.get_by_key_range(&condition).await?;
         let len = rtn.len();
+        debug!("loaded records: {} for: {} ", len, ins.meta);
         // set context
         if len == setting.page_size as usize {
-            ins.sys_context.insert(CONTEXT_LOOP_NEXT.to_string(), rtn[len - 1].get_key());
+            let next = rtn[len - 1].get_key();
+            ins.sys_context.insert(CONTEXT_LOOP_NEXT.to_string(), next.to_string());
+            debug!("for meta: {} set the next loop from: {}", ins.meta, next);
         } else {
             ins.sys_context.insert(CONTEXT_LOOP_FINISHED.to_string(), "".to_string());
+            debug!("finished loop for: {}", ins.meta);
         }
         // filter
         for mut one in rtn {
@@ -67,6 +72,7 @@ impl FilterBefore for Loader {
             content.push(one.content.to_string());
         }
         ins.content = serde_json::to_string(&content)?;
+        debug!("loaded content for: {} is: {}", ins.meta, ins.content);
         Ok(())
     }
 }

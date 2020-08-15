@@ -56,7 +56,7 @@ async fn do_convert(task: TaskForConvert, raw: RawTask) {
             return;
         }
     };
-    let rtn = call_executor(&task, &raw, &task.target, &last, master).await;
+    let rtn = call_executor(&mut task, &raw, &last, master).await;
     match handle_converted(rtn, &task, &raw, &task.target, &last).await {
         Ok(()) => (),
         Err(NatureError::EnvironmentError(_)) => (),
