@@ -8,7 +8,8 @@
 ## Release 0.14
 
 - MetaSetting: add `output_last` property. only used by `MetaType::Loop`, output the instance only when loop finished. This requires the multi_meta has only one item.
-- add builtin:task-checker: make sure the certain tasks are all done before execute a `Executor`
+- add pre-filter-builtin: task-checker: make sure the certain tasks are all done before execute a `Executor`
+- add pre-filter-builtin: para_as_key: convert para part as content key and old content as value
 - builtin:merge support top
 - bug fix: meta load verify error 
 - Optimize and bug fix: MetaType::Loop
@@ -22,6 +23,9 @@
 
 ### 未完成
 
+- add pre-filter-builtin: para_as_key: convert para part as content key and old content as value
+  - doc
+  
 - verify loop : per-batch 2 records
   - output_last : false
   - can't start second loop
