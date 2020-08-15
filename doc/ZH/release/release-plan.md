@@ -23,8 +23,7 @@
 ### 未完成
 
 - verify loop : per-batch 2 records
-  - redo over 6 times and does not move to error
-  - can't start work
+  - can't start second loop
 
 - demo : sale-statistics
 

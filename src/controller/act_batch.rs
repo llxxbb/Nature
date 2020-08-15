@@ -1,9 +1,8 @@
-use nature_common::{Instance, MetaType, Result};
-use nature_db::{C_M, C_R, D_M, D_R, D_T, MetaCache, Mission, RawTask, RelationCache, TaskDao};
-use nature_db::flow_tool::{context_check, state_check};
+use nature_common::{Instance, Result};
+use nature_db::{D_T, RawTask, TaskDao};
 
-use crate::controller::channel_store;
-use crate::task::{gen_loop_mission, TaskForStore};
+use crate::controller::{channel_store, get_store_task};
+use crate::task::TaskForStore;
 
 pub async fn channel_batch(instances: Vec<Instance>, raw: RawTask) {
     if let Err(e) = inner_batch(instances, &raw).await {
@@ -16,17 +15,7 @@ async fn inner_batch(instances: Vec<Instance>, raw: &RawTask) -> Result<()> {
     let mut store_infos: Vec<RawTask> = Vec::new();
     let mut t_d: Vec<(TaskForStore, RawTask)> = Vec::new();
     for instance in &instances {
-        let meta = C_M.get(&instance.meta, &*D_M).await?;
-        let mission = match meta.get_meta_type() {
-            MetaType::Loop => {
-                gen_loop_mission(instance, &*C_M, &*D_M).await?
-            }
-            _ => {
-                let r = C_R.get(&instance.meta, &*D_R, &*C_M, &*D_M).await?;
-                Mission::get_by_instance(&instance, &r, context_check, state_check)
-            }
-        };
-        let task = TaskForStore::new(instance.clone(), mission, None, meta.need_cache());
+        let task = get_store_task(&instance, None).await?;
         match task.to_raw() {
             Ok(x) => {
                 store_infos.push(x.clone());
