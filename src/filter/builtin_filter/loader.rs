@@ -1,7 +1,7 @@
 use std::str::FromStr;
 use std::sync::Arc;
 
-use nature_common::{CONTEXT_LOOP_FINISHED, CONTEXT_LOOP_NEXT, Executor, get_para_part, Instance, is_default, KeyCondition, NatureError, Result};
+use nature_common::{CONTEXT_LOOP_FINISHED, CONTEXT_LOOP_ID, CONTEXT_LOOP_NEXT, Executor, get_para_part, Instance, is_default, KeyCondition, NatureError, Result};
 use nature_db::KeyRange;
 
 use crate::filter::builtin_filter::FilterBefore;
@@ -40,6 +40,15 @@ impl FilterBefore for Loader {
             None => setting.key_gt,
         };
         debug!("loader for: {}, condition first: {}", ins.meta, first);
+
+        // init loop_id
+        let loop_id = match ins.sys_context.get(CONTEXT_LOOP_ID) {
+            Some(id) => u32::from_str(id)? + 1,
+            None => 1
+        };
+        ins.sys_context.insert(CONTEXT_LOOP_ID.to_string(), loop_id.to_string());
+
+        // load
         let condition = KeyCondition {
             id: "".to_string(),
             meta: "".to_string(),
@@ -57,6 +66,7 @@ impl FilterBefore for Loader {
         let rtn: Vec<Instance> = self.dao.get_by_key_range(&condition).await?;
         let len = rtn.len();
         debug!("loaded records: {} for: {} ", len, ins.meta);
+
         // set context
         if len == setting.page_size as usize {
             let next = rtn[len - 1].get_key();

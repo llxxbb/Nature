@@ -1,4 +1,6 @@
-use nature_common::{append_para, CONTEXT_LOOP_FINISHED, CONTEXT_LOOP_NEXT, CONTEXT_LOOP_TASK, Instance, MetaSetting, MetaType, NatureError, Result, SelfRouteInstance};
+use std::str::FromStr;
+
+use nature_common::{append_para, CONTEXT_LOOP_FINISHED, CONTEXT_LOOP_ID, CONTEXT_LOOP_NEXT, CONTEXT_LOOP_TASK, Instance, MetaSetting, MetaType, NatureError, Result, SelfRouteInstance};
 use nature_db::{D_T, Mission, MissionRaw, RawTask, TaskDao, TaskType};
 
 use crate::controller::{channel_batch, channel_store, get_store_task};
@@ -70,15 +72,40 @@ fn meta_loop(task: &TaskForConvert, rtn: &mut Converted) -> Result<()> {
 /// **Notice** need get sys_context from upstream
 fn gen_instance_for_loop(ins: &mut Instance, task: &TaskForConvert) -> Result<()> {
     ins.id = task.from.id;
-    let para: &str = if let Some(v) = task.from.sys_context.get(CONTEXT_LOOP_NEXT) {
-        ins.sys_context.insert(CONTEXT_LOOP_NEXT.to_string(), v.to_string());
-        v
-    } else {
-        ""
-    };
-    ins.para = append_para(&task.from.para, para);
+
+    // loop next
+    if let Some(next) = task.from.sys_context.get(CONTEXT_LOOP_NEXT) {
+        ins.sys_context.insert(CONTEXT_LOOP_NEXT.to_string(), next.to_string());
+    }
+
+    // fix ins.para
+    fix_loop_id(ins, task)?;
+
     let raw = MissionRaw::from(task.target.clone()).to_json()?;
     ins.sys_context.insert(CONTEXT_LOOP_TASK.to_string(), raw);
+    Ok(())
+}
+
+fn fix_loop_id(ins: &mut Instance, task: &TaskForConvert) -> Result<()> {
+    if let Some(ver) = task.from.sys_context.get(CONTEXT_LOOP_ID) {
+        let mut n_ver = i32::from_str(ver)?;
+        let append = if n_ver > 1 {
+            n_ver -= 1;
+            let mut ver_len = n_ver.to_string().len();
+            let para_len = task.from.para.len();
+            if para_len > ver_len {
+                ver_len += 1;
+            }
+            let end = para_len as i32 - ver_len as i32;
+            if end < 0 {
+                return Err(NatureError::SystemError("para of old loop.id has problem".to_string()));
+            }
+            task.from.para[0..end as usize].to_string()
+        } else {
+            ins.para.to_string()
+        };
+        ins.para = append_para(&append, ver);
+    };
     Ok(())
 }
 
@@ -92,7 +119,6 @@ async fn state_loop_check(task: &TaskForConvert, ins: &Instance, raw: &RawTask) 
         false
     }
 }
-
 
 async fn save_one(converted: Converted, previous_mission: &Mission) -> Result<()> {
     let instance = &converted.converted[0];
@@ -124,4 +150,79 @@ pub async fn process_null(meta_type: MetaType, task_id: &str) -> Result<()> {
 pub fn received_self_route(_task: &TaskForConvert, _raw: &RawTask, _instances: Vec<SelfRouteInstance>) -> Result<()> {
     // TODO unimplemented
     unimplemented!()
+}
+
+#[cfg(test)]
+mod loop_test {
+    use super::*;
+
+    #[test]
+    fn nothing() {
+        let mut instance = Instance::default();
+        let convert = TaskForConvert::default();
+        fix_loop_id(&mut instance, &convert).unwrap();
+    }
+
+    #[test]
+    fn para_only() {
+        let mut instance = Instance::default();
+        let mut convert = TaskForConvert::default();
+        convert.from.para = "llxxbb".to_string();
+        fix_loop_id(&mut instance, &convert).unwrap();
+        assert_eq!(instance.para, "")
+    }
+
+    #[test]
+    fn sys_context_1() {
+        let mut instance = Instance::default();
+        let mut convert = TaskForConvert::default();
+        convert.from.sys_context.insert(CONTEXT_LOOP_ID.to_string(), 1.to_string());
+        fix_loop_id(&mut instance, &convert).unwrap();
+        assert_eq!(instance.para, "1")
+    }
+
+    #[test]
+    fn sys_context_1_with_other() {
+        let mut instance = Instance::default();
+        instance.para = "llzzbb".to_string();
+        let mut convert = TaskForConvert::default();
+        convert.from.sys_context.insert(CONTEXT_LOOP_ID.to_string(), 1.to_string());
+        fix_loop_id(&mut instance, &convert).unwrap();
+        assert_eq!(instance.para, "llzzbb/1");
+
+        // from has para
+        instance.para = "llzzbb".to_string();
+        convert.from.para = "made".to_string();
+        fix_loop_id(&mut instance, &convert).unwrap();
+        assert_eq!(instance.para, "llzzbb/1");
+    }
+
+    #[test]
+    fn sys_context_10_error() {
+        let mut instance = Instance::default();
+        let mut convert = TaskForConvert::default();
+        convert.from.sys_context.insert(CONTEXT_LOOP_ID.to_string(), 10.to_string());
+        let result = fix_loop_id(&mut instance, &convert);
+        assert_eq!(result.is_err(), true);
+    }
+
+    #[test]
+    fn sys_context_10() {
+        let mut instance = Instance::default();
+        let mut convert = TaskForConvert::default();
+        convert.from.para = "9".to_string();
+        convert.from.sys_context.insert(CONTEXT_LOOP_ID.to_string(), 10.to_string());
+        fix_loop_id(&mut instance, &convert).unwrap();
+        assert_eq!(instance.para, "10")
+    }
+
+    #[test]
+    fn sys_context_10_with_other() {
+        let mut instance = Instance::default();
+        let mut convert = TaskForConvert::default();
+        convert.from.para = "llxxbb/9".to_string();
+        convert.from.sys_context.insert(CONTEXT_LOOP_ID.to_string(), 10.to_string());
+        fix_loop_id(&mut instance, &convert).unwrap();
+        assert_eq!(instance.para, "llxxbb/10")
+    }
 }

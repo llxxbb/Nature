@@ -23,6 +23,7 @@
 ### 未完成
 
 - verify loop : per-batch 2 records
+  - output_last : false
   - can't start second loop
 
 - demo : sale-statistics
