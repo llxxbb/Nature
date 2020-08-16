@@ -52,6 +52,9 @@ fn meta_loop(task: &TaskForConvert, rtn: &mut Converted) -> Result<()> {
         };
         if let Some(_) = task.from.sys_context.get(CONTEXT_LOOP_FINISHED) {
             // finished need do nothing
+            if rtn.converted.len() == 1 && setting.output_last {
+                remove_loop_id(&mut rtn.converted[0], task)?;
+            }
             return Ok(());
         }
         if rtn.converted.len() == 1 && setting.output_last {
@@ -64,6 +67,36 @@ fn meta_loop(task: &TaskForConvert, rtn: &mut Converted) -> Result<()> {
             ins.meta = task.target.to.meta_string();
             gen_instance_for_loop(&mut ins, task)?;
             rtn.converted.push(ins);
+        }
+    }
+    Ok(())
+}
+
+/// **Notice** need get sys_context from upstream
+fn remove_loop_id(ins: &mut Instance, task: &TaskForConvert) -> Result<()> {
+    // first, need not to repair
+    if task.from.meta != task.target.to.meta_string() {
+        return Ok(());
+    }
+
+    // loop next
+    if let Some(loop_id) = task.from.sys_context.get(CONTEXT_LOOP_ID) {
+        let mut n_loop_id = u32::from_str(loop_id)?;
+        n_loop_id -= 1;
+        let ver_len = n_loop_id.to_string().len();
+        if n_loop_id == 0 {
+            // the first version of loop.id does not put to the para
+            return Ok(());
+        }
+        let para_len = ins.para.len();
+        if para_len < ver_len {
+            return Err(NatureError::LogicalError("para should not be less than loop.ip".to_string()));
+        }
+        if para_len == ver_len {
+            ins.para = ins.para[0..para_len - ver_len].to_string()
+        } else {
+            // with the "/" in front of the loop.id
+            ins.para = ins.para[0..para_len - ver_len - 1].to_string()
         }
     }
     Ok(())
@@ -154,7 +187,87 @@ pub fn received_self_route(_task: &TaskForConvert, _raw: &RawTask, _instances: V
 }
 
 #[cfg(test)]
-mod loop_test {
+mod remove_loop_id_test {
+    use nature_common::Meta;
+
+    use super::*;
+
+    #[test]
+    fn diff_meta() {
+        let mut instance = Instance::default();
+        let convert = TaskForConvert::default();
+        remove_loop_id(&mut instance, &convert).unwrap();
+    }
+
+    #[test]
+    fn no_id_context() {
+        let mut instance = Instance::default();
+        let mut convert = TaskForConvert::default();
+        convert.from.meta = "B:llxxbb:1".to_string();
+        convert.target.to = Meta::new("llxxbb", 1, MetaType::Business).unwrap();
+        remove_loop_id(&mut instance, &convert).unwrap();
+    }
+
+    #[test]
+    fn first_ver_no_other_para() {
+        let mut instance = Instance::default();
+        let mut convert = TaskForConvert::default();
+        convert.from.meta = "B:llxxbb:1".to_string();
+        convert.target.to = Meta::new("llxxbb", 1, MetaType::Business).unwrap();
+        convert.from.sys_context.insert(CONTEXT_LOOP_ID.to_string(), 1.to_string());
+        remove_loop_id(&mut instance, &convert).unwrap();
+    }
+
+    #[test]
+    fn first_ver_whit_other_para() {
+        let mut instance = Instance::default();
+        instance.para = "happy/work".to_string();
+        let mut convert = TaskForConvert::default();
+        convert.from.meta = "B:llxxbb:1".to_string();
+        convert.target.to = Meta::new("llxxbb", 1, MetaType::Business).unwrap();
+        convert.from.sys_context.insert(CONTEXT_LOOP_ID.to_string(), 1.to_string());
+        remove_loop_id(&mut instance, &convert).unwrap();
+        assert_eq!(instance.para, "happy/work")
+    }
+
+    #[test]
+    fn ver_10_para_err() {
+        let mut instance = Instance::default();
+        let mut convert = TaskForConvert::default();
+        convert.from.meta = "B:llxxbb:1".to_string();
+        convert.target.to = Meta::new("llxxbb", 1, MetaType::Business).unwrap();
+        convert.from.sys_context.insert(CONTEXT_LOOP_ID.to_string(), 10.to_string());
+        remove_loop_id(&mut instance, &convert).err().unwrap();
+    }
+
+    #[test]
+    fn ver_10_simple() {
+        let mut instance = Instance::default();
+        instance.para = "8".to_string();
+        let mut convert = TaskForConvert::default();
+        convert.from.meta = "B:llxxbb:1".to_string();
+        convert.target.to = Meta::new("llxxbb", 1, MetaType::Business).unwrap();
+        convert.from.sys_context.insert(CONTEXT_LOOP_ID.to_string(), 10.to_string());
+        remove_loop_id(&mut instance, &convert).unwrap();
+        assert_eq!(instance.para, "")
+    }
+
+    #[test]
+    fn ver_10_with_other_para() {
+        let mut instance = Instance::default();
+        instance.para = "happy/work/8".to_string();
+        let mut convert = TaskForConvert::default();
+        convert.from.meta = "B:llxxbb:1".to_string();
+        convert.target.to = Meta::new("llxxbb", 1, MetaType::Business).unwrap();
+        convert.from.sys_context.insert(CONTEXT_LOOP_ID.to_string(), 10.to_string());
+        remove_loop_id(&mut instance, &convert).unwrap();
+        assert_eq!(instance.para, "happy/work")
+    }
+}
+
+
+#[cfg(test)]
+mod add_loop_id_test {
     use super::*;
 
     #[test]

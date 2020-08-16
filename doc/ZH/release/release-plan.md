@@ -10,7 +10,9 @@
 - MetaSetting: add `output_last` property. only used by `MetaType::Loop`, output the instance only when loop finished. This requires the multi_meta has only one item.
 - add pre-filter-builtin: task-checker: make sure the certain tasks are all done before execute a `Executor`
 - add pre-filter-builtin: para_as_key: convert para part as content key and old content as value
-- builtin:merge support top
+- builtin-executor:merge 
+  - support top
+  - rename Setting.key.VecTuple to Setting.key.Content. 
 - bug fix: meta load verify error 
 - Optimize and bug fix: MetaType::Loop
 - bug fix: exchange the order of generate ID and Para
@@ -23,8 +25,7 @@
 
 ### 未完成
 
-- VecTube doc need repair
-- loop.id does not delivery between two instances
+- bug: loop should remove the loop.id from last output 
 
 - add pre-filter-builtin: para_as_key: convert para part as content key and old content as value
   - doc

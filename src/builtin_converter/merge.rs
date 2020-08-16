@@ -26,7 +26,7 @@ pub fn merge(input: &ConverterParameter) -> ConverterReturned {
             Ok(rtn) => rtn,
             Err(e) => return ConverterReturned::LogicalError(e.to_string())
         },
-        KeyType::VecTuple => match serde_json::from_str::<Vec<String>>(&input.from.content) {
+        KeyType::Content => match serde_json::from_str::<Vec<String>>(&input.from.content) {
             Ok(items) => {
                 let mut rtn: Vec<Item> = vec![];
                 for item in items {
@@ -209,8 +209,8 @@ struct Setting {
 enum KeyType {
     /// `Vec<u8>` which part of para you want to sum， it will become to the key of the item,
     Para(Vec<u8>),
-    /// The `Instance.content` will the json value of `Vec<Item>`
-    VecTuple,
+    /// The `Instance.content` will the json value of `Vec<"{\"key\",val}"}>`
+    Content,
     /// The `Instance.content` will the json value of `Vec<i64>`, no key needed
     None,
 }
@@ -499,7 +499,7 @@ mod content_tuple_test {
             last_state: None,
             task_id: "".to_string(),
             master: None,
-            cfg: r#"{"key":"VecTuple"}"#.to_string(),
+            cfg: r#"{"key":"Content"}"#.to_string(),
         };
         if let ConverterReturned::LogicalError(e) = merge(&input) {
             assert_eq!(e.contains("input format error"), true);
@@ -521,7 +521,7 @@ mod content_tuple_test {
             last_state: None,
             task_id: "".to_string(),
             master: None,
-            cfg: r#"{"key":"VecTuple"}"#.to_string(),
+            cfg: r#"{"key":"Content"}"#.to_string(),
         };
         let _ = if let ConverterReturned::Instances(rtn) = merge(&input) {
             let rtn = &rtn[0];
@@ -548,7 +548,7 @@ mod content_tuple_test {
             last_state: None,
             task_id: "".to_string(),
             master: None,
-            cfg: r#"{"key":"VecTuple"}"#.to_string(),
+            cfg: r#"{"key":"Content"}"#.to_string(),
         };
 
         // mode sum
@@ -561,7 +561,7 @@ mod content_tuple_test {
         };
 
         // mode old
-        input.cfg = r#"{"key":"VecTuple","when_same":"Old"}"#.to_string();
+        input.cfg = r#"{"key":"Content","when_same":"Old"}"#.to_string();
         let _ = if let ConverterReturned::Instances(rtn) = merge(&input) {
             let rtn = &rtn[0];
             assert_eq!(rtn.content, r#"{"a":112}"#);
@@ -571,7 +571,7 @@ mod content_tuple_test {
         };
 
         // mode New
-        input.cfg = r#"{"key":"VecTuple","when_same":"New"}"#.to_string();
+        input.cfg = r#"{"key":"Content","when_same":"New"}"#.to_string();
         let _ = if let ConverterReturned::Instances(rtn) = merge(&input) {
             let rtn = &rtn[0];
             assert_eq!(rtn.content, r#"{"a":100}"#);
@@ -581,7 +581,7 @@ mod content_tuple_test {
         };
 
         // mode Max
-        input.cfg = r#"{"key":"VecTuple","when_same":"Max"}"#.to_string();
+        input.cfg = r#"{"key":"Content","when_same":"Max"}"#.to_string();
         let _ = if let ConverterReturned::Instances(rtn) = merge(&input) {
             let rtn = &rtn[0];
             assert_eq!(rtn.content, r#"{"a":112}"#);
@@ -591,7 +591,7 @@ mod content_tuple_test {
         };
 
         // mode Min
-        input.cfg = r#"{"key":"VecTuple","when_same":"Min"}"#.to_string();
+        input.cfg = r#"{"key":"Content","when_same":"Min"}"#.to_string();
         let _ = if let ConverterReturned::Instances(rtn) = merge(&input) {
             let rtn = &rtn[0];
             assert_eq!(rtn.content, r#"{"a":100}"#);
