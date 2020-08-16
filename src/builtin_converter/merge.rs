@@ -708,3 +708,21 @@ mod content_none_key_test {
         };
     }
 }
+
+#[cfg(test)]
+mod config_test {
+    use super::*;
+
+    #[test]
+    #[ignore]
+    fn max_top() {
+        let setting = Setting {
+            key: Default::default(),
+            when_same: Default::default(),
+            sum_all: false,
+            top: TopMode::MaxTop(2),
+        };
+        let string = serde_json::to_string(&setting).unwrap();
+        dbg!(string);
+    }
+}
