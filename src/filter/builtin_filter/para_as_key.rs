@@ -26,7 +26,7 @@ impl FilterBefore for ParaAsKey {
         let (part, _) = get_para_and_key_from_para(&ins.para, &cfg.part)?;
 
         // construct result
-        if cfg.paint_content {
+        if cfg.plain {
             ins.content = format!("{{\"{}\":{}}}", part, ins.content);
         } else {
             ins.content = format!("{{\"{}\":\"{}\"}}", part, ins.content);
@@ -40,7 +40,7 @@ struct Setting {
     /// if false add "" around the content.
     #[serde(skip_serializing_if = "is_default")]
     #[serde(default)]
-    paint_content: bool,
+    plain: bool,
     /// where to get the part from the `Instance'para` which used to form a key for content
     part: Vec<u8>,
 }
@@ -111,3 +111,4 @@ mod test{
         assert_eq!(ins.content, r#"{"xx":happy"day"}"#)
     }
 }
+

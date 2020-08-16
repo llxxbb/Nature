@@ -236,3 +236,46 @@ mod setting_test {
         assert_eq!(NatureError::VerifyError("builtin-filter loader `settings` can't be empty".to_string()), err);
     }
 }
+
+#[cfg(test)]
+mod test_ignore {
+    use nature_db::RelationSettings;
+
+    use super::*;
+
+    #[derive(Serialize, Deserialize, Debug)]
+    struct ParaAsKeyTest {
+        /// if false add "" around the content.
+        #[serde(skip_serializing_if = "is_default")]
+        #[serde(default)]
+        plain: bool,
+        /// where to get the part from the `Instance'para` which used to form a key for content
+        part: Vec<u8>,
+    }
+
+    #[test]
+    #[ignore]
+    fn complex_config_test() {
+        // filter
+        let mut para_as_key = Executor::default();
+        let para_test = ParaAsKeyTest { plain: true, part: vec![2] };
+        para_as_key.settings = serde_json::to_string(&para_test).unwrap();
+
+        // loader
+        let mut loader = Executor::default();
+        let loader_setting = Setting {
+            key_gt: "".to_string(),
+            key_lt: "".to_string(),
+            page_size: 0,
+            time_part: None,
+            filters: vec![para_as_key],
+        };
+        loader.settings = serde_json::to_string(&loader_setting).unwrap();
+
+        // relation
+        let mut relation_settings = RelationSettings::default();
+        relation_settings.filter_before = vec![loader];
+        let result = serde_json::to_string(&relation_settings).unwrap();
+        dbg!(result);
+    }
+}

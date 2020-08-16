@@ -26,7 +26,7 @@ fn init_builtin() -> HashMap<String, Arc<dyn FilterBefore>> {
     let one = TaskCheckerFilter {};
     map.insert("task-checker".to_string(), Arc::new(one));
     let one = ParaAsKey {};
-    map.insert("para_go_content".to_string(), Arc::new(one));
+    map.insert("para_as_key".to_string(), Arc::new(one));
     map
 }
 
