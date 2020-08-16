@@ -105,6 +105,7 @@ fn fix_loop_id(ins: &mut Instance, task: &TaskForConvert) -> Result<()> {
             ins.para.to_string()
         };
         ins.para = append_para(&append, ver);
+        ins.sys_context.insert(CONTEXT_LOOP_ID.to_string(), ver.to_string());
     };
     Ok(())
 }

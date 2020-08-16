@@ -129,7 +129,7 @@
 
 生成示例的 ins_key 示例： B:sale/item/tag_second:1|0|1596207504/1596207505
 
-### instance-loader 前置过滤器
+### instance-loader 
 
 **作用**：依据给定的条件检索出一批 Instance，并提取出所以的 content 属性形成数组，并替换掉 执行器入参中的 from.content。
 

@@ -23,6 +23,9 @@
 
 ### 未完成
 
+- VecTube doc need repair
+- loop.id does not delivery between two instances
+
 - add pre-filter-builtin: para_as_key: convert para part as content key and old content as value
   - doc
   

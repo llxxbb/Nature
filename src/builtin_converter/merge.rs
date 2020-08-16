@@ -16,7 +16,6 @@ pub fn merge(input: &ConverterParameter) -> ConverterReturned {
         match serde_json::from_str::<Setting>(&input.cfg) {
             Ok(cfg) => cfg,
             Err(err) => {
-                warn!("error setting: {}", &input.cfg);
                 return ConverterReturned::LogicalError(err.to_string());
             }
         }
@@ -27,8 +26,22 @@ pub fn merge(input: &ConverterParameter) -> ConverterReturned {
             Ok(rtn) => rtn,
             Err(e) => return ConverterReturned::LogicalError(e.to_string())
         },
-        KeyType::VecTuple => match serde_json::from_str::<Vec<Item>>(&input.from.content) {
-            Ok(rtn) => rtn,
+        KeyType::VecTuple => match serde_json::from_str::<Vec<String>>(&input.from.content) {
+            Ok(items) => {
+                let mut rtn: Vec<Item> = vec![];
+                for item in items {
+                    match serde_json::from_str::<(String, i64)>(&item) {
+                        Ok(item) => {
+                            rtn.push(Item { key: item.0, value: item.1 })
+                        }
+                        Err(e) => {
+                            let msg = format!("input data is not an `Item` format! str: {}, err{}", item, e);
+                            return ConverterReturned::LogicalError(msg);
+                        }
+                    }
+                }
+                rtn
+            }
             Err(e) => {
                 let msg = format!("builtin-merge : input format error. {}", e);
                 warn!("{}, content: {}", msg, input.from.content);

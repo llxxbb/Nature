@@ -27,9 +27,9 @@ impl FilterBefore for ParaAsKey {
 
         // construct result
         if cfg.plain {
-            ins.content = format!("{{\"{}\":{}}}", part, ins.content);
+            ins.content = format!("[\"{}\",{}]", part, ins.content);
         } else {
-            ins.content = format!("{{\"{}\":\"{}\"}}", part, ins.content);
+            ins.content = format!("[\"{}\",\"{}\"]", part, ins.content);
         }
         Ok(())
     }
