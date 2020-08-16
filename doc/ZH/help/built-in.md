@@ -114,6 +114,44 @@
 
 ## 前置过滤器
 
+### para_as_key
+
+**作用**：将 Instance.para 的一部分作为 key, 将 Instant.content 作为 value 组成 [key, value] 形式替换掉原有的 Instance.content。
+
+**配置**：
+
+| 选项  | 说明                                               | 示例 | 缺省值 |
+| ----- | -------------------------------------------------- | ---- | ------ |
+| plain | 如果为 false 则 value 的值会放到""中去。           | true | false  |
+| part  | 取上游的 `Instance.para`中的哪几个部分作为输入时间 | [1]  |        |
+
+**示例**：
+
+Instance.para = "ll/xx/bb"
+
+Instance.content = 123
+
+如配置为
+
+```json
+{
+	"plain":true,
+	"part":[1]
+}
+```
+
+执行后， 则 Instance.content 变为： ["xx",123]
+
+如配置为
+
+```json
+{
+	"part":[0,2]
+}
+```
+
+执行后， 则 Instance.content 变为： ["ll/bb","123"]
+
 ### time_range
 
 **作用**：用于生成一个时间区间（单位：秒），并赋值给 `Instance.para` 属性。

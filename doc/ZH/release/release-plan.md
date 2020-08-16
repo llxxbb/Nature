@@ -5,19 +5,7 @@
 - 功能性先于非功能性需求
 - 应用情景支持，内部优先于外部（如网关）
 
-## Release 0.14
-
-- MetaSetting: add `output_last` property. only used by `MetaType::Loop`, output the instance only when loop finished. This requires the multi_meta has only one item.
-- add pre-filter-builtin: task-checker: make sure the certain tasks are all done before execute a `Executor`
-- add pre-filter-builtin: para_as_key: convert para part as content key and old content as value
-- builtin-executor:merge 
-  - support top
-  - rename Setting.key.VecTuple to Setting.key.Content. 
-- bug fix: meta load verify error 
-- Optimize and bug fix: MetaType::Loop
-- bug fix: exchange the order of generate ID and Para
-- Optimize: make builtin:loader setting.time_part optional
-- fix bug: retry is over the max times should move to `task_error` table
+## Release 0.15
 
 ### should commit
 
@@ -25,24 +13,9 @@
 
 ### 未完成
 
-- bug: loop should remove the loop.id from last output 
-
-- add pre-filter-builtin: para_as_key: convert para part as content key and old content as value
-  - doc
-  
-- verify loop : per-batch 2 records
-  - output_last : false
-  - can't start second loop
-
 - demo : sale-statistics
 
-- 修正，订单->区间统计任务
-    minute : consistent with second data 
-    - 将分钟数据转移到其他小节中去。
-
-- doc: instance-loader
-
-- concurrent task number limit 
+- concurrent tasks limit and monitor 
 - redo check busy first
 
 - 压测
