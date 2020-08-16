@@ -510,7 +510,9 @@ mod content_tuple_test {
 
     #[test]
     fn one() {
-        let data: Vec<(String, u64)> = vec![("a".to_string(), 112)];
+        let data: Vec<String> = vec![
+            r#"["a", 112]"#.to_string(),
+        ];
         let data = serde_json::to_string(&data).unwrap();
         let input = ConverterParameter {
             from: {
@@ -534,9 +536,9 @@ mod content_tuple_test {
 
     #[test]
     fn mode() {
-        let data: Vec<(String, u64)> = vec![
-            ("a".to_string(), 112),
-            ("a".to_string(), 100),
+        let data: Vec<String> = vec![
+            r#"["a", 112]"#.to_string(),
+            r#"["a", 100]"#.to_string(),
         ];
         let data = serde_json::to_string(&data).unwrap();
         let mut input = ConverterParameter {

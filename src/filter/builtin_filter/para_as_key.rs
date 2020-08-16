@@ -79,7 +79,7 @@ mod test{
         let mut ins  = Instance::default();
         ins.para="ll/xx/bb".to_string();
         svc.filter(&mut ins, r#"{"part":[1]}"#).await.unwrap();
-        assert_eq!(ins.content, r#"{"xx":""}"#)
+        assert_eq!(ins.content, r#"["xx",""]"#)
     }
 
     #[tokio::test]
@@ -89,7 +89,7 @@ mod test{
         ins.content = "happy".to_string();
         ins.para="ll/xx/bb".to_string();
         svc.filter(&mut ins, r#"{"part":[1]}"#).await.unwrap();
-        assert_eq!(ins.content, r#"{"xx":"happy"}"#)
+        assert_eq!(ins.content, r#"["xx","happy"]"#)
     }
 
     #[tokio::test]
@@ -97,8 +97,8 @@ mod test{
         let svc = ParaAsKey {};
         let mut ins  = Instance::default();
         ins.para="ll/xx/bb".to_string();
-        svc.filter(&mut ins, r#"{"part":[1],"paint_content":true}"#).await.unwrap();
-        assert_eq!(ins.content, r#"{"xx":}"#)
+        svc.filter(&mut ins, r#"{"part":[1],"plain":true}"#).await.unwrap();
+        assert_eq!(ins.content, r#"["xx",]"#)
     }
 
     #[tokio::test]
@@ -107,8 +107,8 @@ mod test{
         let mut ins  = Instance::default();
         ins.content = "happy\"day\"".to_string();
         ins.para="ll/xx/bb".to_string();
-        svc.filter(&mut ins, r#"{"part":[1],"paint_content":true}"#).await.unwrap();
-        assert_eq!(ins.content, r#"{"xx":happy"day"}"#)
+        svc.filter(&mut ins, r#"{"part":[1],"plain":true}"#).await.unwrap();
+        assert_eq!(ins.content, r#"["xx",happy"day"]"#)
     }
 }
 
