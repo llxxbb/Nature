@@ -46,18 +46,18 @@ fn meta_loop(task: &TaskForConvert, rtn: &mut Converted) -> Result<()> {
             Some(set) => set,
             None => {
                 let mut set = MetaSetting::default();
-                set.output_last = false;
+                set.only_one = false;
                 set
             }
         };
         if let Some(_) = task.from.sys_context.get(CONTEXT_LOOP_FINISHED) {
             // finished need do nothing
-            if rtn.converted.len() == 1 && setting.output_last {
+            if rtn.converted.len() == 1 && setting.only_one {
                 remove_loop_id(&mut rtn.converted[0], task)?;
             }
             return Ok(());
         }
-        if rtn.converted.len() == 1 && setting.output_last {
+        if rtn.converted.len() == 1 && setting.only_one {
             // use MetaType::Loop replace the real one
             rtn.converted[0].meta = task.target.to.meta_string();
             gen_instance_for_loop(&mut rtn.converted[0], task)?;

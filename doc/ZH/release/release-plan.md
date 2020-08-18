@@ -5,7 +5,9 @@
 - 功能性先于非功能性需求
 - 应用情景支持，内部优先于外部（如网关）
 
-## Release 0.15
+## Release 0.14.1
+
+- rename MetaSetting.output_last to MetaSetting.only_one
 
 ### should commit
 
@@ -13,7 +15,11 @@
 
 ### 未完成
 
+
 - demo : sale-statistics
+
+- 极简编程
+  - 融合这么多特性，最终目的就是简化编程。
 
 - concurrent tasks limit and monitor 
 - redo check busy first
@@ -37,7 +43,7 @@
 
 
 - 自路由：对`执行器`返回的自路由进行支持。
-- ID 生成器 snowflake for 128 bit implement.
+- ID 生成器 snowflake for 128 bits implement.
 - builtin-executor sum :
   - for stream sum
 

@@ -215,7 +215,7 @@ Nature 在与`执行器`通信或者进行自身调度时会自动捕捉`Environ
 
 假设我们要统计一下一个火爆的电商网站的单品销售 top, 每次统计可能涉及到千万数据，传统的基于 sql 的统计已经不太现实。对于这个问题 Nature 提供了一套自己的解决方案。Nature 提供了一个专有的 `MetaType::Loop` ，Loop 可以**驱动**一次处理一批数据。有两种处理模式：
 
-- MetaSetting.output_last = false
+- MetaSetting.only_one = false
 
 ```
 Upstream -> Loop + downstream
@@ -224,7 +224,7 @@ Loop -> Loop + downstream
 Loop -> downstream
 ```
 
-- MetaSetting.output_last = true
+- MetaSetting.only_one = true
 
 ```
 Upstream -> Loop
@@ -233,7 +233,7 @@ Loop -> Loop
 Loop -> downstream
 ```
 
-**注意**：对于 `MetaType::Loop` 来讲 `MetaSetting.output_last`如果设置为 true, Nature 会将要输出的 Instance 视为有状态的，只有这样才能实现结果的叠加，才能完成形如 input + old = new 这种形式的数据处理。但你不能把`MetaType::Loop` 的目标 Meta 设置为有状态的！因为从 Nature 外部来看我们只要一个最终结果而不是中间结果，如果置为状态数据会让人感觉到非常奇怪。为了实现这种效果，Nature会把中间结果作为 last_state 数据并带到下一个批次里处理直到完成为止。
+**注意**：对于 `MetaType::Loop` 来讲 `MetaSetting.only_one`如果设置为 true, Nature 会将要输出的 Instance 视为有状态的，只有这样才能实现结果的叠加，才能完成形如 input + old = new 这种形式的数据处理。但你不能把`MetaType::Loop` 的目标 Meta 设置为有状态的！因为从 Nature 外部来看我们只要一个最终结果而不是中间结果，如果置为状态数据会让人感觉到非常奇怪。为了实现这种效果，Nature会把中间结果作为 last_state 数据并带到下一个批次里处理直到完成为止。
 
 批量的控制则来源于 Nature 的一个[内置执行器](built-in.md)：`instance-loader` 后面有这样的示例，请参考：[示例及功能讲解](https://github.com/llxxbb/Nature-Demo)。
 
