@@ -7,7 +7,7 @@
 
 ## Release 0.14.1
 
-- rename MetaSetting.output_last to MetaSetting.only_one
+- rename MetaSetting.output_last to MetaSetting.only_one and fix bug around
 - optimize: builtin-task_checker include update time check
 
 ### should commit
@@ -15,7 +15,6 @@
 
 ### 未完成
 
-- bug : only_one set to false
 - demo : sale-statistics
 
 

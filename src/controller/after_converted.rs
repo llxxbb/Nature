@@ -65,6 +65,7 @@ fn meta_loop(task: &TaskForConvert, rtn: &mut Converted) -> Result<()> {
             // append a MetaType::Loop instance
             let mut ins = Instance::default();
             ins.meta = task.target.to.meta_string();
+            ins.para = task.from.para.clone();
             gen_instance_for_loop(&mut ins, task)?;
             rtn.converted.push(ins);
         }
