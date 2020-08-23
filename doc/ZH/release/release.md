@@ -1,6 +1,11 @@
 
 # 发布的功能
 
+## Release 0.14.1
+
+- rename MetaSetting.output_last to MetaSetting.only_one and fix bug around
+- optimize: builtin-task_checker include update time check
+
 ## Release 0.14 2020-08-16
 
 - MetaSetting: add `output_last` property. only used by `MetaType::Loop`, output the instance only when loop finished. This requires the multi_meta has only one item.

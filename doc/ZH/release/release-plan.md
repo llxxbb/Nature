@@ -5,10 +5,8 @@
 - 功能性先于非功能性需求
 - 应用情景支持，内部优先于外部（如网关）
 
-## Release 0.14.1
+## Release 0.14.2
 
-- rename MetaSetting.output_last to MetaSetting.only_one and fix bug around
-- optimize: builtin-task_checker include update time check
 
 ### should commit
 
