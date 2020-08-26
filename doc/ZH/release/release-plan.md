@@ -9,6 +9,7 @@
 
 - user can custom log level
 - optimize: normalize meta property for inputted instances
+- optimize: message for the database when it is unready
 - bug: generated state-instance create_time does not set
 
 ### should commit
