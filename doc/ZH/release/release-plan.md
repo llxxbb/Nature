@@ -7,14 +7,19 @@
 
 ## Release 0.14.2
 
+- optimize: normalize meta property for inputted instances
 
 ### should commit
 
 
 ### 未完成
 
-- demo : sale-statistics
+- bug: auto generated instance create_time does not set
 
+- user can custom log level, web log level
+
+- 数据库
+{"Err":{"EnvironmentError":"Input/output error: 由于目标计算机积极拒绝，无法连接。 (os error 10061)"}}
 
 - 极简编程
   - 融合这么多特性，最终目的就是简化编程。

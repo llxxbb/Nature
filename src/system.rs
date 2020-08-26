@@ -14,6 +14,7 @@ use nature_db::{InstanceDaoImpl, KeyRange};
 
 use crate::channels::start_receive_threads;
 use crate::web::actix::*;
+// use actix_web::middleware::Logger;
 
 lazy_static! {
     pub static ref INS_KEY_GT : Arc<dyn KeyRange> = Arc::new(InstanceDaoImpl{});
@@ -35,9 +36,12 @@ lazy_static! {
 
 pub async fn sys_init() -> std::io::Result<()> {
     dotenv().ok();
+    // std::env::set_var("RUST_LOG", "actix_web=info");
     let _ = setup_logger();
     let _ = start_receive_threads();
-    HttpServer::new(|| App::new().configure(web_config))
+    HttpServer::new(|| App::new()
+        // .wrap(Logger::default())
+        .configure(web_config))
         .bind("127.0.0.1:".to_owned() + &SERVER_PORT).unwrap()
         .run().await
 }

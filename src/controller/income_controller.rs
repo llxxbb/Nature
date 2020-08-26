@@ -125,6 +125,8 @@ async fn get_task_and_last(task: &RawTask) -> Result<(TaskForConvert, Option<Ins
 
 async fn check_and_revise(instance: &mut Instance) -> Result<&mut Instance> {
     let meta: Meta = C_M.get(&instance.meta, &*D_M).await?;    // verify meta
+    // normalize meta
+    instance.meta = meta.meta_string();
     // check previous state version
     let version = instance.state_version;
     if meta.is_state() && version > 1 {

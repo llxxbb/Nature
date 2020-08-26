@@ -49,8 +49,27 @@ async fn get_by_key_range(para: Json<KeyCondition>) -> HttpResponse {
     return_result(x)
 }
 
+#[derive(Serialize, Deserialize)]
+struct MyStruct {
+    name: String
+}
+
+// /// fuzzy query
+// async fn hello(para: Json<MyStruct>) -> impl Responder {
+//     format!("Hello {}!", para.name)
+// }
+//
+//
+// #[get("/{id}/{name}/index.html")]
+// async fn index(path: Path<(u32, String)>) -> impl Responder {
+//     format!("Hello {}! id:{}", path.1, path.0)
+// }
+
+
 pub fn web_config(cfg: &mut web::ServiceConfig) {
     cfg
+        // .service(index)
+        // .route("/hello", web::post().to(hello))
         .route("/input", web::post().to(input))
         .route("/self_route", web::post().to(self_route))
         .route("/callback", web::post().to(callback))
