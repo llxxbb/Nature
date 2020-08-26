@@ -8,15 +8,16 @@
 ## Release 0.14.2
 
 - optimize: normalize meta property for inputted instances
+- bug: generated state-instance create_time does not set
 
 ### should commit
 
 
 ### 未完成
 
-- bug: auto generated instance create_time does not set
+- user can custom log level
 
-- user can custom log level, web log level
+- make shell version of demo
 
 - 数据库
 {"Err":{"EnvironmentError":"Input/output error: 由于目标计算机积极拒绝，无法连接。 (os error 10061)"}}

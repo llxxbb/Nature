@@ -1,3 +1,5 @@
+use chrono::Local;
+
 use nature_common::{append_para, CONTEXT_DYNAMIC_PARA, CONTEXT_TARGET_INSTANCE_ID, CONTEXT_TARGET_INSTANCE_PARA, FromInstance, get_para_and_key_from_para, Instance, Meta, MetaType, NatureError, Result};
 use nature_db::{Mission, RawTask};
 
@@ -100,6 +102,8 @@ fn check_id(ins: &mut Vec<Instance>, from: &FromInstance, target: &Mission) -> R
         }
         if ins[0].id == 0 && ins[0].para.is_empty() {
             ins[0].revise()?;
+        } else {
+            ins[0].create_time = Local::now().timestamp_millis();
         }
         // set sys_context
         if !target.target_demand.context_name.is_empty() {
