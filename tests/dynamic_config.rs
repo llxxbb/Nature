@@ -37,9 +37,9 @@ fn convert_is_empty() {
 }
 
 
-fn query(instance: SelfRouteInstance) -> u128 {
+fn query(instance: SelfRouteInstance) -> ID {
     let req = WEB_CLIENT.post("http://localhost:8080/self_route").json(&instance).send().unwrap();
-    let rtn = req.json::<Result<u128>>();
+    let rtn = req.json::<Result<ID>>();
     let rtn = rtn.unwrap().unwrap();
     rtn
 }
@@ -84,10 +84,10 @@ fn target_is_null() {
     };
     sleep(4000);
     let rtn = query(instance);
-    assert_eq!(rtn, 331801733395679954677043458405181585943);
+    assert_eq!(rtn, 12);
     // check input
     let written = Runtime::new().unwrap().block_on(InstanceDaoImpl::get_by_id(KeyCondition {
-        id: format!("{:x}", 331801733395679954677043458405181585943 as u128),
+        id: format!("{:x}", 3 as ID),
         meta: "/D/dynamic/target/is/null:1".to_string(),
         key_gt: "".to_string(),
         key_ge: "".to_string(),
@@ -119,12 +119,12 @@ fn write_one_target_to_db() {
     };
     sleep(5000);
     let rtn = query(instance);
-    assert_eq!(rtn, 134864226241881275556374404860687412363);
+    assert_eq!(rtn, 12);
 
     // query target
     sleep(3000);
     let ins_db = Runtime::new().unwrap().block_on(InstanceDaoImpl::get_by_id(KeyCondition {
-        id: format!("{:x}", 303195405634045585338298858306929603801 as u128),
+        id: format!("{:x}", 31 as ID),
         meta: "/D/dynamic/one_target:1".to_string(),
         key_gt: "".to_string(),
         key_ge: "".to_string(),
@@ -164,12 +164,12 @@ fn write_two_target_to_db() {
     sleep(5000);
 
     let rtn = query(instance);
-    assert_eq!(rtn, 226523548363893646026242274612477165645);
+    assert_eq!(rtn, 123);
 
     // query target
     sleep(2500);
     let ins_db = Runtime::new().unwrap().block_on(InstanceDaoImpl::get_by_id(KeyCondition {
-        id: format!("{:x}", 251184288685302246237493378684975241377 as u128),
+        id: format!("{:x}", 12 as ID),
         meta: "/D/dynamic/two_of_1:1".to_string(),
         key_gt: "".to_string(),
         key_ge: "".to_string(),
@@ -183,7 +183,7 @@ fn write_two_target_to_db() {
     })).unwrap().unwrap();
     assert_eq!("/D/dynamic/two_of_1:1", ins_db.meta);
     let ins_db = Runtime::new().unwrap().block_on(InstanceDaoImpl::get_by_id(KeyCondition {
-        id: format!("{:x}", 280748872477529468003584044421765998976 as u128),
+        id: format!("{:x}", 12 as ID),
         meta: "/D/dynamic/two_of_2:1".to_string(),
         key_gt: "".to_string(),
         key_ge: "".to_string(),

@@ -2,6 +2,11 @@
 
 English|[中文](README.md)
 
+Nature is a **minimalist programming** platform. It is net-based, so it can be used in a variety of network languages. Nature simplifies your coding in the following ways:
+
+- Nature provides a **unified data storage model and ultimate data consistency assurance**. Nature's database model can be used in many business scenarios without additional database design and code support for database logic.
+- Nature provides **configuration-based process control**. Code can basically not consider process control, time scheduling, failure retry and other questions.
+
 Nature is an innovative product that draws on messaging systems, BPMN, Workflow, FaaS and databases to integrate some of the ideas.
 
 Nature is an open source solution for building a new class of applications based on **data-driven**, **business-oriented**, and **decentralized**. **Nature organically integrates system architecture and business architecture together**,  to bridge the gap between the two and enable the system to better serve the business.
@@ -40,13 +45,13 @@ In a traditional development approach, business objects are defined by code. In 
 - The target has **strong control ability **. The identity of the code changes from definer to follower, there is no longer a constraining capital on the target, and the target has the ability to truly control rather than guiding the code. And need not worry about being kidnapped by code.
 - Refinement work and business changes should just care about the business dimensions, **technical iterations will become meaningless**.
 
-### Take away code control over business processes and reduce the complexity of business systems.
+### Take away the control of the code over business processes and reduce the complexity of business systems.
 
 Traditional business systems are complex when they grow large. Whether it's technical or business, there's a lot of logic woven together like a jumble of interlocking threads. But Nature split it into three parts: the technical part is Nature's responsibility as much as possible, and the functional implementation of Leave it to the developers and leave the most important part, process control, to the business managers, this part is configurable and can be easily controlled, without programming. This would simplify and organize a complex system.
 
 
 
-翻译到：
+Sorry! for unfinished translation：
 
 剥夺代码对业务流程的控制权，降低业务系统的复杂度。
 

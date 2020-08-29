@@ -1,6 +1,5 @@
 //! World Connection Service provider
 extern crate dotenv;
-extern crate uuid;
 
 use std::env;
 use std::sync::Arc;
@@ -14,6 +13,7 @@ use nature_db::{InstanceDaoImpl, KeyRange};
 
 use crate::channels::start_receive_threads;
 use crate::web::actix::*;
+
 // use actix_web::middleware::Logger;
 
 lazy_static! {

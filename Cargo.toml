@@ -16,10 +16,9 @@ serde_json = { version = "1.0", features = ["raw_value"] }
 serde = "1.0"
 serde_derive = "1.0"
 lazy_static = "1.4"
-uuid = { version = "0.8", features = ["v3"] }
 lru_time_cache = "0.10"
 futures = "0.3"
-async-trait="0.1"
+async-trait = "0.1"
 itertools = "0.9.0"
 
 # for local executor implement
@@ -34,22 +33,22 @@ fern = "0.6"        # Simple, efficient logging
 dotenv = "0.15"
 
 # web
-reqwest = { version = "0.10", features = ["blocking","json"] }
+reqwest = { version = "0.10", features = ["blocking", "json"] }
 actix-web = "2.0"
 actix-rt = "1.0"
 tokio = { version = "0.2", features = ["full"] }
 
 # self project group
-nature_common = {path = "../Nature-Common", version = "0.14.1"}
-nature_db = {path = "../Nature-DB", features = ["mysql"], version = "0.14.1"}
+nature_common = { path = "../Nature-Common", version = "0.14.1" }
+nature_db = { path = "../Nature-DB", version = "0.14.1" }
 
 [workspace]
 members = ["../Nature-Common",
-"../Nature-DB",
-"../Nature-Retry",
-"../Nature-Integrate-Test-Executor",
-"../Nature-Demo",
-"../Nature-Demo-Common",
-"../Nature-Demo-Executor",
-"../Nature-Demo-Executor-Restful",
+    "../Nature-DB",
+    "../Nature-Retry",
+    "../Nature-Integrate-Test-Executor",
+    "../Nature-Demo",
+    "../Nature-Demo-Common",
+    "../Nature-Demo-Executor",
+    "../Nature-Demo-Executor-Restful",
 ]

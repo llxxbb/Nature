@@ -1,6 +1,6 @@
 use std::convert::TryFrom;
 
-use nature_common::{ConverterReturned, DelayedInstances, generate_id, Instance, KeyCondition, Meta, MetaType, NatureError, Result, SelfRouteInstance};
+use nature_common::{ConverterReturned, DelayedInstances, generate_id, ID, Instance, KeyCondition, Meta, MetaType, NatureError, Result, SelfRouteInstance};
 use nature_db::{C_M, C_R, D_M, D_R, D_T, InstanceDaoImpl, MetaCache, Mission, RawTask, RelationCache, TaskDao, TaskType};
 use nature_db::flow_tool::{context_check, state_check};
 
@@ -12,7 +12,7 @@ pub struct IncomeController {}
 
 impl IncomeController {
     /// born an instance which is the beginning of the changes.
-    pub async fn input(mut instance: Instance) -> Result<u128> {
+    pub async fn input(mut instance: Instance) -> Result<ID> {
         let _ = check_and_revise(&mut instance).await?;
         let relations = C_R.get(&instance.meta, &*D_R, &*C_M, &*D_M).await?;
         let mission = Mission::get_by_instance(&instance, &relations, context_check, state_check);
@@ -30,7 +30,7 @@ impl IncomeController {
 
 
     /// born an instance which is the beginning of the changes.
-    pub async fn self_route(instance: SelfRouteInstance) -> Result<u128> {
+    pub async fn self_route(instance: SelfRouteInstance) -> Result<ID> {
         let _ = instance.verify()?;
         // Convert a Self-Route-Instance to Normal Instance
         let mut ins = instance.to_instance();

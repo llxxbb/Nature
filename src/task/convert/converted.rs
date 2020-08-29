@@ -1,6 +1,6 @@
 use chrono::Local;
 
-use nature_common::{append_para, CONTEXT_DYNAMIC_PARA, CONTEXT_TARGET_INSTANCE_ID, CONTEXT_TARGET_INSTANCE_PARA, FromInstance, get_para_and_key_from_para, Instance, Meta, MetaType, NatureError, Result};
+use nature_common::{append_para, CONTEXT_DYNAMIC_PARA, CONTEXT_TARGET_INSTANCE_ID, CONTEXT_TARGET_INSTANCE_PARA, FromInstance, get_para_and_key_from_para, id_from_hex_str, Instance, Meta, MetaType, NatureError, Result};
 use nature_db::{Mission, RawTask};
 
 use crate::task::{CachedKey, TaskForConvert};
@@ -89,13 +89,7 @@ fn check_id(ins: &mut Vec<Instance>, from: &FromInstance, target: &Mission) -> R
     // handle state-instance, the id and para had put to the sys_context before convert
     if target.to.is_state() {
         if let Some(id) = target.sys_context.get(CONTEXT_TARGET_INSTANCE_ID) {
-            ins[0].id = match u128::from_str_radix(id, 16) {
-                Ok(rtn) => rtn,
-                Err(e) => {
-                    let msg = format!("sys_context.{}, {} can'nt convert to u128, err:{}", CONTEXT_TARGET_INSTANCE_ID, id, e);
-                    return Err(NatureError::VerifyError(msg));
-                }
-            }
+            ins[0].id = id_from_hex_str(id)?;
         }
         if let Some(para) = target.sys_context.get(CONTEXT_TARGET_INSTANCE_PARA) {
             ins[0].para = para.to_string();

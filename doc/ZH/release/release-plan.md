@@ -5,8 +5,8 @@
 - 功能性先于非功能性需求
 - 应用情景支持，内部优先于外部（如网关）
 
-## Release 0.14.2
-
+## Release 0.15.0
+- id64 support: use u64 as generated id
 - user can custom log level
 - optimize: normalize meta property for inputted instances
 - optimize: message for the database when it is unready
@@ -18,9 +18,6 @@
 ### 未完成
 
 
-- 数据库
-{"Err":{"EnvironmentError":"Input/output error: 由于目标计算机积极拒绝，无法连接。 (os error 10061)"}}
-- user can config username and password for db
 
 - make shell version of demo
 
