@@ -5,25 +5,17 @@
 - 功能性先于非功能性需求
 - 应用情景支持，内部优先于外部（如网关）
 
-## Release 0.15.0
-- id64 support: use u64 as generated id
-- user can custom log level
-- optimize: normalize meta property for inputted instances
-- optimize: message for the database when it is unready
-- bug: generated state-instance create_time does not set
+## Release 0.16.0
 
 ### should commit
 
 
 ### 未完成
 
-
+- merge nature, common, db, retry together
+- merge demo, demo-common, demo-executor, demo-executor-restful together.
 
 - make shell version of demo
-
-
-- 极简编程
-  - 融合这么多特性，最终目的就是简化编程。
 
 - concurrent tasks limit and monitor 
 - redo check busy first

@@ -1,6 +1,14 @@
 
 # 发布的功能
 
+## Release 0.15.0
+
+- id64 support: use u64 as generated id
+- user can custom log level
+- optimize: normalize meta property for inputted instances
+- optimize: message for the database when it is unready
+- bug: generated state-instance create_time does not set
+
 ## Release 0.14.1
 
 - rename MetaSetting.output_last to MetaSetting.only_one and fix bug around
