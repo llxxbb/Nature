@@ -1,7 +1,7 @@
 use serde::Deserialize;
 use serde_json::value::RawValue;
 
-use nature_common::{ConverterParameter, ConverterReturned, default_para_separator, Instance, is_default_para_separator, SEPARATOR_INS_PARA};
+use crate::common::{ConverterParameter, ConverterReturned, default_para_separator, Instance, is_default_para_separator, SEPARATOR_INS_PARA};
 
 /// Setting is a json, include the following properties:
 /// each you defined dimensions will be output as `Instance.para`

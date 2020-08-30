@@ -1,8 +1,7 @@
 use chrono::Local;
 
-use nature_common::{append_para, CONTEXT_DYNAMIC_PARA, CONTEXT_TARGET_INSTANCE_ID, CONTEXT_TARGET_INSTANCE_PARA, FromInstance, get_para_and_key_from_para, id_from_hex_str, Instance, Meta, MetaType, NatureError, Result};
-use nature_db::{Mission, RawTask};
-
+use crate::common::{append_para, CONTEXT_DYNAMIC_PARA, CONTEXT_TARGET_INSTANCE_ID, CONTEXT_TARGET_INSTANCE_PARA, FromInstance, get_para_and_key_from_para, id_from_hex_str, Instance, Meta, MetaType, NatureError, Result};
+use crate::db::{Mission, RawTask};
 use crate::task::{CachedKey, TaskForConvert};
 
 pub struct Converted {
@@ -235,9 +234,8 @@ mod sys_context_test {
 mod test {
     use chrono::Local;
 
-    use nature_common::{Meta, MetaType, State, TargetState};
-    use nature_db::Mission;
-    use nature_db::relation_target::RelationTarget;
+    use crate::common::{Meta, MetaType, State, TargetState};
+    use crate::db::relation_target::RelationTarget;
 
     use super::*;
 
@@ -326,7 +324,7 @@ mod test {
 
 #[cfg(test)]
 mod check_id_for_state {
-    use nature_common::{Meta, MetaSetting, MetaType};
+    use crate::common::{Meta, MetaSetting, MetaType};
 
     use super::*;
 
@@ -391,7 +389,7 @@ mod check_id_for_state {
 
 #[cfg(test)]
 mod check_id_for_normal {
-    use nature_common::{Meta, MetaSetting, MetaType};
+    use crate::common::{Meta, MetaSetting, MetaType};
 
     use super::*;
 

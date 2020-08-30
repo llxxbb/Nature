@@ -3,8 +3,7 @@ use std::str::FromStr;
 
 use itertools::Itertools;
 
-use nature_common::{ConverterParameter, ConverterReturned, get_para_and_key_from_para, Instance, is_default, NatureError};
-use nature_common::Result;
+use crate::common::{ConverterParameter, ConverterReturned, get_para_and_key_from_para, Instance, is_default, NatureError, Result};
 
 /// items can't be repeated
 /// detail always save due to recognize the repeated item.

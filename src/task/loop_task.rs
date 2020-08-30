@@ -1,5 +1,5 @@
-use nature_common::{CONTEXT_LOOP_TASK, Instance, MetaType, NatureError, Result};
-use nature_db::{MetaCache, MetaDao, Mission, MissionRaw};
+use crate::common::{CONTEXT_LOOP_TASK, Instance, MetaType, NatureError, Result};
+use crate::db::{MetaCache, MetaDao, Mission, MissionRaw};
 
 pub async fn gen_loop_mission<MC, M>(ins: &Instance, mc_g: &MC, m_g: &M) -> Result<Vec<Mission>>
     where MC: MetaCache, M: MetaDao

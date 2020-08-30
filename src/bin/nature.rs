@@ -1,5 +1,3 @@
-extern crate nature;
-
 use nature::system::sys_init;
 
 #[actix_rt::main]

@@ -1,8 +1,6 @@
 #[macro_use]
 extern crate lazy_static;
 extern crate nature;
-extern crate nature_common;
-extern crate nature_db;
 
 use std::collections::{HashMap, HashSet};
 use std::env;
@@ -11,11 +9,9 @@ use futures::executor::block_on;
 use reqwest::blocking::Client;
 use tokio::runtime::Runtime;
 
+use nature::common::*;
 use nature::controller::IncomeController;
-use nature_common::*;
-use nature_db::InstanceDaoImpl;
-
-use crate::common::{CONN_STR, sleep, test_init};
+use nature::db::{CONN_STR, InstanceDaoImpl};
 
 pub mod common;
 
@@ -70,7 +66,7 @@ pub fn new_with_type(key: &str, meta: MetaType) -> Result<Instance> {
 // #[test]
 #[allow(dead_code)]
 fn target_is_null() {
-    test_init();
+    common::test_init();
     // prepare input para
     let instance = new_with_type("/dynamic/target/is/null", MetaType::Dynamic).unwrap();
     let instance = SelfRouteInstance {
@@ -82,7 +78,7 @@ fn target_is_null() {
             delay: 0,
         }],
     };
-    sleep(4000);
+    common::sleep(4000);
     let rtn = query(instance);
     assert_eq!(rtn, 12);
     // check input
@@ -105,7 +101,7 @@ fn target_is_null() {
 // #[test]
 #[allow(dead_code)]
 fn write_one_target_to_db() {
-    test_init();
+    common::test_init();
     // prepare input para
     let instance = new_with_type("/dynamic/write/one", MetaType::Dynamic).unwrap();
     let instance = SelfRouteInstance {
@@ -117,12 +113,12 @@ fn write_one_target_to_db() {
             delay: 0,
         }],
     };
-    sleep(5000);
+    common::sleep(5000);
     let rtn = query(instance);
     assert_eq!(rtn, 12);
 
     // query target
-    sleep(3000);
+    common::sleep(3000);
     let ins_db = Runtime::new().unwrap().block_on(InstanceDaoImpl::get_by_id(KeyCondition {
         id: format!("{:x}", 31 as ID),
         meta: "/D/dynamic/one_target:1".to_string(),
@@ -142,7 +138,7 @@ fn write_one_target_to_db() {
 // #[test]
 #[allow(dead_code)]
 fn write_two_target_to_db() {
-    test_init();
+    common::test_init();
     // prepare input para
     let instance = new_with_type("/dynamic/write/two", MetaType::Dynamic).unwrap();
     let instance = SelfRouteInstance {
@@ -161,13 +157,13 @@ fn write_two_target_to_db() {
                 delay: 0,
             }],
     };
-    sleep(5000);
+    common::sleep(5000);
 
     let rtn = query(instance);
     assert_eq!(rtn, 123);
 
     // query target
-    sleep(2500);
+    common::sleep(2500);
     let ins_db = Runtime::new().unwrap().block_on(InstanceDaoImpl::get_by_id(KeyCondition {
         id: format!("{:x}", 12 as ID),
         meta: "/D/dynamic/two_of_1:1".to_string(),

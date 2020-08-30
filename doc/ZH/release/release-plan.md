@@ -7,12 +7,13 @@
 
 ## Release 0.16.0
 
+- merge nature, common, db and retry projects together
+
 ### should commit
 
 
 ### 未完成
 
-- merge nature, common, db, retry together
 - merge demo, demo-common, demo-executor, demo-executor-restful together.
 
 - make shell version of demo

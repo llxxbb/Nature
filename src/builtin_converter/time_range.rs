@@ -3,7 +3,7 @@ use std::str::FromStr;
 
 use chrono::{Date, Datelike, Duration, Local, NaiveDate, NaiveDateTime, TimeZone};
 
-use nature_common::{ConverterParameter, ConverterReturned, get_para_and_key_from_para, Instance, is_default, NatureError, Result, SEPARATOR_INS_PARA};
+use crate::common::{ConverterParameter, ConverterReturned, get_para_and_key_from_para, Instance, is_default, NatureError, Result, SEPARATOR_INS_PARA};
 
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
 struct Setting {

@@ -1,9 +1,8 @@
 use std::str::FromStr;
 use std::sync::Arc;
 
-use nature_common::{CONTEXT_LOOP_FINISHED, CONTEXT_LOOP_ID, CONTEXT_LOOP_NEXT, Executor, get_para_part, Instance, is_default, KeyCondition, NatureError, Result};
-use nature_db::KeyRange;
-
+use crate::common::{CONTEXT_LOOP_FINISHED, CONTEXT_LOOP_ID, CONTEXT_LOOP_NEXT, Executor, get_para_part, Instance, is_default, KeyCondition, NatureError, Result};
+use crate::db::KeyRange;
 use crate::filter::builtin_filter::FilterBefore;
 use crate::filter::filter_before;
 
@@ -98,7 +97,7 @@ struct Setting {
     #[serde(skip_serializing_if = "is_100")]
     #[serde(default = "default_100")]
     page_size: u16,
-    /// where to get the time range from the `Instance'para` which used to load data from Instance table
+    /// where to get the time range from the `Instance.para` which used to load data from Instance table
     /// it only accept two element, one for Begin Time and the other for End Time
     time_part: Option<Vec<u8>>,
     /// correct the format of the data loaded.
@@ -239,7 +238,7 @@ mod setting_test {
 
 #[cfg(test)]
 mod test_ignore {
-    use nature_db::RelationSettings;
+    use crate::db::RelationSettings;
 
     use super::*;
 
@@ -249,7 +248,7 @@ mod test_ignore {
         #[serde(skip_serializing_if = "is_default")]
         #[serde(default)]
         plain: bool,
-        /// where to get the part from the `Instance'para` which used to form a key for content
+        /// where to get the part from the `Instance.para` which used to form a key for content
         part: Vec<u8>,
     }
 

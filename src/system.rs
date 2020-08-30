@@ -8,10 +8,9 @@ use std::thread::JoinHandle;
 use actix_web::{App, HttpServer};
 use dotenv::dotenv;
 
-use nature_common::setup_logger;
-use nature_db::{InstanceDaoImpl, KeyRange};
-
 use crate::channels::start_receive_threads;
+use crate::common::setup_logger;
+use crate::db::{InstanceDaoImpl, KeyRange};
 use crate::web::actix::*;
 
 // use actix_web::middleware::Logger;

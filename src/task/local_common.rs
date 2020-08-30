@@ -6,7 +6,7 @@ use std::time::Duration;
 
 use lru_time_cache::LruCache;
 
-use nature_common::{NatureError, Result};
+use crate::common::{NatureError, Result};
 
 type CALLER<'a, T, R> = lib::Symbol<'a, fn(&T) -> R>;
 type LIB = Option<lib::Library>;
@@ -96,7 +96,7 @@ fn entry_from_str(path: &str) -> Result<LibraryEntry> {
 mod test {
     use futures::executor::block_on;
 
-    use nature_common::{ConverterParameter, ConverterReturned, Instance};
+    use crate::common::{ConverterParameter, ConverterReturned, Instance};
 
     use super::*;
 

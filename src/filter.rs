@@ -1,8 +1,7 @@
 use futures::future::BoxFuture;
 use futures::FutureExt;
 
-use nature_common::{Executor, Instance, NatureError, Protocol, Result};
-
+use crate::common::{Executor, Instance, NatureError, Protocol, Result};
 use crate::filter::builtin_filter::BuiltIn;
 use crate::task::local_common::local_execute;
 
@@ -20,7 +19,7 @@ pub fn filter_before(para: &mut Instance, filter: Vec<Executor>) -> BoxFuture<Re
                                 Ok(new) => *para = new,
                                 Err(err) => return Err(err)
                             }
-                        },
+                        }
                         Err(err) => {
                             warn!("local filter occur error: {}", err);
                             return Err(err);

@@ -3,7 +3,7 @@ use std::sync::Arc;
 
 use loader::Loader;
 /// built-in xecutor
-use nature_common::{Instance, NatureError, Result};
+use crate::common::{Instance, NatureError, Result};
 use para_as_key::ParaAsKey;
 use task_checker::TaskCheckerFilter;
 

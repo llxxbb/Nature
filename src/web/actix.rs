@@ -4,10 +4,9 @@ use actix_web::{HttpResponse, ResponseError, web};
 use actix_web::web::Json;
 use serde::export::fmt::Debug;
 
-use nature_common::{DelayedInstances, Instance, KeyCondition, NatureError, SelfRouteInstance};
-use nature_db::{InstanceDaoImpl, RawTask};
-
+use crate::common::{DelayedInstances, Instance, KeyCondition, NatureError, SelfRouteInstance};
 use crate::controller::IncomeController;
+use crate::db::{InstanceDaoImpl, RawTask};
 use crate::system::INS_KEY_GT;
 
 /// **Note** This do not receive System `Meta`'s instances
@@ -93,7 +92,7 @@ impl Display for WebError {
 
 impl ResponseError for WebError {}
 
-fn return_result<T>(x: nature_common::Result<T>) -> HttpResponse
+fn return_result<T>(x: crate::common::Result<T>) -> HttpResponse
     where T: serde::Serialize + Debug
 {
     HttpResponse::Ok().json(x)

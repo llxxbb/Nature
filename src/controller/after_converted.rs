@@ -1,9 +1,8 @@
 use std::str::FromStr;
 
-use nature_common::{append_para, CONTEXT_LOOP_FINISHED, CONTEXT_LOOP_ID, CONTEXT_LOOP_NEXT, CONTEXT_LOOP_TASK, Instance, MetaSetting, MetaType, NatureError, Result, SelfRouteInstance};
-use nature_db::{D_T, Mission, MissionRaw, RawTask, TaskDao, TaskType};
-
+use crate::common::{append_para, CONTEXT_LOOP_FINISHED, CONTEXT_LOOP_ID, CONTEXT_LOOP_NEXT, CONTEXT_LOOP_TASK, Instance, MetaSetting, MetaType, NatureError, Result, SelfRouteInstance};
 use crate::controller::{channel_batch, channel_store, get_store_task};
+use crate::db::{D_T, Mission, MissionRaw, RawTask, TaskDao, TaskType};
 use crate::system::SWITCH_SAVE_DIRECTLY_FOR_ONE;
 use crate::task::{Converted, TaskForConvert};
 
@@ -190,7 +189,7 @@ pub fn received_self_route(_task: &TaskForConvert, _raw: &RawTask, _instances: V
 
 #[cfg(test)]
 mod remove_loop_id_test {
-    use nature_common::Meta;
+    use crate::common::Meta;
 
     use super::*;
 

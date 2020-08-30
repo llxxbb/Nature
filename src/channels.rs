@@ -3,9 +3,8 @@ use std::sync::Mutex;
 use std::thread;
 use std::thread::JoinHandle;
 
-use nature_db::*;
-
 use crate::controller::channel_convert;
+use crate::db::*;
 use crate::task::*;
 
 lazy_static! {
