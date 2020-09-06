@@ -16,7 +16,7 @@ lazy_static! {
 
 pub async fn start() {
     dotenv::dotenv().ok();
-    let _ = setup_logger();
+    let _ = env_logger::init();
     let mut last_delay: u64 = 0;
     let base_delay = env::var("BASE_DELAY").unwrap_or_else(|_| "2".to_string()).parse::<i64>().unwrap();
     let load_size = env::var("LOAD_SIZE").unwrap_or_else(|_| "100".to_string()).parse::<i64>().unwrap();

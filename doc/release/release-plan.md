@@ -7,10 +7,13 @@
 
 ## Release 0.16.1
 
+- change crate `fern` to `env_logger`
+
 ### should commit
 
 
 ### 未完成
+
 
 - make shell version of demo
 

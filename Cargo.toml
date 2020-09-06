@@ -38,7 +38,7 @@ libloading = "0.5"
 
 # log
 log = "0.4"
-fern = "0.6"        # Simple, efficient logging
+env_logger = "0.7"
 
 #config
 dotenv = "0.15"

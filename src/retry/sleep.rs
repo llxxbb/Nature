@@ -29,13 +29,11 @@ pub fn sleep_by_records(records: u32, last_sleep: u64) -> u64 {
 mod test {
     use std::env;
 
-    use crate::common::setup_logger;
-
     use super::*;
 
     #[test]
     fn sleep_max_test() {
-        let _ = setup_logger();
+        let _ = env_logger::init();
         env::set_var("MAX_SLEEP", "10");
         env::set_var("MIN_SLEEP", "4");
 

@@ -63,7 +63,6 @@ mod test {
 
     use chrono::{Local, TimeZone};
 
-    use crate::common::setup_logger;
     use crate::db::CONN_STR;
 
     use super::*;
@@ -71,7 +70,7 @@ mod test {
     #[tokio::test]
     async fn get_test() {
         env::set_var("DATABASE_URL", CONN_STR);
-        let _ = setup_logger();
+        let _ = env_logger::init();
 
         let condition = Condition {
             key_gt: "".to_string(),
@@ -88,7 +87,7 @@ mod test {
     #[ignore]
     async fn get_ignore_test() {
         env::set_var("DATABASE_URL", CONN_STR);
-        let _ = setup_logger();
+        let _ = env_logger::init();
 
         let condition = Condition {
             key_gt: "B:sale/item/count:1|0|".to_string(),

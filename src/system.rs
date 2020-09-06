@@ -6,14 +6,12 @@ use std::sync::Arc;
 use std::thread::JoinHandle;
 
 use actix_web::{App, HttpServer};
+use actix_web::middleware::Logger;
 use dotenv::dotenv;
 
 use crate::channels::start_receive_threads;
-use crate::common::setup_logger;
 use crate::db::{InstanceDaoImpl, KeyRange};
 use crate::web::actix::*;
-
-// use actix_web::middleware::Logger;
 
 lazy_static! {
     pub static ref INS_KEY_GT : Arc<dyn KeyRange> = Arc::new(InstanceDaoImpl{});
@@ -35,11 +33,10 @@ lazy_static! {
 
 pub async fn sys_init() -> std::io::Result<()> {
     dotenv().ok();
-    // std::env::set_var("RUST_LOG", "actix_web=info");
-    let _ = setup_logger();
+    let _ = env_logger::init();
     let _ = start_receive_threads();
     HttpServer::new(|| App::new()
-        // .wrap(Logger::default())
+        .wrap(Logger::default())
         .configure(web_config))
         .bind("127.0.0.1:".to_owned() + &SERVER_PORT).unwrap()
         .run().await

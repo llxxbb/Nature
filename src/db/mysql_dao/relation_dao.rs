@@ -139,7 +139,7 @@ mod test {
 
     use std::env;
 
-    use crate::common::{Meta, setup_logger};
+    use crate::common::Meta;
     use crate::db::{C_M, CONN_STR};
 
     use super::*;
@@ -149,7 +149,7 @@ mod test {
     #[ignore]
     async fn relation_test() {
         env::set_var("DATABASE_URL", CONN_STR);
-        let _ = setup_logger();
+        let _ = env_logger::init();
 
         // clear before test
         debug!("--delete first-----------------");

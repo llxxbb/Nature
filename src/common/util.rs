@@ -1,8 +1,7 @@
-pub use self::id_tool::*;
-pub use self::logger::setup_logger;
 pub use serde_tool::*;
 
-mod logger;
+pub use self::id_tool::*;
+
 mod serde_tool;
 
 mod id_tool;
