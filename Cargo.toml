@@ -6,7 +6,7 @@ edition = "2018"
 description = "Nature is a minimalism-program platform for building big business system. It is data-driven, business-oriented and streaming."
 repository = "https://github.com/llxxbb/Nature"
 readme = "README.md"
-license = "MIT,GPL3"
+license = "MIT+GPL3"
 keywords = ["FaaS", "MQ", "BPM", "Workflow"]
 
 [lib]
