@@ -1,6 +1,11 @@
 
 # 发布的功能
 
+## Release 0.16.0 2020-09-06
+
+- merge nature, common, db and retry projects together
+- merge demo, demo-common, demo-executor, demo-executor-restful together.
+
 ## Release 0.15.0
 
 - id64 support: use u64 as generated id

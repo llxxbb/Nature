@@ -5,16 +5,12 @@
 - 功能性先于非功能性需求
 - 应用情景支持，内部优先于外部（如网关）
 
-## Release 0.16.0
-
-- merge nature, common, db and retry projects together
+## Release 0.16.1
 
 ### should commit
 
 
 ### 未完成
-
-- merge demo, demo-common, demo-executor, demo-executor-restful together.
 
 - make shell version of demo
 

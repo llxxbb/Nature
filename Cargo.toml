@@ -1,9 +1,9 @@
 [package]
 name = "nature"
-version = "0.15.0"
+version = "0.16.0"
 authors = ["XueBin Li <llxxbb@yeah.net>"]
 edition = "2018"
-description = "Nature is a data-driven, business-oriented, minimalism-program platform for building big system."
+description = "Nature is a minimalism-program platform for building big business system. It is data-driven, business-oriented and streaming."
 repository = "https://github.com/llxxbb/Nature"
 readme = "README.md"
 license = "MIT,GPL3"

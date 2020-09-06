@@ -6,7 +6,7 @@ copy /Y ..\.env %RELEASE_PATH%
 copy /Y ..\target\debug\nature.exe %RELEASE_PATH%
 copy /Y ..\target\debug\retry.exe %RELEASE_PATH%
 copy /Y ..\target\debug\nature_demo.dll %RELEASE_PATH%
-copy /Y ..\target\debug\restful_executor.exe %RELEASE_PATH%
+copy /Y ..\target\debug\nature_demo_restful.exe %RELEASE_PATH%
 copy /Y schema.sql %RELEASE_PATH%
 
 del %RELEASE_PATH%\release.zip
