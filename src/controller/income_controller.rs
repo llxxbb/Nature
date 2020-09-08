@@ -11,7 +11,7 @@ pub struct IncomeController {}
 
 impl IncomeController {
     /// born an instance which is the beginning of the changes.
-    pub async fn input(mut instance: Instance) -> Result<ID> {
+    pub async fn input(mut instance: Instance) -> Result<String> {
         let _ = check_and_revise(&mut instance).await?;
         let relations = C_R.get(&instance.meta, &*D_R, &*C_M, &*D_M).await?;
         let mission = Mission::get_by_instance(&instance, &relations, context_check, state_check);
@@ -24,7 +24,7 @@ impl IncomeController {
         if num == 1 {
             channel_store(task, raw).await?;
         }
-        Ok(instance.id)
+        Ok(format!("{:x}",instance.id))
     }
 
 
