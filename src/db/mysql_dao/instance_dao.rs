@@ -146,20 +146,22 @@ impl InstanceDaoImpl {
         } else {
             "".to_string()
         };
-        let mut id: ID = match mission.sys_context.get(&*CONTEXT_TARGET_INSTANCE_ID) {
+        let id = match mission.sys_context.get(&*CONTEXT_TARGET_INSTANCE_ID) {
             // context have target id
-            Some(state_id) => id_from_hex_str(state_id)?,
-            None => 0,
-        };
-        if id == 0 {
-            if mission.use_upstream_id || mission.to.check_master(&from.meta) {
-                mission.sys_context.insert(CONTEXT_TARGET_INSTANCE_ID.to_string(), format!("{:x}", from.id));
-                id = from.id
+            Some(state_id) => state_id.to_string(),
+            None => {
+                if mission.use_upstream_id || mission.to.check_master(&from.meta) {
+                    let from_id = format!("{:x}", from.id);
+                    mission.sys_context.insert(CONTEXT_TARGET_INSTANCE_ID.to_string(), from_id.to_string());
+                    from_id
+                } else {
+                    "0".to_string()
+                }
             }
-        }
+        };
         let meta = mission.to.meta_string();
         debug!("get last state for meta {}", &meta);
-        let qc = KeyCondition::new(id, &meta, &para_id, 0);
+        let qc = KeyCondition::new(&id, &meta, &para_id, 0);
         Self::get_last_state(&qc).await
     }
 }
@@ -211,15 +213,15 @@ impl KeyRange for InstanceDaoImpl {
             limit :limit", time_ge, time_lt, key_gt, key_ge, key_lt, key_le, key_like);
 
         let p = params! {
-            "meta" => f_para.meta.to_string() + "%",
-            "key_gt" => f_para.key_gt.to_string(),
-            "key_ge" => f_para.key_ge.to_string(),
-            "key_lt" => f_para.key_lt.to_string(),
-            "key_le" => f_para.key_le.to_string(),
-            "time_ge" => Local.timestamp_millis(time_ge_v).naive_local(),
-            "time_lt" => Local.timestamp_millis(time_lt_v).naive_local(),
-            "limit" => limit,
-        };
+"meta" => f_para.meta.to_string() + "%",
+"key_gt" => f_para.key_gt.to_string(),
+"key_ge" => f_para.key_ge.to_string(),
+"key_lt" => f_para.key_lt.to_string(),
+"key_le" => f_para.key_le.to_string(),
+"time_ge" => Local.timestamp_millis(time_ge_v).naive_local(),
+"time_lt" => Local.timestamp_millis(time_lt_v).naive_local(),
+"limit" => limit,
+};
         dbg!(&sql);
         let result = MySql::fetch(sql, p, RawInstance::from).await?;
         let mut rtn: Vec<Instance> = vec![];
@@ -243,7 +245,7 @@ mod test {
     #[allow(dead_code)]
     fn get_last_state_test() {
         env::set_var("DATABASE_URL", "mysql://root@localhost/nature");
-        let para = KeyCondition::new(0, "B:score/trainee/all-subject:1", "002", 0);
+        let para = KeyCondition::new("0", "B:score/trainee/all-subject:1", "002", 0);
         let result = Runtime::new().unwrap().block_on(InstanceDaoImpl::get_last_state(&para));
         let _ = dbg!(result);
     }

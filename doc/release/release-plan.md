@@ -8,13 +8,14 @@
 ## Release 0.16.1
 
 - change crate `fern` to `env_logger`
+- change input method return type from u64 to hex string
 
 ### should commit
 
 
 ### 未完成
 
-
+- change task_id from char to bigint
 - make shell version of demo
 
 - concurrent tasks limit and monitor 

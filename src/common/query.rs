@@ -35,9 +35,9 @@ pub struct KeyCondition {
 }
 
 impl KeyCondition {
-    pub fn new(id: ID, meta: &str, para: &str, state_version: i32) -> Self {
+    pub fn new(id: &str, meta: &str, para: &str, state_version: i32) -> Self {
         KeyCondition {
-            id: format!("{:x}", id),
+            id: id.to_string(),
             meta: meta.to_string(),
             key_gt: "".to_string(),
             key_ge: "".to_string(),

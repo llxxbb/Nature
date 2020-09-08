@@ -87,7 +87,7 @@ impl Instance {
             Some(setting) => match setting.master {
                 None => Ok(None),
                 Some(master) => {
-                    let condition = KeyCondition::new(self.id, &master, &self.para, 0);
+                    let condition = KeyCondition::new(&format!("{:x}", self.id), &master, &self.para, 0);
                     let result = dao(condition);
                     Ok(result.await?)
                 }
