@@ -15,13 +15,12 @@
 
 ### 未完成
 
-- change task_id from char to bigint
+- incompatible change: task_id from char to bigint
 - make shell version of demo
+- 压测
 
 - concurrent tasks limit and monitor 
 - redo check busy first
-
-- 压测
 
 ## Release 1.0.0
 
