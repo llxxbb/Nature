@@ -5,7 +5,7 @@
 - 功能性先于非功能性需求
 - 应用情景支持，内部优先于外部（如网关）
 
-## Release 0.16.1
+## Release 0.17
 
 - change crate `fern` to `env_logger`
 - change input method return type from u64 to hex string
@@ -15,6 +15,10 @@
 
 ### 未完成
 
+- optimize input interface performance
+    spawn task for after_stored ...
+
+## Release 0.18
 - incompatible change: task_id from char to bigint
 - make shell version of demo
 - 压测

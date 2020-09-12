@@ -19,7 +19,7 @@ pub fn channel_convert(store: (TaskForConvert, RawTask)) {
     runtime.block_on(do_convert(store.0, store.1));
 }
 
-async fn do_convert(task: TaskForConvert, raw: RawTask) {
+pub(crate) async fn do_convert(task: TaskForConvert, raw: RawTask) {
     // debug!("---task for convert: from:{}, to {}", task.from.meta, task.target.to.meta_string());
     let protocol = task.target.executor.protocol.clone();
     let mut from_instance = task.from.clone();

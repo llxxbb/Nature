@@ -18,11 +18,14 @@ pub async fn channel_stored(task: TaskForStore, raw: RawTask) {
                 warn!("==== converter task saved failed : {}", rtn.err().unwrap().to_string());
                 return;
             }
-            for t in converters {
-                if t.0.target.delay == 0 {
-                    let _ = CHANNEL_CONVERT.sender.lock().unwrap().send(t);
+            tokio::spawn(async move {
+                for t in converters {
+                    if t.0.target.delay == 0 {
+                        // do_convert(t.0,t.1).await
+                        let _ = CHANNEL_CONVERT.sender.lock().unwrap().send(t);
+                    }
                 }
-            }
+            });
         }
         Err(err) => {
             warn!("{}", err);

@@ -11,7 +11,12 @@ use crate::task::gen_loop_mission;
 
 pub async fn channel_store(task: TaskForStore, carrier: RawTask) -> Result<()> {
     match InstanceDaoImpl::insert(&task.instance).await {
-        Ok(_) => after_saved(task, carrier).await,
+        Ok(_) => {
+            tokio::spawn(async move {
+                after_saved(task, carrier).await
+            });
+            Ok(())
+        }
         Err(NatureError::DaoDuplicated(_)) => {
             duplicated_instance(task, carrier).await
         }
