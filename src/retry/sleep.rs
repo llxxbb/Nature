@@ -32,6 +32,7 @@ mod test {
     use super::*;
 
     #[test]
+    #[ignore]
     fn sleep_max_test() {
         let _ = env_logger::init();
         env::set_var("MAX_SLEEP", "10");
