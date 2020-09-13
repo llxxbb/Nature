@@ -1,6 +1,12 @@
 
 # 发布的功能
 
+## Release 0.17 2020-09-13
+
+- change input method return type from u64 to hex string
+- change crate `fern` to `env_logger`
+- optimize input interface performance
+
 ## Release 0.16.0 2020-09-06
 
 - merge nature, common, db and retry projects together
