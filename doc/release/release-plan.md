@@ -15,7 +15,7 @@
 
 ## Release 0.18
 
-- write interface document
+- write document for summary use
 - incompatible change: task_id from char to bigint
 - make shell version of demo
 - 压测
