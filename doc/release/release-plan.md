@@ -12,11 +12,15 @@
 
 ### 未完成
 
-
-## Release 0.18
-
+- 简化readme
+- 架构：流式计算：可以理解为只有 map,可以内嵌 filter(两层意思：条件过滤和内容修改) 
+- 提供 executor 接口定义
+- 修正 prepare.md
 - write document for summary use
+- 流式计算：
+    map filter sum fold groupBy reduce
 - incompatible change: task_id from char to bigint
+
 - make shell version of demo
 - 压测
 

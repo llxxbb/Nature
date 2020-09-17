@@ -1,6 +1,6 @@
 # Guide
 
-## the `Tnstance` you put into `Nature`.
+## the `Instance` you put into `Nature`.
 
 We strongly recommend generate an ID for an `Instance` from outside of `Nature` before to do you business.
 The profit to do that is you can recommit to `Nature` when some environment errors occur,
