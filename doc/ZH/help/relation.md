@@ -127,6 +127,8 @@ pub struct Executor {
 - Auto：当使用者不指定`executor`时，Nature在`运行时`会自动构建一个`executor`。因为`auto-executor`不会生成`Instance.content`的内容。所以当我们不需要关心实例的内容而只关心ID，状态等时可以不指定`executor`。
 - BuiltIn：使用Nature 内置的转换器进行转换。通过 `url` 属性来指定要使用哪一个`builtin-executor`
 
+http及LocalRustr两种形式都需要是因为者自行实现，请参考[Executor接口定义](executor.md)
+
 **url**：用于定位`Executor`的位置
 
 **settings**:`Executor`专有的配置，由具体的`Executor`给出。**注意** settings 的内容可以在运行时被 `Instance.sys_context`的`para.dynamic` 属性中的内容替换掉，而这种替换只局限于当前 Instance，不会影响后续 Instance 的替换。举例： 假设一个用于批量加载  Instance 的 beforter_filter 的 settings 配置如下：
@@ -197,64 +199,5 @@ pub struct TargetState {
 }
 ```
 
-## Executor接口形式
 
-### Executor：转换器接口形式
-
-`Executor` 用于实现 `Meta` 间 `Instance` 的转换，一般需要自己实现，Nature 也有内建及自动化的 `Executor` 实现。实现方式请参考[示例及功能讲解](https://github.com/llxxbb/Nature-Demo)。
-
-`Executor`只有一个入参和一个出参。
-
-**入参：ConverterParameter**
-
-```rust
-pub struct ConverterParameter {
-    pub from: Instance,					// 上游数据实例
-    pub last_state: Option<Instance>,	// 最近一次状态目标的数据实例
-    pub task_id: Vec<u8>,				// 此次任务ID，延时处理时回调Nature的凭据。
-    pub master: Option<Instance>,		// 上游 mater的数据实例（ID相同）
-    pub cfg: String,					// json 对象，`Executor`自有的配置。
-}
-```
-
-**出参：**
-
-```rust
-pub enum ConverterReturned {
-    LogicalError(String),				// 逻辑错误，Nature 不会重试
-    EnvError(String),					// 当前条件不满足，Nature 会在将来的某个时刻重试
-    None,								// 没有数据返回
-    Delay(u32),							// 用于延时处理，具体用法请看Demo
-    Instances(Vec<Instance>),			// 产出的目标数据实例
-    SelfRoute(Vec<SelfRouteInstance>),	// 定义动态路由
-}
-```
-
-### Executor：filter_before 接口形式
-
-filter_before 需要使用者自行实现,下面为LocalRust的实现形式
-
-```rust
-#[no_mangle]
-#[allow(improper_ctypes)]
-pub extern fn your_func(para: &Instance) -> Result<Instance> {
-	// TODO your logic
-}
-```
-
-### Executor：filter_after 接口形式
-
-filter_after 需要使用者自行实现,下面为LocalRust的实现形式
-
-```rust
-#[no_mangle]
-#[allow(improper_ctypes)]
-pub extern fn your_func(para: &Vec<Instance>) -> Result<Vec<Instance>> {
-	// TODO your logic
-}
-```
-
-## 动态`Executor`转换器
-
-动态路由不需要在运行之前预先定义，既在运行时决定自己的去处，非常的灵活，每个实例可以有自己独立的选择。不过不建议使用，一是目前此功能还不完善，二是该功能性能比静态路由要差，三、业务布局的展示会比较困难。
 

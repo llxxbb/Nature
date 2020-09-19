@@ -37,7 +37,7 @@ Nature 提供了**统一的数据存储模型**。开发者不再需要为每个
    VALUES('B:sale/order:1', 'B:finance/orderAccount:1', '{"executor":{"protocol":"localRust","url":"nature_demo:order_receivable"},"target":{"states":{"add":["unpaid"]}}}');
    ```
 
-4. 编码实现 map 逻辑（您唯一的编码部分）：如将
+4. 请依据`关系`定义中指定的通讯协议在[Executor](doc/ZH/help/executor.md)中找到对应的接口形式编码实现 map 逻辑（您唯一的编码部分）
 
 5. 启动 Nature
 
