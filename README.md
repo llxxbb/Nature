@@ -21,7 +21,7 @@ Nature 提供了**统一的数据存储模型**。开发者不再需要为每个
 
 1. 创建一个[mysql](https://www.mysql.com/) 或 [mariadb](https://mariadb.org/) 或 [Tidb](https://pingcap.com/en/) 数据库，并执行 [schema.sql](shell/schema.sql)
 
-2. 定义多个业务对象（Nature 称之为[Meta](doc/ZH/help/meta.md)），如：我们定义`订单`和`订单账`两个业务对象 
+2. 在 [Meta](doc/ZH/help/meta.md) 数据表里定义多个业务对象，如：我们定义`订单`和`订单账`两个业务对象 
 
    ```sql
    INSERT INTO meta (full_key, description, version, states, fields, config) VALUES
@@ -29,7 +29,7 @@ Nature 提供了**统一的数据存储模型**。开发者不再需要为每个
    ('B', 'finance/orderAccount', 'order account', 1, 'unpaid|partial|paid', '', '{"master":"B:sale/order:1"}'); 
    ```
 
-3. 使用[关系](doc/ZH/help/relation.md)将多个业务对象关联起来（流式计算中的 map），如上面的订单和订单账可以有这样的定义：
+3. 在 [relation](doc/ZH/help/relation.md) 数据表使定义关系将多个业务对象关联起来（相当于流式计算中的 map），如上面的`订单`和`订单账`可以有这样的定义：
 
    ```sql
    INSERT INTO relation
@@ -37,11 +37,15 @@ Nature 提供了**统一的数据存储模型**。开发者不再需要为每个
    VALUES('B:sale/order:1', 'B:finance/orderAccount:1', '{"executor":{"protocol":"localRust","url":"nature_demo:order_receivable"},"target":{"states":{"add":["unpaid"]}}}');
    ```
 
-4. 请依据`关系`定义中指定的通讯协议在[Executor](doc/ZH/help/executor.md)中找到对应的接口形式编码实现 map 逻辑（您唯一的编码部分）
+4. 请依据`关系`定义中指定的 protocol 实现用于业务对象间转换的逻辑，我们称之为[Executor](doc/ZH/help/executor.md)。如对于`订单`和`订单账`来讲这个逻辑是：
 
-5. 启动 Nature
+   - 生成一个`订单账`业务对象
+   - 从传入的`订单`中提取所有商品的应收款项记为该`订单账`的应收
+   - 将`订单账`对象返回给 Nature 以驱动下一环节的处理。
 
-6. 提交数据到 Nature
+5. 配置好.evn以指向您创建的数据库，启动 natrue.exe 和 retry.exe
+
+6. 对 Nature 发起 http 请求，以POST方式将`订单`数据提交数据到 Nature，请参考[提交数据到 Nature](doc/ZH/help/submit-to-nature.md)
 
 ## 深入了解Nature
 

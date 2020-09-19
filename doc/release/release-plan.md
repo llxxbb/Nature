@@ -12,6 +12,9 @@
 
 ### 未完成
 
+- incompatible change: filter_before -> convert_before
+- incompatible change: filter_after -> convert_after
+
 - 简化readme
 - 架构：流式计算：可以理解为只有 map,可以内嵌 filter(两层意思：条件过滤和内容修改) 
 - 提供 executor 接口定义
