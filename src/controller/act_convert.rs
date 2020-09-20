@@ -3,7 +3,7 @@ use actix_rt::Runtime;
 use crate::common::{CONTEXT_TARGET_INSTANCE_ID, ConverterReturned, Instance, Meta, NatureError, Protocol, Result};
 use crate::controller::{after_converted, process_null, received_self_route};
 use crate::db::{C_M, D_M, D_T, InstanceDaoImpl, MetaCache, Mission, RawTask, TaskDao};
-use crate::filter::filter_after;
+use crate::filter::convert_after;
 use crate::task::{call_executor, TaskForConvert};
 
 /// **Notice**: Can't use async under actix-rt directly, otherwise it can lead to "actix-rt overflow its stack".
@@ -69,7 +69,7 @@ pub(crate) async fn do_convert(task: TaskForConvert, raw: RawTask) {
 async fn handle_converted(converted: ConverterReturned, task: &TaskForConvert, raw: &RawTask, mission: &Mission, last: &Option<Instance>) -> Result<()> {
     match converted {
         ConverterReturned::Instances(mut instances) => {
-            filter_after(&mut instances, &task.target.filter_after).await?;
+            convert_after(&mut instances, &task.target.convert_after).await?;
             after_converted(task, &raw, instances, &last).await?;
         }
         ConverterReturned::SelfRoute(ins) => {

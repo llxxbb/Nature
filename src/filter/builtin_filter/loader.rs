@@ -4,7 +4,7 @@ use std::sync::Arc;
 use crate::common::{CONTEXT_LOOP_FINISHED, CONTEXT_LOOP_ID, CONTEXT_LOOP_NEXT, Executor, get_para_part, Instance, is_default, KeyCondition, NatureError, Result};
 use crate::db::KeyRange;
 use crate::filter::builtin_filter::FilterBefore;
-use crate::filter::filter_before;
+use crate::filter::convert_before;
 
 pub struct Loader {
     pub dao: Arc<dyn KeyRange>
@@ -77,7 +77,7 @@ impl FilterBefore for Loader {
         }
         // filter
         for mut one in rtn {
-            filter_before(&mut one, setting.filters.clone()).await?;
+            convert_before(&mut one, setting.filters.clone()).await?;
             content.push(one.content.to_string());
         }
         ins.content = serde_json::to_string(&content)?;
@@ -273,7 +273,7 @@ mod test_ignore {
 
         // relation
         let mut relation_settings = RelationSettings::default();
-        relation_settings.filter_before = vec![loader];
+        relation_settings.convert_before = vec![loader];
         let result = serde_json::to_string(&relation_settings).unwrap();
         dbg!(result);
     }

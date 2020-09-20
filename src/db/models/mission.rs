@@ -12,8 +12,8 @@ use crate::db::models::relation_target::RelationTarget;
 pub struct Mission {
     pub to: Meta,
     pub executor: Executor,
-    pub filter_before: Vec<Executor>,
-    pub filter_after: Vec<Executor>,
+    pub convert_before: Vec<Executor>,
+    pub convert_after: Vec<Executor>,
     pub target_demand: RelationTarget,
     pub use_upstream_id: bool,
     pub delay: i32,
@@ -27,10 +27,10 @@ pub struct MissionRaw {
     pub executor: Executor,
     #[serde(skip_serializing_if = "is_default")]
     #[serde(default)]
-    pub filter_before: Vec<Executor>,
+    pub convert_before: Vec<Executor>,
     #[serde(skip_serializing_if = "is_default")]
     #[serde(default)]
-    pub filter_after: Vec<Executor>,
+    pub convert_after: Vec<Executor>,
     #[serde(skip_serializing_if = "is_default")]
     #[serde(default)]
     pub target_demand: RelationTarget,
@@ -53,8 +53,8 @@ impl From<Mission> for MissionRaw {
         MissionRaw {
             to: input.to.meta_string(),
             executor: input.executor,
-            filter_before: input.filter_before,
-            filter_after: input.filter_after,
+            convert_before: input.convert_before,
+            convert_after: input.convert_after,
             target_demand: input.target_demand,
             use_upstream_id: input.use_upstream_id,
             delay: input.delay,
@@ -89,8 +89,8 @@ impl Mission {
             let mission = Mission {
                 to: t,
                 executor: d.fun.clone(),
-                filter_before: vec![],
-                filter_after: vec![],
+                convert_before: vec![],
+                convert_after: vec![],
                 target_demand: Default::default(),
                 use_upstream_id: d.use_upstream_id,
                 delay: d.delay,
@@ -138,8 +138,8 @@ impl Mission {
         let rtn = Mission {
             to: mc_g.get(&raw.to, m_g).await?,
             executor: raw.executor.clone(),
-            filter_before: raw.filter_before.clone(),
-            filter_after: raw.filter_after.clone(),
+            convert_before: raw.convert_before.clone(),
+            convert_after: raw.convert_after.clone(),
             target_demand: raw.target_demand.clone(),
             use_upstream_id: raw.use_upstream_id,
             delay: raw.delay,
@@ -163,10 +163,10 @@ fn init_by_instance(m: &mut Mission, instance: &Instance, r: &Relation) -> Resul
             for para in paras {
                 debug!("para dynamic will be replaced from {} to {} for relation: {:?}", para.0, para.1, r);
                 m.executor.settings = m.executor.settings.replace(&para.0, &para.1);
-                m.filter_before.iter_mut().for_each(|one| {
+                m.convert_before.iter_mut().for_each(|one| {
                     one.settings = one.settings.replace(&para.0, &para.1);
                 });
-                m.filter_after.iter_mut().for_each(|one| {
+                m.convert_after.iter_mut().for_each(|one| {
                     one.settings = one.settings.replace(&para.0, &para.1);
                 });
             }
@@ -181,8 +181,8 @@ impl From<Relation> for Mission {
         Mission {
             to: r.to.clone(),
             executor: r.executor.clone(),
-            filter_before: r.filter_before.clone(),
-            filter_after: r.filter_after.clone(),
+            convert_before: r.convert_before.clone(),
+            convert_after: r.convert_after.clone(),
             target_demand: r.target.clone(),
             use_upstream_id: r.use_upstream_id,
             delay: 0,

@@ -4,7 +4,7 @@ use crate::builtin_converter::BuiltIn;
 use crate::common::{ConverterParameter, ConverterReturned, Instance, NatureError, Protocol};
 use crate::db::flow_tool::state_check;
 use crate::db::RawTask;
-use crate::filter::filter_before;
+use crate::filter::convert_before;
 use crate::task::{http_execute_async, TaskForConvert};
 use crate::task::local_common::local_execute;
 
@@ -19,7 +19,7 @@ pub async fn call_executor(task: &mut TaskForConvert, raw: &RawTask, last_target
         }
     };
     &task.from;
-    match filter_before(&mut task.from, task.target.filter_before.clone()).await {
+    match convert_before(&mut task.from, task.target.convert_before.clone()).await {
         Err(NatureError::EnvironmentError(e)) => return ConverterReturned::EnvError(e),
         Err(e) => return ConverterReturned::LogicalError(e.to_string()),
         _ => ()

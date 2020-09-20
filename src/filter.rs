@@ -5,7 +5,7 @@ use crate::common::{Executor, Instance, NatureError, Protocol, Result};
 use crate::filter::builtin_filter::BuiltIn;
 use crate::task::local_common::local_execute;
 
-pub fn filter_before(para: &mut Instance, filter: Vec<Executor>) -> BoxFuture<Result<()>> {
+pub fn convert_before(para: &mut Instance, filter: Vec<Executor>) -> BoxFuture<Result<()>> {
     async move {
         for f in filter {
             match f.protocol {
@@ -37,7 +37,7 @@ pub fn filter_before(para: &mut Instance, filter: Vec<Executor>) -> BoxFuture<Re
     }.boxed()
 }
 
-pub async fn filter_after(para: &mut Vec<Instance>, filter: &Vec<Executor>) -> Result<()>
+pub async fn convert_after(para: &mut Vec<Instance>, filter: &Vec<Executor>) -> Result<()>
 {
     for f in filter {
         match f.protocol {

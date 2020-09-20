@@ -252,8 +252,8 @@ mod test {
             target: Mission {
                 to: meta.clone(),
                 executor: Default::default(),
-                filter_before: vec![],
-                filter_after: vec![],
+                convert_before: vec![],
+                convert_after: vec![],
                 target_demand: Default::default(),
                 use_upstream_id: true,
                 delay: 0,
@@ -297,8 +297,8 @@ mod test {
                     m
                 },
                 executor: Default::default(),
-                filter_before: vec![],
-                filter_after: vec![],
+                convert_before: vec![],
+                convert_after: vec![],
                 target_demand: RelationTarget {
                     states: Some({
                         let mut sd = TargetState::default();

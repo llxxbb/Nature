@@ -3,13 +3,13 @@
 Executor 用于执行用户定制的逻辑，除了[内建 Executor](built-in.md) 和自动化的 Executor外，都需要用户按照给定的规范进行实现，Nature 目前有三种形式的 `Executor`：
 
 - converter 形式，用于业务对象（`Meta`）间数据实例（`Instance`）的转换。
-- filter_before 形式，用于业务对象转换前的预处理，如数据格式的修正，数据加载等。
-- filter_after 形式，用于业务对象转换后的后置处理。
+- convert_before 形式，用于业务对象转换前的预处理，如数据格式的修正，数据加载等。
+- convert_after 形式，用于业务对象转换后的后置处理。
 
-其实从功能上讲 `filter_before` 和 `filter_after` 完全可以用 `converter` 形式来替换但不建议，有下面的原因：
+其实从功能上讲 `convert_before` 和 `convert_after` 完全可以用 `converter` 形式来替换但不建议，有下面的原因：
 
-- `filter_before` 和 `filter_after` 一般只是技术上的处理，没有超出业务对象的范围，而 converter 则是衔接了两个业务对象。这个区别将来会用于业务对象关系的展示，既`filter_before` 和 `filter_after`是不会体现在这个界面上的。
-- 从性能上讲 `converter` 与 `converter` 之间会有一个转换后的存储过程，而 `filter_before` ,`filter_after` 和 `converter` 之间是不需要存储的，效率会更高。
+- `convert_before` 和 `convert_after` 一般只是技术上的处理，没有超出业务对象的范围，而 converter 则是衔接了两个业务对象。这个区别将来会用于业务对象关系的展示，既`convert_before` 和 `convert_after`是不会体现在这个界面上的。
+- 从性能上讲 `converter` 与 `converter` 之间会有一个转换后的存储过程，而 `convert_before` ,`convert_after` 和 `converter` 之间是不需要存储的，效率会更高。
 
 目前 Nature 可以通过两种方式来调用`Executor`  ： http 和 localRust。
 
@@ -66,7 +66,7 @@ pub enum ConverterReturned {
 }
 ```
 
-### filter_before 接口形式
+### convert_before 接口形式
 
 接口实现形式如下：
 
@@ -108,7 +108,7 @@ pub struct BizObject {
 }
 ```
 
-### filter_after 接口形式
+### convert_after 接口形式
 
 接口实现形式如下，Instance 定义同上。
 

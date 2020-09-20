@@ -14,11 +14,11 @@ pub struct RelationSettings {
     /// filter will execute before executor,
     #[serde(skip_serializing_if = "is_default")]
     #[serde(default)]
-    pub filter_before: Vec<Executor>,
+    pub convert_before: Vec<Executor>,
     /// filter will execute after executor,
     #[serde(skip_serializing_if = "is_default")]
     #[serde(default)]
-    pub filter_after: Vec<Executor>,
+    pub convert_after: Vec<Executor>,
     /// if the downstream is state meta, when `is_main` is set to true, the upstream's id will be used as downstream's id
     #[serde(skip_serializing_if = "is_default")]
     #[serde(default)]

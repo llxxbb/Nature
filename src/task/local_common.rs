@@ -120,11 +120,11 @@ mod test {
         // ok
         let rtn: ConverterReturned = block_on(local_execute("nature_integrate_test_executor:rtn_none", &para)).unwrap();
         assert_eq!(rtn, ConverterReturned::None);
-        // filter_before
-        let rtn: Result<Instance> = block_on(local_execute("nature_integrate_test_executor:filter_before_test", &Instance::default())).unwrap();
+        // convert_before
+        let rtn: Result<Instance> = block_on(local_execute("nature_integrate_test_executor:convert_before_test", &Instance::default())).unwrap();
         assert_eq!(rtn.is_ok(), true);
-        // filter_after
-        let rtn: Result<Vec<Instance>> = block_on(local_execute("nature_integrate_test_executor:filter_after_test", &vec![Instance::default()])).unwrap();
+        // convert_after
+        let rtn: Result<Vec<Instance>> = block_on(local_execute("nature_integrate_test_executor:convert_after_test", &vec![Instance::default()])).unwrap();
         assert_eq!(rtn.is_ok(), true);
     }
 }
