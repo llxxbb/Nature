@@ -331,7 +331,7 @@ mod para_type_test {
         let input = ConverterParameter {
             from: Default::default(),
             last_state: None,
-            task_id: "".to_string(),
+            task_id: 0,
             master: None,
             cfg: serde_json::to_string(&Setting {
                 key: KeyType::Para(vec![1]),
@@ -357,7 +357,7 @@ mod para_type_test {
                 rtn
             },
             last_state: None,
-            task_id: "".to_string(),
+            task_id: 0,
             master: None,
             cfg: serde_json::to_string(&Setting {
                 key: KeyType::Para(vec![1]),
@@ -383,7 +383,7 @@ mod para_type_test {
                 rtn
             },
             last_state: None,
-            task_id: "".to_string(),
+            task_id: 0,
             master: None,
             cfg: serde_json::to_string(&Setting {
                 key: KeyType::Para(vec![1]),
@@ -414,7 +414,7 @@ mod para_type_test {
                 rtn.content = r#"{"detail":{"b":123},"total":123}"#.to_string();
                 rtn
             }),
-            task_id: "".to_string(),
+            task_id: 0,
             master: None,
             cfg: "".to_string(),
         };
@@ -496,7 +496,7 @@ mod content_tuple_test {
         let input = ConverterParameter {
             from: Default::default(),
             last_state: None,
-            task_id: "".to_string(),
+            task_id: 0,
             master: None,
             cfg: r#"{"key":"Content"}"#.to_string(),
         };
@@ -520,7 +520,7 @@ mod content_tuple_test {
                 ins
             },
             last_state: None,
-            task_id: "".to_string(),
+            task_id: 0,
             master: None,
             cfg: r#"{"key":"Content"}"#.to_string(),
         };
@@ -547,7 +547,7 @@ mod content_tuple_test {
                 ins
             },
             last_state: None,
-            task_id: "".to_string(),
+            task_id: 0,
             master: None,
             cfg: r#"{"key":"Content"}"#.to_string(),
         };
@@ -612,7 +612,7 @@ mod content_none_key_test {
         let input = ConverterParameter {
             from: Default::default(),
             last_state: None,
-            task_id: "".to_string(),
+            task_id: 0,
             master: None,
             cfg: "".to_string(),
         };
@@ -632,7 +632,7 @@ mod content_none_key_test {
                 ins
             },
             last_state: None,
-            task_id: "".to_string(),
+            task_id: 0,
             master: None,
             cfg: "".to_string(),
         };
@@ -654,7 +654,7 @@ mod content_none_key_test {
                 ins
             },
             last_state: None,
-            task_id: "".to_string(),
+            task_id: 0,
             master: None,
             cfg: "".to_string(),
         };

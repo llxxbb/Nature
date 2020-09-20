@@ -40,7 +40,7 @@ CREATE TABLE `instances` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 create TABLE `task` (
-	`task_id`	char(40) NOT NULL,
+	`task_id`	bigint(20) unsigned NOT NULL AUTO_INCREMENT,
 	`task_key`	VARCHAR ( 511 ) NOT NULL COMMENT 'meta|id|para|sta_ver',
 	`task_type`	TINYINT NOT NULL,
 	`task_for`	VARCHAR ( 255 ) NOT NULL,
@@ -55,7 +55,7 @@ create TABLE `task` (
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 create TABLE `task_error` (
-	`task_id`	char(40) NOT NULL,
+	`task_id`	bigint(20) unsigned NOT NULL AUTO_INCREMENT,
 	`task_key`	VARCHAR ( 511 ) NOT NULL,
 	`task_type`	TINYINT NOT NULL,
 	`task_for`	VARCHAR ( 255 ) NOT NULL,

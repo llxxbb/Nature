@@ -88,7 +88,7 @@ mod test {
         let para = ConverterParameter {
             from: input_instance,
             last_state: None,
-            task_id: "".to_string(),
+            task_id: 0,
             master: None,
             cfg: serde_json::to_string(&setting).unwrap(),
         };

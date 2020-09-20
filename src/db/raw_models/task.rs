@@ -12,7 +12,7 @@ use crate::db::TaskDao;
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, Eq, Hash)]
 pub struct RawTask {
-    pub task_id: String,
+    pub task_id: u64,
     pub task_key: String,
     pub task_type: i8,
     pub task_for: String,
@@ -26,7 +26,7 @@ pub struct RawTask {
 impl Default for RawTask {
     fn default() -> Self {
         RawTask {
-            task_id: "".to_string(),
+            task_id: 0,
             task_key: "".to_string(),
             task_type: 0,
             task_for: "".to_string(),
@@ -50,9 +50,8 @@ impl RawTask {
             return Err(NatureError::SystemError("data's length can' be over : ".to_owned() + &TASK_CONTENT_MAX_LENGTH.to_string()));
         }
         let time = Local::now().naive_local();
-        let id = format!("{}{}{}{}", json, task_key, task_for, task_type);
         Ok(RawTask {
-            task_id: format!("{:x}", generate_id(&id)?),
+            task_id: 0,
             task_key: task_key.to_string(),
             task_type,
             task_for: task_for.to_string(),
@@ -79,14 +78,14 @@ impl RawTask {
     }
 
 
-    pub async fn save_batch<T>(news: &mut Vec<RawTask>, old_id: &str, task: &T) -> Result<()>
+    pub async fn save_batch<T>(news: &mut Vec<RawTask>, old_id: &u64, task: &T) -> Result<()>
         where T: TaskDao
     {
         let mut will_deleted: HashSet<RawTask> = HashSet::new();
-        for v in news.iter() {
+        for v in news.iter_mut() {
             let num = task.insert(&v).await?;
             // drop repeated task avoid data consistent problem, retry.exe will pick it up
-            if num != 1 {
+            if num < 1 {
                 will_deleted.insert(v.clone());
             }
         }

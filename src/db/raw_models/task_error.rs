@@ -5,7 +5,7 @@ use crate::common::NatureError;
 use crate::db::raw_models::RawTask;
 
 pub struct RawTaskError {
-    pub task_id: String,
+    pub task_id: u64,
     pub task_key: String,
     pub task_type: i8,
     pub task_for: String,
@@ -17,7 +17,7 @@ pub struct RawTaskError {
 impl RawTaskError {
     pub fn from_raw(err: &NatureError, raw: &RawTask) -> Self {
         RawTaskError {
-            task_id: raw.task_id.clone(),
+            task_id: raw.task_id,
             task_key: raw.task_key.clone(),
             task_type: raw.task_type,
             data: raw.data.clone(),

@@ -106,15 +106,15 @@ mod test {
             Err(NatureError::EnvironmentError("can't connect".to_string()))
         }
 
-        async fn insert(&self, _one: RawRelation) -> Result<usize> {
+        async fn insert(&self, _one: RawRelation) -> Result<u64> {
             unimplemented!()
         }
 
-        async fn delete(&self, _one: RawRelation) -> Result<usize> {
+        async fn delete(&self, _one: RawRelation) -> Result<u64> {
             unimplemented!()
         }
 
-        async fn update_flag(&self, _from: &str, _to: &str, _flag_f: i32) -> Result<usize> {
+        async fn update_flag(&self, _from: &str, _to: &str, _flag_f: i32) -> Result<u64> {
             unimplemented!()
         }
 
@@ -122,7 +122,7 @@ mod test {
             unimplemented!()
         }
 
-        async fn delete_by_biz(&self, _from: &str, _to: &str) -> Result<usize> {
+        async fn delete_by_biz(&self, _from: &str, _to: &str) -> Result<u64> {
             unimplemented!()
         }
     }
@@ -133,15 +133,15 @@ mod test {
             Err(NatureError::EnvironmentError("another error".to_string()))
         }
 
-        async fn insert(&self, _one: RawRelation) -> Result<usize> {
+        async fn insert(&self, _one: RawRelation) -> Result<u64> {
             unimplemented!()
         }
 
-        async fn delete(&self, _one: RawRelation) -> Result<usize> {
+        async fn delete(&self, _one: RawRelation) -> Result<u64> {
             unimplemented!()
         }
 
-        async fn update_flag(&self, _from: &str, _to: &str, _flag_f: i32) -> Result<usize> {
+        async fn update_flag(&self, _from: &str, _to: &str, _flag_f: i32) -> Result<u64> {
             unimplemented!()
         }
 
@@ -149,7 +149,7 @@ mod test {
             unimplemented!()
         }
 
-        async fn delete_by_biz(&self, _from: &str, _to: &str) -> Result<usize> {
+        async fn delete_by_biz(&self, _from: &str, _to: &str) -> Result<u64> {
             unimplemented!()
         }
     }
@@ -160,15 +160,15 @@ mod test {
             Ok(vec![])
         }
 
-        async fn insert(&self, _one: RawRelation) -> Result<usize> {
+        async fn insert(&self, _one: RawRelation) -> Result<u64> {
             unimplemented!()
         }
 
-        async fn delete(&self, _one: RawRelation) -> Result<usize> {
+        async fn delete(&self, _one: RawRelation) -> Result<u64> {
             unimplemented!()
         }
 
-        async fn update_flag(&self, _from: &str, _to: &str, _flag_f: i32) -> Result<usize> {
+        async fn update_flag(&self, _from: &str, _to: &str, _flag_f: i32) -> Result<u64> {
             unimplemented!()
         }
 
@@ -176,7 +176,7 @@ mod test {
             unimplemented!()
         }
 
-        async fn delete_by_biz(&self, _from: &str, _to: &str) -> Result<usize> {
+        async fn delete_by_biz(&self, _from: &str, _to: &str) -> Result<u64> {
             unimplemented!()
         }
     }
@@ -201,15 +201,15 @@ mod test {
             Ok(Some(RawMeta::from(Meta::from_string(m)?)))
         }
 
-        async fn insert(&self, _define: &RawMeta) -> Result<usize> {
+        async fn insert(&self, _define: &RawMeta) -> Result<u64> {
             unimplemented!()
         }
 
-        async fn update_flag(&self, _meta_str: &str, _flag_f: i32) -> Result<usize> {
+        async fn update_flag(&self, _meta_str: &str, _flag_f: i32) -> Result<u64> {
             unimplemented!()
         }
 
-        async fn delete(&self, _m: &Meta) -> Result<usize> {
+        async fn delete(&self, _m: &Meta) -> Result<u64> {
             unimplemented!()
         }
     }

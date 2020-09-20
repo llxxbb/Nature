@@ -34,7 +34,7 @@ pub struct ConverterParameter {
     #[serde(default)]
     pub last_state: Option<Instance>,
     /// This is used for callback
-    pub task_id: String,
+    pub task_id: u64,
     #[serde(skip_serializing_if = "is_default")]
     #[serde(default)]
     pub master: Option<Instance>,

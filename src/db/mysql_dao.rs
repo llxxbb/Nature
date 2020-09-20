@@ -21,7 +21,7 @@ pub struct MySql;
 
 impl MySql {
     /// i(nsert) d(elete) u(pdate)
-    pub async fn idu<Q, P>(query: Q, params: P) -> Result<usize>
+    pub async fn idu<Q, P>(query: Q, params: P) -> Result<u64>
         where
             Q: AsRef<str>,
             P: Into<Params>,
@@ -29,7 +29,10 @@ impl MySql {
         let conn = MySql::get_conn().await?;
         match conn.prep_exec(query, params).await {
             Ok(num) => {
-                Ok(num.affected_rows() as usize)
+                match num.last_insert_id() {
+                    Some(id) => Ok(id),
+                    None => Ok(num.affected_rows())
+                }
             }
             Err(e) => return Err(MysqlError(e).into())
         }

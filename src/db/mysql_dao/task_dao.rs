@@ -1,9 +1,9 @@
 use chrono::{Duration, Local};
+use mysql_async::{params, Value};
 
 use crate::common::{NatureError, Result};
 use crate::db::MySql;
 use crate::db::raw_models::{RawTask, RawTaskError};
-use mysql_async::{params, Value};
 
 lazy_static! {
     pub static ref D_T: TaskDaoImpl = TaskDaoImpl {};
@@ -11,28 +11,28 @@ lazy_static! {
 
 #[async_trait]
 pub trait TaskDao {
-    async fn insert(&self, raw: &RawTask) -> Result<usize>;
-    async fn delete(&self, _record_id: &str) -> Result<usize>;
-    async fn delete_finished(&self, _delay: i64) -> Result<usize>;
-    async fn raw_to_error(&self, err: &NatureError, raw: &RawTask) -> Result<usize>;
+    async fn insert(&self, raw: &RawTask) -> Result<u64>;
+    async fn delete(&self, _record_id: &u64) -> Result<u64>;
+    async fn delete_finished(&self, _delay: i64) -> Result<u64>;
+    async fn raw_to_error(&self, err: &NatureError, raw: &RawTask) -> Result<u64>;
     async fn get_overdue(&self, delay: i64, _limit: i64) -> Result<Vec<RawTask>>;
-    async fn update_execute_time(&self, _record_id: &str, delay: i64) -> Result<usize>;
-    async fn finish_task(&self, _record_id: &str) -> Result<usize>;
-    async fn increase_times_and_delay(&self, _record_id: &str, delay: i32) -> Result<usize>;
-    async fn get(&self, _record_id: &str) -> Result<Option<RawTask>>;
+    async fn update_execute_time(&self, _record_id: &u64, delay: i64) -> Result<u64>;
+    async fn finish_task(&self, _record_id: &u64) -> Result<u64>;
+    async fn increase_times_and_delay(&self, _record_id: &u64, delay: i32) -> Result<u64>;
+    async fn get(&self, _record_id: &u64) -> Result<Option<RawTask>>;
 }
 
 pub struct TaskDaoImpl;
 
 #[async_trait]
 impl TaskDao for TaskDaoImpl {
-    async fn insert(&self, raw: &RawTask) -> Result<usize> {
+    async fn insert(&self, raw: &RawTask) -> Result<u64> {
         let sql = r"INSERT INTO task
             (task_id, task_key, task_type, task_for, task_state, `data`, create_time, execute_time, retried_times)
             VALUES(:task_id, :task_key, :task_type, :task_for, :task_state, :data, :create_time, :execute_time, :retried_times)";
 
         let p: Vec<(String, Value)> = raw.clone().into();
-        let num: usize = match MySql::idu(sql, p).await {
+        let num: u64 = match MySql::idu(sql, p).await {
             Ok(n) => {
                 debug!("---- saved task KEY: {} FOR: {} TYPE: {}", &raw.task_key, &raw.task_for, raw.task_type);
                 n
@@ -52,7 +52,7 @@ impl TaskDao for TaskDaoImpl {
     }
 
     #[allow(dead_code)]
-    async fn delete(&self, _record_id: &str) -> Result<usize> {
+    async fn delete(&self, _record_id: &u64) -> Result<u64> {
         let sql = r"DELETE FROM nature.task
             WHERE task_id=:task_id";
 
@@ -60,12 +60,12 @@ impl TaskDao for TaskDaoImpl {
             "task_id" => _record_id,
         };
 
-        let rtn: usize = MySql::idu(sql, p).await?;
+        let rtn = MySql::idu(sql, p).await?;
         Ok(rtn)
     }
 
     /// delete finished task after `delay` seconds
-    async fn delete_finished(&self, _delay: i64) -> Result<usize> {
+    async fn delete_finished(&self, _delay: i64) -> Result<u64> {
         let sql = r"DELETE FROM task
             WHERE execute_time < date_sub(now(), interval :delay second) AND task_state = 1";
 
@@ -73,18 +73,18 @@ impl TaskDao for TaskDaoImpl {
             "delay" => _delay,
         };
 
-        let rtn: usize = MySql::idu(sql, p).await?;
+        let rtn = MySql::idu(sql, p).await?;
         Ok(rtn)
     }
 
-    async fn raw_to_error(&self, err: &NatureError, raw: &RawTask) -> Result<usize> {
+    async fn raw_to_error(&self, err: &NatureError, raw: &RawTask) -> Result<u64> {
         let sql = r"INSERT INTO task_error
             (task_id, task_key, task_type, task_for, `data`, create_time, msg)
             VALUES(:task_id, :task_key, :task_type, :task_for, :data, :create_time, :msg)";
 
         let rd = RawTaskError::from_raw(err, raw);
         let p: Vec<(String, Value)> = rd.into();
-        let num: usize = match MySql::idu(sql, p).await {
+        let num = match MySql::idu(sql, p).await {
             Ok(num) => {
                 self.delete(&raw.task_id).await?;
                 num
@@ -113,7 +113,7 @@ impl TaskDao for TaskDaoImpl {
         MySql::fetch(sql, p, RawTask::from).await
     }
 
-    async fn update_execute_time(&self, _record_id: &str, delay: i64) -> Result<usize> {
+    async fn update_execute_time(&self, _record_id: &u64, delay: i64) -> Result<u64> {
         let sql = r"UPDATE nature.task
             SET execute_time=:execute_time
             WHERE task_id=:task_id";
@@ -127,7 +127,7 @@ impl TaskDao for TaskDaoImpl {
         Ok(rtn)
     }
 
-    async fn finish_task(&self, _record_id: &str) -> Result<usize> {
+    async fn finish_task(&self, _record_id: &u64) -> Result<u64> {
         let sql = r"UPDATE nature.task
             SET task_state=1
             WHERE task_id=:task_id and task_state=0";
@@ -146,7 +146,7 @@ impl TaskDao for TaskDaoImpl {
     }
 
     /// increase one times and delay `delay` seconds
-    async fn increase_times_and_delay(&self, _record_id: &str, delay: i32) -> Result<usize> {
+    async fn increase_times_and_delay(&self, _record_id: &u64, delay: i32) -> Result<u64> {
         let sql = r"UPDATE nature.task
             SET execute_time=:execute_time, retried_times = retried_times+1
             WHERE task_id=:task_id";
@@ -160,7 +160,7 @@ impl TaskDao for TaskDaoImpl {
         Ok(rtn)
     }
 
-    async fn get(&self, _record_id: &str) -> Result<Option<RawTask>> {
+    async fn get(&self, _record_id: &u64) -> Result<Option<RawTask>> {
         let sql = r"SELECT task_id, task_key, task_type, task_for, task_state, `data`, create_time, execute_time, retried_times
             FROM task
             WHERE task_id=:task_id";
@@ -191,17 +191,18 @@ mod test {
     async fn insert_repeat_test() {
         env::set_var("DATABASE_URL", CONN_STR);
         let mut task = RawTask::default();
-        let _num = D_T.delete("lxb").await.unwrap();
-        task.task_id = "lxb".to_string();
+        let _num = D_T.delete(&1).await.unwrap();
         let num = D_T.insert(&task).await.unwrap();
+        task.task_id = num;
         assert_eq!(1, num);
+        // repeat
         let num = D_T.insert(&task).await.unwrap();
         assert_eq!(0, num);
-        let get_task = D_T.get("lxb").await.unwrap();
+        let get_task = D_T.get(&1).await.unwrap();
         assert!(get_task.is_some());
         let num = D_T.raw_to_error(&NatureError::LogicalError("my test".to_string()), &task).await.unwrap();
         assert_eq!(1, num);
-        let get_task = D_T.get("lxb").await.unwrap();
+        let get_task = D_T.get(&1).await.unwrap();
         assert!(get_task.is_none());
     }
 }

@@ -16,13 +16,13 @@ pub trait KeyRange: Sync + Send {
 pub struct InstanceDaoImpl;
 
 impl InstanceDaoImpl {
-    pub async fn insert(instance: &Instance) -> Result<usize> {
+    pub async fn insert(instance: &Instance) -> Result<u64> {
         let new = RawInstance::new(instance)?;
         let sql = r"INSERT INTO instances
             (ins_key, content, context, states, state_version, create_time, sys_context, from_key)
             VALUES(:ins_key, :content,:context,:states,:state_version,:create_time,:sys_context,:from_key)";
         let vec: Vec<(String, Value)> = new.into();
-        let rtn: usize = match MySql::idu(sql, vec).await {
+        let rtn: u64 = match MySql::idu(sql, vec).await {
             Ok(n) => n,
             Err(e) => {
                 return Err(e);
@@ -111,13 +111,13 @@ impl InstanceDaoImpl {
         }
     }
 
-    pub async fn delete(ins: &Instance) -> Result<usize> {
+    pub async fn delete(ins: &Instance) -> Result<u64> {
         let sql = r"DELETE FROM instances
             WHERE ins_key=:ins_key";
         let p = params! {
             "ins_key" => ins.get_key(),
         };
-        let rtn: usize = MySql::idu(sql, p).await?;
+        let rtn = MySql::idu(sql, p).await?;
         debug!("instance deleted, id is : {:?}", ins.id);
         Ok(rtn)
     }

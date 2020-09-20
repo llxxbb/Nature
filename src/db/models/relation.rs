@@ -208,15 +208,15 @@ mod test_from_raw {
             Ok(Some(RawMeta::from(Meta::from_string(m)?)))
         }
 
-        async fn insert(&self, _define: &RawMeta) -> Result<usize> {
+        async fn insert(&self, _define: &RawMeta) -> Result<u64> {
             unimplemented!()
         }
 
-        async fn update_flag(&self, _meta_str: &str, _flag_f: i32) -> Result<usize> {
+        async fn update_flag(&self, _meta_str: &str, _flag_f: i32) -> Result<u64> {
             unimplemented!()
         }
 
-        async fn delete(&self, _m: &Meta) -> Result<usize> {
+        async fn delete(&self, _m: &Meta) -> Result<u64> {
             unimplemented!()
         }
     }

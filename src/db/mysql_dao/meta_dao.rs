@@ -15,9 +15,9 @@ pub type MetaGetter = fn(&str) -> dyn Future<Output=Result<Option<RawMeta>>>;
 #[async_trait]
 pub trait MetaDao: Sync + Send {
     async fn get(&self, meta_str: &str) -> Result<Option<RawMeta>>;
-    async fn insert(&self, define: &RawMeta) -> Result<usize>;
-    async fn update_flag(&self, meta_str: &str, flag_f: i32) -> Result<usize>;
-    async fn delete(&self, m: &Meta) -> Result<usize>;
+    async fn insert(&self, define: &RawMeta) -> Result<u64>;
+    async fn update_flag(&self, meta_str: &str, flag_f: i32) -> Result<u64>;
+    async fn delete(&self, m: &Meta) -> Result<u64>;
 }
 
 pub struct MetaDaoImpl;
@@ -48,17 +48,17 @@ impl MetaDao for MetaDaoImpl {
         }
     }
 
-    async fn insert(&self, define: &RawMeta) -> Result<usize> {
+    async fn insert(&self, define: &RawMeta) -> Result<u64> {
         let sql = r"INSERT INTO meta
             (meta_type, meta_key, description, version, states, fields, config, flag, create_time)
             VALUES(:meta_type, :meta_key, :description, :version, :states, :fields, :config, :flag, :create_time)";
         let p: Vec<(String, Value)> = define.clone().into();
-        let rtn: usize = MySql::idu(sql, p).await?;
+        let rtn = MySql::idu(sql, p).await?;
         debug!("Saved meta : {}:{}:{}", define.meta_type, define.meta_key, define.version);
         Ok(rtn)
     }
 
-    async fn update_flag(&self, meta_str: &str, flag_f: i32) -> Result<usize> {
+    async fn update_flag(&self, meta_str: &str, flag_f: i32) -> Result<u64> {
         let sql = r"UPDATE meta
             SET flag=:flag
             WHERE meta_type = :meta_type and meta_key = :meta_key and version = :version";
@@ -75,7 +75,7 @@ impl MetaDao for MetaDaoImpl {
         Ok(rtn)
     }
 
-    async fn delete(&self, m: &Meta) -> Result<usize> {
+    async fn delete(&self, m: &Meta) -> Result<u64> {
         let sql = r"DELETE FROM meta
             WHERE meta_type = :meta_type and meta_key = :meta_key and version = :version";
 
@@ -85,7 +85,7 @@ impl MetaDao for MetaDaoImpl {
             "version" => m.version,
         };
 
-        let rtn: usize = MySql::idu(sql, p).await?;
+        let rtn = MySql::idu(sql, p).await?;
         debug!("meta deleted: {}:{}:{}", m.get_meta_type().get_prefix(), m.get_key(), m.version);
         Ok(rtn)
     }

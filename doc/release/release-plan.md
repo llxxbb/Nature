@@ -5,10 +5,7 @@
 - 功能性先于非功能性需求
 - 应用情景支持，内部优先于外部（如网关）
 
-## Release 0.18
-
-- incompatible change: filter_before -> convert_before
-- incompatible change: filter_after -> convert_after
+## Release 0.18.1
 
 ### should commit
 
@@ -22,7 +19,7 @@
 - write document for summary use
 - 流式计算：
     map filter sum fold groupBy reduce
-- incompatible change: task_id from char to bigint
+
 
 - make shell version of demo
 - 压测

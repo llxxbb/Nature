@@ -19,12 +19,13 @@ impl IncomeController {
         //     debug!("--generate mission from:{},to:{}", &instance.meta, o.to.meta_string());
         // }
         let task = TaskForStore::new(instance.clone(), mission, None, false);
-        let raw = task.to_raw()?;
+        let mut raw = task.to_raw()?;
         let num = D_T.insert(&raw).await?;
-        if num == 1 {
+        if num > 0 {
+            raw.task_id = num;
             channel_store(task, raw).await?;
         }
-        Ok(format!("{:x}",instance.id))
+        Ok(format!("{:x}", instance.id))
     }
 
 
@@ -36,9 +37,10 @@ impl IncomeController {
         MetaType::check_type(&ins.meta, MetaType::Dynamic)?;
         let uuid = ins.revise()?.id;
         let task = TaskForStore::for_dynamic(&ins, instance.converter, None, false)?;
-        let raw = task.to_raw()?;
+        let mut raw = task.to_raw()?;
         let num = D_T.insert(&raw).await?;
-        if num == 1 {
+        if num > 0 {
+            raw.task_id = num;
             channel_store(task, raw).await?;
         }
         Ok(uuid)
@@ -106,11 +108,12 @@ impl IncomeController {
 
     pub async fn batch(batch: Vec<Instance>) -> Result<()> {
         let id = generate_id(&batch)?;
-        let raw = RawTask::new(&batch, &id.to_string(), TaskType::Batch as i8, &batch[0].meta)?;
+        let mut raw = RawTask::new(&batch, &id.to_string(), TaskType::Batch as i8, &batch[0].meta)?;
         let num = D_T.insert(&raw).await?;
-        if num != 1 {
+        if num < 1 {
             return Ok(());
         }
+        raw.task_id = num;
         let rtn = channel_batch(batch, raw).await;
         Ok(rtn)
     }

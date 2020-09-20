@@ -1,5 +1,10 @@
-
 # 发布的功能
+
+## Release 0.18 2020-09-20
+
+- incompatible change: task_id from char to bigint
+- incompatible change: filter_before -> convert_before
+- incompatible change: filter_after -> convert_after
 
 ## Release 0.17 2020-09-13
 

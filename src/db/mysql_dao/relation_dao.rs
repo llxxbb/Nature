@@ -18,11 +18,11 @@ lazy_static! {
 pub trait RelationDao: Sync + Send {
     async fn get_relations<MC, M>(&self, from: &str, meta_cache_getter: &MC, meta_getter: &M) -> Relations
         where MC: MetaCache, M: MetaDao;
-    async fn insert(&self, one: RawRelation) -> Result<usize>;
-    async fn delete(&self, one: RawRelation) -> Result<usize>;
-    async fn update_flag(&self, from: &str, to: &str, flag_f: i32) -> Result<usize>;
+    async fn insert(&self, one: RawRelation) -> Result<u64>;
+    async fn delete(&self, one: RawRelation) -> Result<u64>;
+    async fn update_flag(&self, from: &str, to: &str, flag_f: i32) -> Result<u64>;
     async fn insert_by_biz(&self, from: &str, to: &str, url: &str, protocol: &str) -> Result<RawRelation>;
-    async fn delete_by_biz(&self, from: &str, to: &str) -> Result<usize>;
+    async fn delete_by_biz(&self, from: &str, to: &str) -> Result<u64>;
 }
 
 pub struct RelationDaoImpl;
@@ -56,17 +56,17 @@ impl RelationDao for RelationDaoImpl {
             ))
         }
     }
-    async fn insert(&self, one: RawRelation) -> Result<usize> {
+    async fn insert(&self, one: RawRelation) -> Result<u64> {
         let sql = r"INSERT INTO nature.relation
             (from_meta, to_meta, settings, flag)
             VALUES(:from_meta, :to_meta, :settings, :flag)";
 
         let p: Vec<(String, Value)> = one.clone().into();
-        let rtn: usize = MySql::idu(sql, p).await?;
+        let rtn = MySql::idu(sql, p).await?;
         debug!("Saved relation : {} -> {}", one.from_meta, one.to_meta);
         Ok(rtn)
     }
-    async fn delete(&self, one: RawRelation) -> Result<usize> {
+    async fn delete(&self, one: RawRelation) -> Result<u64> {
         let sql = r"DELETE FROM nature.relation
             WHERE from_meta=:from_meta AND to_meta=:to_meta";
 
@@ -75,13 +75,13 @@ impl RelationDao for RelationDaoImpl {
             "to_meta" => one.to_meta.to_string(),
         };
 
-        let rtn: usize = MySql::idu(sql, p).await?;
+        let rtn = MySql::idu(sql, p).await?;
         debug!("relation deleted : {} -> {}", one.from_meta, one.to_meta);
         Ok(rtn)
     }
 
     /// `from` and `to`'s form are full_key:version
-    async fn update_flag(&self, from: &str, to: &str, flag_f: i32) -> Result<usize> {
+    async fn update_flag(&self, from: &str, to: &str, flag_f: i32) -> Result<u64> {
         let sql = r"UPDATE nature.relation
             SET settings='', flag=:flag
             WHERE from_meta=:from_meta AND to_meta=:to_meta";
@@ -122,7 +122,7 @@ impl RelationDao for RelationDaoImpl {
         Ok(one)
     }
 
-    async fn delete_by_biz(&self, from: &str, to: &str) -> Result<usize> {
+    async fn delete_by_biz(&self, from: &str, to: &str) -> Result<u64> {
         let row = RawRelation {
             from_meta: from.to_string(),
             to_meta: to.to_string(),
