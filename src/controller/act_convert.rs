@@ -75,15 +75,15 @@ async fn handle_converted(converted: ConverterReturned, task: &TaskForConvert, r
         ConverterReturned::SelfRoute(ins) => {
             let _ = received_self_route(task, &raw, ins);
         }
-        ConverterReturned::Delay(delay) => {
+        ConverterReturned::Delay { num: delay } => {
             debug!("delay task from meta: {}", task.from.meta);
             let _ = D_T.update_execute_time(&raw.task_id, i64::from(delay)).await;
         }
-        ConverterReturned::LogicalError(ss) => {
+        ConverterReturned::LogicalError {msg:ss} => {
             warn!("executor returned logic err from : {}, task would be deleted", task.from.meta);
             let _ = D_T.raw_to_error(&NatureError::LogicalError(ss), &raw).await;
         }
-        ConverterReturned::EnvError(e) => {
+        ConverterReturned::EnvError {msg:e} => {
             warn!("executor returned env err: {}", e);
         }
         ConverterReturned::None => {

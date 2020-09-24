@@ -52,17 +52,17 @@ impl IncomeController {
                 match raw {
                     None => Err(NatureError::VerifyError("task data missed, maybe it had done already.".to_string())),
                     Some(carrier) => match delayed.result {
-                        ConverterReturned::LogicalError(err) => {
+                        ConverterReturned::LogicalError { msg: err } => {
                             let err = NatureError::LogicalError(err);
                             warn!("{}", err);
                             let _ = D_T.raw_to_error(&err, &carrier).await?;
                             Ok(())
                         }
-                        ConverterReturned::EnvError(e) => {
+                        ConverterReturned::EnvError { msg: e } => {
                             warn!("{}", e);
                             Ok(())
                         }
-                        ConverterReturned::Delay(_) => {
+                        ConverterReturned::Delay { num: _ } => {
                             Err(NatureError::VerifyError("callback can not process [ConverterReturned::Delay]".to_string()))
                         }
                         ConverterReturned::Instances(ins) => {

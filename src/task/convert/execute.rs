@@ -20,8 +20,8 @@ pub async fn call_executor(task: &mut TaskForConvert, raw: &RawTask, last_target
     };
     &task.from;
     match convert_before(&mut task.from, task.target.convert_before.clone()).await {
-        Err(NatureError::EnvironmentError(e)) => return ConverterReturned::EnvError(e),
-        Err(e) => return ConverterReturned::LogicalError(e.to_string()),
+        Err(NatureError::EnvironmentError(e)) => return ConverterReturned::EnvError { msg: e },
+        Err(e) => return ConverterReturned::LogicalError { msg: e.to_string() },
         _ => ()
     };
     let para = ConverterParameter {
@@ -36,7 +36,7 @@ pub async fn call_executor(task: &mut TaskForConvert, raw: &RawTask, last_target
         Protocol::Http => http_execute_async(&task.target.executor.url, &para).await,
         Protocol::LocalRust => match local_execute(&task.target.executor.url, &para).await {
             Ok(rtn) => rtn,
-            Err(err) => ConverterReturned::EnvError(err.to_string())
+            Err(err) => ConverterReturned::EnvError { msg: err.to_string() }
         }
         Protocol::BuiltIn => match BuiltIn::get(&task.target.executor.url) {
             Ok(exe) => {
@@ -46,13 +46,13 @@ pub async fn call_executor(task: &mut TaskForConvert, raw: &RawTask, last_target
                     }
                     Err(e) => {
                         warn!("{:?} return error: {:?}", task.target.executor.url, e);
-                        ConverterReturned::LogicalError("executor implement error".to_string())
+                        ConverterReturned::LogicalError { msg: "executor implement error".to_string() }
                     }
                 }
             }
-            Err(_) => ConverterReturned::LogicalError("get built-in executor failed".to_string())
+            Err(_) => ConverterReturned::LogicalError { msg: "get built-in executor failed".to_string() }
         }
-        _ => ConverterReturned::LogicalError(format!("Did not implement for protocal : {:?}", &task.target.executor.protocol)),
+        _ => ConverterReturned::LogicalError { msg: format!("Did not implement for protocal : {:?}", &task.target.executor.protocol) },
     };
     rtn
 }

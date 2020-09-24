@@ -38,7 +38,7 @@ pub fn scatter(para: &ConverterParameter) -> ConverterReturned {
     let set = serde_json::from_str::<Setting>(cfg);
     if let Err(e) = set {
         let msg = format!("setting error : {:?}", e.to_string());
-        return ConverterReturned::LogicalError(msg);
+        return ConverterReturned::LogicalError { msg: msg };
     }
     let set = set.unwrap();
 
@@ -46,7 +46,7 @@ pub fn scatter(para: &ConverterParameter) -> ConverterReturned {
     let input = serde_json::from_str::<Vec<Item>>(&para.from.content);
     if let Err(e) = input {
         let msg = format!("instance content error : {:?}", e.to_string());
-        return ConverterReturned::LogicalError(msg);
+        return ConverterReturned::LogicalError { msg: msg };
     }
 
     // process split

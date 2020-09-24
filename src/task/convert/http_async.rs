@@ -10,7 +10,7 @@ pub async fn http_execute_async(address: &str, para: &ConverterParameter) -> Con
     let rtn = reqwest_call(address, para).await;
     match rtn {
         Ok(e) => e,
-        Err(e) => ConverterReturned::EnvError(e.to_string())
+        Err(e) => ConverterReturned::EnvError { msg: e.to_string() }
     }
 }
 

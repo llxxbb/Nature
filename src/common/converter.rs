@@ -6,15 +6,16 @@ use crate::common::error::NatureError;
 use super::Instance;
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
+#[serde(tag = "type")]
 pub enum ConverterReturned {
     /// This will break process for ever.
-    LogicalError(String),
+    LogicalError { msg: String },
     /// This can quick finish the process, and retry later.
-    EnvError(String),
+    EnvError { msg: String },
     /// No instance would be return.
     None,
     /// Tell `Nature` the task will be processed asynchronously, Nature will wait for seconds you assigned, and converter will callback to `Nature` later while result are ready.
-    Delay(u32),
+    Delay { num: u32 },
     /// return instances
     Instances(Vec<Instance>),
     /// return `SelfRouteInstance`
@@ -126,7 +127,7 @@ impl Executor {
 }
 
 #[cfg(test)]
-mod test {
+mod executor_test {
     use super::*;
 
     #[test]
@@ -140,5 +141,40 @@ mod test {
         assert_eq!(ewe_s, "{\"protocol\":\"localRust\"}");
         let ewe_dw: Executor = serde_json::from_str(&ewe_s).unwrap();
         assert_eq!(ewe_dw, exe);
+    }
+}
+
+#[cfg(test)]
+mod converter_returned_test {
+    use super::*;
+
+    #[test]
+    fn none_test() {
+        // converterReturned
+        let none = ConverterReturned::None;
+        let result = serde_json::to_string(&none).unwrap();
+        println!("{}", &result);
+        let back: ConverterReturned = serde_json::from_str(&result).unwrap();
+        assert_eq!(none, back)
+    }
+
+    #[test]
+    fn logical_error_test() {
+        // converterReturned
+        let original = ConverterReturned::LogicalError { msg: "some error".to_string() };
+        let result = serde_json::to_string(&original).unwrap();
+        println!("{}", &result);
+        let back: ConverterReturned = serde_json::from_str(&result).unwrap();
+        assert_eq!(original, back)
+    }
+
+    #[test]
+    fn env_error_test() {
+        // converterReturned
+        let original = ConverterReturned::EnvError { msg: "some error".to_string() };
+        let result = serde_json::to_string(&original).unwrap();
+        println!("{}", &result);
+        let back: ConverterReturned = serde_json::from_str(&result).unwrap();
+        assert_eq!(original, back)
     }
 }

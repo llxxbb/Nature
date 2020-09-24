@@ -15,7 +15,7 @@ pub fn merge(input: &ConverterParameter) -> ConverterReturned {
         match serde_json::from_str::<Setting>(&input.cfg) {
             Ok(cfg) => cfg,
             Err(err) => {
-                return ConverterReturned::LogicalError(err.to_string());
+                return ConverterReturned::LogicalError { msg: err.to_string() };
             }
         }
     };
@@ -23,7 +23,7 @@ pub fn merge(input: &ConverterParameter) -> ConverterReturned {
     let items = match &cfg.key {
         KeyType::Para(part) => match one_to_vec(&input.from.para, &part, &input.from.content) {
             Ok(rtn) => rtn,
-            Err(e) => return ConverterReturned::LogicalError(e.to_string())
+            Err(e) => return ConverterReturned::LogicalError { msg: e.to_string() }
         },
         KeyType::Content => match serde_json::from_str::<Vec<String>>(&input.from.content) {
             Ok(items) => {
@@ -35,7 +35,7 @@ pub fn merge(input: &ConverterParameter) -> ConverterReturned {
                         }
                         Err(e) => {
                             let msg = format!("input data is not an `Item` format! str: {}, err{}", item, e);
-                            return ConverterReturned::LogicalError(msg);
+                            return ConverterReturned::LogicalError { msg: msg };
                         }
                     }
                 }
@@ -44,7 +44,7 @@ pub fn merge(input: &ConverterParameter) -> ConverterReturned {
             Err(e) => {
                 let msg = format!("builtin-merge : input format error. {}", e);
                 warn!("{}, content: {}", msg, input.from.content);
-                return ConverterReturned::LogicalError(msg);
+                return ConverterReturned::LogicalError { msg: msg };
             }
         },
         KeyType::None => match serde_json::from_str::<Vec<String>>(&input.from.content) {
@@ -56,7 +56,7 @@ pub fn merge(input: &ConverterParameter) -> ConverterReturned {
                         Err(e) => {
                             let msg = format!("builtin-merge : input format error. {}", e);
                             warn!("{}, content: {}", msg, input.from.content);
-                            return ConverterReturned::LogicalError(msg);
+                            return ConverterReturned::LogicalError { msg: msg };
                         }
                     };
                     items.push(Item { key: "ignore".to_string(), value });
@@ -66,7 +66,7 @@ pub fn merge(input: &ConverterParameter) -> ConverterReturned {
             Err(e) => {
                 let msg = format!("builtin-merge : input format error. {}", e);
                 warn!("{}, content: {}", msg, input.from.content);
-                return ConverterReturned::LogicalError(msg);
+                return ConverterReturned::LogicalError { msg: msg };
             }
         }
     };
@@ -77,7 +77,7 @@ pub fn merge(input: &ConverterParameter) -> ConverterReturned {
             Err(err) => {
                 let msg = format!("builtin-merge : load last error {}. last: {}", err, o_i.content);
                 warn!("{}", msg);
-                return ConverterReturned::LogicalError(msg);
+                return ConverterReturned::LogicalError { msg };
             }
             Ok(content) => content
         }
@@ -98,12 +98,12 @@ pub fn merge(input: &ConverterParameter) -> ConverterReturned {
         if cfg.sum_all {
             match serde_json::to_string(&content) {
                 Ok(s) => s,
-                Err(err) => return ConverterReturned::LogicalError(err.to_string())
+                Err(err) => return ConverterReturned::LogicalError { msg: err.to_string() }
             }
         } else {
             match serde_json::to_string(&content.detail) {
                 Ok(s) => s,
-                Err(err) => return ConverterReturned::LogicalError(err.to_string())
+                Err(err) => return ConverterReturned::LogicalError { msg: err.to_string() }
             }
         }
     };
@@ -341,7 +341,7 @@ mod para_type_test {
             }).unwrap(),
         };
         dbg!(&input.cfg);
-        if let ConverterReturned::LogicalError(e) = merge(&input) {
+        if let ConverterReturned::LogicalError { msg: e } = merge(&input) {
             assert!(e.contains("get key from para error"));
         } else {
             panic!("should return error");
@@ -366,7 +366,7 @@ mod para_type_test {
                 top: Default::default(),
             }).unwrap(),
         };
-        if let ConverterReturned::LogicalError(e) = merge(&input) {
+        if let ConverterReturned::LogicalError { msg: e } = merge(&input) {
             assert_eq!(true, e.contains("the value be used to sum is not a number"));
         } else {
             panic!("should return error");
@@ -500,7 +500,7 @@ mod content_tuple_test {
             master: None,
             cfg: r#"{"key":"Content"}"#.to_string(),
         };
-        if let ConverterReturned::LogicalError(e) = merge(&input) {
+        if let ConverterReturned::LogicalError { msg: e } = merge(&input) {
             assert_eq!(e.contains("input format error"), true);
         } else {
             panic!("should return error");
@@ -616,7 +616,7 @@ mod content_none_key_test {
             master: None,
             cfg: "".to_string(),
         };
-        if let ConverterReturned::LogicalError(e) = merge(&input) {
+        if let ConverterReturned::LogicalError{ msg: e } = merge(&input) {
             assert_eq!(e.contains("input format error"), true);
         } else {
             panic!("should return error");
