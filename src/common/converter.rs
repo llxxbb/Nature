@@ -47,7 +47,7 @@ pub struct ConverterParameter {
 
 #[derive(Serialize, Deserialize, Debug, Default, Clone, PartialEq)]
 pub struct DynamicConverter {
-    /// Only `Dynamic` and `Null` target supported for security reason.
+    /// Only `Dynamic` and `Null` metaType support
     pub to: Option<String>,
     /// REST api for convert to `to`
     pub fun: Executor,

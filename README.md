@@ -43,9 +43,11 @@ Nature 提供了**统一的数据存储模型**。开发者不再需要为每个
    - 从传入的`订单`中提取所有商品的应收款项记为该`订单账`的应收
    - 将`订单账`对象返回给 Nature 以驱动下一环节的处理。
 
-5. 配置好.evn以指向您创建的数据库，启动 natrue.exe 和 retry.exe
+5. 配置好`.env` 文件中的`DATABASE_URL`属性以指向您创建的数据库，
 
-6. 对 Nature 发起 http 请求，以POST方式将`订单`数据提交数据到 Nature，请参考[提交数据到 Nature](doc/ZH/help/submit-to-nature.md)
+6. 启动 natrue.exe 和 retry.exe。
+
+7. 对 Nature 发起 http post 请求，如将`订单`数据提交数据到 Nature，请参考[Nature接口定义](doc/ZH/help/nature-interface.md)
 
 ## 深入了解Nature
 

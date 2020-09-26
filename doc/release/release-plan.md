@@ -7,8 +7,9 @@
 
 ## Release 0.19
 
-- make ConverterReturned is fit for json translate
-- add Executor.md
+- make ConverterReturned to fit for json communication
+- simple readme.md(CH)
+- add Executor.md(CH)
 
 ### should commit
 
@@ -16,13 +17,13 @@
 
 ### 未完成
 
-- doc: callback.md
-- ConverterReturned deserialize problem
-- simple readme(CH/EN)
-- 提供 executor 接口定义
+- add nature-interface.md(CH)
+
 - 架构：流式计算：可以理解为只有 map,可以内嵌 filter(两层意思：条件过滤和内容修改) 
 
 - channel_store:17-19 说用 tokio::spawn 任务不启动， 且有个怪问题，前一个任务是如何完成的？
+
+- simple readme(EN)
 
 - 修正 prepare.md
 - write document for summary use
