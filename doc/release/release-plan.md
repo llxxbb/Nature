@@ -5,11 +5,7 @@
 - 功能性先于非功能性需求
 - 应用情景支持，内部优先于外部（如网关）
 
-## Release 0.19
-
-- make ConverterReturned to fit for json communication
-- simple readme.md(CH)
-- add Executor.md(CH)
+## Release 0.20
 
 ### should commit
 
@@ -17,7 +13,7 @@
 
 ### 未完成
 
-- add nature-interface.md(CH)
+
 
 - 架构：流式计算：可以理解为只有 map,可以内嵌 filter(两层意思：条件过滤和内容修改) 
 

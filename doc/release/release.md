@@ -1,5 +1,12 @@
 # 发布的功能
 
+## Release 0.19 2020-09-26
+
+- make ConverterReturned to fit for json communication
+- simple readme.md(CH)
+- add Executor.md(CH)
+- add nature-interface.md(CH)
+
 ## Release 0.18 2020-09-20
 
 - incompatible change: task_id from char to bigint
