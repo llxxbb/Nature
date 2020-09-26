@@ -64,7 +64,7 @@ pub fn scatter(para: &ConverterParameter) -> ConverterReturned {
         rtn.push(ins);
     }
     // return result
-    ConverterReturned::Instances(rtn)
+    ConverterReturned::Instances { ins: rtn }
 }
 
 #[cfg(test)]
@@ -94,7 +94,7 @@ mod test {
         };
 
         let rtn = scatter(&para);
-        if let ConverterReturned::Instances(ins) = rtn {
+        if let ConverterReturned::Instances { ins } = rtn {
             assert_eq!(ins.len(), 3);
             let one = &ins[0];
             assert_eq!(one.para, "class5/name1/subject1");

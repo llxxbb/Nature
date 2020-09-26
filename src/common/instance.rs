@@ -62,7 +62,7 @@ impl Instance {
     pub fn revise(&mut self) -> Result<&mut Self> {
         self.create_time = Local::now().timestamp_millis();
         if self.para.is_empty() && self.id == 0 {
-            self.id = generate_id(&self.data)?;
+            self.id = generate_id(&self.data)? as ID;
         }
         Ok(self)
     }
@@ -73,7 +73,7 @@ impl Instance {
         }
         let option = is[1..].iter().find(|x| { !x.meta.eq(&is[0].meta) });
         match option {
-            Some(_) => Err(NatureError::VerifyError("instances's meta must be same!".to_string())),
+            Some(_) => Err(NatureError::VerifyError("instances meta must be same!".to_string())),
             None => Ok(())
         }
     }
@@ -267,6 +267,27 @@ mod test {
         order.data.content = "my order detail".to_string();
         let rtn = serde_json::to_string(&order).unwrap();
         assert_eq!(rtn, r#"{"data":{"meta":"B:sale/order:1","content":"my order detail"}}"#);
+    }
+
+    #[test]
+    fn json_ok_instance_test() {
+        // instance
+        let instance = Instance::new("hello").unwrap();
+        let ok_ins: Result<Instance> = Ok(instance);
+        let result = serde_json::to_string(&ok_ins).unwrap();
+        println!("{}", result);
+        let result: Result<Instance> = serde_json::from_str(&result).unwrap();
+        assert_eq!(result, ok_ins)
+    }
+
+    #[test]
+    fn json_err_test() {
+        // instance
+        let ok_ins: Result<Instance> = Err(NatureError::LogicalError("hello".to_string()));
+        let result = serde_json::to_string(&ok_ins).unwrap();
+        println!("{}", result);
+        let result: Result<Instance> = serde_json::from_str(&result).unwrap();
+        assert_eq!(result, ok_ins)
     }
 }
 

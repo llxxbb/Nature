@@ -68,22 +68,22 @@ pub(crate) async fn do_convert(task: TaskForConvert, raw: RawTask) {
 
 async fn handle_converted(converted: ConverterReturned, task: &TaskForConvert, raw: &RawTask, mission: &Mission, last: &Option<Instance>) -> Result<()> {
     match converted {
-        ConverterReturned::Instances(mut instances) => {
+        ConverterReturned::Instances { ins: mut instances } => {
             convert_after(&mut instances, &task.target.convert_after).await?;
             after_converted(task, &raw, instances, &last).await?;
         }
-        ConverterReturned::SelfRoute(ins) => {
+        ConverterReturned::SelfRoute { ins } => {
             let _ = received_self_route(task, &raw, ins);
         }
         ConverterReturned::Delay { num: delay } => {
             debug!("delay task from meta: {}", task.from.meta);
             let _ = D_T.update_execute_time(&raw.task_id, i64::from(delay)).await;
         }
-        ConverterReturned::LogicalError {msg:ss} => {
+        ConverterReturned::LogicalError { msg: ss } => {
             warn!("executor returned logic err from : {}, task would be deleted", task.from.meta);
             let _ = D_T.raw_to_error(&NatureError::LogicalError(ss), &raw).await;
         }
-        ConverterReturned::EnvError {msg:e} => {
+        ConverterReturned::EnvError { msg: e } => {
             warn!("executor returned env err: {}", e);
         }
         ConverterReturned::None => {

@@ -73,7 +73,7 @@ pub fn time_range(input: &ConverterParameter) -> ConverterReturned {
     };
     let mut instance = Instance::default();
     instance.para = format!("{}{}{}", result.0, *SEPARATOR_INS_PARA, result.1);
-    ConverterReturned::Instances(vec![instance])
+    ConverterReturned::Instances { ins: vec![instance] }
 }
 
 /// setting----------------------------------------------------

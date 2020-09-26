@@ -8,6 +8,7 @@
 ## Release 0.19
 
 - make ConverterReturned is fit for json translate
+- add Executor.md
 
 ### should commit
 
@@ -15,6 +16,7 @@
 
 ### 未完成
 
+- doc: callback.md
 - ConverterReturned deserialize problem
 - simple readme(CH/EN)
 - 提供 executor 接口定义

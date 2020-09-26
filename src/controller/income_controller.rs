@@ -65,11 +65,11 @@ impl IncomeController {
                         ConverterReturned::Delay { num: _ } => {
                             Err(NatureError::VerifyError("callback can not process [ConverterReturned::Delay]".to_string()))
                         }
-                        ConverterReturned::Instances(ins) => {
+                        ConverterReturned::Instances { ins } => {
                             let (task, last) = get_task_and_last(&carrier).await?;
                             after_converted(&task, &carrier, ins, &last).await
                         }
-                        ConverterReturned::SelfRoute(sf) => {
+                        ConverterReturned::SelfRoute { ins: sf } => {
                             let (task, _last) = get_task_and_last(&carrier).await?;
                             received_self_route(&task, &carrier, sf)
                         }

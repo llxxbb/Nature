@@ -109,7 +109,7 @@ pub fn merge(input: &ConverterParameter) -> ConverterReturned {
     };
     ins.id = input.from.id;
     ins.para = input.from.para.clone();
-    ConverterReturned::Instances(vec![ins])
+    ConverterReturned::Instances { ins: vec![ins] }
 }
 
 fn top_mode_select(cfg: &Setting, mut content: &mut Content) {
@@ -393,7 +393,7 @@ mod para_type_test {
             }).unwrap(),
         };
         match merge(&input) {
-            ConverterReturned::Instances(rtn) => {
+            ConverterReturned::Instances { ins: rtn } => {
                 assert_eq!(rtn[0].content, r#"{"detail":{"b":123},"total":123}"#);
             }
             _ => panic!("error")
@@ -426,7 +426,7 @@ mod para_type_test {
             top: Default::default(),
         }).unwrap();
         match merge(&input) {
-            ConverterReturned::Instances(rtn) => {
+            ConverterReturned::Instances { ins: rtn } => {
                 assert_eq!(rtn[0].content, r#"{"detail":{"b":223},"total":223}"#);
             }
             _ => panic!("error")
@@ -440,7 +440,7 @@ mod para_type_test {
         }).unwrap();
         dbg!(&input.cfg);
         match merge(&input) {
-            ConverterReturned::Instances(rtn) => {
+            ConverterReturned::Instances { ins: rtn } => {
                 assert_eq!(rtn[0].content, r#"{"detail":{"b":123},"total":123}"#);
             }
             _ => panic!("error")
@@ -453,7 +453,7 @@ mod para_type_test {
             top: Default::default(),
         }).unwrap();
         match merge(&input) {
-            ConverterReturned::Instances(rtn) => {
+            ConverterReturned::Instances { ins: rtn } => {
                 assert_eq!(rtn[0].content, r#"{"detail":{"b":100},"total":100}"#);
             }
             _ => panic!("error")
@@ -466,7 +466,7 @@ mod para_type_test {
             top: Default::default(),
         }).unwrap();
         match merge(&input) {
-            ConverterReturned::Instances(rtn) => {
+            ConverterReturned::Instances { ins: rtn } => {
                 assert_eq!(rtn[0].content, r#"{"detail":{"b":123},"total":123}"#);
             }
             _ => panic!("error")
@@ -479,7 +479,7 @@ mod para_type_test {
             top: Default::default(),
         }).unwrap();
         match merge(&input) {
-            ConverterReturned::Instances(rtn) => {
+            ConverterReturned::Instances { ins: rtn } => {
                 assert_eq!(rtn[0].content, r#"{"detail":{"b":100},"total":100}"#);
             }
             _ => panic!("error")
@@ -524,7 +524,7 @@ mod content_tuple_test {
             master: None,
             cfg: r#"{"key":"Content"}"#.to_string(),
         };
-        let _ = if let ConverterReturned::Instances(rtn) = merge(&input) {
+        let _ = if let ConverterReturned::Instances { ins: rtn } = merge(&input) {
             let rtn = &rtn[0];
             assert_eq!(rtn.content, r#"{"a":112}"#);
             rtn.clone()
@@ -553,7 +553,7 @@ mod content_tuple_test {
         };
 
         // mode sum
-        let _ = if let ConverterReturned::Instances(rtn) = merge(&input) {
+        let _ = if let ConverterReturned::Instances { ins: rtn } = merge(&input) {
             let rtn = &rtn[0];
             assert_eq!(rtn.content, r#"{"a":212}"#);
             rtn.clone()
@@ -563,7 +563,7 @@ mod content_tuple_test {
 
         // mode old
         input.cfg = r#"{"key":"Content","when_same":"Old"}"#.to_string();
-        let _ = if let ConverterReturned::Instances(rtn) = merge(&input) {
+        let _ = if let ConverterReturned::Instances { ins: rtn } = merge(&input) {
             let rtn = &rtn[0];
             assert_eq!(rtn.content, r#"{"a":112}"#);
             rtn.clone()
@@ -573,7 +573,7 @@ mod content_tuple_test {
 
         // mode New
         input.cfg = r#"{"key":"Content","when_same":"New"}"#.to_string();
-        let _ = if let ConverterReturned::Instances(rtn) = merge(&input) {
+        let _ = if let ConverterReturned::Instances { ins: rtn } = merge(&input) {
             let rtn = &rtn[0];
             assert_eq!(rtn.content, r#"{"a":100}"#);
             rtn.clone()
@@ -583,7 +583,7 @@ mod content_tuple_test {
 
         // mode Max
         input.cfg = r#"{"key":"Content","when_same":"Max"}"#.to_string();
-        let _ = if let ConverterReturned::Instances(rtn) = merge(&input) {
+        let _ = if let ConverterReturned::Instances { ins: rtn } = merge(&input) {
             let rtn = &rtn[0];
             assert_eq!(rtn.content, r#"{"a":112}"#);
             rtn.clone()
@@ -593,7 +593,7 @@ mod content_tuple_test {
 
         // mode Min
         input.cfg = r#"{"key":"Content","when_same":"Min"}"#.to_string();
-        let _ = if let ConverterReturned::Instances(rtn) = merge(&input) {
+        let _ = if let ConverterReturned::Instances { ins: rtn } = merge(&input) {
             let rtn = &rtn[0];
             assert_eq!(rtn.content, r#"{"a":100}"#);
             rtn.clone()
@@ -616,7 +616,7 @@ mod content_none_key_test {
             master: None,
             cfg: "".to_string(),
         };
-        if let ConverterReturned::LogicalError{ msg: e } = merge(&input) {
+        if let ConverterReturned::LogicalError { msg: e } = merge(&input) {
             assert_eq!(e.contains("input format error"), true);
         } else {
             panic!("should return error");
@@ -636,7 +636,7 @@ mod content_none_key_test {
             master: None,
             cfg: "".to_string(),
         };
-        let _ = if let ConverterReturned::Instances(rtn) = merge(&input) {
+        let _ = if let ConverterReturned::Instances { ins: rtn } = merge(&input) {
             let rtn = &rtn[0];
             assert_eq!(rtn.content, r#"112"#);
             rtn.clone()
@@ -660,7 +660,7 @@ mod content_none_key_test {
         };
 
         // mode sum
-        let _ = if let ConverterReturned::Instances(rtn) = merge(&input) {
+        let _ = if let ConverterReturned::Instances { ins: rtn } = merge(&input) {
             let rtn = &rtn[0];
             assert_eq!(rtn.content, "212");
             rtn.clone()
@@ -670,7 +670,7 @@ mod content_none_key_test {
 
         // mode old
         input.cfg = r#"{"when_same":"Old"}"#.to_string();
-        let _ = if let ConverterReturned::Instances(rtn) = merge(&input) {
+        let _ = if let ConverterReturned::Instances { ins: rtn } = merge(&input) {
             let rtn = &rtn[0];
             assert_eq!(rtn.content, "112");
             rtn.clone()
@@ -680,7 +680,7 @@ mod content_none_key_test {
 
         // mode New
         input.cfg = r#"{"when_same":"New"}"#.to_string();
-        let _ = if let ConverterReturned::Instances(rtn) = merge(&input) {
+        let _ = if let ConverterReturned::Instances { ins: rtn } = merge(&input) {
             let rtn = &rtn[0];
             assert_eq!(rtn.content, "100");
             rtn.clone()
@@ -690,7 +690,7 @@ mod content_none_key_test {
 
         // mode Max
         input.cfg = r#"{"when_same":"Max"}"#.to_string();
-        let _ = if let ConverterReturned::Instances(rtn) = merge(&input) {
+        let _ = if let ConverterReturned::Instances { ins: rtn } = merge(&input) {
             let rtn = &rtn[0];
             assert_eq!(rtn.content, "112");
             rtn.clone()
@@ -700,7 +700,7 @@ mod content_none_key_test {
 
         // mode Min
         input.cfg = r#"{"when_same":"Min"}"#.to_string();
-        let _ = if let ConverterReturned::Instances(rtn) = merge(&input) {
+        let _ = if let ConverterReturned::Instances { ins: rtn } = merge(&input) {
             let rtn = &rtn[0];
             assert_eq!(rtn.content, "100");
             rtn.clone()

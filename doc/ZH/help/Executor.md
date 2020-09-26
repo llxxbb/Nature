@@ -21,7 +21,7 @@ Executor 用于执行用户定制的逻辑，除了[内建 Executor](built-in.md
 
 该接口接收一个 json 输入，并产生一个 json 输出。
 
-**入参的json结构定义如下**
+#### 入参的json结构定义如下
 
 ```json
 {
@@ -69,7 +69,13 @@ Executor 用于执行用户定制的逻辑，除了[内建 Executor](built-in.md
 }
 ```
 
-**出参的json结构定义如下**：
+#### 出参的json结构定义如下：
+
+用下面的方式返回转换结果，其中 `ins` 属性是 `instance` 数组，结构说明请看上方的 instance json
+
+```json
+{"type":"Instances","ins":[]}
+```
 
 如果不需要返回数据实例，则请返回下面的 json
 
@@ -89,57 +95,91 @@ Executor 用于执行用户定制的逻辑，除了[内建 Executor](built-in.md
 {"type":"EnvError","msg":"some error"}
 ```
 
+如果需要进行异步处理，则可以立即返回下面的信息给 Nature，Nature 将在您给定的时间内不会发起重试，请您在您自己指定的时间内完成转换任务并回调 [Nature 的回调接口](callback.md)。这里`num` 的单位是秒。
 
+```json
+{"type":"Delay","num":10}
+```
+
+返回自带路由的数据请以下面的形式进行返回，其中 `ins` 为 SelfRouteInstance 数组，其结构请看下方的 SelfRouteInstance json。
+
+```json
+{"type":"SelfRoute","ins":[]}
+```
+
+**SelfRouteInstance** json
 
 ```rust
-pub enum ConverterReturned {
-    LogicalError(String),				// 逻辑错误，Nature 不会重试
-    EnvError(String),					// 当前条件不满足，Nature 会在将来的某个时刻重试
-    None,								// 没有数据返回
-    Delay(u32),							// 用于延时处理，具体用法请看Demo
-    Instances(Vec<Instance>),			// 产出的目标数据实例
-    SelfRoute(Vec<SelfRouteInstance>),	// 定义动态路由
+{
+    "instance": {},			// 请参考上方的 instance json
+    "converter": []			// 为 DynamicConverter 数组，请看下方的DynamicConverter json
+}
+```
+
+**DynamicConverter** 动态转换器，其 json结构如下：
+
+```json
+{
+    "to": "D:targetMeta:1",	// Only `Dynamic` and `Null` metaType support
+    "fun": {},				// 请看下方的 Executor json
+    "use_upstream_id": true,// 缺省 false, 是否使用上游实例ID 作为自身的ID
+    "delay": 10				// 缺省 0，Executor 需要延时执行的时间
+}
+```
+
+**Executor** json 结构如下
+
+```json
+{
+    "protocol": "http",		// 可选的协议：http|https|localRust|builtin
+    "url": String,			// executor 坐标
+    "settings": String		// executor 自身的配置。
 }
 ```
 
 ### convert_before 接口形式
 
-接口实现形式如下：
+该接口接收一个 json 输入，并产生一个 json 输出。入参为 `instance` 对象，请见上方的 instance json。出参有两种情况，如下：
 
-```rust
-#[no_mangle]
-#[allow(improper_ctypes_definitions)]
-pub extern fn your_func(para: &Instance) -> Result<Instance> {
-	// TODO your logic
-}
-```
+1. 正常情况下请输出下面的内容，Ok 的值为改变后的 instance 对象，请见上方的 instance json
 
-**BizObject**的结构定义如下：
+   ```json
+   {"Ok":{}}
+   ```
 
-```rust
-pub struct BizObject {
-    pub meta: String,		// 该业务对象实例所属的 meta 定义
-    pub content: String,	// 业务对象的具体内容
-    pub context: HashMap<String, String>,	// 存储业务对象之外的其它业务信息，这些信息可能会影响流程走向，可能会影响下游数据的处理方式。
-    pub sys_context: HashMap<String, String>, // 同 context 只是这个上下文里的内容是由 Nature 进行规范的。
-    pub states: HashSet<String>,	// 业务对象数据实例的业务状态描述。
-    pub state_version: i32,			// 标记当前的状态变化是第几个版本
-    pub from: Option<FromInstance>,	// 当前数据实例的上游数据实例
-    pub para: String,				// 另一种唯一标记该数据实例的方式，是关联外部数据的有力工具
-}
-```
+2. 如果处理过程中遇到问题，则返回下面的内容:
+
+   ```json
+   {"Err":{"LogicalError":"err message"}}	
+   ```
+
+   或
+
+   ```json
+   {"Err":{"EnvironmentError":"err message"}}	
+   ```
 
 ### convert_after 接口形式
 
-接口实现形式如下，Instance 定义同上。
+该接口接收一个 json 输入，并产生一个 json 输出。接口实现形式如下，入参为 `instance` 对象数组，请见上方的 instance json。出参有两种情况，如下：
 
-```rust
-#[no_mangle]
-#[allow(improper_ctypes_definitions)]
-pub extern fn your_func(para: &Vec<Instance>) -> Result<Vec<Instance>> {
-	// TODO your logic
-}
-```
+1. 正常情况下请输出下面的内容，Ok 的值为改变后的 instance 对象数组，请见上方的 instance json
+
+   ```json
+   {"Ok":[]}
+   ```
+
+2. 如果处理过程中遇到问题，则返回下面的内容:
+
+   ```json
+   {"Err":{"LogicalError":"err message"}}	
+   ```
+
+   或
+
+   ```json
+   {"Err":{"EnvironmentError":"err message"}}	
+   ```
 
 ## localRust协议实现方式
 
@@ -252,10 +292,6 @@ pub extern fn your_func(para: &Vec<Instance>) -> Result<Vec<Instance>> {
 	// TODO your logic
 }
 ```
-
-## 动态`Executor`转换器（实验阶段）
-
-动态路由不需要在运行之前预先定义，既在运行时决定自己的去处，非常的灵活，每个实例可以有自己独立的选择。不过不建议使用，一是目前此功能还不完善，二是该功能性能比静态路由要差，三、业务布局的展示会比较困难。
 
 ## 示例
 

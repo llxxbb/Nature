@@ -17,9 +17,9 @@ pub enum ConverterReturned {
     /// Tell `Nature` the task will be processed asynchronously, Nature will wait for seconds you assigned, and converter will callback to `Nature` later while result are ready.
     Delay { num: u32 },
     /// return instances
-    Instances(Vec<Instance>),
+    Instances { ins: Vec<Instance> },
     /// return `SelfRouteInstance`
-    SelfRoute(Vec<SelfRouteInstance>),
+    SelfRoute { ins: Vec<SelfRouteInstance> },
 }
 
 impl Default for ConverterReturned {
@@ -172,6 +172,36 @@ mod converter_returned_test {
     fn env_error_test() {
         // converterReturned
         let original = ConverterReturned::EnvError { msg: "some error".to_string() };
+        let result = serde_json::to_string(&original).unwrap();
+        println!("{}", &result);
+        let back: ConverterReturned = serde_json::from_str(&result).unwrap();
+        assert_eq!(original, back)
+    }
+
+    #[test]
+    fn delay_test() {
+        // converterReturned
+        let original = ConverterReturned::Delay { num: 10 };
+        let result = serde_json::to_string(&original).unwrap();
+        println!("{}", &result);
+        let back: ConverterReturned = serde_json::from_str(&result).unwrap();
+        assert_eq!(original, back)
+    }
+
+    #[test]
+    fn instance_test() {
+        // converterReturned
+        let original = ConverterReturned::Instances { ins: vec![Instance::default()] };
+        let result = serde_json::to_string(&original).unwrap();
+        println!("{}", &result);
+        let back: ConverterReturned = serde_json::from_str(&result).unwrap();
+        assert_eq!(original, back)
+    }
+
+    #[test]
+    fn self_route_test() {
+        // converterReturned
+        let original = ConverterReturned::SelfRoute { ins: vec![SelfRouteInstance::default()] };
         let result = serde_json::to_string(&original).unwrap();
         println!("{}", &result);
         let back: ConverterReturned = serde_json::from_str(&result).unwrap();
