@@ -77,7 +77,7 @@
 - fix bug for instance_dao::get_by_key_range
 - fix bug for task_dao::raw_to_error
 - fix bug: timeZone problem when load `Instance`
-- bug fix: MetaType::Multi has no from_key generated
+- bug fix: MetaType::Multi has none from_key generated
 - optimize: short time expression for time_range
 
 ## Release 0.11 2020-07-26
@@ -173,7 +173,7 @@
 - instance table add sys_context field
 - `Relation`support [any} option
 - system context : sys.target -> target.id
-- optimize: fetch task witch need to redo
+- optimize: fetch tasks which need to redo
 - change mysql as default db because of sqlite's cb_lock
 - update reqwest to 0.10
 - bug fix: get old plan error “not 1 or 0 but get 2”

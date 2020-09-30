@@ -25,6 +25,25 @@ create TABLE `relation` (
 	PRIMARY KEY(`from_meta`,`to_meta`)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- 5-3 changes
+--CREATE TABLE `instances` (
+--  `instance_id` binary(16) NOT NULL,
+--  `meta` varchar(255) CHARACTER SET latin1 NOT NULL,
+--  `para` varchar(255) CHARACTER SET latin1 NOT NULL,
+--  `content` varchar(1023) CHARACTER SET latin1 NOT NULL,
+--  `context` text CHARACTER SET latin1 DEFAULT NULL,
+--  `states` text CHARACTER SET latin1 DEFAULT NULL,
+--  `state_version` int(11) NOT NULL,
+--  `from_meta` varchar(255) CHARACTER SET latin1 NOT NULL DEFAULT '',
+--  `from_para` varchar(255) CHARACTER SET latin1 NOT NULL DEFAULT '',
+--  `from_id` binary(16) NOT NULL DEFAULT '0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0',
+--  `from_state_version` int(11) NOT NULL DEFAULT 0,
+--  `create_time` datetime NOT NULL,
+--  `sys_context` text CHARACTER SET latin1 DEFAULT NULL,
+--  UNIQUE KEY `instance_un` (`meta`,`instance_id`,`para`,`from_meta`,`from_id`,`from_para`,`from_state_version`),
+--  PRIMARY KEY (`meta`,`instance_id`,`para`,`state_version`)
+--);
+
 CREATE TABLE `instances` (
   `ins_key` varchar(256) NOT NULL COMMENT 'meta|id|para',
   `content` text NOT NULL,
