@@ -1,9 +1,9 @@
-use crate::common::{FromInstance, ID, Instance, is_default, is_one, one, SEPARATOR_INS_KEY};
+use crate::common::{FromInstance, Instance, is_default, is_one, one, SEPARATOR_INS_KEY};
 
 /// used for query instance by id
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct KeyCondition {
-    pub id: String,
+    pub id: u64,
     pub meta: String,
     #[serde(skip_serializing_if = "is_default")]
     #[serde(default)]
@@ -35,9 +35,9 @@ pub struct KeyCondition {
 }
 
 impl KeyCondition {
-    pub fn new(id: &str, meta: &str, para: &str, state_version: i32) -> Self {
+    pub fn new(id: u64, meta: &str, para: &str, state_version: i32) -> Self {
         KeyCondition {
-            id: id.to_string(),
+            id,
             meta: meta.to_string(),
             key_gt: "".to_string(),
             key_ge: "".to_string(),
@@ -67,7 +67,7 @@ impl KeyCondition {
 impl From<&Instance> for KeyCondition {
     fn from(input: &Instance) -> Self {
         KeyCondition {
-            id: format!("{}", input.id),
+            id: input.id,
             meta: input.meta.to_string(),
             key_gt: "".to_string(),
             key_ge: "".to_string(),
@@ -85,7 +85,7 @@ impl From<&Instance> for KeyCondition {
 impl From<&FromInstance> for KeyCondition {
     fn from(input: &FromInstance) -> Self {
         KeyCondition {
-            id: format!("{}", input.id),
+            id: input.id,
             meta: input.meta.to_string(),
             key_gt: "".to_string(),
             key_ge: "".to_string(),
@@ -103,7 +103,7 @@ impl From<&FromInstance> for KeyCondition {
 /// used for query instance by id
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct IDAndFrom {
-    pub id: ID,
+    pub id: u64,
     pub meta: String,
     pub from_key: String,
 }
@@ -141,7 +141,7 @@ mod test {
     #[ignore]
     fn key_condition_test() {
         let condition = KeyCondition {
-            id: "$id".to_string(),
+            id: 0,
             meta: "$meta".to_string(),
             key_gt: "".to_string(),
             key_ge: "".to_string(),

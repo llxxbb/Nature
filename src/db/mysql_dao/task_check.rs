@@ -68,6 +68,7 @@ mod test {
     use super::*;
 
     #[tokio::test]
+    #[ignore]
     async fn get_test() {
         env::set_var("DATABASE_URL", CONN_STR);
         let _ = env_logger::init();

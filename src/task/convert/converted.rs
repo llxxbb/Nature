@@ -216,7 +216,7 @@ mod sys_context_test {
         let mut from = FromInstance::default();
         from.id = 123;
         bridge_context_id(&mut ins, &mission, &from);
-        assert_eq!("7b", ins[0].sys_context.get("target.id").unwrap());
+        assert_eq!("123", ins[0].sys_context.get("target.id").unwrap());
     }
 
     #[test]

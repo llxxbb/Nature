@@ -32,5 +32,3 @@ mod target_state;
 mod util;
 
 pub type Result<T> = std::result::Result<T, NatureError>;
-
-pub type ID = u64;

@@ -1,7 +1,7 @@
 use std::convert::TryFrom;
 
 use crate::channels::CHANNEL_CONVERT;
-use crate::common::{ConverterReturned, DelayedInstances, generate_id, ID, Instance, KeyCondition, Meta, MetaType, NatureError, Result, SelfRouteInstance};
+use crate::common::{ConverterReturned, DelayedInstances, generate_id, Instance, KeyCondition, Meta, MetaType, NatureError, Result, SelfRouteInstance};
 use crate::controller::*;
 use crate::db::{C_M, C_R, D_M, D_R, D_T, InstanceDaoImpl, MetaCache, Mission, RawTask, RelationCache, TaskDao, TaskType};
 use crate::db::flow_tool::{context_check, state_check};
@@ -30,7 +30,7 @@ impl IncomeController {
 
 
     /// born an instance which is the beginning of the changes.
-    pub async fn self_route(instance: SelfRouteInstance) -> Result<ID> {
+    pub async fn self_route(instance: SelfRouteInstance) -> Result<u64> {
         let _ = instance.verify()?;
         // Convert a Self-Route-Instance to Normal Instance
         let mut ins = instance.to_instance();

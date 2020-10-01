@@ -8,7 +8,7 @@ use chrono::prelude::*;
 use futures::Future;
 use itertools::Itertools;
 
-use crate::common::{DynamicConverter, FromInstance, generate_id, ID, is_default, KeyCondition, MetaType, NatureError, Result, SEPARATOR_INS_KEY, SEPARATOR_META, TargetState};
+use crate::common::{DynamicConverter, FromInstance, generate_id, is_default, KeyCondition, MetaType, NatureError, Result, SEPARATOR_INS_KEY, SEPARATOR_META, TargetState};
 
 use super::Meta;
 
@@ -29,7 +29,7 @@ pub struct Instance {
     /// A unique value used to distinguish other instance
     #[serde(skip_serializing_if = "is_default")]
     #[serde(default)]
-    pub id: ID,
+    pub id: u64,
     pub data: BizObject,
     /// When this instance created in db
     #[serde(skip_serializing_if = "is_default")]
@@ -62,7 +62,7 @@ impl Instance {
     pub fn revise(&mut self) -> Result<&mut Self> {
         self.create_time = Local::now().timestamp_millis();
         if self.para.is_empty() && self.id == 0 {
-            self.id = generate_id(&self.data)? as ID;
+            self.id = generate_id(&self.data)? as u64;
         }
         Ok(self)
     }
@@ -87,7 +87,7 @@ impl Instance {
             Some(setting) => match setting.master {
                 None => Ok(None),
                 Some(master) => {
-                    let condition = KeyCondition::new(&format!("{}", self.id), &master, &self.para, 0);
+                    let condition = KeyCondition::new(self.id, &master, &self.para, 0);
                     let result = dao(condition);
                     Ok(result.await?)
                 }
@@ -124,7 +124,7 @@ impl DerefMut for Instance {
 impl Into<KeyCondition> for Instance {
     fn into(self) -> KeyCondition {
         KeyCondition {
-            id: format!("{}", self.id),
+            id: self.id,
             meta: self.data.meta.to_string(),
             key_gt: "".to_string(),
             key_ge: "".to_string(),

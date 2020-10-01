@@ -1,10 +1,10 @@
 use std::str::FromStr;
 
-use crate::common::{ID, id_from_hex_str, Instance, is_default, NatureError, Result, SEPARATOR_INS_KEY};
+use crate::common::{id_from_hex_str, Instance, is_default, NatureError, Result, SEPARATOR_INS_KEY};
 
 #[derive(Serialize, Deserialize, Debug, Default, Clone, PartialEq, Eq, Hash)]
 pub struct FromInstance {
-    pub id: ID,
+    pub id: u64,
     pub meta: String,
     #[serde(skip_serializing_if = "is_default")]
     #[serde(default)]

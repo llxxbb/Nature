@@ -49,7 +49,7 @@ impl FilterBefore for Loader {
 
         // load
         let condition = KeyCondition {
-            id: "".to_string(),
+            id: 0,
             meta: "".to_string(),
             key_gt: first,
             key_ge: "".to_string(),
