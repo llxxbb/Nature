@@ -37,7 +37,7 @@ impl InstanceDaoImpl {
     pub async fn get_by_from(f_para: &IDAndFrom) -> Result<Option<Instance>> {
         let sql = r"SELECT meta, ins_id, para, content, context, states, state_version, create_time, sys_context, from_key
             FROM instances
-            where meta = :meta, ins_id = :ins_id and from_key = :from_key
+            where meta = :meta and ins_id = :ins_id and from_key = :from_key
             order by state_version desc
             limit 1";
         let p = params! {

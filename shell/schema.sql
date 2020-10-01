@@ -27,7 +27,7 @@ create TABLE `relation` (
 
 CREATE TABLE `instances` (
   `meta` varchar(150) NOT NULL,
-  `ins_id` bigint(20) NOT NULL,
+  `ins_id` bigint(20) unsigned NOT NULL,
   `para` varchar(255) NOT NULL,
   `content` text NOT NULL,
   `context` text DEFAULT NULL,
