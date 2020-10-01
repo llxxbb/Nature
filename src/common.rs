@@ -33,8 +33,4 @@ mod util;
 
 pub type Result<T> = std::result::Result<T, NatureError>;
 
-#[cfg(feature = "id64")]
 pub type ID = u64;
-
-#[cfg(feature = "id128")]
-pub type ID = u128;

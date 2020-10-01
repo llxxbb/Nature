@@ -1,9 +1,24 @@
-#[cfg(feature = "id128")]
-pub use id128::*;
-#[cfg(feature = "id64")]
-pub use id64::*;
+use std::collections::hash_map::DefaultHasher;
+use std::hash::{Hash, Hasher};
+use std::str::FromStr;
 
-#[cfg(feature = "id128")]
-mod id128;
-#[cfg(feature = "id64")]
-mod id64;
+use crate::common::{NatureError, Result};
+
+#[inline]
+pub fn generate_id<T: Hash>(value: &T) -> Result<u64> {
+    let mut s = DefaultHasher::new();
+    value.hash(&mut s);
+    Ok(s.finish())
+}
+
+#[inline]
+pub fn id_from_hex_str(value: &str) -> Result<u64> {
+    match u64::from_str(value) {
+        Ok(rtn) => Ok(rtn),
+        Err(e) => {
+            let msg = format!("can't convert to id from {}, err: {}", value, e);
+            warn!("{}", msg);
+            Err(NatureError::VerifyError(msg))
+        }
+    }
+}

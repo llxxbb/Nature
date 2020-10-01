@@ -38,16 +38,11 @@ pub struct ConverterParameter {
 
 ```rust
 pub struct Instance {
-    pub id: ID,				// 用于唯一标识这个业务对象的值，
+    pub id: u64,				// 用于唯一标识这个业务对象的值，
     pub data: BizObject,	// 业务对象的具体内容
     pub create_time: i64,	// 创建时间
 }
 ```
-
-其中`ID`会依据 Nature 编译时选取的 feature 不同而不同。
-
-- 如果 feature = id64 （缺省）则ID为u64
-- 如果 feature = id128 则ID为u128
 
 **json 形式如下**：
 

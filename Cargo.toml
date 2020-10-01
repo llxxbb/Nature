@@ -53,9 +53,6 @@ tokio = { version = "0.2", features = ["full"] }
 mysql_async = "0.23"
 
 [features]
-default = ["id64", "mysql"]
-#default = ["id128"]
-id128 = ["uuid"]
-id64 = []
+default = ["mysql"]
 mysql = []
 sqlite = []
