@@ -83,7 +83,7 @@
 //     assert_eq!(rtn, 12);
 //     // check input
 //     let written = Runtime::new().unwrap().block_on(InstanceDaoImpl::get_by_id(KeyCondition {
-//         id: format!("{:x}", 3 as ID),
+//         id: format!("{}", 3 as ID),
 //         meta: "/D/dynamic/target/is/null:1".to_string(),
 //         key_gt: "".to_string(),
 //         key_ge: "".to_string(),
@@ -120,7 +120,7 @@
 //     // query target
 //     common::sleep(3000);
 //     let ins_db = Runtime::new().unwrap().block_on(InstanceDaoImpl::get_by_id(KeyCondition {
-//         id: format!("{:x}", 31 as ID),
+//         id: format!("{}", 31 as ID),
 //         meta: "/D/dynamic/one_target:1".to_string(),
 //         key_gt: "".to_string(),
 //         key_ge: "".to_string(),
@@ -165,7 +165,7 @@
 //     // query target
 //     common::sleep(2500);
 //     let ins_db = Runtime::new().unwrap().block_on(InstanceDaoImpl::get_by_id(KeyCondition {
-//         id: format!("{:x}", 12 as ID),
+//         id: format!("{}", 12 as ID),
 //         meta: "/D/dynamic/two_of_1:1".to_string(),
 //         key_gt: "".to_string(),
 //         key_ge: "".to_string(),
@@ -179,7 +179,7 @@
 //     })).unwrap().unwrap();
 //     assert_eq!("/D/dynamic/two_of_1:1", ins_db.meta);
 //     let ins_db = Runtime::new().unwrap().block_on(InstanceDaoImpl::get_by_id(KeyCondition {
-//         id: format!("{:x}", 12 as ID),
+//         id: format!("{}", 12 as ID),
 //         meta: "/D/dynamic/two_of_2:1".to_string(),
 //         key_gt: "".to_string(),
 //         key_ge: "".to_string(),

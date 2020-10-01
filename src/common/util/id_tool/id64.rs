@@ -1,5 +1,6 @@
 use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
+use std::str::FromStr;
 
 use crate::common::{NatureError, Result};
 
@@ -12,7 +13,7 @@ pub fn generate_id<T: Hash>(value: &T) -> Result<u64> {
 
 #[inline]
 pub fn id_from_hex_str(value: &str) -> Result<u64> {
-    match u64::from_str_radix(value, 16) {
+    match u64::from_str(value) {
         Ok(rtn) => Ok(rtn),
         Err(e) => {
             let msg = format!("can't convert to id from {}, err: {}", value, e);

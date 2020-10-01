@@ -63,7 +63,7 @@ impl FromStr for FromInstance {
 impl ToString for FromInstance {
     fn to_string(&self) -> String {
         let sep: &str = &*SEPARATOR_INS_KEY;
-        format!("{}{}{:x}{}{}{}{}", self.meta, sep, self.id, sep, self.para, sep, self.state_version)
+        format!("{}{}{}{}{}{}{}", self.meta, sep, self.id, sep, self.para, sep, self.state_version)
     }
 }
 

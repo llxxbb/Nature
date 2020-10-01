@@ -148,7 +148,7 @@ fn bridge_context_id(instances: &mut Vec<Instance>, mission: &Mission, from: &Fr
         }
     } else {
         for instance in instances {
-            instance.data.sys_context.insert(CONTEXT_TARGET_INSTANCE_ID.to_string(), format!("{:x}", from.id));
+            instance.data.sys_context.insert(CONTEXT_TARGET_INSTANCE_ID.to_string(), format!("{}", from.id));
         }
     }
 }

@@ -87,7 +87,7 @@ impl Instance {
             Some(setting) => match setting.master {
                 None => Ok(None),
                 Some(master) => {
-                    let condition = KeyCondition::new(&format!("{:x}", self.id), &master, &self.para, 0);
+                    let condition = KeyCondition::new(&format!("{}", self.id), &master, &self.para, 0);
                     let result = dao(condition);
                     Ok(result.await?)
                 }
@@ -97,12 +97,12 @@ impl Instance {
 
     pub fn get_key(&self) -> String {
         let sep: &str = &*SEPARATOR_INS_KEY;
-        format!("{}{}{:x}{}{}{}{}", self.meta, sep, self.id, sep, self.para, sep, self.state_version)
+        format!("{}{}{}{}{}{}{}", self.meta, sep, self.id, sep, self.para, sep, self.state_version)
     }
 
     pub fn key_no_state(&self) -> String {
         let sep: &str = &*SEPARATOR_INS_KEY;
-        format!("{}{}{:x}{}{}", self.meta, sep, self.id, sep, self.para)
+        format!("{}{}{}{}{}", self.meta, sep, self.id, sep, self.para)
     }
 }
 
@@ -124,7 +124,7 @@ impl DerefMut for Instance {
 impl Into<KeyCondition> for Instance {
     fn into(self) -> KeyCondition {
         KeyCondition {
-            id: format!("{:x}", self.id),
+            id: format!("{}", self.id),
             meta: self.data.meta.to_string(),
             key_gt: "".to_string(),
             key_ge: "".to_string(),

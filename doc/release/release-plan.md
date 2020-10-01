@@ -8,6 +8,7 @@
 ## Release 0.20
 
 - incompatible change: change `Instance` table design, split `ins_key` into `meta`, `ins_id` and `para`
+- incompatible change: use decimal replace hexadecimal to represent instance.id
 
 ### should commit
 
@@ -15,7 +16,6 @@
 
 ### 未完成
 
-- remove all {:x} 
 - doc: 如何实现一个 Executor 的灰度替换
 - split instance.ins_key to meta, id and para
 

@@ -25,7 +25,7 @@ impl IncomeController {
             raw.task_id = num;
             channel_store(task, raw).await?;
         }
-        Ok(format!("{:x}", instance.id))
+        Ok(format!("{}", instance.id))
     }
 
 

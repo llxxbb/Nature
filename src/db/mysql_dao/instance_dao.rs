@@ -1,4 +1,5 @@
 use std::collections::HashSet;
+use std::str::FromStr;
 
 use chrono::{Local, TimeZone};
 use mysql_async::{params, Value};
@@ -59,7 +60,7 @@ impl InstanceDaoImpl {
             where meta = :meta and ins_id = :ins_id and para = :para
             order by state_version desc
             limit 1";
-        let id = ID::from_str_radix(&f_para.id, 16)?;
+        let id = ID::from_str(&f_para.id)?;
         let p = params! {
             "meta" => f_para.meta.to_string(),
             "ins_id" => id,
@@ -135,7 +136,7 @@ impl InstanceDaoImpl {
             Some(state_id) => state_id.to_string(),
             None => {
                 if mission.use_upstream_id || mission.to.check_master(&from.meta) {
-                    let from_id = format!("{:x}", from.id);
+                    let from_id = format!("{}", from.id);
                     mission.sys_context.insert(CONTEXT_TARGET_INSTANCE_ID.to_string(), from_id.to_string());
                     from_id
                 } else {

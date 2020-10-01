@@ -14,7 +14,7 @@ pub fn generate_id<T: ?Sized + Serialize>(value: &T) -> Result<u128> {
 
 #[inline]
 pub fn id_from_hex_str(value: &str) -> Result<u128> {
-    match u128::from_str_radix(value, 16) {
+    match u128::from_str(value) {
         Ok(rtn) => Ok(rtn),
         Err(e) => {
             let msg = format!("can't convert to id from {}, err: {}", value, e);
@@ -61,11 +61,11 @@ mod test {
     #[test]
     fn u128_2_hex_str() {
         let result = generate_id("str").unwrap();
-        let string1 = format!("{:x}", result);
+        let string1 = format!("{}", result);
         let string2 = format!("{:#x}", result);
         dbg!(&string1);
         dbg!(&string2);
-        let radix = u128::from_str_radix(&string1, 16).unwrap();
+        let radix = u128::from_str(&string1).unwrap();
         assert_eq!(result, radix);
     }
 }

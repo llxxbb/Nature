@@ -67,7 +67,7 @@ impl KeyCondition {
 impl From<&Instance> for KeyCondition {
     fn from(input: &Instance) -> Self {
         KeyCondition {
-            id: format!("{:x}", input.id),
+            id: format!("{}", input.id),
             meta: input.meta.to_string(),
             key_gt: "".to_string(),
             key_ge: "".to_string(),
@@ -85,7 +85,7 @@ impl From<&Instance> for KeyCondition {
 impl From<&FromInstance> for KeyCondition {
     fn from(input: &FromInstance) -> Self {
         KeyCondition {
-            id: format!("{:x}", input.id),
+            id: format!("{}", input.id),
             meta: input.meta.to_string(),
             key_gt: "".to_string(),
             key_ge: "".to_string(),
@@ -110,7 +110,7 @@ pub struct IDAndFrom {
 
 impl IDAndFrom {
     pub fn para_like(&self) -> String {
-        format!("{}|{:x}|%", self.meta, self.id)
+        format!("{}|{}|%", self.meta, self.id)
     }
 }
 

@@ -108,7 +108,7 @@ async fn init_target_id_for_sys_context(task: &mut TaskForConvert, from_instance
     }
     let master = setting.master.unwrap();
     if master.eq(&from_instance.meta) {
-        task.target.sys_context.insert(CONTEXT_TARGET_INSTANCE_ID.to_string(), format!("{:x}", from_instance.id));
+        task.target.sys_context.insert(CONTEXT_TARGET_INSTANCE_ID.to_string(), format!("{}", from_instance.id));
         return;
     }
     let f_meta: Meta = C_M.get(&task.from.meta, &*D_M).await.unwrap();
@@ -121,7 +121,7 @@ async fn init_target_id_for_sys_context(task: &mut TaskForConvert, from_instance
     }
     let f_master = f_setting.master.unwrap();
     if f_master.eq(&master) {
-        task.target.sys_context.insert(CONTEXT_TARGET_INSTANCE_ID.to_string(), format!("{:x}", from_instance.id));
+        task.target.sys_context.insert(CONTEXT_TARGET_INSTANCE_ID.to_string(), format!("{}", from_instance.id));
     }
 }
 
