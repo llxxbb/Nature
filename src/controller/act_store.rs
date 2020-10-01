@@ -64,7 +64,7 @@ async fn duplicated_instance(task: TaskForStore, carrier: RawTask) -> Result<()>
     } else {
         warn!("conflict for state-meta: [{}] on version : {}", &task.instance.meta, task.instance.state_version);
         sleep(Duration::from_millis(10));
-        let mut rtn = TaskForConvert::from_raw(&carrier, InstanceDaoImpl::get_by_key, &*C_M, &*D_M).await?;
+        let mut rtn = TaskForConvert::from_raw(&carrier, InstanceDaoImpl::get_by_id, &*C_M, &*D_M).await?;
         rtn.conflict_version = task.instance.state_version;
         CHANNEL_CONVERT.sender.lock().unwrap().send((rtn, carrier))?;
         Ok(())

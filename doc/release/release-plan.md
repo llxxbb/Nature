@@ -7,13 +7,16 @@
 
 ## Release 0.20
 
+- incompatible change: change `Instance` table design, split `ins_key` into `meta`, `ins_id` and `para`
+
 ### should commit
 
 
 
 ### 未完成
 
-- 如何实现一个 Executor 的灰度替换
+- remove all {:x} 
+- doc: 如何实现一个 Executor 的灰度替换
 - split instance.ins_key to meta, id and para
 
 - 架构：流式计算：可以理解为只有 map,可以内嵌 filter(两层意思：条件过滤和内容修改) 

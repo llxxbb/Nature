@@ -1,5 +1,7 @@
 use std::collections::HashSet;
+use std::convert::TryInto;
 use std::fmt::Debug;
+use std::str::FromStr;
 
 use chrono::prelude::*;
 use lazy_static::__Deref;
@@ -129,6 +131,31 @@ impl Into<Vec<(String, Value)>> for RawTask {
             "execute_time" => self.execute_time,
             "retried_times" => self.retried_times,
         }
+    }
+}
+
+impl TryInto<KeyCondition> for &RawTask {
+    type Error = NatureError;
+
+    fn try_into(self) -> Result<KeyCondition> {
+        let temp: Vec<&str> = self.task_key.split(&*SEPARATOR_TASK_KEY).collect();
+        if temp.len() != 4 {
+            return Err(NatureError::VerifyError("error key format for task".to_string()));
+        }
+        let rtn = KeyCondition {
+            id: temp[1].to_string(),
+            meta: temp[0].to_string(),
+            key_gt: "".to_string(),
+            key_ge: "".to_string(),
+            key_lt: "".to_string(),
+            key_le: "".to_string(),
+            para: temp[2].to_string(),
+            state_version: i32::from_str(temp[3])?,
+            time_ge: None,
+            time_lt: None,
+            limit: 1,
+        };
+        Ok(rtn)
     }
 }
 

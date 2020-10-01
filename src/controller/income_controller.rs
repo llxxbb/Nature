@@ -93,7 +93,7 @@ impl IncomeController {
                 channel_stored(rtn, raw).await;
             }
             TaskType::Convert => {
-                let rtn = TaskForConvert::from_raw(&raw, InstanceDaoImpl::get_by_key, &*C_M, &*D_M).await?;
+                let rtn = TaskForConvert::from_raw(&raw, InstanceDaoImpl::get_by_id, &*C_M, &*D_M).await?;
                 debug!("--redo convert task: from:{}, to:{}", rtn.from.meta, rtn.target.to.meta_string());
                 CHANNEL_CONVERT.sender.lock().unwrap().send((rtn, raw))?;
             }
@@ -120,7 +120,7 @@ impl IncomeController {
 }
 
 async fn get_task_and_last(task: &RawTask) -> Result<(TaskForConvert, Option<Instance>)> {
-    let mut task: TaskForConvert = TaskForConvert::from_raw(task, InstanceDaoImpl::get_by_key, &*C_M, &*D_M).await?;
+    let mut task: TaskForConvert = TaskForConvert::from_raw(task, InstanceDaoImpl::get_by_id, &*C_M, &*D_M).await?;
     let last = InstanceDaoImpl::get_last_target(&task.from, &mut task.target).await?;
     Ok((task, last))
 }

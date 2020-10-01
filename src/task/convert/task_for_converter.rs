@@ -1,11 +1,12 @@
+use std::convert::TryInto;
 use std::ops::Add;
 
 use chrono::{FixedOffset, Local};
 use futures::Future;
 
-use crate::common::{Instance, NatureError, Result};
+use crate::common::{Instance, KeyCondition, NatureError, Result};
 use crate::db::{MetaCache, MetaDao, Mission, MissionRaw, RawTask, TaskType};
-use crate::task::{TASK_KEY_SEPARATOR, TaskForStore};
+use crate::task::TaskForStore;
 
 #[derive(Debug, Clone)]
 pub struct TaskForConvert {
@@ -56,11 +57,11 @@ impl TaskForConvert {
             None => false,
         }
     }
-    pub async fn from_raw<T, MC, M>(raw: &RawTask, ins_g: fn(String, String) -> T, mc_g: &MC, m_g: &M) -> Result<Self>
+    pub async fn from_raw<T, MC, M>(raw: &RawTask, ins_g: fn(KeyCondition) -> T, mc_g: &MC, m_g: &M) -> Result<Self>
         where T: Future<Output=Result<Option<Instance>>>, MC: MetaCache, M: MetaDao
     {
         let mr = MissionRaw::from_json(&raw.data)?;
-        let result = ins_g(raw.task_key.to_string(), TASK_KEY_SEPARATOR.to_string()).await?;
+        let result = ins_g(raw.try_into()?).await?;
         let rtn = match result {
             None => return Err(NatureError::EnvironmentError("can't find instance".to_string())),
             Some(ins) => {

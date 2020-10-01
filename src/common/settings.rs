@@ -7,6 +7,9 @@ lazy_static! {
     pub static ref SEPARATOR_INS_KEY:String={
         env::var("SEPARATOR_INS_KEY").unwrap_or_else(|_| "|".to_string())
     };
+    pub static ref SEPARATOR_TASK_KEY:String={
+        env::var("SEPARATOR_TASK_KEY").unwrap_or_else(|_| "|".to_string())
+    };
     pub static ref SEPARATOR_META:String={
         env::var("SEPARATOR_META").unwrap_or_else(|_| ":".to_string())
     };

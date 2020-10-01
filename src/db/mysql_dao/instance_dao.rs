@@ -1,4 +1,4 @@
-use std::str::FromStr;
+use std::collections::HashSet;
 
 use chrono::{Local, TimeZone};
 use mysql_async::{params, Value};
@@ -19,7 +19,7 @@ impl InstanceDaoImpl {
     pub async fn insert(instance: &Instance) -> Result<u64> {
         let new = RawInstance::new(instance)?;
         let sql = r"INSERT INTO instances
-            (ins_key, content, context, states, state_version, create_time, sys_context, from_key)
+            (meta, ins_id, para, content, context, states, state_version, create_time, sys_context, from_key)
             VALUES(:ins_key, :content,:context,:states,:state_version,:create_time,:sys_context,:from_key)";
         let vec: Vec<(String, Value)> = new.into();
         let rtn: u64 = match MySql::idu(sql, vec).await {
@@ -32,16 +32,16 @@ impl InstanceDaoImpl {
         Ok(rtn)
     }
 
-    //noinspection RsLiveness
     /// check whether source stored earlier
     pub async fn get_by_from(f_para: &IDAndFrom) -> Result<Option<Instance>> {
-        let sql = r"SELECT ins_key, content, context, states, state_version, create_time, sys_context, from_key
+        let sql = r"SELECT meta, ins_id, para, content, context, states, state_version, create_time, sys_context, from_key
             FROM instances
-            where ins_key like :para_like and from_key = :from_key
+            where meta = :meta, ins_id = :ins_id and from_key = :from_key
             order by state_version desc
             limit 1";
         let p = params! {
-            "para_like" => f_para.para_like().to_string(),
+            "meta" => f_para.meta.to_string(),
+            "ins_id" => f_para.id,
             "from_key" => f_para.from_key.to_string(),
         };
 
@@ -53,15 +53,17 @@ impl InstanceDaoImpl {
         }
     }
 
-    //noinspection RsLiveness
     async fn get_last_state(f_para: &KeyCondition) -> Result<Option<Instance>> {
-        let sql = r"SELECT ins_key, content, context, states, state_version, create_time, sys_context, from_key
+        let sql = r"SELECT meta, ins_id, para, content, context, states, state_version, create_time, sys_context, from_key
             FROM instances
-            where ins_key = :ins_key
+            where meta = :meta and ins_id = :ins_id and para = :para
             order by state_version desc
             limit 1";
+        let id = ID::from_str_radix(&f_para.id, 16)?;
         let p = params! {
-            "ins_key" => f_para.get_key(),
+            "meta" => f_para.meta.to_string(),
+            "ins_id" => id,
+            "para" => f_para.para.to_string(),
         };
         let rtn = MySql::fetch(sql, p, RawInstance::from).await?;
         match rtn.len() {
@@ -71,36 +73,16 @@ impl InstanceDaoImpl {
         }
     }
 
-    pub async fn get_by_key(key: String, spliter: String) -> Result<Option<Instance>> {
-        let temp: Vec<&str> = key.split(&spliter).collect();
-        if temp.len() != 4 {
-            return Err(NatureError::VerifyError("error key format for task".to_string()));
-        }
-        let para = KeyCondition {
-            id: temp[1].to_string(),
-            meta: temp[0].to_string(),
-            key_gt: "".to_string(),
-            key_ge: "".to_string(),
-            key_lt: "".to_string(),
-            key_le: "".to_string(),
-            para: temp[2].to_string(),
-            state_version: i32::from_str(temp[3])?,
-            time_ge: None,
-            time_lt: None,
-            limit: 1,
-        };
-        Self::get_by_id(para).await
-    }
-
-    //noinspection RsLiveness
     pub async fn get_by_id(f_para: KeyCondition) -> Result<Option<Instance>> {
-        let sql = r"SELECT ins_key, content, context, states, state_version, create_time, sys_context, from_key
+        let sql = r"SELECT meta, ins_id, para, content, context, states, state_version, create_time, sys_context, from_key
             FROM instances
-            where ins_key = :ins_key and state_version = :state_version
+            where meta = :meta and ins_id = :ins_id and para = :para and state_version = :state_version
             order by state_version desc
             limit 1";
         let p = params! {
-            "ins_key" => f_para.get_key().to_string(),
+            "meta" => f_para.meta.to_string(),
+            "ins_id" => f_para.id,
+            "para" => f_para.para,
             "state_version" => f_para.state_version,
         };
         let rtn = MySql::fetch(sql, p, RawInstance::from).await?;
@@ -113,12 +95,14 @@ impl InstanceDaoImpl {
 
     pub async fn delete(ins: &Instance) -> Result<u64> {
         let sql = r"DELETE FROM instances
-            WHERE ins_key=:ins_key";
+            WHERE meta = :meta and ins_id = :ins_id and para = :para";
         let p = params! {
-            "ins_key" => ins.get_key(),
+            "meta" => ins.meta.to_string(),
+            "ins_id" => ins.id,
+            "para" => ins.para.to_string(),
         };
         let rtn = MySql::idu(sql, p).await?;
-        debug!("instance deleted, id is : {:?}", ins.id);
+        debug!("instance deleted, meta:id is : {}:{:?}", ins.meta, ins.id);
         Ok(rtn)
     }
 
@@ -170,23 +154,30 @@ impl InstanceDaoImpl {
 impl KeyRange for InstanceDaoImpl {
     /// ins_key > and between time range
     async fn get_by_key_range(&self, f_para: &KeyCondition) -> Result<Vec<Instance>> {
-        let key_like = if f_para.meta.is_empty() {
+        let mut list: Vec<String> = vec![];
+        let mut set: HashSet<String> = HashSet::new();
+
+        let meta = if f_para.meta.is_empty() {
             ""
         } else {
-            " and ins_key like :meta"
+            " and meta = :meta"
         };
-        let key_gt = if f_para.key_gt.eq("") { "" } else {
-            " and ins_key > :key_gt"
+        // key
+        if !f_para.key_gt.eq("") {
+            build_for_part(&mut set, &mut list, &f_para.key_gt, ">")?;
         };
-        let key_ge = if f_para.key_ge.eq("") { "" } else {
-            " and ins_key >= :key_ge"
+        if !f_para.key_ge.eq("") {
+            build_for_part(&mut set, &mut list, &f_para.key_ge, ">=")?;
         };
-        let key_lt = if f_para.key_lt.eq("") { "" } else {
-            " and ins_key < :key_lt"
+        if !f_para.key_lt.eq("") {
+            build_for_part(&mut set, &mut list, &f_para.key_lt, "<")?;
         };
-        let key_le = if f_para.key_le.eq("") { "" } else {
-            " and ins_key <= :key_le"
+        if !f_para.key_le.eq("") {
+            build_for_part(&mut set, &mut list, &f_para.key_le, "<=")?;
         };
+        let key = list.join("");
+
+        // other
         let time_ge = match f_para.time_ge {
             Some(_) => " and create_time >= :time_ge",
             None => ""
@@ -206,22 +197,19 @@ impl KeyRange for InstanceDaoImpl {
         let limit = if f_para.limit < *QUERY_SIZE_LIMIT {
             f_para.limit
         } else { *QUERY_SIZE_LIMIT };
-        let sql = format!("SELECT ins_key, content, context, states, state_version, create_time, sys_context, from_key
+        // sql
+        let sql = format!("SELECT meta, ins_id, para, content, context, states, state_version, create_time, sys_context, from_key
             FROM instances
-            where 1=1{}{}{}{}{}{}{}
-            order by ins_key
-            limit :limit", time_ge, time_lt, key_gt, key_ge, key_lt, key_le, key_like);
+            where 1=1{}{}{}{}
+            order by meta, ins_id, para
+            limit :limit", time_ge, time_lt, key, meta);
 
         let p = params! {
-"meta" => f_para.meta.to_string() + "%",
-"key_gt" => f_para.key_gt.to_string(),
-"key_ge" => f_para.key_ge.to_string(),
-"key_lt" => f_para.key_lt.to_string(),
-"key_le" => f_para.key_le.to_string(),
-"time_ge" => Local.timestamp_millis(time_ge_v).naive_local(),
-"time_lt" => Local.timestamp_millis(time_lt_v).naive_local(),
-"limit" => limit,
-};
+            "meta" => f_para.meta.to_string(),
+            "time_ge" => Local.timestamp_millis(time_ge_v).naive_local(),
+            "time_lt" => Local.timestamp_millis(time_lt_v).naive_local(),
+            "limit" => limit,
+        };
         dbg!(&sql);
         let result = MySql::fetch(sql, p, RawInstance::from).await?;
         let mut rtn: Vec<Instance> = vec![];
@@ -232,6 +220,46 @@ impl KeyRange for InstanceDaoImpl {
     }
 }
 
+fn key_to_part(key: &str) -> Vec<String> {
+    if key.is_empty() {
+        return vec![];
+    }
+    let parts: Vec<&str> = key.split(&*SEPARATOR_INS_KEY).collect();
+    let mut rtn: Vec<String> = vec![];
+    for part in parts {
+        if part.is_empty() {
+            break;
+        }
+        rtn.push(part.to_string());
+    }
+    rtn
+}
+
+/// generate where clause for query, ignore the parts more than 3
+fn build_for_part(set: &mut HashSet<String>, list: &mut Vec<String>, parts: &str, end_sign: &str) -> Result<()> {
+    if parts.contains("'") {
+        return Err(NatureError::VerifyError("illegal query condition!".to_string()));
+    }
+    let vec = key_to_part(parts);
+    if vec.len() > 1 {
+        if set.insert(vec[0].clone()) {
+            list.push(" and meta = '".to_owned() + &vec[0] + "'")
+        }
+    } else if vec.len() == 1 {
+        list.push(" and meta ".to_owned() + end_sign + " '" + &vec[0] + "'")
+    }
+    if vec.len() > 2 {
+        if set.insert(vec[0].clone() + &*SEPARATOR_INS_KEY + &vec[1]) {
+            list.push(" and ins_id = ".to_owned() + &vec[1])
+        }
+    } else if vec.len() == 2 {
+        list.push(" and ins_id ".to_owned() + end_sign + " " + &vec[1])
+    }
+    if vec.len() >= 3 {
+        list.push(" and para ".to_owned() + end_sign + " '" + &vec[2] + "'")
+    }
+    Ok(())
+}
 
 #[cfg(test)]
 mod test {
@@ -333,5 +361,103 @@ mod test {
         assert!(result.is_ok());
         let vec = result.unwrap();
         dbg!(&vec);
+    }
+
+    #[test]
+    fn key_to_part_test() {
+        let vec = key_to_part("a||b");
+        assert_eq!(1, vec.len());
+        assert_eq!("a", vec[0]);
+
+        let vec = key_to_part("a|b|");
+        assert_eq!(2, vec.len());
+        assert_eq!("a", vec[0]);
+        assert_eq!("b", vec[1]);
+
+        let vec = key_to_part("a|b");
+        assert_eq!(2, vec.len());
+        assert_eq!("a", vec[0]);
+        assert_eq!("b", vec[1]);
+    }
+}
+
+#[cfg(test)]
+mod build_for_part_test {
+    use super::*;
+
+    #[test]
+    fn error_input_test() {
+        let mut list: Vec<String> = vec![];
+        let mut set: HashSet<String> = HashSet::new();
+        let result = build_for_part(&mut set, &mut list, "dfafdf|fdfa'fdsa|dfsadfasu", "");
+        assert_eq!(true, result.is_err());
+    }
+
+    #[test]
+    fn empty_input_test() {
+        let mut list: Vec<String> = vec![];
+        let mut set: HashSet<String> = HashSet::new();
+        let result = build_for_part(&mut set, &mut list, "", "");
+        assert_eq!(true, result.is_ok());
+        assert_eq!(0, list.len());
+        assert_eq!(0, set.len());
+    }
+
+    #[test]
+    fn meta_test() {
+        let mut list: Vec<String> = vec![];
+        let mut set: HashSet<String> = HashSet::new();
+        let _ = build_for_part(&mut set, &mut list, "a", ">");
+        let _ = build_for_part(&mut set, &mut list, "b", "<");
+        assert_eq!(0, set.len());
+        assert_eq!(2, list.len());
+        assert_eq!(" and meta > 'a'", list[0]);
+        assert_eq!(" and meta < 'b'", list[1]);
+    }
+
+    #[test]
+    fn id_test() {
+        let mut list: Vec<String> = vec![];
+        let mut set: HashSet<String> = HashSet::new();
+        let _ = build_for_part(&mut set, &mut list, "m|1", ">");
+        let _ = build_for_part(&mut set, &mut list, "m|5", "<");
+        assert_eq!(1, set.len());
+        assert_eq!(true, set.contains("m"));
+        assert_eq!(3, list.len());
+        assert_eq!(" and meta = 'm'", list[0]);
+        assert_eq!(" and ins_id > 1", list[1]);
+        assert_eq!(" and ins_id < 5", list[2]);
+    }
+
+    #[test]
+    fn para_test() {
+        let mut list: Vec<String> = vec![];
+        let mut set: HashSet<String> = HashSet::new();
+        let _ = build_for_part(&mut set, &mut list, "m|0|a", ">");
+        let _ = build_for_part(&mut set, &mut list, "m|0|b", "<");
+        assert_eq!(2, set.len());
+        assert_eq!(true, set.contains("m"));
+        assert_eq!(true, set.contains("m|0"));
+        assert_eq!(4, list.len());
+        assert_eq!(" and meta = 'm'", list[0]);
+        assert_eq!(" and ins_id = 0", list[1]);
+        assert_eq!(" and para > 'a'", list[2]);
+        assert_eq!(" and para < 'b'", list[3]);
+    }
+
+    #[test]
+    fn more_than_three_part_test() {
+        let mut list: Vec<String> = vec![];
+        let mut set: HashSet<String> = HashSet::new();
+        let _ = build_for_part(&mut set, &mut list, "m|0|a|dfdfd", ">");
+        let _ = build_for_part(&mut set, &mut list, "m|0|b|eeefddi", "<");
+        assert_eq!(2, set.len());
+        assert_eq!(true, set.contains("m"));
+        assert_eq!(true, set.contains("m|0"));
+        assert_eq!(4, list.len());
+        assert_eq!(" and meta = 'm'", list[0]);
+        assert_eq!(" and ins_id = 0", list[1]);
+        assert_eq!(" and para > 'a'", list[2]);
+        assert_eq!(" and para < 'b'", list[3]);
     }
 }
