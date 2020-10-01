@@ -21,7 +21,7 @@ impl InstanceDaoImpl {
         let new = RawInstance::new(instance)?;
         let sql = r"INSERT INTO instances
             (meta, ins_id, para, content, context, states, state_version, create_time, sys_context, from_key)
-            VALUES(:ins_key, :content,:context,:states,:state_version,:create_time,:sys_context,:from_key)";
+            VALUES(:meta,:ins_id,:para,:content,:context,:states,:state_version,:create_time,:sys_context,:from_key)";
         let vec: Vec<(String, Value)> = new.into();
         let rtn: u64 = match MySql::idu(sql, vec).await {
             Ok(n) => n,
@@ -269,6 +269,16 @@ mod test {
     use tokio::runtime::Runtime;
 
     use super::*;
+
+    #[tokio::test]
+    async fn insert_test() {
+        env::set_var("DATABASE_URL", "mysql://root@localhost/nature");
+        let instance = Instance::new("test").unwrap();
+        let rtn = InstanceDaoImpl::insert(&instance).await.unwrap();
+        assert_eq!(true, rtn > 0);
+        let _ = dbg!(rtn);
+    }
+
 
     #[test]
     #[allow(dead_code)]

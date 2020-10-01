@@ -11,7 +11,9 @@ use crate::common::*;
 use crate::db::models::define::*;
 
 pub struct RawInstance {
-    ins_key: String,
+    meta: String,
+    ins_id: u64,
+    para: String,
     content: String,
     context: Option<String>,
     states: Option<String>,
@@ -26,8 +28,6 @@ impl RawInstance {
         let from = if self.from_key.eq("") { None } else {
             Some(FromInstance::from_str(&self.from_key)?)
         };
-
-        let key = FromInstance::from_key_no_state(&self.ins_key)?;
         let context = match self.context {
             None => HashMap::new(),
             Some(ref s) => serde_json::from_str::<HashMap<String, String>>(s)?
@@ -43,22 +43,22 @@ impl RawInstance {
         let time = match Local.from_local_datetime(&self.create_time).single() {
             Some(t) => t,
             None => {
-                let msg = format!("instance create time error: {}", self.ins_key);
+                let msg = format!("instance create time error: {}|{}|{}", self.meta, self.ins_id, self.para);
                 error!("{}", msg);
                 return Err(NatureError::VerifyError(msg));
             }
         };
         Ok(Instance {
-            id: key.id,
+            id: self.ins_id,
             data: BizObject {
-                meta: key.meta.clone(),
+                meta: self.meta.clone(),
                 content: self.content.clone(),
                 context,
                 sys_context,
                 states,
                 state_version: self.state_version,
                 from,
-                para: key.para.clone(),
+                para: self.para.clone(),
             },
             create_time: time.timestamp_millis(),
         })
@@ -66,7 +66,9 @@ impl RawInstance {
 
     pub fn new(instance: &Instance) -> Result<RawInstance> {
         Ok(RawInstance {
-            ins_key: instance.key_no_state(),
+            meta: instance.meta.to_string(),
+            ins_id: instance.id,
+            para: instance.para.to_string(),
             content: {
                 if instance.content.len() > *INSTANCE_CONTENT_MAX_LENGTH.deref() {
                     return Err(NatureError::SystemError("content's length can' be over : ".to_owned() + &INSTANCE_CONTENT_MAX_LENGTH.to_string()));
@@ -103,9 +105,11 @@ impl RawInstance {
 
 impl From<Row> for RawInstance {
     fn from(row: Row) -> Self {
-        let (ins_key, content, context, states, state_version, create_time, sys_context, from_key) = mysql_async::from_row(row);
+        let (meta, ins_id, para, content, context, states, state_version, create_time, sys_context, from_key) = mysql_async::from_row(row);
         RawInstance {
-            ins_key,
+            meta,
+            ins_id,
+            para,
             content,
             context,
             states,
@@ -120,7 +124,9 @@ impl From<Row> for RawInstance {
 impl Into<Vec<(String, Value)>> for RawInstance {
     fn into(self) -> Vec<(String, Value)> {
         params! {
-            "ins_key" => self.ins_key,
+            "meta" => self.meta,
+            "ins_id" => self.ins_id,
+            "para" => self.para,
             "content" => self.content,
             "context" => self.context,
             "states" => self.states,

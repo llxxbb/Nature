@@ -10,7 +10,7 @@
 - incompatible change: change `Instance` table design, split `ins_key` into `meta`, `ins_id` and `para`
 - incompatible change: use decimal replace hexadecimal to represent the instance.id
 - remove u128 support
-- KeyCondition.id type changed to u64 from String
+- incompatible change: KeyCondition.id type changed to u64 from String
 
 ### should commit
 
