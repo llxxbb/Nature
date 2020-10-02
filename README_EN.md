@@ -2,66 +2,108 @@
 
 English|[中文](README.md)
 
-Nature is a **minimalist programming** platform. It is net-based, so it can be used in a variety of network languages. Nature simplifies your coding in the following ways:
+## What is Nature？
 
-- Nature provides a **unified data storage model and ultimate data consistency assurance**. Nature's database model can be used in many business scenarios without additional database design and code support for database logic.
-- Nature provides **configuration-based process control**. Code can basically not consider process control, time scheduling, failure retry and other questions.
+### Distributed Stream-Compute-Engine
 
-Nature is an innovative product that draws on messaging systems, BPMN, Workflow, FaaS and databases to integrate some of the ideas.
+Traditional stream-compute is proposed to solve the timeliness of data processing, emphasizing calculation logic, and emphasizing `map-reduce`. Nature is also a stream-compute framework, and its core processing mode is: **Data--map--> Data--map-->Data...**, which simplifies `map-reduce` to `map` (It is not that `reduce` is discarded, but it can be embedded into `map` for processing). This simplified mode allows us to more easily focus on the data itself rather than the process, so **Nature emphasize data**, but not calculation logic. This point will be further explained below.
 
-Nature is an open source solution for building a new class of applications based on **data-driven**, **business-oriented**, and **decentralized**. **Nature organically integrates system architecture and business architecture together**,  to bridge the gap between the two and enable the system to better serve the business.
+### Business Control Center
 
-Nature builds systems using downstream **Natural Selection** upstream instead of the traditional **upstream control downstream** approach. Changing from centrally controlled **one-to-many** to decentralized **one-to-one**, so that it can reduces transaction complexity significantly. Nature can dramatically streamline the business model and to meet the need for rapid iteration of the business, allowing the system to **evolve through constant selection**. That's what the name of the project implies.
+**Data--map--> Data--map--> Data** is **Nature's runtime mode**. From a management point of view, we pay more attention to results rather than processes, so Nature simplifies this mode further, the map is removed, and the new mode becomes: **Data-->Data-->Data...**. This is **Nature's design-time mode**. This also proves that Nature is a data-centric Stream-Compute-Engine.
 
-Nature allows the business to **have complete control over the code** without being constrained in one way or another by existing systems. You can control business processes in a non-coding way, this will be important in two ways: it will make it easier to shape your system, and it will significantly reduce development investment.
+Nature uses `Meta` and `Relation` to represent data and the relationship between them respectively. In this way, within Nature system, only Nature knows what business the data represents and how to find downstream businesses through `Relation` for all business systems involved in collaboration, so Nature becomes the actual business control center.
 
-## Problems with traditional development approaches
+### Dispatching Center
 
-To achieve business goals, the system requires a suite of software engineering to escort it. For staffing, management and time costs, we tend to tailor to varying degrees and combine various development models, such as agile, to achieve a balance between quality and cost. But even this, research and development remains costly, because traditional development methods cannot get around the following problems.
+The `map` in Nature runtime mode corresponds to the `Executor` in `Relation`. Nature will follow the data flow in the design-time mode to schedule Executor. These schedules include pre-processing, post-processing, idempotence, delay processing, timing processing, and batch processing. If it is timeout or encounters an abnormal environment, Nature will retry multiple times under the retry strategy, and try its best to ensure the final consistency of the data. Even if the final retry fails or a logical exception is encountered, Nature will not discard the task, but will put it in the error data table. After problem fixed, you can re-import the data from the error data table to the task data table, and Nature will retry these tasks again until they are successfully completed.
 
-- **The Passing Game**: Large systems generally need to be collaborated through multiple teams of different functions such as requirements, product, design, and R&D, so they often have high latency and inefficiency issues. In order to reduce these losses, we generally also introduce quality control links, which are cost reflective, the more links, the higher the cost.
-- **weak controllability**: The requirements proponent is mostly not a developer, and his ideas can only be embodied on the system indirectly through others, **not directly controlled**. For the iceberg of the system, the requirements proponent is **only able to provide some guidance** for the surface portion, has no absolute control, and has no say over the underwater portion.
-- **Target kidnapped**: The goal is expressed in code, yet the business wants to change and the code is hard to change! **There are always modules in the big system that people are afraid to touch! It's an eternal pain in the system.**
-- **The skeletal reality**: The slogans can be shouted very clearly and loudly, but when it really gets down to the nitty-gritty and settles into the implementation details, it's hard for technicians to make the ideal system when they're in the crosshairs of business, technology, cost and other dimensions. Backed by the belief that **rapid iteration and continuous delivery** is pinned on the next correction.
+### Data Center
 
-- **The Lost Target**: Most of our work is functionally oriented, and we only occasionally look back at our goals. Over time, without realizing it, we get caught up in the vortex of function, and **forget what we really want**.
-- **Non-functional requirements**: For a complex business system, non-functional requirements are far more difficult and time-consuming to develop than functional requirements, such as idempotent, retry, consistency, stability, reliability, etc. **These are the black holes that suck money**.
+`Executor` generates `Instance` at runtime. The initial data submitted to Nature by the external system is also `Instance`. `Instance` is the runtime expression of `Meta`, which is also the instance data of the business. If you want, you can hand over as much `Meta` to Nature as possible. Nature will provide unified and centralized storage for the `Instance` generated by `Meta` and provide query interfaces for them, so that Nature will played the role of a Data Center. Here are a few notes:
 
-## Nature's solution
+- Data retrieval: Nature's business objects are all stored unstructured, much like the `Key-Value` database. If you want to perform statistics on the data in the business object. It can be convenient to utilize Nature’s Stream-Compute-Engine to process any data you want. Please refer to the demo of sales statistics in [Example](https://github.com/llxxbb/Nature-Demo).
 
-The problems faced by traditional development methods are inherent in themselves and cannot be solved by perfecting them. To solve these problems, a whole new mechanism is needed, and Nature provides such a mechanism.
+- Database capacity: Nature uses mysql as the back-end storage by default. If you have a large amount of data, you can consider using [Tidb](https://pingcap.com/en/).
 
-Nature is business-oriented, she abstracts business at a high latitude, and all complex business worlds can be represented by **business objects** and the **relationships** between them. Business objects are actually **business goals**, and relationships are the springboard that will allow you to **achieve them one by one**. A relationship is not a method or a function, but it is a vehicle for function. It doesn't tell you what to do, but it does tell you what you need.
+### Minimal Development Platform
 
-### Business objects have "target" attributes
+You can see that Nature integrates many heavyweight elements, and the purpose of integration is to simplify our programming and enable developers to better focus on the business itself. It is embodied in the following aspects:
 
-On a macro level, systems are designed to process data. What you see on the monitor and what you interact with between systems is data. So **systems are made for data, and data is the goal of the system**.  Microscopically speaking, a method inputs data and outputs data. **Methods exist for processing data, and data is the goal of the method**. It follows that data is what we want, and in that sense **data is the object**. Business objects are the data that describe the business, so **business objects are the soul of the system**. If the business objects are well managed, the goals are well managed, and Nature was created to manage business objects.
+- Data driven
+  Traditional function-oriented development will mix business data, technical data, control data, and temporary data together, creating unnecessary coupling, and unintentionally increasing the complexity and maintenance cost of the system; worse more, the key business Data may be "kidnapped" by the system, which becomes bloated, inefficient and difficult to change.
+  Nature's design-time model is entirely composed of business data, without the smallest amount of function, which ensures the purity, intuitiveness and simplicity of the business, and can guarantee the absolute control of the business on the system. Nature's `Executor` divides the entire business system into the smallest collaborative units that are not coupled with each other, ensuring the simplicity of development and maintenance.
 
-### Freeing the target from the code, making it implicit to explicit
+- Significantly reduce interface and storage related work
 
-In a traditional development approach, business objects are defined by code. In Nature, business objects are called `Meta` and are defined in a configurable way. This is a humanized definition that does not require coding. The `Meta` is digital and is can directly involved in the processing of the system, that can avoid the following problems generated.
+  Nature’s business process control is achieved through [Configuration](doc/ZH/help/relation.md), and developers do not need to care about upstream and downstream process control issues. Reflected in two aspects: one is the definition of the interface, compared with the complex and a large number of personalized interface definitions in traditional projects, Nature only provides a limited number of interfaces; the other is the use of interfaces. Traditional projects need to write logic in the code for the calling of the interfaces, but for Nature, except submitting data to Nature, all interface calls are handled by Nature, which greatly simplifies interface-related design, development, debugging and follow-up maintenance work.
 
-- There is **no need to transmit the target**. One person can define it just fine, and all the people see the same thing, thus avoiding the problem of distortion, so that the target delivery, translation and control costs are gone.
-- The target has **strong control ability **. The identity of the code changes from definer to follower, there is no longer a constraining capital on the target, and the target has the ability to truly control rather than guiding the code. And need not worry about being kidnapped by code.
-- Refinement work and business changes should just care about the business dimensions, **technical iterations will become meaningless**.
+  Similarly, Nature adopts a centralized and unified data storage mechanism, and developers do not need to care about the design of data tables and indexes and subsequent development and maintenance work.
 
-### Take away the control of the code over business processes and reduce the complexity of business systems.
+- Significantly reduce non-functional development related work
 
-Traditional business systems are complex when they grow large. Whether it's technical or business, there's a lot of logic woven together like a jumble of interlocking threads. But Nature split it into three parts: the technical part is Nature's responsibility as much as possible, and the functional implementation of Leave it to the developers and leave the most important part, process control, to the business managers, this part is configurable and can be easily controlled, without programming. This would simplify and organize a complex system.
+  Nature has done a lot of work for the availability (such as idempotence, eventual consistency of data) and reliability (such as retries, exception records) for the system. In addition, Nature also supports the business in terms of scalability , Such as the version technology of `Meta`. According to Pareto Principle (the 80/20 Rule), these 80% of the heavy and important work can now be undertaken by Nature.
 
+## how to use
 
+We need to do the following
 
-Sorry! for unfinished translation：
+1. Create a [mysql](https://www.mysql.com/) or [mariadb](https://mariadb.org/) or [Tidb](https://pingcap.com/en/) database , And execute [schema.sql](shell/schema.sql)
 
-剥夺代码对业务流程的控制权，降低业务系统的复杂度。
+2. Define multiple business objects in the [Meta](doc/ZH/help/meta.md) data table, for example: we define two business objects, `Order` and `Order Account`
 
+   ```sql
+   INSERT INTO meta (full_key, description, version, states, fields, config) VALUES
+   ('B', 'sale/order', 'order', 1, '', '', ''),
+   ('B', 'finance/orderAccount', 'order account', 1, 'unpaid|partial|paid', '', '{"master":"B:sale/order:1"}'); 
+   ```
 
+3. In the [relation](doc/ZH/help/relation.md) data table, define the relationship to associate multiple business objects together, and set an `Executor` in the `Relation` for converting (equivalent to `map` in stream-compute), for example there is a definition for `order` and `order account` above:
 
-[A concrete example](https://github.com/llxxbb/Nature-Demo)
+   ```sql
+   INSERT INTO relation
+   (from_meta, to_meta, settings)
+   VALUES('B:sale/order:1', 'B:finance/orderAccount:1', '{"executor":{"protocol":"localRust","url":"nature_demo:order_receivable"},"target":{"states":{"add":["unpaid"]}}}');
+   ```
 
-[Concepts](doc\help\concepts.md)
+4. Write code to implement the [Executor](doc/ZH/help/executor.md) you defined above. If it is based on Http, please start it after completion. If it is based on class library, please put it in the same directory as nature.exe. For example, the logic for `order` and `order account` is:
 
-[Architecture](doc\help\architecture.md)
+   - Generate an `order account` business object
+   - Extract the receivables of all commodities from the incoming `order` and record them as the receivables of the `order account`
+   - Return the `Order Account` object to Nature to drive the next step of processing
 
-[Reference](doc\help\reference.md)
+5. Configure the `DATABASE_URL` property in the `.env` file to point to the database you created
 
+6. Start natrue.exe and retry.exe.
+
+7. post request to Nature, such as submitting the `order` data to Nature, please refer to [Nature interface definition](doc/ZH/help/nature-interface.md)
+
+## Learn more about Nature
+
+[Sample and function explanation](https://github.com/llxxbb/Nature-Demo)
+
+[Nature Architecture Description](doc/ZH/help/architecture.md)
+
+[Use Meta](doc/ZH/help/meta.md)
+
+[Use Relation](doc/ZH/help/relation.md)
+
+[Built-in actuator](doc/ZH/help/built-in.md)
+
+[Solutions to some business scenarios](doc/ZH/help/use-case.md)
+
+## Note
+
+The system is still in its early stage, especially the documentation needs to be continuously improved. If there are any improprieties, please provide more suggestions.
+
+## Donate
+
+If you feel that Nature is helpful to you, or just supports the construction of the Nature, you can express your affirmation and support for me through the following payment methods.
+
+WeChat:
+
+![](doc\wechat.png)
+
+Alipay:
+
+![](doc\alipay.png)

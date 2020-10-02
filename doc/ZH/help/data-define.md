@@ -96,7 +96,7 @@ pub struct BizObject {
 
 ```rust
 pub struct FromInstance {
-    pub id: ID,						// 上游 ID 见上方的Instance 说明
+    pub id: u64,						// 上游 ID 见上方的Instance 说明
     pub meta: String,				// 上游业务对象实例所属的 meta 定义
     pub para: String,				// 请参考 BizObject.para
     pub state_version: 0,			// 请参考 BizObject.state_version
@@ -278,7 +278,7 @@ pub struct DelayedInstances {
 
 ```rust
 pub struct KeyCondition {
-    pub id: String,			// 16 进制的 instance id 
+    pub id: u64,			// instance id 
     pub meta: String,		// instance 对应的元数据
     pub key_gt: String,		// 用于批查询，结果的 key 要大于此值
     pub key_ge: String,		// 用于批查询，结果的 key 要大于等于此值
@@ -298,7 +298,7 @@ pub struct KeyCondition {
 
 ```json
 {
-    "id": "1a2b",			// 16 进制的 instance id 
+    "id": 123,			// instance id 
     "meta": "B:sale/Order:1",	// instance 对应的元数据
     "key_gt": "",		// 用于批查询，结果的 key 要大于此值
     "key_ge": "",		// 用于批查询，结果的 key 要大于等于此值

@@ -11,6 +11,7 @@
 - incompatible change: use decimal replace hexadecimal to represent the instance.id
 - remove u128 support
 - incompatible change: KeyCondition.id type changed to u64 from String
+- simple readme(CH && EN)
 
 ### should commit
 
@@ -19,16 +20,15 @@
 ### 未完成
 
 - doc: 如何实现一个 Executor 的灰度替换
-- split instance.ins_key to meta, id and para
 
 - 架构：流式计算：可以理解为只有 map,可以内嵌 filter(两层意思：条件过滤和内容修改) 
 
 - channel_store:17-19 说用 tokio::spawn 任务不启动， 且有个怪问题，前一个任务是如何完成的？
 
-- simple readme(EN)
+
 
 - 修正 prepare.md
-- write document for summary use
+- write the document for summary use
 - 流式计算：
     map filter sum fold groupBy reduce
 
