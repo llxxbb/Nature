@@ -36,7 +36,7 @@ You can see that Nature integrates many heavyweight elements, and the purpose of
 
 - Significantly reduce interface and storage related work
 
-  Nature’s business process control is achieved through [Configuration](doc/ZH/help/relation.md), and developers do not need to care about upstream and downstream process control issues. Reflected in two aspects: one is the definition of the interface, compared with the complex and a large number of personalized interface definitions in traditional projects, Nature only provides a limited number of interfaces; the other is the use of interfaces. Traditional projects need to write logic in the code for the calling of the interfaces, but for Nature, except submitting data to Nature, all interface calls are handled by Nature, which greatly simplifies interface-related design, development, debugging and follow-up maintenance work.
+  Nature’s business process control is achieved through [Configuration](doc/EN/help/relation.md), and developers do not need to care about upstream and downstream process control issues. Reflected in two aspects: one is the definition of the interface, compared with the complex and a large number of personalized interface definitions in traditional projects, Nature only provides a limited number of interfaces; the other is the use of interfaces. Traditional projects need to write logic in the code for the calling of the interfaces, but for Nature, except submitting data to Nature, all interface calls are handled by Nature, which greatly simplifies interface-related design, development, debugging and follow-up maintenance work.
 
   Similarly, Nature adopts a centralized and unified data storage mechanism, and developers do not need to care about the design of data tables and indexes and subsequent development and maintenance work.
 
@@ -95,15 +95,3 @@ We need to do the following
 ## Note
 
 The system is still in its early stage, especially the documentation needs to be continuously improved. If there are any improprieties, please provide more suggestions.
-
-## Donate
-
-If you feel that Nature is helpful to you, or just supports the construction of the Nature, you can express your affirmation and support for me through the following payment methods.
-
-WeChat:
-
-![](doc\wechat.png)
-
-Alipay:
-
-![](doc\alipay.png)

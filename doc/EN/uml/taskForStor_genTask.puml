@@ -1,9 +1,0 @@
-@startuml
-hide footbox
-[-> TaskForStore: gen_task(instance)
-activate TaskForStore
-TaskForStore -> OneStepFlow: get_steps
-TaskForStore -> Mission: filter_relations
-deactivate TaskForStore
-
-@enduml

@@ -1,8 +1,0 @@
-@startuml
-
-' sys key, logger, env config, thread operate etc.
-class system
-
-!include biz-class.puml
-
-@enduml
