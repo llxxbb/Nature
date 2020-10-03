@@ -4,13 +4,14 @@ use std::ops::Sub;
 use chrono::{Local, TimeZone};
 
 use crate::common::{CONTEXT_DYNAMIC_PARA, DynamicConverter, Executor, get_para_and_key_from_para, Instance, is_default, Meta, MetaType, Result};
-use crate::db::{MetaCache, MetaDao, Relation};
+use crate::db::{LastSelector, MetaCache, MetaDao, Relation};
 use crate::db::flow_tool::{ContextChecker, StateChecker};
 use crate::db::models::relation_target::RelationTarget;
 
 #[derive(Debug, Clone, Default)]
 pub struct Mission {
     pub to: Meta,
+    pub last_select: LastSelector,
     pub executor: Executor,
     pub convert_before: Vec<Executor>,
     pub convert_after: Vec<Executor>,
@@ -24,6 +25,9 @@ pub struct Mission {
 #[derive(Debug, Clone, Default, Deserialize, Serialize)]
 pub struct MissionRaw {
     pub to: String,
+    #[serde(skip_serializing_if = "is_default")]
+    #[serde(default)]
+    pub last_select: LastSelector,
     pub executor: Executor,
     #[serde(skip_serializing_if = "is_default")]
     #[serde(default)]
@@ -52,6 +56,7 @@ impl From<Mission> for MissionRaw {
     fn from(input: Mission) -> Self {
         MissionRaw {
             to: input.to.meta_string(),
+            last_select: input.last_select,
             executor: input.executor,
             convert_before: input.convert_before,
             convert_after: input.convert_after,
@@ -88,6 +93,7 @@ impl Mission {
             };
             let mission = Mission {
                 to: t,
+                last_select: Default::default(),
                 executor: d.fun.clone(),
                 convert_before: vec![],
                 convert_after: vec![],
@@ -137,6 +143,7 @@ impl Mission {
     {
         let rtn = Mission {
             to: mc_g.get(&raw.to, m_g).await?,
+            last_select: raw.last_select.clone(),
             executor: raw.executor.clone(),
             convert_before: raw.convert_before.clone(),
             convert_after: raw.convert_after.clone(),
@@ -178,8 +185,17 @@ fn init_by_instance(m: &mut Mission, instance: &Instance, r: &Relation) -> Resul
 
 impl From<Relation> for Mission {
     fn from(r: Relation) -> Self {
+        let last_select = match r.selector {
+            None => LastSelector::default(),
+            Some(sel) => LastSelector {
+                last_all: sel.last_all,
+                last_any: sel.last_any,
+                last_none: sel.last_none,
+            }
+        };
         Mission {
             to: r.to.clone(),
+            last_select,
             executor: r.executor.clone(),
             convert_before: r.convert_before.clone(),
             convert_after: r.convert_after.clone(),

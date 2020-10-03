@@ -16,6 +16,15 @@ pub struct FlowSelector {
     pub state_none: HashSet<String>,
     #[serde(skip_serializing_if = "is_default")]
     #[serde(default)]
+    pub last_all: HashSet<String>,
+    #[serde(skip_serializing_if = "is_default")]
+    #[serde(default)]
+    pub last_any: HashSet<String>,
+    #[serde(skip_serializing_if = "is_default")]
+    #[serde(default)]
+    pub last_none: HashSet<String>,
+    #[serde(skip_serializing_if = "is_default")]
+    #[serde(default)]
     pub context_all: HashSet<String>,
     #[serde(skip_serializing_if = "is_default")]
     #[serde(default)]
@@ -44,6 +53,9 @@ mod test {
             state_all: HashSet::new(),
             state_any: Default::default(),
             state_none: HashSet::new(),
+            last_all: Default::default(),
+            last_any: Default::default(),
+            last_none: Default::default(),
             context_all: HashSet::new(),
             context_any: Default::default(),
             context_none: HashSet::new(),

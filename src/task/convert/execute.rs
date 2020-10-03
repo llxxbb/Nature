@@ -12,10 +12,9 @@ pub type Execute = fn(para: &ConverterParameter) -> ConverterReturned;
 
 pub async fn call_executor(task: &mut TaskForConvert, raw: &RawTask, last_target: &Option<Instance>, master: Option<Instance>) -> ConverterReturned {
     if let Some(ref last) = last_target {
-        if let Some(demand) = &task.target.target_demand.states {
-            if !state_check(&last.states, &demand.need_none, &demand.need_all, &demand.need_any) {
-                return ConverterReturned::None;
-            }
+        let demand = &task.target.last_select;
+        if !state_check(&last.states, &demand.last_none, &demand.last_all, &demand.last_any) {
+            return ConverterReturned::EnvError { msg: "target last instance unready".to_string() };
         }
     };
     &task.from;

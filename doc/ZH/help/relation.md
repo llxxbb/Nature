@@ -1,8 +1,8 @@
 # Relation
 
-用于实现目标之间的转换，其定义存储到数据表 relation 中
+用于定义两个 `Meta` 的上下游关系，其定义存储到数据表 relation 中。
 
-## 存储 `Relation`
+## 定义 `Relation`
 
 示例如下：
 
@@ -14,71 +14,47 @@ VALUES('B:sale/order:1', 'B:sale/orderState:1', '{"target_states":{"add":["new"]
 
 ## 定义 `Relation` 的处理方式
 
-上面的示例 SQL 中的 settings 字段用于对每个关系的处理方式进行个性化定义。settings 的值是 JSON形式的 `RelationSettings` 对象，其结构如下。
+即使两个 `Meta` 建立了 `Relation` 也不一定可以执行，还要看 `settings` 里的设置，`settings` 为 JSON字符串，其内容定义如下：
 
-```rust
-pub struct RelationSettings {
-    pub selector: Option<FlowSelector>,
-    pub executor: Option<Executor>,
-    pub convert_before: Vec<Executor>,
-    pub convert_after: Vec<Executor>,
-    pub use_upstream_id: bool,
-    pub target: RelationTarget,
-    pub delay: i32,
-    pub delay_on_para: (i32, u8),
-    pub id_bridge: bool,
+```json
+{
+    "selector": {...},		// 缺省为 null, 选择符合条件的上游。见下面的“选择上游”
+    "executor": {...},		// 缺省为 null, 指定 Executor。见下面的 “Executor”
+    "convert_before": [{...}],	// 前置 Executor, 可以指定多个，按给定的顺序执行。
+    "convert_after": [{...}],	// 后置 Executor, 可以指定多个，按给定的顺序执行。
+    "use_upstream_id": bool,	// 新生成的 Instance.id 将使用上游 Instance.id
+    "target": {},			// 缺省为 null, 对下游 Instance 进行干预下游，见下面的“干预下游”
+    "delay": 0,				// 缺省为 0，从当前时间延迟指定的秒数后执行本任务
+    "delay_on_para": [100,2],	// 缺省为 null，延迟执行。数组中的第一个值为延迟的秒数，第二个值为基础时间的位置，该位置位于上游 Instance.para 中。
+    "id_bridge": bool,		// 缺省为 false, 下游不使用上游的id，但下游的下游会用到，则需要将此值设为true
 }
 ```
 
-- selector：属性用于选择符合条件的 `Instance` 进入 `Executor` 进入处理，其结构见下方 `FlowSelector`的结构说明。
-- executor：属性用于定义谁来做这个转化处理，其结构见下方 `Executor`的结构说明。
-- convert_before: 在executor之前执行用于对输入实例进行修正。可以是多个，按给定的顺序执行。
-- convert_after: 在executor之后执行用于对结果进行修正。可以是多个，按给定的顺序执行。
-- use_upstream_id：新生成的 `Instance` 的 ID 将使用上游 `Instance`的 ID。
-- target：对目标实例的一些要求，下面会有具体解释。
-- delay：本次任务需要延迟指定的秒数后执行。
-- delay_on_para：延迟本次任务的执行，延迟的时间=上游`Instance.para`中指定的位置的时间（元组中的第二个值）+给定的延时时间（元组中的第一个值）
-- id_bridge: 如果此关系的下游的下游ID需要置为此关系的上游的ID，请设置此属性为 `true`
+### 选择上游
 
-### 触发转换的条件： FlowSelector
+上游必须满足指定条件 Nature 才可以调用 `Executor`。这些条件的定义如下：
 
-```rust
-pub struct FlowSelector {
-    pub state_all: HashSet<String>,
-    pub state_any: HashSet<String>,
-    pub state_none: HashSet<String>,
-    pub context_all: HashSet<String>,
-    pub context_any: HashSet<String>,
-    pub context_none: HashSet<String>,
-    pub sys_context_all: HashSet<String>,
-    pub sys_context_any: HashSet<String>,
-    pub sys_context_none: HashSet<String>,
+```json
+{
+    "state_all": ["s1"],	// 缺省为 null, 上游必须满足全部指定的状态
+    "state_any": ["s1"],	// 缺省为 null, 上游需要满足其中的一个状态
+    "state_none": ["s1"],	// 缺省为 null, 上游不能包含任何给定的状态
+    "context_all": ["c1"],	// 缺省为 null, 上游必须满足全部指定的 context
+    "context_any": ["c1"],	// 缺省为 null, 上游需要满足其中的一个 context
+    "context_none": ["c1"],	// 缺省为 null, 上游不能包含任何给定的 context
+    "sys_context_all": ["c1"],	// 缺省为 null, 上游必须满足全部指定的 sys_context
+    "sys_context_any": ["c1"],	// 缺省为 null, 上游需要满足其中的一个 sys_context
+    "sys_context_none": ["c1"],	// 缺省为 null, 上游不能包含任何给定的 sys_context
 }
-
 ```
 
-
-all of above are `and` relation
-
-- state_[...]：上游 `Instance` 的状态必须满足[]中的要求。
-- context_[...]：上游 `Instance` 的上下文必须满足[]中的要求。
-- sys_context_[...]：上游`Instance`的系统上下文必须满足[]中的要求。
-
-优先级
-
-```
-/// none: means can't include any one
-/// all : means must include all
-/// any : means must include one
-```
+条件的检查顺序为：xxx_none，xxx_all，xxx_any。
 
 **注意**：
 
-尽管`上下文`和`系统上下文`都是 KV 类型，但当做流程选择条件时，Nature 只处理“K”不处理“V”，这是从简化设计角度来考虑的。V的形式是业务决定的，可能是一个URL，也可能“a|b|c”，也可能是个json，所以是不规范的。Nature 也不想对此进行规范，这样可能既限制了业务的灵活性又降低了处理性能。而“K”则是非常规范的，就是一个标签，非常便于 Nature 进行处理。当然这种方式也有问题，当`上下文`和`系统上下文`用作流程选择时就失去了KV的意义。
+尽管`context`和`sys_context`都是 KV 类型，但当做流程选择条件时，Nature 只处理“K”不处理“V”，这是从简化设计角度来考虑的。“V”的形式是业务决定的，可能是一个URL，“a|b|c”，或者是个json，所以是不规范的。Nature 也不想对此进行规范，这样可能既限制了业务的灵活性又降低了处理性能。而“K”则是非常规范的，就是一个标签，非常便于 Nature 进行处理。当然这种方式也有问题，当`context`和`sys_context`用作流程选择时就失去了KV的意义。如根据性别选择不同的处理流程：
 
-所以在一开始使用`上下文`和`系统上下文`时可能会出现错误的使用方式，如根据性别选择不同的处理流程：
-
-- 错误的方式：K:gender,  V: boy | girl
+- 错误的方式：
 
   | KEY    | VALUE           |
   | ------ | --------------- |
@@ -110,28 +86,26 @@ all of above are `and` relation
 
 ### Executor
 
-Executor 目前有三种形态：转换器、前置过滤器、后置过滤器。其配置都采用下面的形式。
+`Executor` 目前有三种形态：转换器、前置过滤器、后置过滤器。其配置都采用下面的形式。
 
-```rust
-pub struct Executor {
-    pub protocol: Protocol,
-    pub url: String,
-    pub settings: String,
+```json
+{
+    "protocol": "http",						// 通讯协议，见下面的说明。
+    "url": "http://my-executor/fun",		// 用于定位`Executor`的位置
+    "settings": "executor self settings",	// 见下面的说明。
 }
 ```
 
-**protocol**： Nature 与 `Executor`间的通讯协议，其内容不区分大小写，目前支持下面的方式。
+**protocol**： Nature 与 `Executor` 间的通讯协议，其值不区分大小写，目前支持下面的方式。
 
-- Http | Https：远程调用一个`Executor`。
-- LocalRust：Nature 会加载一个本地 rust 库作为`Executor`
-- Auto：当使用者不指定`executor`时，Nature在`运行时`会自动构建一个`executor`。因为`auto-executor`不会生成`Instance.content`的内容。所以当我们不需要关心实例的内容而只关心ID，状态等时可以不指定`executor`。
-- BuiltIn：使用Nature 内置的转换器进行转换。通过 `url` 属性来指定要使用哪一个`builtin-executor`
+- Http | Https：通过 post 方式远程调用一个`Executor`。
+- LocalRust：`Executor` 被实现为一个 Rust 的类库，Nature 通过 FFI 方式与该类库交互。
+- Auto：当您不指定`executor`时，Nature在 `runtime` 会自动构建一个`executor`， 但`auto-executor`没有能力为 `Instance.content` 生成内容。所以当我们只关心ID、状态等信息时 Nature 的 `auto-executor` 会为我们带来很多便利。
+- BuiltIn：使用Nature 内置的转换器进行转换。通过 `url` 属性来指定一个要使用的`builtin-executor`
 
-http及LocalRustr两种形式都需要是因为者自行实现，请参考[Executor接口定义](executor.md)
+http及LocalRust两种形式都需要您自行实现，请参考[Executor接口定义](executor.md)。
 
-**url**：用于定位`Executor`的位置
-
-**settings**:`Executor`专有的配置，由具体的`Executor`给出。**注意** settings 的内容可以在运行时被 `Instance.sys_context`的`para.dynamic` 属性中的内容替换掉，而这种替换只局限于当前 Instance，不会影响后续 Instance 的替换。举例： 假设一个用于批量加载  Instance 的 beforter_filter 的 settings 配置如下：
+**settings**: 每个`Executor`可以有自己独立的的配置，这个配置由 Executor 自己进行解释。**注意** settings 的内容可以在 `runtime` 被 `Instance.sys_context`的`para.dynamic` 属性中的内容替换掉，而这种替换只局限于当前 Instance，不会影响到其它 Instance 。举例： 假设一个用于批量加载  Instance 的 before_filter 的 settings 配置如下：
 
 ```json
 {
@@ -140,15 +114,24 @@ http及LocalRustr两种形式都需要是因为者自行实现，请参考[Execu
 }
 ```
 
-我们希望(item_id)在运行时被真正的ID 所替换。此时如果上游 instance.sys_context的 para.dynamic 属性中含有下面的定义，我们的愿望就可以实现了：
+我们希望(item_id)在 `runtime` 被真正的ID 所替换。此时如果上游 `instance.sys_context`的 `para.dynamic` 属性中含有下面的定义，我们的愿望就可以实现了：
 
 ```properties
 para.dynamic = "[[\"(item_id)\":\"123\"]]"
 ```
 
-则上面的(item_id)会被替换为123。**注意**：目前 `para.dynamic` 只支持简单的替换，建议添加明确的边界符，如本示例用"()"，以避免发生错误的替换。
+既在 Nature 调用 `Executor` 之前，会将 `settings`替换成下面的内容并传递给 `Exexutor`
 
-**`Executor`的示例**
+```json
+{
+    "key_gt":"B:sale/item/123:1|",
+    "key_lt":"B:sale/item/123:2|"
+}
+```
+
+**注意**：目前 `para.dynamic` 只支持简单的替换，建议添加明确的边界符，如本示例用"()"，以避免发生错误的替换。
+
+**`Executor`的一些示例**
 
 ```json
 {
@@ -171,10 +154,12 @@ para.dynamic = "[[\"(item_id)\":\"123\"]]"
 }
 ```
 
-### RelationTarget
+### 干预下游
+
+在 `Executor` 执行完成后，有时我们会想附加一些信息到目标 `Instance` 上。比如，对于初始`Order`我们可以`OrderState`的状态自动置为 `new` 而不需要编程来实现，这时候我们可以通过下面的配置对结果进行干预。
 
 ```
-pub struct RelationTarget {
+{
     pub states: Option<TargetState>,
     pub append_para: Vec<u8>,
     pub context_name: String,

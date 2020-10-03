@@ -12,12 +12,19 @@
 - remove u128 support
 - incompatible change: KeyCondition.id type changed to u64 from String
 - simple readme(CH && EN)
+- incompatible change: move need_all, need_any, need_none from TargetState to FlowSelector 
+- bug fix target last instance check
 
 ### should commit
 
 
 
 ### 未完成
+
+
+
+- architect doc : 上一状态的数据
+    
 
 - doc: 如何实现一个 Executor 的灰度替换
 

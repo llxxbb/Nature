@@ -251,6 +251,7 @@ mod test {
             from: from_ins,
             target: Mission {
                 to: meta.clone(),
+                last_select: Default::default(),
                 executor: Default::default(),
                 convert_before: vec![],
                 convert_after: vec![],
@@ -296,6 +297,7 @@ mod test {
                     let _ = m.set_states(Some(vec![State::Normal("new".to_string())]));
                     m
                 },
+                last_select: Default::default(),
                 executor: Default::default(),
                 convert_before: vec![],
                 convert_after: vec![],

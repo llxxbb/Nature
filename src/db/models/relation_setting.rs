@@ -123,7 +123,7 @@ mod test {
 
     #[test]
     fn target_state() {
-        let state = TargetState { add: Some(vec!["new".to_string()]), remove: None, need_all: Default::default(), need_any: Default::default(), need_none: Default::default() };
+        let state = TargetState { add: Some(vec!["new".to_string()]), remove: None };
         let mut setting = RelationSettings::default();
         setting.target.states = Some(state);
         let result = serde_json::to_string(&setting).unwrap();
