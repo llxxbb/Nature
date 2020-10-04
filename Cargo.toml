@@ -7,7 +7,8 @@ description = "Nature is a distribute-stream-engine, business-controll-center, d
 repository = "https://github.com/llxxbb/Nature"
 readme = "README.md"
 license = "GPL-3.0+"
-keywords = ["Stream", "BPM", "dispatch", "data-center", "minimal-program"]
+keywords = ["platform", "data", "stream", "distributed", "management"]
+categories = ["network-programming", "database", "asynchronous", "concurrency", "development-tools"]
 
 [lib]
 name = "nature"           # The name of the target.
