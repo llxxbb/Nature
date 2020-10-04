@@ -15,5 +15,5 @@ pub struct RelationTarget {
     /// this is the key of the para.dynamic
     #[serde(skip_serializing_if = "is_default")]
     #[serde(default)]
-    pub context_name: String,
+    pub dynamic_para: String,
 }

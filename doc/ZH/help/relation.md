@@ -53,9 +53,9 @@ VALUES('B:sale/order:1', 'B:sale/orderState:1', '{"target_states":{"add":["new"]
 
 条件的检查顺序为：xxx_none，xxx_all，xxx_any。
 
-**注意**：
+**注意**：last_xxx 如果不满足，则会产生 `EnvError`，并在以后某个时间尝试重试。
 
-尽管`context`和`sys_context`都是 KV 类型，但当做流程选择条件时，Nature 只处理“K”不处理“V”，这是从简化设计角度来考虑的。“V”的形式是业务决定的，可能是一个URL，“a|b|c”，或者是个json，所以是不规范的。Nature 也不想对此进行规范，这样可能既限制了业务的灵活性又降低了处理性能。而“K”则是非常规范的，就是一个标签，非常便于 Nature 进行处理。当然这种方式也有问题，当`context`和`sys_context`用作流程选择时就失去了KV的意义。如根据性别选择不同的处理流程：
+**注意**：尽管`context`和`sys_context`都是 KV 类型，但当做流程选择条件时，Nature 只处理“K”不处理“V”，这是从简化设计角度来考虑的。“V”的形式是业务决定的，可能是一个URL，“a|b|c”，或者是个json，所以是不规范的。Nature 也不想对此进行规范，这样可能既限制了业务的灵活性又降低了处理性能。而“K”则是非常规范的，就是一个标签，非常便于 Nature 进行处理。当然这种方式也有问题，当`context`和`sys_context`用作流程选择时就失去了KV的意义。如根据性别选择不同的处理流程：
 
 - 错误的方式：
 
@@ -159,33 +159,23 @@ para.dynamic = "[[\"(item_id)\":\"123\"]]"
 
 ### 干预下游
 
-在 `Executor` 执行完成后，有时我们会想附加一些信息到目标 `Instance` 上。比如，对于初始`Order`我们可以`OrderState`的状态自动置为 `new` 而不需要编程来实现，这时候我们可以通过下面的配置对结果进行干预。
+在 `Executor` 执行完成后，有时我们会想附加一些信息到目标 `Instance` 上。比如，对于初始 `Order`我们可以将`OrderState`的状态自动置为 `new` 而不需要编程来实现。这时候我们可以通过下面的配置对结果进行干预。
 
-```
+```json
 {
-    pub states: Option<TargetState>,
-    pub append_para: Vec<u8>,
-    pub context_name: String,
+    "state_add": ["s1"],		// 默认 null, 在上个状态基础上增加新的状态，状态必须在 `Meta` 中定义过。
+    "state_remove": ["s1"],		// 默认 null, 从上个状态中删除指定的状态。
+    "append_para": [2,1],		// 默认 null, 从上游 Instance.para 中选取一部分附加到下游的 Instance.para 上，详细说明见下。
+    "dynamic_para": "(key)",	 见下面说明
 }
 ```
 
-**target_states**：可以增加或删除转化后的 `Instance` 的状态，状态必须在 `Meta` 中定义过。
+**append_para**：该属性说明如何生成下游 `Instance.para` 属性。示例，如其值为[3,1]， 假设上游 `Instance.para`为 “a/b/c/d”，则下游实例的 `para` 值为 “d/b”。如果下游 `para` 已经有值， 则在此值的后面附加。**注意**下游 `Meta` 如果是状态数据则自身 **para**  不能有值，否则无法形成版本数据。
 
-**append_para**：该属性可指导 Nature 如何生成目标实例的 `para` 属性。示例，如其值为[3,1]， 假设上游para为 “a/b/c/d”，则目标实例的 `para` 值为 “d/b”。如果自身 `para` 已经有值， 则在此值的后面附加。**注意**下游 `Meta` 如果是状态数据则自身 **para**  不能有值，否则无法形成版本数据。
+**dynamic_para**: Nature 会用此生成  `Instance.sys_context` 属性的 `para.dynamic`，其格式如下：
 
-**context_name**: 这个只有在设置了 `append_para` 后才有效，Nature 会把 `append_para` 对应的值用作后续 `relation`配置中的参数替换，而 `context_name` 则指明了要替换的那个参数的名字。请见上方的 `Executor.settings` 说明
-
-### 对目标状态的处理及要求：TargetState
-
-```rust
-pub struct TargetState {
-    pub add: Option<Vec<String>>,		// 在上个状态基础上增加新的状态
-    pub remove: Option<Vec<String>>,	// 从上个状态中删除指定的状态
-    pub need_all: HashSet<String>,		// 上个目标状态必须拥有指定的状态
-    pub need_any: HashSet<String>,		// 上个目标状态必须有一个或多个指定的状态
-    pub need_none: HashSet<String>,		// 上个目标状态中不能含有任何一个指定的状态
-}
+```json
+{"para.dynamic":"[[\"key\",\"value\"]]"}
 ```
 
-
-
+其中的 key 来源于 `dynamic_para`  对应的值，而 value 则来源于 `append_para` 生成的附加值。`para.dynamic` 的作用为替换`Executor.settings`中的变量，请参考 [Demo](https://github.com/llxxbb/Nature-Demo) 中的销售统计。

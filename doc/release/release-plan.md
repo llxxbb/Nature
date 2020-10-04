@@ -13,6 +13,7 @@
 - incompatible change: KeyCondition.id type changed to u64 from String
 - incompatible change: move need_all, need_any, need_none from TargetState to FlowSelector 
 - incompatible change: merge TargetState to RelationTarget
+- incompatible change: context_name to dynamic_para
 - simplify the readme(CH && EN)
 - bug fix: if target last instance check failed, should return environment error  
 
@@ -23,7 +24,6 @@
 ### 未完成
 
 
-   
 - demo java(time off: 请假)
     last state check
 
@@ -31,16 +31,10 @@
 
 - channel_store:17-19 说用 tokio::spawn 任务不启动， 且有个怪问题，前一个任务是如何完成的？
 
-
-
 - 修正 prepare.md
 - write the document for summary use
 - 流式计算：
     map filter sum fold groupBy reduce
-
-
-- make shell version of demo
-- 压测
 
 - concurrent tasks limit and monitor 
 - redo check busy first

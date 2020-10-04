@@ -99,7 +99,7 @@ fn check_id(ins: &mut Vec<Instance>, from: &FromInstance, target: &Mission) -> R
             ins[0].create_time = Local::now().timestamp_millis();
         }
         // set sys_context
-        if !target.target_demand.context_name.is_empty() {
+        if !target.target_demand.dynamic_para.is_empty() {
             let para = &ins[0].para.to_string();
             append_dynamic_para_from_mission(target, &mut &mut ins[0], &para)?
         }
@@ -118,7 +118,7 @@ fn check_id(ins: &mut Vec<Instance>, from: &FromInstance, target: &Mission) -> R
             let result = get_para_and_key_from_para(&from.para, &target.target_demand.append_para)?;
             one.para = append_para(&one.para, &result.0);
             // set sys_context
-            if !target.target_demand.context_name.is_empty() {
+            if !target.target_demand.dynamic_para.is_empty() {
                 append_dynamic_para_from_mission(target, &mut one, &result.0)?
             }
         }
@@ -136,7 +136,7 @@ fn append_dynamic_para_from_mission(target: &Mission, one: &mut &mut Instance, v
         Some(s) => serde_json::from_str::<Vec<(String, String)>>(s)?,
         None => vec![]
     };
-    paras.push((target.target_demand.context_name.clone(), value.to_string()));
+    paras.push((target.target_demand.dynamic_para.clone(), value.to_string()));
     one.sys_context.insert(CONTEXT_DYNAMIC_PARA.to_string(), serde_json::to_string(&paras)?);
     Ok(())
 }
@@ -306,7 +306,7 @@ mod test {
                     state_add: vec!["new".to_string()],
                     state_remove: vec![],
                     append_para: vec![],
-                    context_name: "".to_string(),
+                    dynamic_para: "".to_string(),
                 },
                 use_upstream_id: false,
                 delay: 0,
@@ -410,7 +410,7 @@ mod check_id_for_normal {
         from.para = "c/d/e".to_string();
         mission.to = Meta::new("remove master", 1, MetaType::Business).unwrap();
         mission.target_demand.append_para = vec![0, 2];
-        mission.target_demand.context_name = "(a)".to_string();
+        mission.target_demand.dynamic_para = "(a)".to_string();
         let mut one = Instance::new("one").unwrap();
         one.para = "a/b".to_string();
         let mut input = vec![one];

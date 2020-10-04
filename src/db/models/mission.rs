@@ -315,7 +315,7 @@ mod test {
             state_add: state.clone(),
             state_remove: vec![],
             append_para: vec![],
-            context_name: "".to_string(),
+            dynamic_para: "".to_string(),
         };
         let mut relation = Relation::default();
         relation.from = "a".to_string();
