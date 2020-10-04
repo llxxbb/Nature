@@ -1,6 +1,6 @@
 [package]
 name = "nature"
-version = "0.19.0"
+version = "0.20.0"
 authors = ["XueBin Li <llxxbb@yeah.net>"]
 edition = "2018"
 description = "Nature is a distribute-stream-engine, business-controll-center, dispatch-center, data-center and Minimalist-programming-platform."

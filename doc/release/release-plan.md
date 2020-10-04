@@ -5,17 +5,8 @@
 - 功能性先于非功能性需求
 - 应用情景支持，内部优先于外部（如网关）
 
-## Release 0.20
-
-- incompatible change: change `Instance` table design, split `ins_key` into `meta`, `ins_id` and `para`
-- incompatible change: use decimal replace hexadecimal to represent the instance.id
-- remove u128 support
-- incompatible change: KeyCondition.id type changed to u64 from String
-- incompatible change: move need_all, need_any, need_none from TargetState to FlowSelector 
-- incompatible change: merge TargetState to RelationTarget
-- incompatible change: context_name to dynamic_para
-- simplify the readme(CH && EN)
-- bug fix: if target last instance check failed, should return environment error  
+## Release 0.20.1
+ 
 
 ### should commit
 

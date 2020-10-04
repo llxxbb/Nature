@@ -1,5 +1,17 @@
 # 发布的功能
 
+## Release 0.20 2020-10-04
+
+- incompatible change: change `Instance` table design, split `ins_key` into `meta`, `ins_id` and `para`
+- incompatible change: use decimal replace hexadecimal to represent the instance.id
+- remove u128 support
+- incompatible change: KeyCondition.id type changed to u64 from String
+- incompatible change: move need_all, need_any, need_none from TargetState to FlowSelector 
+- incompatible change: merge TargetState to RelationTarget
+- incompatible change: context_name to dynamic_para
+- simplify the readme(CH && EN)
+- bug fix: if target last instance check failed, should return environment error 
+
 ## Release 0.19 2020-09-26
 
 - make ConverterReturned to fit for json communication
