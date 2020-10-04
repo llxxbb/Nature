@@ -18,7 +18,7 @@ Even if two `Meta` have established `Relation`, it may not be executed. It depen
 
 ```json
 {
-    "selector": {...}, 			// default null, select the upstream that meets the conditions. See "Select upstream" below
+    "selector": {...}, 			// default null, select the upstream that meets the conditions. See "Selector" below
     "executor": {...}, // default null, specify Executor. See "Executor" below
     "convert_before": [{...}], 	// Pre-executor, you can specify multiple, will be execute in the given order.
     "convert_after": [{...}], 	// Post Executor, you can specify multiple, will be execute in the given order.
@@ -30,16 +30,19 @@ Even if two `Meta` have established `Relation`, it may not be executed. It depen
 }
 ```
 
-### Choose upstream
+### Selector
 
-The upstream must meet the specified conditions before Nature can call Executor. These conditions are defined as follows:
+The upstream and downstream must meet the specified conditions before Nature can call Executor. These conditions are defined as follows:
 
 ```json
 {
      "state_all": ["s1"], // default null, upstream must meet all specified states
      "state_any": ["s1"], // default null, upstream needs to satisfy one of the states
      "state_none": ["s1"], // default null, upstream cannot contain any given state
-     "context_all": ["c1"], // default null, upstream must meet all specified context
+	 "last_all": ["s1"], // default null, the downstream previous version must meet all specified states
+     "last_any": ["s1"], // default null, the downstream previous version needs to meet one of the states
+     "last_none": ["s1"], // default null, the downstream previous version cannot contain any given status
+    "context_all": ["c1"], // default null, upstream must meet all specified context
      "context_any": ["c1"], // default null, upstream needs to satisfy one of the context
      "context_none": ["c1"], // default null, upstream cannot contain any given context
      "sys_context_all": ["c1"], // default null, upstream must meet all specified sys_context

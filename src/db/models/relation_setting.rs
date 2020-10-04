@@ -46,7 +46,7 @@ pub struct RelationSettings {
 mod test {
     use std::collections::HashSet;
 
-    use crate::common::{Protocol, TargetState};
+    use crate::common::Protocol;
 
     use super::*;
 
@@ -123,11 +123,11 @@ mod test {
 
     #[test]
     fn target_state() {
-        let state = TargetState { add: Some(vec!["new".to_string()]), remove: None };
+        let state = vec!["new".to_string()];
         let mut setting = RelationSettings::default();
-        setting.target.states = Some(state);
+        setting.target.state_add = state;
         let result = serde_json::to_string(&setting).unwrap();
-        let res_str = r#"{"target":{"states":{"add":["new"]}}}"#;
+        let res_str = r#"{"target":{"state_add":["new"]}}"#;
         assert_eq!(result, res_str);
         let res_obj: RelationSettings = serde_json::from_str(res_str).unwrap();
         assert_eq!(res_obj, setting);

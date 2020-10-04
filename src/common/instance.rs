@@ -8,7 +8,8 @@ use chrono::prelude::*;
 use futures::Future;
 use itertools::Itertools;
 
-use crate::common::{DynamicConverter, FromInstance, generate_id, is_default, KeyCondition, MetaType, NatureError, Result, SEPARATOR_INS_KEY, SEPARATOR_META, TargetState};
+use crate::common::{DynamicConverter, FromInstance, generate_id, is_default, KeyCondition, MetaType, NatureError, Result, SEPARATOR_INS_KEY, SEPARATOR_META};
+use crate::db::relation_target::RelationTarget;
 
 use super::Meta;
 
@@ -198,20 +199,17 @@ impl Hash for BizObject {
 }
 
 impl BizObject {
-    pub fn modify_state(&mut self, add_and_delete: &TargetState, meta: &Meta) {
+    pub fn modify_state(&mut self, add_and_delete: &RelationTarget, meta: &Meta) {
         // delete first
-        if let Some(x) = &add_and_delete.remove {
-            x.iter().for_each(|one| { self.states.remove(one); });
-        }
+        add_and_delete.state_remove.iter().for_each(|one| { self.states.remove(one); });
         let mut append: Vec<String> = self.states.clone().into_iter().collect();
-        match &add_and_delete.add {
-            Some(ss) => {
-                append.append(&mut ss.clone());
-                let (remained, _) = meta.check_state(&append).unwrap();
-                self.states = remained.into_iter().collect();
-            }
-            None => ()
+        let ss = &add_and_delete.state_add;
+        if ss.is_empty() {
+            return;
         }
+        append.append(&mut ss.clone());
+        let (remained, _) = meta.check_state(&append).unwrap();
+        self.states = remained.into_iter().collect();
     }
 }
 

@@ -223,7 +223,6 @@ fn get_delay(ins: &Instance, rela: &Relation) -> Result<i32> {
 
 #[cfg(test)]
 mod test {
-    use crate::common::TargetState;
     use crate::db::flow_tool::{context_check, state_check};
     use crate::db::FlowSelector;
     use crate::db::models::relation_target::RelationTarget;
@@ -311,11 +310,10 @@ mod test {
     fn mission_copy_from_relation() {
         let meta = Meta::from_string("B:hello:1").unwrap();
         let executor = Executor::for_local("abc");
-        let mut state = TargetState::default();
-        state.add = Some(vec!["a".to_string()]);
-        let state = Some(state);
+        let state = vec!["a".to_string()];
         let target = RelationTarget {
-            states: state.clone(),
+            state_add: state.clone(),
+            state_remove: vec![],
             append_para: vec![],
             context_name: "".to_string(),
         };
@@ -333,7 +331,7 @@ mod test {
         assert_eq!(rtn.executor, executor);
         assert_eq!(rtn.to, meta);
         assert_eq!(rtn.use_upstream_id, true);
-        assert_eq!(rtn.target_demand.states, state);
+        assert_eq!(rtn.target_demand.state_add, state);
     }
 
     #[test]

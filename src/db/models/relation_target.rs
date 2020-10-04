@@ -1,10 +1,13 @@
-use crate::common::{is_default, TargetState};
+use crate::common::is_default;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq, Eq)]
 pub struct RelationTarget {
     #[serde(skip_serializing_if = "is_default")]
     #[serde(default)]
-    pub states: Option<TargetState>,
+    pub state_add: Vec<String>,
+    #[serde(skip_serializing_if = "is_default")]
+    #[serde(default)]
+    pub state_remove: Vec<String>,
     #[serde(skip_serializing_if = "is_default")]
     #[serde(default)]
     pub append_para: Vec<u8>,

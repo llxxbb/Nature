@@ -11,9 +11,10 @@
 - incompatible change: use decimal replace hexadecimal to represent the instance.id
 - remove u128 support
 - incompatible change: KeyCondition.id type changed to u64 from String
-- simple readme(CH && EN)
 - incompatible change: move need_all, need_any, need_none from TargetState to FlowSelector 
-- bug fix target last instance check
+- incompatible change: merge TargetState to RelationTarget
+- simplify the readme(CH && EN)
+- bug fix: if target last instance check failed, should return environment error  
 
 ### should commit
 
@@ -22,11 +23,9 @@
 ### 未完成
 
 
-
-- architect doc : 上一状态的数据
-    
-
-- doc: 如何实现一个 Executor 的灰度替换
+   
+- demo java(time off: 请假)
+    last state check
 
 - 架构：流式计算：可以理解为只有 map,可以内嵌 filter(两层意思：条件过滤和内容修改) 
 

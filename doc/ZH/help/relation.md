@@ -18,7 +18,7 @@ VALUES('B:sale/order:1', 'B:sale/orderState:1', '{"target_states":{"add":["new"]
 
 ```json
 {
-    "selector": {...},		// 缺省为 null, 选择符合条件的上游。见下面的“选择上游”
+    "selector": {...},		// 缺省为 null, 选择符合条件的上游和下游。见下面的“选择器”
     "executor": {...},		// 缺省为 null, 指定 Executor。见下面的 “Executor”
     "convert_before": [{...}],	// 前置 Executor, 可以指定多个，按给定的顺序执行。
     "convert_after": [{...}],	// 后置 Executor, 可以指定多个，按给定的顺序执行。
@@ -30,15 +30,18 @@ VALUES('B:sale/order:1', 'B:sale/orderState:1', '{"target_states":{"add":["new"]
 }
 ```
 
-### 选择上游
+### 选择器
 
-上游必须满足指定条件 Nature 才可以调用 `Executor`。这些条件的定义如下：
+上游或下游必须满足指定条件 Nature 才可以调用 `Executor`。这些条件的定义如下：
 
 ```json
 {
     "state_all": ["s1"],	// 缺省为 null, 上游必须满足全部指定的状态
     "state_any": ["s1"],	// 缺省为 null, 上游需要满足其中的一个状态
     "state_none": ["s1"],	// 缺省为 null, 上游不能包含任何给定的状态
+    "last_all": ["s1"],		// 缺省为 null, 下游上一版本必须满足全部指定的状态
+    "last_any": ["s1"],		// 缺省为 null, 下游上一版本需要满足其中的一个状态
+    "last_none": ["s1"],	// 缺省为 null, 下游上一版本不能包含任何给定的状态
     "context_all": ["c1"],	// 缺省为 null, 上游必须满足全部指定的 context
     "context_any": ["c1"],	// 缺省为 null, 上游需要满足其中的一个 context
     "context_none": ["c1"],	// 缺省为 null, 上游不能包含任何给定的 context

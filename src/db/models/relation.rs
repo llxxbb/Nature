@@ -84,14 +84,13 @@ impl Relation {
         where MC: MetaCache, M: MetaDao
     {
         let m_to = meta_cache_getter.get(meta_to, meta_getter).await?;
-        if let Some(ts) = &settings.target.states {
-            if let Some(x) = &ts.add {
-                Relation::check_state(&m_to, x)?
-            };
-            if let Some(x) = &ts.remove {
-                Relation::check_state(&m_to, x)?
-            };
-        }
+        let ts = &settings.target;
+        if !&ts.state_add.is_empty() {
+            Relation::check_state(&m_to, &ts.state_add)?
+        };
+        if !&ts.state_remove.is_empty() {
+            Relation::check_state(&m_to, &ts.state_remove)?
+        };
         Ok(m_to)
     }
 
