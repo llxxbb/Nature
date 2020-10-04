@@ -192,7 +192,8 @@ fn verify_state(task: &TaskForConvert, instances: &mut Vec<Instance>, last_state
         }
     };
 // set status
-    if let Some(lsd) = &task.target.target_demand.states {
+    let lsd = &task.target.target_demand;
+    if !lsd.state_remove.is_empty() || !lsd.state_add.is_empty() {
         ins.modify_state(lsd, &task.target.to);
     } else {
         let (_, mutex) = task.target.to.check_state(&temp_states.clone().into_iter().collect())?;
@@ -234,7 +235,7 @@ mod sys_context_test {
 mod test {
     use chrono::Local;
 
-    use crate::common::{Meta, MetaType, State, TargetState};
+    use crate::common::{Meta, MetaType, State};
     use crate::db::relation_target::RelationTarget;
 
     use super::*;
@@ -302,11 +303,8 @@ mod test {
                 convert_before: vec![],
                 convert_after: vec![],
                 target_demand: RelationTarget {
-                    states: Some({
-                        let mut sd = TargetState::default();
-                        sd.add = Some(vec!["new".to_string()]);
-                        sd
-                    }),
+                    state_add: vec!["new".to_string()],
+                    state_remove: vec![],
                     append_para: vec![],
                     context_name: "".to_string(),
                 },
