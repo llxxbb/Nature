@@ -7,7 +7,7 @@
 
 ## Release 0.20.1
  
-- finished english doc: meta.md 
+- finished english doc: meta.md executor.md
 
 ### should commit
 
@@ -15,7 +15,7 @@
 
 ### 未完成
 
-- doc EN: meta, executor 
+- doc EN: executor, architecture, solution, builtin-executor, interface, data-define
 - demo java(time off: 请假)
     last state check
 

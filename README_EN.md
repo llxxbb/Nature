@@ -66,7 +66,7 @@ We need to do the following
    VALUES('B:sale/order:1', 'B:finance/orderAccount:1', '{"executor":{"protocol":"localRust","url":"nature_demo:order_receivable"},"target":{"states":{"add":["unpaid"]}}}');
    ```
 
-4. Write code to implement the [Executor](doc/ZH/help/executor.md) you defined above. If it is based on Http, please start it after completion. If it is based on class library, please put it in the same directory as nature.exe. For example, the logic for `order` and `order account` is:
+4. Write code to implement the [Executor](doc/EN/help/executor.md) you defined above. If it is based on Http, please start it after completion. If it is based on class library, please put it in the same directory as nature.exe. For example, the logic for `order` and `order account` is:
 
    - Generate an `order account` business object
    - Extract the receivables of all commodities from the incoming `order` and record them as the receivables of the `order account`
@@ -76,21 +76,21 @@ We need to do the following
 
 6. Start natrue.exe and retry.exe.
 
-7. post request to Nature, such as submitting the `order` data to Nature, please refer to [Nature interface definition](doc/ZH/help/nature-interface.md)
+7. post request to Nature, such as submitting the `order` data to Nature, please refer to [Nature interface definition](doc/EN/help/nature-interface.md)
 
 ## Learn more about Nature
 
 [Sample and function explanation](https://github.com/llxxbb/Nature-Demo)
 
-[Nature Architecture Description](doc/ZH/help/architecture.md)
+[Nature Architecture Description](doc/EN/help/architecture.md)
 
-[Use Meta](doc/ZH/help/meta.md)
+[Use Meta](doc/EN/help/meta.md)
 
-[Use Relation](doc/ZH/help/relation.md)
+[Use Relation](doc/EN/help/relation.md)
 
-[Built-in actuator](doc/ZH/help/built-in.md)
+[Built-in executor](doc/EN/help/built-in.md)
 
-[Solutions to some business scenarios](doc/ZH/help/use-case.md)
+[Solutions to some business scenarios](doc/EN/help/use-case.md)
 
 ## Note
 
