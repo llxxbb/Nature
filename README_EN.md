@@ -50,7 +50,7 @@ We need to do the following
 
 1. Create a [mysql](https://www.mysql.com/) or [mariadb](https://mariadb.org/) or [Tidb](https://pingcap.com/en/) database , And execute [schema.sql](shell/schema.sql)
 
-2. Define multiple business objects in the [Meta](doc/ZH/help/meta.md) data table, for example: we define two business objects, `Order` and `Order Account`
+2. Define multiple business objects in the [Meta](doc/EN/help/meta.md) data table, for example: we define two business objects, `Order` and `Order Account`
 
    ```sql
    INSERT INTO meta (full_key, description, version, states, fields, config) VALUES
@@ -58,7 +58,7 @@ We need to do the following
    ('B', 'finance/orderAccount', 'order account', 1, 'unpaid|partial|paid', '', '{"master":"B:sale/order:1"}'); 
    ```
 
-3. In the [relation](doc/ZH/help/relation.md) data table, define the relationship to associate multiple business objects together, and set an `Executor` in the `Relation` for converting (equivalent to `map` in stream-compute), for example there is a definition for `order` and `order account` above:
+3. In the [relation](doc/EN/help/relation.md) data table, define the relationship to associate multiple business objects together, and set an `Executor` in the `Relation` for converting (equivalent to `map` in stream-compute), for example there is a definition for `order` and `order account` above:
 
    ```sql
    INSERT INTO relation

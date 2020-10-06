@@ -7,6 +7,7 @@
 
 ## Release 0.20.1
  
+- finished english doc: meta.md 
 
 ### should commit
 
@@ -14,7 +15,7 @@
 
 ### 未完成
 
-
+- doc EN: meta, executor 
 - demo java(time off: 请假)
     last state check
 
