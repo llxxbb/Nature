@@ -15,7 +15,7 @@
 
 ### 未完成
 
-- doc EN: executor, architecture, solution, builtin-executor, interface, data-define
+- doc EN: interface, data-define, builtin-executor, architecture, solution
 - demo java(time off: 请假)
     last state check
 
