@@ -12,6 +12,7 @@
   - executor.md
   - nature-interface.md
   - data-define.md
+  - builtin-executor
 
 ### should commit
 
@@ -19,7 +20,7 @@
 
 ### 未完成
 
-- doc EN: builtin-executor, architecture, solution
+- doc EN: architecture, solution
 - demo java(time off: 请假)
     last state check
 
