@@ -52,3 +52,6 @@ Please refer to the `KeyCondition` of [Data Definition](data-define.md) for inpu
 {"Ok":[]} // [] is instance array, please refer to Instance in the data definition
 ```
 
+## /redo_task
+
+This interface is the internal interface of the Nature system, you only need to understand it, you will not use this interface directly. This interface is used to retry failed tasks and is called by the `retry` executable program.
