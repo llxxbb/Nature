@@ -1,6 +1,6 @@
 # Nature Data Definition
 
-The data definitions used by the Nature interface and `Executor` interface are listed here
+The data definitions used by the Nature interface and `Executor` interface listed here
 
 ## ConverterParameter
 
@@ -151,19 +151,19 @@ If you encounter a logic error, please return to the following json, and Nature 
 {"type":"LogicalError","msg":"some error"}
 ```
 
-If you encounter an environmental error, please return the following json, and Nature will retry according to the retry strategy.
+If you encounter an environmental error, please return the following json, and Nature will retry according to the retrying strategy.
 
 ```json
 {"type":"EnvError","msg":"some error"}
 ```
 
-If you need to perform asynchronous processing, you can immediately return the following information to Nature, and Nature will not emit a retry within the time given by you. When complete the conversion task you should call back the `/callback` interface described in [Nature interface](nature-interface.md). The unit of `num` here is seconds.
+If you need to perform asynchronous processing, you can immediately return the following information to Nature, and Nature will not retry within the time given by you. When complete the conversion task you should call back the `/callback` interface described in [Nature interface](nature-interface.md). The unit of `num` here is seconds.
 
 ```json
 {"type":"Delay","num":10}
 ```
 
-If you want to return Instance with your own route, please return the following form, where `ins` is the SelfRouteInstance array, and its structure is shown in the SelfRouteInstance below.
+If you want to return Instance with your own route, please return the following form, where `ins` is the SelfRouteInstance array, and its structure shown in the SelfRouteInstance below.
 
 ```json
 {"type":"SelfRoute","ins":[]}
@@ -193,7 +193,7 @@ pub struct SelfRouteInstance {
 
 ## DynamicConverter
 
-Dynamic converter for `SelfRouteInstance`
+A dynamic converter for `SelfRouteInstance`
 
 **rust form**:
 

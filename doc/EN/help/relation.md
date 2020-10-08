@@ -1,6 +1,6 @@
 # Relation
 
-It is used to define the upstream and downstream relationship between two `Meta`, and its definition is stored in the data table: relation.
+It is used to define the upstream and downstream relationship between two `Meta`, and its definition stored in the data table: relation.
 
 ## 定义 `Relation`
 
@@ -14,7 +14,7 @@ VALUES('B:sale/order:1', 'B:sale/orderState:1', '{"target_states":{"add":["new"]
 
 ## Define how to handle `Relation`
 
-Even if two `Meta` have established `Relation`, it may not be executed. It depends on the `settings`. `settings` is a JSON string and its content is defined as follows:
+Even if two `Meta` have established `Relation`, it may not be executed. It depends on the `settings`. `settings` is a JSON string and its content defined as follows:
 
 ```json
 {
@@ -32,7 +32,7 @@ Even if two `Meta` have established `Relation`, it may not be executed. It depen
 
 ### Selector
 
-The upstream and downstream must meet the specified conditions before Nature can call Executor. These conditions are defined as follows:
+The upstream and downstream must meet the specified conditions before Nature can call Executor. These conditions defined as follows:
 
 ```json
 {
@@ -55,7 +55,7 @@ The check order of conditions is: xxx_none, xxx_all, xxx_any.
 
 **Note**: If last_xxx is not satisfied, an `EnvError` will be generated and try it again later.
 
-**Note**: Although both `context` and `sys_context` are KV types, when used as process selection conditions, Nature only handles the "K" but not the "V". This is considered for easy design. The form of "V" is determined by the business, it may be a URL,  "a|b|c" or a json, so it is not standardized. Nature also does not want to regulate this, which may limit business flexibility and reduce processing performance. But the "K" is very standardized, just a label, which is very convenient for Nature to process. Of course, there are problems with this approach. When `context` and `sys_context` are used as process choices, they lose the meaning of KV. For example: choosing different processing procedures according to gender:
+**Note**: Although both `context` and `sys_context` are KV types, when used as process selection conditions, Nature only handles the "K" but not the "V". This is considered for easy design. The form of "V" is determined by the business, it may be a URL,  "a|b|c" or a json, so it is not standardized. Nature also does not want to regulate this, which may limit business flexibility and reduce processing performance, but the "K" is very standardized, just a label, which is very convenient for Nature to process. Of course, there are problems with this approach. When `context` and `sys_context` are used as process choices, they lose the meaning of KV. For example: choosing different processing procedures according to gender:
 
 - Wrong way：
 
@@ -89,7 +89,7 @@ The check order of conditions is: xxx_none, xxx_all, xxx_any.
 
 ### Executor
 
-`Executor` currently has three forms: converter, pre-filter, and post-filter. Its configuration adopts the following form.
+`Executor` has three forms currently: converter, pre-filter, and post-filter. Its configuration adopts the following form.
 
 ```json
 {
@@ -99,16 +99,16 @@ The check order of conditions is: xxx_none, xxx_all, xxx_any.
 }
 ```
 
-**protocol**: The communication protocol between Nature and ʻExecutor`. Its value is not case sensitive. The following methods are currently supported.
+**protocol**: The communication protocol between Nature and ʻExecutor`. Its value is not case-sensitive. The following methods supported currently.
 
 - Http | Https: Call an `Executor` remotely via post.
 - LocalRust: `Executor` is implemented as a Rust library, and Nature interacts with this library via FFI.
-- Auto: When you does not specify an `executor`, Nature will automatically construct an `executor` at `runtime`, but the `auto-executor` has no ability to generate content for `Instance.content`. So when we only care about ID, status and other information, Nature's `auto-executor` will bring us a lot of convenience.
-- BuiltIn: Use the built-in converter supplied by Nature. Specify a `builtin-executor` will be used through the `url` attribute
+- Auto: When you do not specify an `executor`, Nature will automatically construct an `executor` at `runtime`, but the `auto-executor` has no ability to generate content for `Instance.content`. So when we only care about ID, status and other information, Nature's `auto-executor` will bring us a lot of convenience.
+- BuiltIn: Use the built-in converter supplied by Nature. Specify a `builtin-executor` will be used through the `url` attribute.
 
-Both http and LocalRust are required to be implemented by yourselves, please refer to [Executor interface](executor.md)。
+Both http and LocalRust required to be implemented by yourselves, please refer to [Executor interface](executor.md)。
 
-**settings**: Each `Executor` can have its own independent configuration, which is explained by itself. **Note** The content of settings can be replaced by the content in the `para.dynamic` property of `Instance.sys_context` at `runtime`, and this replacement is limited to the current Instance and will not affect other Instances. Example: Suppose the settings of a before_filter used to load batch Instances are as follows:
+**settings**: Each `Executor` can have its own independent configuration, which is explained by itself. **Note** The content of settings can be replaced by the content in the `para.dynamic` property of `Instance.sys_context` at `runtime`, and this replacement limited to the current Instance and will not affect other Instances. Example: Suppose the settings of a before_filter used to load batch Instances are as follows:
 
 ```json
 {
@@ -178,4 +178,4 @@ After the execution of `Executor` is completed, sometimes we want to append some
 {"para.dynamic":"[[\"key\",\"value\"]]"}
 ```
 
-The key is derived from the value corresponding to `dynamic_para`, and the value is derived from the additional value generated by `append_para`. The function of `para.dynamic` is to replace the variables in `Executor.settings`, please refer to the sales statistics in [Demo](https://github.com/llxxbb/Nature-Demo).
+The key derived from the value corresponding to `dynamic_para`, and the value derived from the additional value generated by `append_para`. The function of `para.dynamic` is to replace the variables in `Executor.settings`, please refer to the sales statistics in [Demo](https://github.com/llxxbb/Nature-Demo).

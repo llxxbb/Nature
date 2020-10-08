@@ -10,16 +10,16 @@ The three forms of `Executor` can all be found in the [Nature-Demo](https://gith
 
 In fact, functionally speaking, `convert_before` and `convert_after` can be replaced by `converter` form, but Nature does not recommend, for the following reasons:
 
-- `convert_before` and `convert_after` are generally only technical processing, and do not exceed the scope of the business object, while `converter` connects two business objects, which is beyond the scope of the business object. On the management interface, `converter` will be used to display business object relationships in the future, but `convert_before` and `convert_after` will not be displayed directly.
+- `convert_before` or `convert_after` is generally only technical processing, and do not exceed the scope of the business object, while `converter` connects two business objects, which is beyond the scope of the business object. On the management interface, `converter` will be used to display business object relationships in the future, but `convert_before` and `convert_after` will not be displayed directly.
 - for the benefit of the performance: `converter` have a process for writing to database, while `convert_before` and `convert_after` do not need storage, so more efficiently. this will be a greater impact on large massive data processing.
 
 ## Protocol
 
-Currently Nature can call `Executor` in two ways: http and localRust. Other protocols may be supplemented in the future.
+Currently, Nature can call `Executor` in two ways: http and localRust. Nature will supplement Other protocols in the future.
 
 ### http|https protocol implementation
 
-Please use any language you like to implement a Web service that can handle POST requests. And make sure that Nature can access this service address via the `url` defined in [Relation](relation.md)'s `executor` property.
+Please use any language you like to implement a Web-Service can handle POST requests. Then make sure Nature can access this service address via the `url` defined in [Relation](relation.md)'s `executor` property.
 
 ### localRust protocol implementation
 
@@ -67,7 +67,7 @@ The input parameter is `Instance`, and the output parameter is `Result<Instance>
     {"Ok":{}}
     ```
 
-2. If problems are encountered during processing, the following content you should return:
+2. If you encounter problems during processing, the following content you should return:
 
     ```json
     {"Err":{"LogicalError":"err message"}}

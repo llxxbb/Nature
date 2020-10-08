@@ -2,15 +2,15 @@
 
 In normal case, `Executor` needs to be implemented by developers. For some commonly used general functions, Nature make it as built-in to reduce the burden on developers. For `Executor` please refer to [Executor](executor.md) and [Relation](relation.md).
 
-As Nature's application field continues to discover, the built-in `Executor` will continue to be enriched and improved, so this document may be adjusted frequently.
+As Nature's application field continues to discover, the built-in `Executor` will continue to be enriched and improved, so this document may adjust frequently.
 
-Three types of `Executor` are defined in [Executor](executor.md): `converter`, `convert_before` and `convert_after`. The following content is organized according to these three interfaces.
+Three types of `Executor` are defined in [Executor](executor.md): `converter`, `convert_before` and `convert_after`. The following content organized according to these three interfaces.
 
 ## converter interface
 
 ### scatter
 
-**Function**: Split the upstream Instance into multiple downstream Instances. And use `Instance.para` to distinguish these downstream `Instance`s.
+**Function**: Split the upstream Instance into multiple downstream Instances, then use `Instance.para` to distinguish these downstream `Instance`s.
 
 **Upstream Instance requirements**: The `Instance.content` must be in the following json format, **Note**: If the data format does not meet the requirements, you can use `convert_before` to correct it.
 
@@ -58,9 +58,9 @@ Three types of `Executor` are defined in [Executor](executor.md): `converter`, `
 
 To merge the upstream `Instance` into the downstream `Instance`, there are the following requirements:
 
-- The `Meta` of the downstream `Instance` must be stateful so can store the merged result. Because the downstream is stateful, this mode is not suitable for use in situations with a large number of data to merge; on the one hand, there is a problem with the capacity of the downstream itself, on the other hand, it is a performance problem for the large number of merged versions.
-- The `key` of the merge item comes from upstream `Instance.para`
-- The `value` of the merge item comes from upstream `Instance.content`
+- The `Meta` of the downstream `Instance` must be stateful so can store the merged result. Because the downstream is stateful, this mode is not suitable for use in situations with large data to merge; on the one hand, there is a problem with the capacity of the downstream itself, on the other hand, it is a performance problem for the large number of merged versions.
+- The `key` of the item to be merged which comes from upstream `Instance.para`
+- The `value` of the item to be merged which comes from upstream `Instance.content`
 
 The example settings are as follows:
 
@@ -88,7 +88,7 @@ The merged downstream data is as follows:
 
 #### None mode
 
-The statistical item has no key. This mode merge the upstream numeric arrays and outputs the result as the downstream `Instance`.
+The statistical item has no key. This mode merges the upstream numeric arrays and outputs the result as the downstream `Instance`.
 
 Examples of upstream is as follows.
 
@@ -199,7 +199,7 @@ The ins_key structure used below is: meta-string:id:para.
 
 ### task-checker
 
-**Function**: Before executing `Executor`, check whether the related Nature task is completed. It is generally used to determine whether the required data is fully in place when loading instances. If it is not in place, return environment exception and wait for the next retry.
+**Function**: Before executing `Executor`, check whether the related Nature-tasks ready. It is generally used to determine whether the required data is fully in place when loading instances. If it is not in place, return environment exception and wait for the next retry.
 
 **Options**:
 

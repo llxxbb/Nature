@@ -8,7 +8,7 @@ This is the main method for external systems to input information to Nature.
 
 The input parameter is `Instance`, please see `Instance` in [Data definition](data-define.md). If the caller does not give an `Instance.id` and an `Instance.para` is not specified, Nature will assign an id to it.
 
-The output parameter is `Instance.id` and the type is Result<u64>. The json example is as follows
+The output parameter is `Instance.id` and the type is Result<u64>. The json example shown as follows.
 
 ```json
 {"Ok":12345}
@@ -16,7 +16,7 @@ The output parameter is `Instance.id` and the type is Result<u64>. The json exam
 
 ## /callback
 
-`callback` is used for the `convert` interface of [Executor](executor.md) to communicate with Nature asynchronously. In asynchronous mode, `convert` must immediately return `ConverterReturned::Delay(seconds)` defined in [Data Definition](data-define.md) to tell Nature that the result will be returned within the time given by `Delay`, when After completing the task, `convert` pushes the result to Nature by calling Nature's `callback` interface. If the result is not submitted within the `Delay` time, Nature will retry according to the retry strategy.
+`callback` is used for the `convert` interface of [Executor](executor.md) to communicate with Nature asynchronously. In this way `convert` must immediately return `ConverterReturned::Delay(seconds)` defined in [Data Definition](data-define.md) to tell Nature that the result will be returned within the time given by `Delay`, when After completing the task, `convert` pushes the result to Nature by calling Nature's `callback` interface. If the result does not submit within the `Delay` time, Nature will retry according to retry strategy.
 
 For input parameter, please refer to `DelayedInstances` in [Data Definition](data-define.md), output parameter is Result<()>, and its json format is as follows:
 
@@ -54,4 +54,4 @@ Please refer to the `KeyCondition` of [Data Definition](data-define.md) for inpu
 
 ## /redo_task
 
-This interface is the internal interface of the Nature system, you only need to understand it, you will not use this interface directly. This interface is used to retry failed tasks and is called by the `retry` executable program.
+This interface is the internal interface of the Nature system, you only need to understand it, you will not use this interface directly. This interface used to retry failed tasks and is called by the `retry` executable program.

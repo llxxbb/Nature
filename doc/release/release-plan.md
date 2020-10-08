@@ -21,7 +21,7 @@
 ### 未完成
 
 - doc EN: architecture, solution
-- demo java(time off: 请假)
+- demo java(leave application: 请假)
     last state check
 
 - 架构：流式计算：可以理解为只有 map,可以内嵌 filter(两层意思：条件过滤和内容修改) 

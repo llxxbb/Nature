@@ -4,7 +4,7 @@
 
 ## Meta-String
 
-A complete `Meta` consists of three parts: `MetaType`, `key` and `version`. For simplicity, Nature is represented by a string in the following form:
+A complete `Meta` consists of three parts: `MetaType`, `key` and `version`. For simplicity, Nature represent it by a string in the following form:
 
 ```
 MetaType:key:version
@@ -27,11 +27,11 @@ MetaType:key:version
 
 ### key
 
-The key is used to uniquely distinguish it from other business objects. You can use "/" to classify the business domain, which is very helpful for the visual management of the business domain.
+be used to uniquely distinguish it from other business objects. You can use "/" to classify the business domain, which is very helpful for the visual management of the business domain.
 
 ### version
 
-A business object may be changed by the development of the business. In order not to affect the existing functions, Nature uses a different `version` to redefine a **"new business object"**, but maintains the consistency of their **business areas**, means that they have the same `key`.  So`version` is very helpful for business expansion.
+The development of the business may change `Meta` often. In order not to affect the existing functions, Nature uses a different `version` to redefine a **"new business object"**, but maintains the consistency of their **business areas**, means that they have the same `key`.  So`version` is very helpful for business expansion.
 
 ## State
 
@@ -51,7 +51,7 @@ For example, suppose we have four states, s1, s2, s3, and s4, and s1 contains fo
 s1[s1-1,s1-2,s1-3|s1-4],s2|s3,s4
 ```
 
-The symbols used in the expression are defined as follows:
+The expression used symbols defined as follows:
 
 | symbol | description                                                  |
 | ------ | ------------------------------------------------------------ |
@@ -62,7 +62,7 @@ The symbols used in the expression are defined as follows:
 **important hint:** 
 
 - The name of each state in the expression must be unique, even if they are in different groups.
-- If the `state`  attribute of `Meta` is empty, then this `Meta` will be none-state. Unless explicitly specified "is_state" to true in `Meta`‘s setting 
+- If the `state`  attribute of `Meta` is empty, then this `Meta` will be none-state. Unless explicitly specify "is_state" to true in `Meta`‘s setting. 
 
 ## Meta settings
 
@@ -82,15 +82,15 @@ The setting information of `Meta` is in JSON format, which is defined as follows
 
 - multi_meta: is a `Meta-String` array. The `Meta` whose `MetaType` is M can allow `Executor` to return multiple `Instance` of different `Meta`. The `Meta` used for returning must be defined here, and must be defined as an independent `Meta`. **Note**: `multi_meta` cannot contain the state `Meta`. **Note**: If `multi_meta` has only one value (Generally common in `Meta` whose MetaType is L), `Executor` does not need to specify the `meta` attribute of the output `Instance`, Nature will automatically fill it; if `multi_meta` is more than one Value, the output of `Executor` must clearly give the value of `Instance.meta`.
 
-- cache_saved: If true, the generated `Instance` will be cached for a short period time to avoid repeated writing to the database to improve efficiency. Common in situations where different upstream generate the same downstream, for example the `Instance` generated for time based statistical task in [Example](https://github.com/llxxbb/Nature-Demo). **Danger reminder**: Use this option incorrectly may consume a lot of memory or even overflow! The cache time is specified by the `CACHE_SAVED_TIME` option in the `.env` file.
-- only_one: Only valid for `Meta` whose `MetaType` is L, and is used to mark whether the Loop has only one downstream `Instance` output. If it is false, each call of Loop can generate multiple `Instance` of different Meta, and these Meta are given by the `multi_meta` attribute. If true, Nature regards the currently defined `Meta` as a state `Meta`, which is used to store state data each time when Loop is called (the content is the `Instance` of the `Meta` specified by `multi_meta`) to serve Next time Loop, note that in this case, `multi_meta` can only define one element. The reason for processing in this way is because:
+- cache_saved: If true, the generated `Instance` will be cached for a short period time to avoid repeated writing to the database to improve efficiency. Common in situations where different upstream generate the same downstream, for example the `Instance` generated for time based statistical task in [Example](https://github.com/llxxbb/Nature-Demo). **Danger reminder**: Use this option incorrectly may consume a lot of memory or even overflow! You can set the `CACHE_SAVED_TIME` option in the `.env` file to change the cache time.
+- only_one: Only valid for `Meta` whose `MetaType` is L, and is used to mark whether the Loop has only one downstream `Instance` output. If it is false, each call of Loop can generate multiple `Instance` of different Meta, and these Meta given by the `multi_meta` attribute. If true, Nature regards the currently defined `Meta` as a state `Meta`, which is used to store state data each time when Loop called (the content is the `Instance` of the `Meta` specified by `multi_meta`) to serve Next time Loop, note that in this case, `multi_meta` can only define one element. The reason for processing in this way because:
 
-  - `multi_meta` cannot accept state data, because processing multiple state data at the same time is extremely complicated for architecture support.
+  - `multi_meta` cannot accept state data, because processing multiple state data at the same time is extremely complex for architecture support.
   - From the user's point of view, users do not expect the intermediate results of Loop, so there is no need for state data in `multi_meta`.
 
 ## Define `Meta`
 
-The `Meta` data is stored in the meta data table. The following is an example of "Order" `Meta`:
+The `Meta` data stored in the "meta" data table. The following is an example of "Order" `Meta`:
 
 ```sql
 INSERT INTO meta
