@@ -5,20 +5,21 @@
 - 功能性先于非功能性需求
 - 应用情景支持，内部优先于外部（如网关）
 
-## Release 0.20.2
+## Release 0.20.3
+
 
 ### should commit
-
-
 
 ### 未完成
 
 - doc EN: architecture, solution
+- doc EN: compare.md
 - demo java(leave application: 请假)
     last state check
 
 - use lru-cache for cache
 
+- 使用状态化代替静态化，以减少多线程锁。
 
 - 架构：流式计算：可以理解为只有 map,可以内嵌 filter(两层意思：条件过滤和内容修改) 
 

@@ -85,6 +85,8 @@ Nature 运行时模式中的 `map` 对应 `Relation`  中的 `Executor`。Nature
 
 [Nature 架构说明](doc/ZH/help/architecture.md)
 
+[与其他框架的比较](doc/ZH/compare.md)
+
 [使用 Meta](doc/ZH/help/meta.md)
 
 [使用 Relation](doc/ZH/help/relation.md)
