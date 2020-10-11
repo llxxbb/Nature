@@ -5,14 +5,7 @@
 - 功能性先于非功能性需求
 - 应用情景支持，内部优先于外部（如网关）
 
-## Release 0.20.1
- 
-- finished english doc:
-  - meta.md
-  - executor.md
-  - nature-interface.md
-  - data-define.md
-  - builtin-executor
+## Release 0.20.2
 
 ### should commit
 
@@ -23,6 +16,9 @@
 - doc EN: architecture, solution
 - demo java(leave application: 请假)
     last state check
+
+- use lru-cache for cache
+
 
 - 架构：流式计算：可以理解为只有 map,可以内嵌 filter(两层意思：条件过滤和内容修改) 
 

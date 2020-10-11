@@ -1,5 +1,14 @@
 # 发布的功能
 
+## Release 0.20.1 2020-10-11
+
+- finished english doc and adjust chinese doc:
+  - meta.md
+  - executor.md
+  - nature-interface.md
+  - data-define.md
+  - builtin-executor
+
 ## Release 0.20 2020-10-04
 
 - incompatible change: change `Instance` table design, split `ins_key` into `meta`, `ins_id` and `para`
