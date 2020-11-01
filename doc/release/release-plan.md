@@ -12,6 +12,7 @@
 ### 未完成
 
 - doc EN: architecture, solution
+- doc EN: compare.md
 - demo java(leave application: 请假)
     last state check
 

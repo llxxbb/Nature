@@ -1,48 +1,55 @@
-# versus other solutions
+# 与其他系统的关系
 
-## map-reduce framework(MRF)
+## 流式计算
 
-### use level
+Nature 也是一款流式计算产品，和其它产品的区别在于：
 
-* MRF's data are defined at low level(by programer).
-* Nature's data are defined at high level by businness manager.
+| 其它流式计算框架             | Nature                 |
+| ---------------------------- | ---------------------- |
+| 倾向于大数据和科学计算       | 倾向于业务业务流程处理 |
+| 低等级控制（需要程序员介入） | 高等级控制，如决策人员 |
 
-### use case
+## 消息系统
 
-* MRF used in OLAP
-* Nature used in BP
+Nature 的处理模式时**数据 --map--> 数据 --map--> 数据...**，这和消息系统有一定的相似之处，两者都可以实现复杂系统的解耦。但两者的区别也比较明显，如下：
 
-## compare to MQ
+| 消息系统                                                     | Nature                                       |
+| ------------------------------------------------------------ | -------------------------------------------- |
+| 服务于技术人员                                               | 更多的服务于决策者                           |
+| 数据是一般是暂时存储的                                       | 数据是长期存储的                             |
+| 数据与数据之间没有必然的相关性；而 Nature 中的数据与数据之间关系密切，数据之间会构成一个链。 | 数据与数据之间关系密切，数据之间会构成一个链 |
+| 连接的是两个功能体                                           | 连接的两个目标                               |
 
-### Nature:
+## workflow
 
-Easy and union redo ability.except finst call from outer all following process will automatic retry when **Environment Error** occurs.
-Even so the first call from outer which wuould be UI usually, so no need retry logic at all.
-而DataHub可以长期存储。数据是可检索的。
-流转管理是集中的。
+Nature 通过串接目标的方式形成的处理流程，这和 workflow 有异曲同工之妙，两者的区别主要体现在：
 
-### MQ
-need to handle every call for retry from outer.
-消息是暂态的，你不能查询一个特定的数据。
-消息流转管理是分散的
+| workflow                                                     | Nature                                                       |
+| ------------------------------------------------------------ | ------------------------------------------------------------ |
+| 告诉我们**怎么做（功能性驱动）**，迭代多了我们的目标可能会**迷失** | 告诉我们**做什么**，聚焦到真正重要的事情上，并让管理变得**简单** |
+| 规则引擎复杂                                                 | 只有一对一的关系，简单                                       |
+| 调整的是流程，较为频繁，目标不容易收敛                       | 调整的是目标，简洁明了。                                     |
 
+## FaaS
 
-## compare to RPC
+Nature 和 `Executor` 协作的方式实际上可以看做是 FaaS(Function as a Service) 的一种形式，两者的区别体现在：
 
-RPC 拥有服务治理，熔断等特性。
+| FaaS                       | Nature                     |
+| -------------------------- | -------------------------- |
+| 面向功能，局部。           | 面向目标，整体。           |
+| 用代码实现功能编织，复杂。 | 用配置进行功能编织，简单。 |
 
-https://mp.weixin.qq.com/s?__biz=MjM5MDE0Mjc4MA==&mid=2651006475&idx=3&sn=7b8da1df204e7fd250246c6554c8d363&chksm=bdbede588ac9574e2d8501b9f178e635a9aa94634f4017d52bba005dccffe89a980c05d6c465&scene=0#rd
+## 数据库
 
-2015 年是流计算百花齐放的时代，各个流计算框架层出不穷。Storm, JStorm, Heron, Flink, Spark Streaming, Google Dataflow (后来的 Beam) 等等。其中 Flink 的一致性语义和最接近 Dataflow 模型的开源实现，使其成为流计算框架中最耀眼的一颗。也许这也是阿里看中 Flink的原因，并决心投入重金去研究基于 Flink的 Blink框架。
+Nature 的本质其实是一款数据管理产品，试图囊括各种业务数据，但本身不具备存储能力，还需要借助具体的数据库产品来存储。 Nature 借鉴了关系数据库的`关系`技术，用简单的一对一来解决一对多，多对多等复杂关系。两者的区别也非常明显，具体体现在：
 
-如果问是基于什么具体的原因使得阿里选择了 Flink框架，阿里巴巴的高级技术专家大沙曾言，他们是在 2015年开始调研新一代流计算引擎的，当时的目标就是要设计一款低延迟、exactly once、流和批统一的，能够支撑足够大体量的复杂计算的引擎。
+| 数据库                 | Nature                             |
+| ---------------------- | ---------------------------------- |
+| 面向技术               | 面向业务                           |
+| 关系：强大，灵活       | 关系：只能通过`from_key`来建立关系 |
+| 可以为业务对象详细建模 | 业务对象是一个 key-value           |
+| 主要用于存取和检索     | 主要用于驱动业务运转               |
 
-Spark streaming的本质还是一款基于 microbatch计算的引擎。这种引擎一个天生的缺点就是每个 microbatch的调度开销比较大。Kafka streaming是从一个日志系统做起来的，它的设计目标是足够轻量，足够简洁易用。这一点很难满足对大体量的复杂计算的需求。Storm是一个没有批处理能力的数据流处理器，除此之外 Storm只提供了非常底层的 API，用户需要自己实现很多复杂的逻辑。
+## ERP
 
-### business relation
-
-Find relation Forward versus backward.
-
-static relation versus dynamic relation.
-
-
+决策集成的问题其实业界早已经关注过了，如ERP。ERP 曾经火及一时，但最近几乎无人问津了。并不是这一概念不好，而是 ERP 不够彻底。我们确实需要围绕着资源在做系统，但资源的调度是需要决策的，然而 ERP 仅仅是形式上将决策放到了一个统一的界面下，但并没有从实质上解决**决策固化**问题，请参考 [Nature 架构](help/architecture.md)。
