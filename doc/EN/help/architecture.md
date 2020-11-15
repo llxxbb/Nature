@@ -1,4 +1,4 @@
-# Nature Architecture
+# Nature Architecture Thought
 
 Before reading, please read [README](../../../README_EN.md) to understand some concepts and terminology.
 
@@ -77,9 +77,105 @@ It is `Relation`, in this way, Nature **corrects the subordination relationship 
 
 ### Decentralization
 
-As we said above, the output of upstream `Relation` can be used as the input of downstream `Relation`. This is a serial streaming method, which can **autonomously flow** one after another and generate corresponding `Instance` at runtime. During this period, there is no need for a certain point or a few points to carry out any process control, which means that the behavior of the system is free to play downstream, is not controlled, and is decentralized.
+As we said above, the output of upstream `Relation` can be used as the input of downstream `Relation`. This is a method of stream processing, which can **autonomously flow** one after another and generate corresponding `Instance` at runtime. During this period, there is no need for a certain point or a few points to carry out any process control, which means that the behavior of the system is free to play by downstream, is not controlled, and is decentralized.
 
 Decentralization is extraordinary in a large-scale system. Mainly reflected in the following aspects
 
--Efficiency: Decentralization means that the control logic is reduced, which means that tasks can be completed in a shorter time and fewer resources. It means that the capacity can be expanded concurrently and horizontally without worrying about squeezing the single-plank bridge.
--Adaptive: On the premise of ensuring the completion of the task, because of the removal of control, there are more possibilities for implementation, without worrying about excessive control and constraints.
+- **Efficiency**: Decentralization means that the length of the control-chain  is reduced, which means that tasks can be completed in a shorter time and fewer resources would be used. It means that it can be concurrent, the capacity can be expanded horizontally, and without worrying about squeezing the single-plank bridge.
+- **Adaptive**: On the premise of ensuring the completion of the task, because of the removal of control, there are more possibilities for implementation, without worrying about excessive control and constraints.
+
+### One to One
+
+`Relation` only allows one input to correspond to one output, which is one-to-one. This approach is borrowed from relational databases. In addition to its simple form, there are several other functions.
+
+- **Force decoupling between businesses**. One-to-many, many-to-one and other complex relationships may be expressed in one-to-one, so that the diversity of control forms is eliminated, and it is easy to unify, which provided the foundation for processing design based on simple configuration that does not require coding.
+- High-level functions are easier to achieve. Each one-to-one is simple, so we can quickly build a lot of functional bodies, when they are aggregated together through Nature, just like the bee colony and ant colony described in "Out of Control", "**emerge** " a high-level ability.
+- One-to-one can make it easier for Nature to **Empower**. Because the form of `Executor` is simple and unified, it is easy for us to apply `aspect` techniques on `Executor`, such as concurrency, idempotence, retry, etc., thereby greatly reducing the technical complexity of `Executor` development, and enabling developers better focus on the business.
+
+## Nature's Philosophical Significance of Operation Mechanism
+
+Here we talk about the difference between **control** and **choice**: Control is the control of others, and choice is the choice of oneself and has nothing to do with others.
+
+### Control
+
+Control is the means and method adopted to achieve the goal. Most of our **systems are based on control**, code controls everything, whether it is a framework, design pattern, or components, it is a kind of control, including Nature, which is a matter of course since the birth of the programming industry. From this point of view, the system is a polymer of goals and functions, and the two are inseparable. **This is a clear proof of the solidification of decision**.
+
+The more points the more difficult to control. Although we can reduce the complexity of control by layering, but it increases the length of the **feedback path**. This is a difficult decision that a large distributed system needs to face directly. The more participants, the more complex the control logic, until a **bottleneck** appears!
+
+**Nature only controls the rules**, not the business itself, and Nature's rules are very simple and very few, which ensures the efficiency of Nature's processing. One of the most important rules in Nature is `Relation`, which refuses to control. Instead, `Relation` requires all business participants to `select`  that described below, It is **self-organize process**. From this level, Nature can greatly reduce the development costs related to business control.
+
+### Select
+
+Selection is the opposite of control. It is bottom-up, just like a river, the upstream cannot control the downstream flow. The form of `Relation` determines that it does not allow control of business processes, only selection. `Relation` not only selects upstream, it also selects `Executor`, so that "functions" can be replaced at will.
+
+Because the upstream does not control, there is no need for the downstream to **feedback** the information to the upstream, it becomes a truly efficient flow, this is especially meaningful for multi-level feedback. Therefore, the selection not only improves performance, but also gives the downstream full flexibility, which is very important for business expansion and adjustment!
+
+### Impact on business iteration
+
+Now it is generally advocated: "Run in small steps, fast iteration, **continuous delivery**", the system bottleneck of business development can be seen in general. However, to achieve this effect is conditional, remove the peripheral dependencies such as automated deployment, DevOps, and cloud infrastructure, it depends on whether the overall structure of your projects has been stable. That is to say, this kind of continuous delivery is generally limited to small-scale adjustments, and it is difficult to achieve rapid cross-system iteration, but this is what we need most urgently! 
+
+This is caused by the limitations of control: **Control requires controlling all participants**. When we need to change something, the control end must review and adjust all relevant participants. For an individual, in order to control it, it must **occupy** some resources in some form that it controls. The ability and scope of control are closely related to the degree of resource occupation. Occupation need to **invade**, and invasion is costly, which is very unfavorable for large distributed systems.
+
+Here is an example of payment and delivery: when the payment status is "paid", an outbound application form is generated, and no action is taken if the payment is not completed. Usually we will use the `if` control statement in the payment logic, this is control! Now we have to make business adjustments: change the delivery dependency from the payment system to the order system. In this way, the logic of the payment system and the order system must be modified; in addition, the smooth transition of the two systems needs to be considered. This is a high-risk, time-consuming, and difficult operation with side effects. So you can see how high the cost of control is despite it is a small decision change!
+
+Let's take a look at `Selection` again. Nature uses `Select` to **guide the flow** instead of controlling the flow, so there is no `if` in the flow control. As for the above example, the payment completion does not automatically trigger any action, but it is triggered when the downstream need it. You only need to define a `Relation` of "payment status=paid->outbound request form". Okay. When the decision becomes to order-status-driven, we only need to change `Relation` to: "Order status=paid->outbound application form" and modify the corresponding `Executor`. From this it can be seen that `selection` can achieve **modification on demand**, but which is difficult for controlling.
+
+Nature is suitable for fast iteration, it does not have the problem of **boundary wall** between systems, which is given by the selection feature of Nature. The selection is OK as long as the other party exists and there is no need to invade, so there is no additional cost, that is, **the select is much lower environmental requirements than the control**. At the same time, because there is no control, you will not encounter complex logic problems, such as branches, loops, jumps, etc.; because there is no control, the cost of system evolution will be very low, and the links between business modules can be easily reorganized and easy to find the optimal path; because there is no control, a variety of business modules are free to test and expand, to meet the needs of business development in a flexible way.
+
+### Ecology and Law
+
+In an ecosystem, there is no supreme master who can control everything. Every species adapts in the selection. Only in this way can there be biological vitality, which is what the current traditional system lacks. The reason why the traditional system is lifeless and inefficient is because of top-down control, which is similar to the level of reporting and approval of the company’s business. **When the control chain is very long and wide, the internal friction caused by the control will be hard**.
+
+Although Nature does not emphasize control, what does Nature use to maintain the order? 
+That's the law. No control does not mean that there is no law, control has a clear purpose, and the law has no purpose. The reason why the earth revolves around the sun is not that the sun deliberately controls the earth, but the law of gravitation is at work. The ecosystem of nature is the same, winter and summer exchange, day and night reincarnation, the law maintains the balance of natural ecology. The law of Nature is `Selection`, that is, `Relation`. Almost all the code in Nature is organized around this rule.
+
+### Invisible control under selection
+
+In [Demo](https://github.com/llxxbb/Nature-Demo) there are examples related to online shopping and statistics. These examples illustrate how Nature can simplify the implementation of these services. We won’t go into details here, we just want to explain how the selection mechanism can effectively support the operation order of the system. For the sake of simplicity, the content expressed may not be exactly the same as in the Demo.
+
+We mentioned above that the downstream select upstream, which reveals a way of thinking: **reverse thinking**, which is what we need to achieve our goals. For online shopping, it needs to be reversed from the end of the process. If the user wants to get the product, the delivery person needs to send it. The delivery data is the receipt, so we define the first `Meta`. Then we push backwards. The delivery person needs to get the goods for delivery from the warehouse. The outbound order is our second `Meta`, so we have the first `Relation`: Outbound order -> Sign receipt.
+
+By analogy, we can define a `Relation` similar to the following
+
+```
+Outbound order -> Sign receipt
+sale Order -> Outbound Order
+```
+
+There is a very important point to talk about. How to schedule from the outbound order to the receipt order, whether it is delivered by your own company or a third-party delivery, does not care here. The `Executor` of `Relation` can use whichever you want. Both `Relation` only cares about the result, not how to do it. Of course, if you have your own logistics team and want to track the logistics status, you can build a branch goal from the Outbound order. We will talk about diversion below.
+
+Such a simple but complete `design time` came out. And this design realizes the control of `runtime` without writing code.
+
+Outbound order -> Signed receipt is a one-to-one relationship in `design time`, and the output of `Instance` at runtime is also one-to-one. Both a real outbound order will correspond to a real sign receipt. This is the most conventional control in Nature. Other control methods are supported by this conventional method, such as the diversion described next.
+
+The form of diversion in the design is that different downstream have the same upstream, just like a river bifurcation. For example, the above outbound order can also drive the inventory status, `Relation` is as follows:
+
+```
+Outbound order -> Sign receipt
+Outbound order -> inventory status
+```
+
+In this case, the outbound order does not need to know how many downstream there are, but Nature will know, so Nature needs to execute the `Executor` of each `Relation` separately behind the scenes.
+
+Pay attention to the "Outgoing List -> Inventory Status" here. This is one-to-one at design time, but it may be many-to-one at runtime. For example, suppose we have two outbound orders in `runtime`, outbound order A includes 2 mobile phones, and outbound order B includes 3 mobile phones, but there can only be one mobile phone inventory status, so in this example, there are two instances of outbound orders corresponding to different versions of the instance data of the same inventory status. (For status data and status concurrency control, please see [Nature Technical Features](characteristics.md))
+
+So is there a one-to-many run-time? Here is an example: Order -> Payment Order. This is one-to-one at design time, but can be one-to-many at runtime. Assuming that the money in the user's first card is not enough to pay for the order, then there will be multiple payments, that is, one order instance corresponds to multiple payment instances.
+
+So is there a many-to-one situation in `design time`? The answer is yes, `Relation` is defined as follows:
+
+```
+Outbound order -> inventory status
+Inbound order -> inventory status
+```
+
+Now let's look at the one-to-many and many-to-one of `design time`, one-to-many and many-to-one of `runtime`, which can be combined at will, which forms a complete closed loop at the theoretical level. In this way, `Relation` can support very complex businesses. But for users, there is basically no need to care about process control issues. Users only need to make reasonable selections, and Nature will control everything under the law (`Relation`).
+
+## Standardization
+
+Nature breaks the traditional function-oriented development model, and its simplified form brings us the possibility of standardization while reducing costs:
+
+One of them is the standardization of decision-making. The solidification of decision in the traditional way makes decision very individual, and only a customized system can express it. Nature's decision is standardized data, we only need to configure it, and it can be understood by the execution system without coding. However, Nature is not limited to the standardization of forms. It has a greater meaning **standardization of decision-making behavior**. Compared with the traditional way, Nature can greatly reduce the consideration of the implementation level and face the final decision product: data.
+
+The second is **implementation standardization**. Because the coupling between services is cut off, each business execution unit is very independent, and these execution units are uniformly scheduled by Nature. This will inevitably unify the interface form and naturally standardized.
+
+The third is **Data Standardization and Purification**. In the traditional model, we may have dozens or hundreds of databases with hundreds or thousands of data tables. These data tables are a mixture of temporary data, business definitions, business control, technical data, and business data. But Nature only has three data tables related to business: `Meta` for business definition, `Relation` for business control, and `Instance` for business data. This will greatly reduce unnecessary data storage and reduce data redundancy. Of course, we may need a large distributed database, such as [Tidb](https://pingcap.com/en/).
