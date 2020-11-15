@@ -4,6 +4,8 @@ English|[中文](README.md)
 
 ## What is Nature？
 
+Summary says Nature is a tool to ensure final consistency of data. However, it also is:
+
 ### Distributed Stream-Compute-Engine
 
 Traditional stream-compute is proposed to solve the timeliness of data processing, emphasizing calculation logic, and emphasizing `map-reduce`. Nature is also a stream-compute framework, and its core processing mode is: **Data--map--> Data--map-->Data...**, which simplifies `map-reduce` to `map` (It is not that `reduce` is discarded, but it can be embedded into `map` for processing). This simplified mode allows us to more easily focus on the data itself rather than the process, so **Nature emphasize data**, but not calculation logic. This point will be further explained below.
@@ -80,17 +82,15 @@ We need to do the following
 
 ## Learn more about Nature
 
-[Sample and function explanation](https://github.com/llxxbb/Nature-Demo)
+If you want to understand Nature's view of nature, time and space, mathematical meaning and philosophical meaning, please read: [Nature architecture thought](doc/EN/help/architecture.md)
 
-[Nature Architecture Description](doc/EN/help/architecture.md)
+If you want to learn how to apply Nature in actual situations read: [Sample and function explanation](https://github.com/llxxbb/Nature-Demo), [Solutions to some business scenarios](doc/EN/help/use-case.md)
 
-[Use Meta](doc/EN/help/meta.md)
+If you want to know how Nature features technical features and how these features are implemented read: [Nature tecnology characteristics](doc/EN/help/characteristics.md)
 
-[Use Relation](doc/EN/help/relation.md)
+If you want to understand differences between Nature and streaming computing, messaging systems, workflow etc. please read: [Compare with other framework](doc/EN/compare.md)
 
-[Built-in executor](doc/EN/help/built-in.md)
-
-[Solutions to some business scenarios](doc/EN/help/use-case.md)
+If you want to use Nature better, read: [Use Meta](doc/EN/help/meta.md), [Use Relation](doc/EN/help/relation.md), [Built-in executor](doc/EN/help/built-in.md)
 
 ## Note
 

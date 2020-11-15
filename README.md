@@ -4,6 +4,8 @@
 
 ## Nature 是什么？
 
+概要一点说，Nature 是保障数据最终一致性的一种工具。然而它还是：
+
 ### 分布式流式计算引擎
 
 传统的流式计算是为了解决数据处理的时效性而提出的，强调的是计算逻辑，强调的是 `map-reduce`。Nature 也是一种流式计算框架，其核心处理模式为： **数据 --map--> 数据 --map--> 数据...**，它将 `map-reduce` 简化为 `map`（并不是丢弃了`reduce`，而是可以将之嵌入到`map`内部来处理），这种简化的模式可以让我们更容易聚焦到数据本身上而不是处理过程上，所以 **Nature 强调的是数据**，而不是计算逻辑。这一点在下面将进一步说明。
@@ -23,7 +25,7 @@ Nature 运行时模式中的 `map` 对应 `Relation`  中的 `Executor`。Nature
 `Executor` 在运行时会生成 `Instance`，外系统提交到 Nature 的初始数据也是 `Instance` ，`Instance` 是 `Meta` 的运行时表达，既业务的实例数据。如果您愿意您可以尽可能多地将 `Meta` 交给 Nature 来搭理，Nature 将为这些 `Meta` 所产生的 `Instance` 提供统一的、集中的存储，并为它们提供查询接口，这样 Nature 就扮演了一个数据中心的角色。这里有几点说明：
 
 - 数据检索：Nature 的业务对象都是非结构化存储的，很像 `Key-Value` 数据库。如果想对业务对象内的数据进行统计。可以利于 Nature 的流式计算机制加工出任何您想要的数据来，请参考[示例](https://github.com/llxxbb/Nature-Demo)中的销量统计。
-- 数据库容量：Nature 缺省使用 mysql 作为后端存储，如果您的数据量很大，可以考虑使用 [Tidb](https://pingcap.com/en/) 。
+- 数据库容量：Nature 缺省使用 mysql 作为后端存储，如果您的数据量很大，可以考虑使用 [Tidb](https://pingcap.com/en/) 
 
 ### 极简开发平台 
 
@@ -81,19 +83,15 @@ Nature 运行时模式中的 `map` 对应 `Relation`  中的 `Executor`。Nature
 
 ## 深入了解Nature
 
-[示例及功能讲解](https://github.com/llxxbb/Nature-Demo)
+如果您想了解下 Nature 的自然观，时空观，数学意义和哲学意义请阅读：[Nature 架构思想](doc/ZH/help/architecture.md)
 
-[Nature 架构说明](doc/ZH/help/architecture.md)
+如果您想在实际情况中了解如何应用 Nature 请阅读：[示例及功能讲解](https://github.com/llxxbb/Nature-Demo)，[一些业务情景的解决方法](doc/ZH/help/use-case.md)
 
-[与其他框架的比较](doc/ZH/compare.md)
+如果您想了解 Nature 的技术特性以及这些特性是如何实现的请阅读：[Nature 的技术特性](doc/ZH/help/characteristics.md)
 
-[使用 Meta](doc/ZH/help/meta.md)
+如果您想了解 Nature 与流式计算，消息系统，工作流等的区别请阅读：[与其他框架的比较](doc/ZH/compare.md)
 
-[使用 Relation](doc/ZH/help/relation.md)
-
-[内置执行器](doc/ZH/help/built-in.md)
-
-[一些业务情景的解决方法](doc/ZH/help/use-case.md)
+如果您想使用好 Nature 请阅读：[使用 Meta](doc/ZH/help/meta.md)，[使用 Relation](doc/ZH/help/relation.md)，[内置执行器](doc/ZH/help/built-in.md)
 
 ## 注意
 

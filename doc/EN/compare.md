@@ -1,30 +1,55 @@
-# Compare with other framework
+# 与其他系统的关系
 
-## map-reduce framework(MRF)
+## 流式计算
 
-### use level
+Nature 也是一款流式计算产品，和其它产品的区别在于：
 
-* MRF's data are defined at low level(by programer).
-* Nature's data are defined at high level by businness manager.
+| 其它流式计算框架             | Nature                 |
+| ---------------------------- | ---------------------- |
+| 倾向于大数据和科学计算       | 倾向于业务业务流程处理 |
+| 低等级控制（需要程序员介入） | 高等级控制，如决策人员 |
 
-### use case
+## 消息系统
 
-* MRF used in OLAP
-* Nature used in BP
+Nature 的处理模式时**数据 --map--> 数据 --map--> 数据...**，这和消息系统有一定的相似之处，两者都可以实现复杂系统的解耦。但两者的区别也比较明显，如下：
 
-## compare to MQ
+| 消息系统                                                     | Nature                                       |
+| ------------------------------------------------------------ | -------------------------------------------- |
+| 服务于技术人员                                               | 更多的服务于决策者                           |
+| 数据是一般是暂时存储的                                       | 数据是长期存储的                             |
+| 数据与数据之间没有必然的相关性；而 Nature 中的数据与数据之间关系密切，数据之间会构成一个链。 | 数据与数据之间关系密切，数据之间会构成一个链 |
+| 连接的是两个功能体                                           | 连接的两个目标                               |
 
-### Nature:
+## workflow
 
-Easy and union redo ability.except finst call from outer all following process will automatic retry when **Environment Error** occurs.
-Even so the first call from outer which wuould be UI usually, so no need retry logic at all.
+Nature 通过串接目标的方式形成的处理流程，这和 workflow 有异曲同工之妙，两者的区别主要体现在：
 
+| workflow                                                     | Nature                                                       |
+| ------------------------------------------------------------ | ------------------------------------------------------------ |
+| 告诉我们**怎么做（功能性驱动）**，迭代多了我们的目标可能会**迷失** | 告诉我们**做什么**，聚焦到真正重要的事情上，并让管理变得**简单** |
+| 规则引擎复杂                                                 | 只有一对一的关系，简单                                       |
+| 调整的是流程，较为频繁，目标不容易收敛                       | 调整的是目标，简洁明了。                                     |
 
+## FaaS
 
-### business relation
+Nature 和 `Executor` 协作的方式实际上可以看做是 FaaS(Function as a Service) 的一种形式，两者的区别体现在：
 
-Find relation Forward versus backward.
+| FaaS                       | Nature                     |
+| -------------------------- | -------------------------- |
+| 面向功能，局部。           | 面向目标，整体。           |
+| 用代码实现功能编织，复杂。 | 用配置进行功能编织，简单。 |
 
-static relation versus dynamic relation.
+## 数据库
 
+Nature 的本质其实是一款数据管理产品，试图囊括各种业务数据，但本身不具备存储能力，还需要借助具体的数据库产品来存储。 Nature 借鉴了关系数据库的`关系`技术，用简单的一对一来解决一对多，多对多等复杂关系。两者的区别也非常明显，具体体现在：
 
+| 数据库                 | Nature                             |
+| ---------------------- | ---------------------------------- |
+| 面向技术               | 面向业务                           |
+| 关系：强大，灵活       | 关系：只能通过`from_key`来建立关系 |
+| 可以为业务对象详细建模 | 业务对象是一个 key-value           |
+| 主要用于存取和检索     | 主要用于驱动业务运转               |
+
+## ERP
+
+决策集成的问题其实业界早已经关注过了，如ERP。ERP 曾经火及一时，但最近几乎无人问津了。并不是这一概念不好，而是 ERP 不够彻底。我们确实需要围绕着资源在做系统，但资源的调度是需要决策的，然而 ERP 仅仅是形式上将决策放到了一个统一的界面下，但并没有从实质上解决**决策固化**问题，请参考 [Nature 架构](help/architecture.md)。
