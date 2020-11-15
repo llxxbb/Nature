@@ -98,14 +98,30 @@ Loop -> Loop
 Loop -> downstream
 ```
 
+**Note**: For `MetaType::Loop`, if `MetaSetting.only_one` is set to true, Nature will treat the Instance to be output as stateful. Only in this way can the result be superimposed and can achieve input + old = new. But you cannot set the target Meta of `MetaType::Loop` as stateful! Because from the outside of Nature, we only need a final result instead of an intermediate result. It would be very strange if set to state data. In order to achieve this effect, Nature will use the intermediate result as last_state data and take it to the next batch for processing until it is completed.
 
+The batch control comes from a [built-in Executor](built-in.md) of Nature: `instance-loader`. There are some examples behind, please refer to: [demo](https://github.com/llxxbb /Nature-Demo).
 
+## Context
 
+Context can provide additional controls, such as editing process control through context. Another benefit of context is that it makes business data more pure and makes control data and business data completely separate.
 
+The context is divided into `system context` and `user context`. User context can be defined by users, while system context is defined by Nature itself. The system context plays an important supplement to the functional construction of Nature. For example, the collaboration of `MetaType::Loop` and `instance-loader` uses three system contexts:
 
+- loop.next: used to control the start instance condition of the next batch
+- loop.task: used to transfer the rules between batch data, only the first batch can get the processing rules.
+- loop.finished: mark whether all batches are processed.
 
+In addition to these, there are system contexts for bridging: `target.id` and `target.para`. When there is a link A->B->C, C wants to use A's ID as its own ID, but B does not use A's ID, then B needs to build a bridge. This problem occurs when B is the data of another system. Please refer to: [Demo](https://github.com/llxxbb/Nature-Demo).
 
+There is also a system context for dynamic parameter substitution: `para.dynamic`. Generally, when configuring Relation data, we always define fixed content. But sometimes we need to determine some parameters at runtime, this time we need the context.
 
-**Note**: For `MetaType::Loop`, if `MetaSetting.only_one` is set to true, Nature will treat the Instance to be output as stateful. Only in this way can the result be superimposed and the shape like input can be completed + old = new This form of data processing. But you cannot set the target Meta of `MetaType::Loop` as stateful! Because from the outside of Nature, we only need a final result instead of an intermediate result. It would be very strange if set to state data. In order to achieve this effect, Nature will use the intermediate result as last_state data and take it to the next batch for processing until it is completed.
+## Scalability
 
-The batch control comes from a [built-in Executor](built-in.md) of Nature: `instance-loader` There are such examples behind, please refer to: [examples and function explanation](https://github.com/llxxbb /Nature-Demo).
+### Business scalability
+
+`Meta` can realize business changes or development through version technology.
+
+### Technical scalability (not yet implemented)
+
+Nature is a business-oriented development platform and constructs business models in a simple way. It enables technology and business to be well decoupled, which allows many technologies not to be limited to specific businesses, and at the same time can use a unified and simple way to strengthen business capabilities, such as monitoring, rights management, visualization, etc.

@@ -1,55 +1,56 @@
-# 与其他系统的关系
+# Relationship with other systems
 
-## 流式计算
+## Streaming Computing
 
-Nature 也是一款流式计算产品，和其它产品的区别在于：
+Nature is also a streaming computing product. The difference from other products is:
 
-| 其它流式计算框架             | Nature                 |
-| ---------------------------- | ---------------------- |
-| 倾向于大数据和科学计算       | 倾向于业务业务流程处理 |
-| 低等级控制（需要程序员介入） | 高等级控制，如决策人员 |
+| Other streaming computing frameworks                 | Nature                                      |
+| ---------------------------------------------------- | ------------------------------------------- |
+| Lean toward big data and scientific computing        | Lean toward business processing             |
+| Low-level control (requires programmer intervention) | High-level control, such as decision-makers |
 
-## 消息系统
+## Message system
 
-Nature 的处理模式时**数据 --map--> 数据 --map--> 数据...**，这和消息系统有一定的相似之处，两者都可以实现复杂系统的解耦。但两者的区别也比较明显，如下：
+Nature's processing mode is **data --map-->data --map-->data...**, which has certain similarities with the message system, and both can realize the decoupling of complex systems. But the difference between the two is also more obvious, as follows:
 
-| 消息系统                                                     | Nature                                       |
+| Message System | Nature |
 | ------------------------------------------------------------ | -------------------------------------------- |
-| 服务于技术人员                                               | 更多的服务于决策者                           |
-| 数据是一般是暂时存储的                                       | 数据是长期存储的                             |
-| 数据与数据之间没有必然的相关性；而 Nature 中的数据与数据之间关系密切，数据之间会构成一个链。 | 数据与数据之间关系密切，数据之间会构成一个链 |
-| 连接的是两个功能体                                           | 连接的两个目标                               |
+| Serving technicians | More serving decision makers |
+| Data is generally stored temporarily | Data is stored long-term |
+| There is no inevitable correlation between data and data; | There is a close relationship between data and data, and data will form a chain |
+| Two functional bodies are connected | Two goals connected |
 
 ## workflow
 
-Nature 通过串接目标的方式形成的处理流程，这和 workflow 有异曲同工之妙，两者的区别主要体现在：
+Nature's processing flow formed by concatenating goals is similar to workflow. The difference between the two is mainly reflected in:
 
-| workflow                                                     | Nature                                                       |
+| workflow | Nature |
 | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| 告诉我们**怎么做（功能性驱动）**，迭代多了我们的目标可能会**迷失** | 告诉我们**做什么**，聚焦到真正重要的事情上，并让管理变得**简单** |
-| 规则引擎复杂                                                 | 只有一对一的关系，简单                                       |
-| 调整的是流程，较为频繁，目标不容易收敛                       | 调整的是目标，简洁明了。                                     |
+| Tell us **how to do it (functionally driven)**, our goals may be **lost** with more iterations | Tell us **what to do**, focus on the really important things, and change management Get **easy** |
+| Complex rule engine | Only one-to-one relationship, simple |
+| The adjustment is the process, which is more frequent, and the goal is not easy to converge | The adjustment is the goal, concise and clear. |
 
 ## FaaS
 
-Nature 和 `Executor` 协作的方式实际上可以看做是 FaaS(Function as a Service) 的一种形式，两者的区别体现在：
+The way Nature and Executor collaborate can actually be regarded as a form of FaaS (Function as a Service). The difference between the two is reflected in:
 
-| FaaS                       | Nature                     |
+| FaaS | Nature |
 | -------------------------- | -------------------------- |
-| 面向功能，局部。           | 面向目标，整体。           |
-| 用代码实现功能编织，复杂。 | 用配置进行功能编织，简单。 |
+| Function-oriented, partial. | Target-oriented, overall. |
+| Use code to achieve functional weaving, complex. | Function knitting with configuration is simple. |
 
-## 数据库
+## Database
 
-Nature 的本质其实是一款数据管理产品，试图囊括各种业务数据，但本身不具备存储能力，还需要借助具体的数据库产品来存储。 Nature 借鉴了关系数据库的`关系`技术，用简单的一对一来解决一对多，多对多等复杂关系。两者的区别也非常明显，具体体现在：
+The essence of Nature is actually a data management product, trying to include all kinds of business data, but it does not have the storage capacity itself, and it needs to use specific database products to store it. Nature draws on the `relationship` technology of relational databases, and uses simple one-to-one to solve one-to-many, many-to-many and other complex relationships. The difference between the two is also very obvious, which is specifically reflected in:
 
-| 数据库                 | Nature                             |
+| Database | Nature |
 | ---------------------- | ---------------------------------- |
-| 面向技术               | 面向业务                           |
-| 关系：强大，灵活       | 关系：只能通过`from_key`来建立关系 |
-| 可以为业务对象详细建模 | 业务对象是一个 key-value           |
-| 主要用于存取和检索     | 主要用于驱动业务运转               |
+| Technology-oriented | Business-oriented |
+| Relationship: powerful and flexible | Relationship: Only support one-to-one relationship with direction |
+| Detailed modeling of business objects | Business object is a key-value |
+| Mainly used for access and retrieval | Mainly used to drive business operations |
 
 ## ERP
 
-决策集成的问题其实业界早已经关注过了，如ERP。ERP 曾经火及一时，但最近几乎无人问津了。并不是这一概念不好，而是 ERP 不够彻底。我们确实需要围绕着资源在做系统，但资源的调度是需要决策的，然而 ERP 仅仅是形式上将决策放到了一个统一的界面下，但并没有从实质上解决**决策固化**问题，请参考 [Nature 架构](help/architecture.md)。
+The issue of decision integration has already been paid attention to in the industry, such as ERP. ERP was once popular, but it has hardly been interested recently. It's not that this concept is bad, but that ERP is not thorough enough. We do need to build a system around resources, but resource scheduling requires decision-making. However, ERP only puts decision-making in a unified view, but it does not substantially solve the problem of **decision-fixing**. Please refer to [Nature Architecture](help/architecture.md).
+
