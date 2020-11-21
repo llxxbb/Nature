@@ -1,6 +1,6 @@
 [package]
 name = "nature"
-version = "0.20.2"
+version = "0.20.3"
 authors = ["XueBin Li <llxxbb@yeah.net>"]
 edition = "2018"
 description = "Summary says Nature is a tool to ensure final consistency of data. However, it also is: distribute-stream-engine, business-controll-center, dispatch-center, data-center and minimalist-programming-platform."

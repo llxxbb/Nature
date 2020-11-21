@@ -1,5 +1,9 @@
 # 发布的功能
 
+## Release 0.20.3 2020-11-21
+
+English doc: architecture.md and others
+
 ## Release 0.20.2 2020-11-01
 
 Chinese doc: fix architecture.md

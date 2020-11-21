@@ -5,15 +5,13 @@
 - 功能性先于非功能性需求
 - 应用情景支持，内部优先于外部（如网关）
 
-## Release 0.20.3
+## Release 0.1.0-snapshot
 
 
 ### should commit
 
 ### 未完成
 
-- doc EN: architecture, solution
-- doc EN: compare.md
 - demo java(leave application: 请假)
     last state check
 
