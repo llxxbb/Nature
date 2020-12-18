@@ -28,7 +28,7 @@ The `map` in Nature runtime mode corresponds to the `Executor` in `Relation`. Na
 
 - Database capacity: Nature uses mysql as the back-end storage by default. If you have a large amount of data, you can consider using [Tidb](https://pingcap.com/en/).
 
-### Minimal Development Platform
+### Low Code Platform
 
 You can see that Nature integrates many heavyweight elements, and the purpose of integration is to simplify our programming and enable developers to better focus on the business itself. It is embodied in the following aspects:
 
