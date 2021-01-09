@@ -1,6 +1,7 @@
-use crate::common::{Executor, is_default};
 use crate::db::FlowSelector;
 use crate::db::relation_target::RelationTarget;
+use crate::domain::*;
+use crate::util::*;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq, Eq)]
 pub struct RelationSettings {
@@ -45,8 +46,6 @@ pub struct RelationSettings {
 #[cfg(test)]
 mod test {
     use std::collections::HashSet;
-
-    use crate::common::Protocol;
 
     use super::*;
 

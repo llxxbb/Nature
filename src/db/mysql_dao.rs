@@ -9,7 +9,7 @@ pub use meta_dao::*;
 pub use relation_dao::*;
 pub use task_dao::*;
 
-use crate::common::{NatureError, Result};
+use crate::domain::*;
 
 pub mod task_check;
 
@@ -74,7 +74,7 @@ fn get_conn() -> Pool {
 
 pub struct MysqlError(mysql_async::error::Error);
 
-impl Into<crate::common::NatureError> for MysqlError {
+impl Into<NatureError> for MysqlError {
     fn into(self) -> NatureError {
         let msg = format!("database exception: {}", self.0.to_string());
         warn!("{}", msg);

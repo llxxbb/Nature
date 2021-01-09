@@ -1,6 +1,6 @@
 use std::collections::HashSet;
 
-use crate::common::is_default;
+use crate::util::*;
 
 /// select an upstream
 #[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq, Eq)]

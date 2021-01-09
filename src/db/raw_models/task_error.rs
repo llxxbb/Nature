@@ -1,8 +1,8 @@
 use chrono::prelude::*;
 use mysql_async::{params, Row, Value};
 
-use crate::common::NatureError;
 use crate::db::raw_models::RawTask;
+use crate::domain::*;
 
 pub struct RawTaskError {
     pub task_id: u64,

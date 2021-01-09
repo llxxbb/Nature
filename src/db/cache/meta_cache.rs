@@ -4,7 +4,7 @@ use std::time::Duration;
 
 use lru_time_cache::LruCache;
 
-use crate::common::{Meta, MetaType, NatureError, Result};
+use crate::domain::*;
 use crate::db::MetaDao;
 
 lazy_static! {
@@ -165,8 +165,6 @@ fn get_master(meta: &Meta) -> Result<Option<String>> {
 #[cfg(test)]
 mod test {
     use std::collections::btree_set::BTreeSet;
-
-    use crate::common::MetaSetting;
     use crate::db::RawMeta;
 
     use super::*;

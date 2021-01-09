@@ -1,13 +1,14 @@
 use std::collections::HashSet;
 use std::str::FromStr;
+use crate::util::*;
 
 use chrono::{Local, TimeZone};
 use mysql_async::{params, Value};
 
-use crate::common::*;
 use crate::db::{Mission, QUERY_SIZE_LIMIT};
 use crate::db::mysql_dao::MySql;
 use crate::db::raw_models::RawInstance;
+use crate::domain::*;
 
 #[async_trait]
 pub trait KeyRange: Sync + Send {

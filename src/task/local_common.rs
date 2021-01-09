@@ -1,12 +1,11 @@
 extern crate libloading as lib;
 
+use crate::domain::*;
 use std::panic::{catch_unwind, RefUnwindSafe};
 use std::sync::Mutex;
 use std::time::Duration;
 
 use lru_time_cache::LruCache;
-
-use crate::common::{NatureError, Result};
 
 type CALLER<'a, T, R> = lib::Symbol<'a, fn(&T) -> R>;
 type LIB = Option<lib::Library>;
@@ -95,8 +94,6 @@ fn entry_from_str(path: &str) -> Result<LibraryEntry> {
 #[cfg(test)]
 mod test {
     use futures::executor::block_on;
-
-    use crate::common::{ConverterParameter, ConverterReturned, Instance};
 
     use super::*;
 

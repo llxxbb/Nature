@@ -14,13 +14,11 @@ extern crate serde_derive;
 extern crate serde_json;
 extern crate tokio;
 
-pub mod system;
 pub mod web;
 pub mod task;
-pub mod controller;
-pub mod channels;
-pub mod builtin_converter;
-pub mod filter;
-pub mod common;
+pub mod dispatcher;
 pub mod db;
 pub mod retry;
+pub mod domain;
+pub mod util;
+pub mod middleware;

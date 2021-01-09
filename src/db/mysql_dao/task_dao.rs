@@ -1,7 +1,6 @@
 use chrono::{Duration, Local};
 use mysql_async::{params, Value};
-
-use crate::common::{NatureError, Result};
+use crate::domain::*;
 use crate::db::MySql;
 use crate::db::raw_models::{RawTask, RawTaskError};
 

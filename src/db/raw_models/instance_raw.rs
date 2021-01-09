@@ -7,8 +7,8 @@ use lazy_static::__Deref;
 use mysql_async::{params, Row, Value};
 use serde_json;
 
-use crate::common::*;
 use crate::db::models::define::*;
+use crate::domain::*;
 
 pub struct RawInstance {
     meta: String,

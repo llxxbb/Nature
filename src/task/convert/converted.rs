@@ -1,7 +1,8 @@
 use chrono::Local;
 
-use crate::common::{append_para, CONTEXT_DYNAMIC_PARA, CONTEXT_TARGET_INSTANCE_ID, CONTEXT_TARGET_INSTANCE_PARA, FromInstance, get_para_and_key_from_para, id_from_hex_str, Instance, Meta, MetaType, NatureError, Result};
 use crate::db::{Mission, RawTask};
+use crate::domain::*;
+use crate::util::*;
 use crate::task::{CachedKey, TaskForConvert};
 
 pub struct Converted {
@@ -235,7 +236,6 @@ mod sys_context_test {
 mod test {
     use chrono::Local;
 
-    use crate::common::{Meta, MetaType, State};
     use crate::db::relation_target::RelationTarget;
 
     use super::*;
@@ -324,8 +324,6 @@ mod test {
 
 #[cfg(test)]
 mod check_id_for_state {
-    use crate::common::{Meta, MetaSetting, MetaType};
-
     use super::*;
 
     #[test]
@@ -389,8 +387,6 @@ mod check_id_for_state {
 
 #[cfg(test)]
 mod check_id_for_normal {
-    use crate::common::{Meta, MetaSetting, MetaType};
-
     use super::*;
 
     #[test]

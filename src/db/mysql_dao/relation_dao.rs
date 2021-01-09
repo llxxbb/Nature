@@ -1,12 +1,12 @@
 use std::str::FromStr;
 
-use mysql_async::Value;
+use mysql_async::{params, Value};
 
-use crate::common::{Executor, Result};
 use crate::db::{MetaCache, MetaDao, Relation, RelationSettings};
 use crate::db::raw_models::RawRelation;
+use crate::domain::*;
 
-use super::*;
+use super::MySql;
 
 pub type Relations = Result<Vec<Relation>>;
 
@@ -105,7 +105,7 @@ impl RelationDao for RelationDaoImpl {
             &RelationSettings {
                 selector: None,
                 executor: Some(Executor {
-                    protocol: crate::common::Protocol::from_str(protocol)?,
+                    protocol: Protocol::from_str(protocol)?,
                     url: url.to_string(),
                     settings: "".to_string(),
                 }),
@@ -139,8 +139,7 @@ mod test {
 
     use std::env;
 
-    use crate::common::Meta;
-    use crate::db::{C_M, CONN_STR};
+    use crate::db::{C_M, CONN_STR, D_M};
 
     use super::*;
 

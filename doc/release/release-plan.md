@@ -5,12 +5,18 @@
 - 功能性先于非功能性需求
 - 应用情景支持，内部优先于外部（如网关）
 
-## Release 0.1.0-snapshot
+## Release 0.21.0
+
 
 
 ### should commit
 
 ### 未完成
+
+add manager
+
+
+- 文档：将所有的外部请求分为读写两个职能。查询和结算都为读。目前缺少写之前的验证过程。
 
 - demo java(leave application: 请假)
     last state check

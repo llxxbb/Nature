@@ -1,6 +1,6 @@
 use std::convert::TryFrom;
 
-use crate::common::NatureError;
+use crate::domain::*;
 
 pub enum TaskType {
     Store = 1,
@@ -11,7 +11,7 @@ pub enum TaskType {
 impl TryFrom<i8> for TaskType {
     type Error = NatureError;
 
-    fn try_from(value: i8) -> Result<Self, Self::Error> {
+    fn try_from(value: i8) -> Result<Self> {
         match value {
             1 => Ok(TaskType::Store),
             2 => Ok(TaskType::Convert),

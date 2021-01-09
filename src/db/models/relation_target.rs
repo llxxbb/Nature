@@ -1,4 +1,4 @@
-use crate::common::is_default;
+use crate::util::*;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq, Eq)]
 pub struct RelationTarget {

@@ -1,7 +1,6 @@
 use std::clone::Clone;
 use std::string::ToString;
-
-use crate::common::{Executor, Meta, NatureError, Protocol, Result};
+use crate::domain::*;
 use crate::db::{FlowSelector, MetaCache, MetaDao, RawRelation, RelationSettings};
 use crate::db::models::relation_target::RelationTarget;
 

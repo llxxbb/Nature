@@ -1,6 +1,6 @@
 use reqwest::Client;
 
-use crate::common::{ConverterParameter, ConverterReturned, NatureError, Result};
+use crate::domain::*;
 
 lazy_static! {
     static ref CLIENT : Client = Client::new();

@@ -4,7 +4,7 @@ use std::time::Duration;
 
 use futures::executor::block_on;
 
-use nature::system::sys_init;
+use nature::util::system::sys_init;
 
 #[allow(dead_code)]
 //pub static CONN_STR : &str = "mysql://root@localhost/nature";

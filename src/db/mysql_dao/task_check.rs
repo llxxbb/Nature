@@ -1,8 +1,8 @@
 use chrono::{Local, NaiveDateTime};
 use mysql_async::params;
 
-use crate::common::Result;
 use crate::db::MySql;
+use crate::domain::*;
 
 pub struct TaskChecker;
 

@@ -10,7 +10,7 @@
 // use tokio::runtime::Runtime;
 //
 // use nature::common::*;
-// use nature::controller::IncomeController;
+// use nature::dispatcher::IncomeController;
 // use nature::db::{CONN_STR, InstanceDaoImpl};
 //
 // pub mod common;

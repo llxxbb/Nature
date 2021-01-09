@@ -46,8 +46,8 @@ dotenv = "0.15"
 
 # web
 reqwest = { version = "0.10", features = ["blocking", "json"] }
-actix-web = "2.0"
-actix-rt = "1.0"
+actix-web = "3"
+actix-rt = "1"
 tokio = { version = "0.2", features = ["full"] }
 
 #db

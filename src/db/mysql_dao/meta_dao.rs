@@ -2,9 +2,9 @@ use std::future::Future;
 
 use mysql_async::{params, Value};
 
-use crate::common::{Meta, NatureError, Result};
 use crate::db::MySql;
 use crate::db::raw_models::RawMeta;
+use crate::domain::*;
 
 lazy_static! {
     pub static ref D_M: MetaDaoImpl = MetaDaoImpl {};

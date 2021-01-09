@@ -2,8 +2,8 @@ use mysql_async::{params, Value};
 use mysql_async::Row;
 use serde_json;
 
-use crate::common::*;
 use crate::db::RelationSettings;
+use crate::domain::*;
 
 #[derive(Debug)]
 #[derive(Clone)]

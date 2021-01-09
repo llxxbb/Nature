@@ -3,7 +3,7 @@ use std::convert::TryInto;
 use chrono::prelude::*;
 use mysql_async::{params, Row, Value};
 
-use crate::common::{Meta, MetaType, NatureError, State};
+use crate::domain::*;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct RawMeta {
@@ -116,8 +116,6 @@ impl Into<Vec<(String, Value)>> for RawMeta {
 
 #[cfg(test)]
 mod test {
-    use crate::common::Result;
-
     use super::*;
 
     #[test]

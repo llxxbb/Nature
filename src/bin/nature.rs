@@ -1,6 +1,6 @@
-use nature::system::sys_init;
+use nature::util::system::sys_init;
 
-#[actix_rt::main]
+#[actix_web::main]
 async fn main() -> std::io::Result<()> {
     sys_init().await
 }

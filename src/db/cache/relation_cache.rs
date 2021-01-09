@@ -3,8 +3,8 @@ use std::time::Duration;
 
 use lru_time_cache::LruCache;
 
-use crate::common::{MetaType, NatureError};
 use crate::db::{MetaCache, MetaDao, Relation, RelationDao, Relations};
+use crate::domain::*;
 
 /// all flows for one upper `Meta` and what a chance to lower `group`
 type ITEM = Vec<Relation>;
@@ -50,7 +50,6 @@ impl RelationCache for RelationCacheImpl {
 
 #[cfg(test)]
 mod test {
-    use crate::common::{Meta, NatureError, Result};
     use crate::db::{RawMeta, RawRelation};
 
     use super::*;
