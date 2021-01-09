@@ -14,11 +14,9 @@ extern crate serde_derive;
 extern crate serde_json;
 extern crate tokio;
 
-pub mod web;
-pub mod task;
-pub mod dispatcher;
+pub mod manager_lib;
 pub mod db;
-pub mod retry;
+pub mod retry_lib;
 pub mod domain;
 pub mod util;
-pub mod middleware;
+pub mod nature_lib;

@@ -20,6 +20,9 @@ path = "src/bin/retry.rs"
 [[bin]]
 name = "nature"
 path = "src/bin/nature.rs"
+[[bin]]
+name = "manager"
+path = "src/bin/manager.rs"
 
 [dependencies]
 # normal
@@ -44,7 +47,7 @@ env_logger = "0.7"
 #config
 dotenv = "0.15"
 
-# web
+# manager_lib
 reqwest = { version = "0.10", features = ["blocking", "json"] }
 actix-web = "3"
 actix-rt = "1"

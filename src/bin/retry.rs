@@ -1,4 +1,4 @@
-use nature::retry::start;
+use nature::retry_lib::start;
 
 #[tokio::main]
 pub async fn main() {

@@ -11,7 +11,7 @@ https://www.shadercat.com/setting-up-a-rust-development-environment-on-windows-1
 
 ## web 
 
-port is set for property `SERVER_PORT` in `.env` file
+port is set for property `SERVER_PORT_NATURE` in `.env` file
 
 ## DB
 

@@ -10,4 +10,3 @@ mod id_tool;
 pub mod instance_para;
 pub mod sys_config;
 pub mod channels;
-pub mod system;

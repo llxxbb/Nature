@@ -3,9 +3,9 @@ use std::sync::Mutex;
 use std::thread;
 use std::thread::JoinHandle;
 
-use crate::dispatcher::channel_convert;
+use crate::nature_lib::dispatcher::channel_convert;
 use crate::db::*;
-use crate::task::*;
+use crate::nature_lib::task::*;
 
 lazy_static! {
     pub static ref CHANNEL_CONVERT : Channel<(TaskForConvert,RawTask)> = Channel::new();
