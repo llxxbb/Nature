@@ -5,8 +5,7 @@ use serde_json;
 use crate::db::RelationSettings;
 use crate::domain::*;
 
-#[derive(Debug)]
-#[derive(Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct RawRelation {
     pub from_meta: String,
     pub to_meta: String,
