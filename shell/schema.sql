@@ -5,6 +5,7 @@ DROP TABLE `task`;
 DROP TABLE `task_error`;
 
 create TABLE `meta` (
+    `id`        int(11) NOT NULL AUTO_INCREMENT,
 	`meta_type`	VARCHAR ( 10 ) NOT NULL,
 	`meta_key`	VARCHAR ( 255 ) NOT NULL,
 	`description`	VARCHAR ( 1023 ),
@@ -14,15 +15,19 @@ create TABLE `meta` (
 	`config`    VARCHAR(2047) DEFAULT '{}' NOT NULL,
 	`flag`      INTEGER DEFAULT 1 NOT NULL,
 	`create_time`	DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-	PRIMARY KEY(`meta_type`,`meta_key`,`version`)
+	PRIMARY KEY(`meta_type`,`meta_key`,`version`),
+    UNIQUE KEY `meta_id_IDX` (`id`) USING BTREE,
+    KEY `meta_create_time_IDX` (`create_time`) USING BTREE
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 create TABLE `relation` (
+    `id`        int(11) NOT NULL AUTO_INCREMENT,
 	`from_meta`	VARCHAR ( 255 ) NOT NULL,
 	`to_meta`	VARCHAR ( 255 ) NOT NULL,
 	`settings`  VARCHAR ( 2047 ) NOT NULL,
 	`flag`      INTEGER DEFAULT 1 NOT NULL,
-	PRIMARY KEY(`from_meta`,`to_meta`)
+	PRIMARY KEY(`from_meta`,`to_meta`),
+    UNIQUE KEY `relation_id_IDX` (`id`) USING BTREE
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `instances` (

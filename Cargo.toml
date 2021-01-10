@@ -3,12 +3,12 @@ name = "nature"
 version = "0.20.3"
 authors = ["XueBin Li <llxxbb@yeah.net>"]
 edition = "2018"
-description = "Summary says Nature is a tool to ensure final consistency of data. However, it also is a: distribute-stream-engine, business-controll-center, dispatch-center, data-center and low code platform."
+description = "It's a low code platform, it's value is to ensure final consistency of data. However, it's mostly like: distribute-stream-engine, business-controll-center, data-center."
 repository = "https://github.com/llxxbb/Nature"
 readme = "README.md"
 license = "GPL-3.0+"
 keywords = ["platform", "data", "stream", "distributed", "management"]
-categories = ["network-programming", "database", "asynchronous", "concurrency", "development-tools"]
+categories = ["network-programming", "database", "asynchronous", "low-code", "development-tools"]
 
 [lib]
 name = "nature"           # The name of the target.
@@ -51,6 +51,7 @@ dotenv = "0.15"
 reqwest = { version = "0.10", features = ["blocking", "json"] }
 actix-web = "3"
 actix-rt = "1"
+actix-cors = "0.5"
 tokio = { version = "0.2", features = ["full"] }
 
 #db

@@ -7,6 +7,7 @@ use crate::domain::*;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct RawRelation {
+    pub id: i32,
     pub from_meta: String,
     pub to_meta: String,
     pub settings: String,
@@ -17,6 +18,7 @@ impl RawRelation {
     pub fn new(from: &str, to: &str, settings: &RelationSettings) -> Result<Self> {
         let st = serde_json::to_string(settings)?;
         let rtn = RawRelation {
+            id: 0,
             from_meta: from.to_string(),
             to_meta: to.to_string(),
             settings: st,
@@ -32,8 +34,9 @@ impl RawRelation {
 
 impl From<Row> for RawRelation {
     fn from(row: Row) -> Self {
-        let (from_meta, to_meta, settings, flag) = mysql_async::from_row(row);
+        let (id, from_meta, to_meta, settings, flag) = mysql_async::from_row(row);
         RawRelation {
+            id,
             from_meta,
             to_meta,
             settings,

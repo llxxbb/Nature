@@ -18,6 +18,7 @@ pub trait MetaDao: Sync + Send {
     async fn insert(&self, define: &RawMeta) -> Result<u64>;
     async fn update_flag(&self, meta_str: &str, flag_f: i32) -> Result<u64>;
     async fn delete(&self, m: &Meta) -> Result<u64>;
+    async fn id_great_than(&self, from: i32, limit: i32) -> Result<Vec<RawMeta>>;
 }
 
 pub struct MetaDaoImpl;
@@ -46,6 +47,20 @@ impl MetaDao for MetaDaoImpl {
             0 => Ok(None),
             _ => Err(NatureError::LogicalError("should not return more than one rows".to_string()))
         }
+    }
+    async fn id_great_than(&self, from: i32, limit: i32) -> Result<Vec<RawMeta>> {
+        let sql = r"SELECT id, meta_type, meta_key, description, version, states, fields, config, flag, create_time
+            FROM meta
+            WHERE id > :from
+            order by id
+            limit :limit";
+
+        let p = params! {
+            "from" => from,
+            "limit" => limit,
+        };
+        let rtn = MySql::fetch(sql, p, RawMeta::from).await?;
+        Ok(rtn)
     }
 
     async fn insert(&self, define: &RawMeta) -> Result<u64> {
@@ -101,6 +116,17 @@ mod test {
     use crate::db::CONN_STR;
 
     use super::*;
+
+    #[test]
+    #[ignore]
+    fn query_test() {
+        env::set_var("DATABASE_URL", CONN_STR);
+        let mut runtime = Runtime::new().unwrap();
+
+        if let Ok(Some(_)) = runtime.block_on(D_M.id_great_than("B:test:100")) {
+            let _ = runtime.block_on(D_M.delete(&m));
+        }
+    }
 
     #[test]
     #[ignore]

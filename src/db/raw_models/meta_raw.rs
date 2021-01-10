@@ -7,6 +7,7 @@ use crate::domain::*;
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct RawMeta {
+    pub id: i32,
     pub meta_type: String,
     pub meta_key: String,
     /// For human readable what the `Meta` is.
@@ -24,6 +25,7 @@ pub struct RawMeta {
 impl Default for RawMeta {
     fn default() -> Self {
         RawMeta {
+            id: 0,
             meta_type: MetaType::default().get_prefix(),
             meta_key: String::new(),
             description: None,
@@ -40,6 +42,7 @@ impl Default for RawMeta {
 impl From<Meta> for RawMeta {
     fn from(m: Meta) -> Self {
         RawMeta {
+            id: 0,
             meta_type: m.get_meta_type().get_prefix(),
             description: None,
             version: m.version as i32,
@@ -83,8 +86,9 @@ impl TryInto<Meta> for RawMeta {
 
 impl From<Row> for RawMeta {
     fn from(row: Row) -> Self {
-        let (meta_type, meta_key, description, version, states, fields, config, flag, create_time) = mysql_async::from_row(row);
+        let (id, meta_type, meta_key, description, version, states, fields, config, flag, create_time) = mysql_async::from_row(row);
         RawMeta {
+            id,
             meta_type,
             meta_key,
             description,

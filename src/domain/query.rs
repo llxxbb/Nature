@@ -1,4 +1,7 @@
 use crate::domain::*;
+/// used for query instance by id
+use crate::util::*;
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct KeyCondition {
     pub id: u64,
@@ -31,9 +34,6 @@ pub struct KeyCondition {
     #[serde(default = "one")]
     pub limit: i32,
 }
-
-/// used for query instance by id
-use crate::util::*;
 
 impl KeyCondition {
     pub fn new(id: u64, meta: &str, para: &str, state_version: i32) -> Self {

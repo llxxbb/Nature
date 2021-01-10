@@ -7,9 +7,13 @@
 
 ## Release 0.21.0
 
-
+add manager backend
+db:meta add id field
+db:relation add id field
 
 ### should commit
+
+
 
 ### 未完成
 

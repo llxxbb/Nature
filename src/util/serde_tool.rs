@@ -1,3 +1,9 @@
+use std::fmt::Debug;
+
+use actix_web::HttpResponse;
+
+use crate::domain::Result;
+
 /// This is only used for serialize
 pub fn is_one(num: &i32) -> bool {
     *num == 1
@@ -15,10 +21,18 @@ pub fn is_default<T: Default + Eq>(val: &T) -> bool {
     val.eq(&T::default())
 }
 
+pub fn web_result<T>(x: Result<T>) -> HttpResponse
+    where T: serde::Serialize + Debug
+{
+    HttpResponse::Ok().json(x)
+}
+
 #[cfg(test)]
 mod test {
-    use super::*;
     use crate::domain::*;
+
+    use super::*;
+
     #[test]
     fn test() {
         assert_eq!(is_default(&0), true);

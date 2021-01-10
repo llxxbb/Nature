@@ -23,6 +23,7 @@ pub trait RelationDao: Sync + Send {
     async fn update_flag(&self, from: &str, to: &str, flag_f: i32) -> Result<u64>;
     async fn insert_by_biz(&self, from: &str, to: &str, url: &str, protocol: &str) -> Result<RawRelation>;
     async fn delete_by_biz(&self, from: &str, to: &str) -> Result<u64>;
+    async fn id_great_than(&self, from: i32, limit: i32) -> Result<Vec<RawRelation>>;
 }
 
 pub struct RelationDaoImpl;
@@ -56,6 +57,21 @@ impl RelationDao for RelationDaoImpl {
             ))
         }
     }
+    async fn id_great_than(&self, from: i32, limit: i32) -> Result<Vec<RawRelation>> {
+        let sql = r"SELECT id, from_meta, to_meta, settings, flag
+            FROM nature.relation
+            WHERE id > :from
+            order by id
+            limit :limit";
+
+        let p = params! {
+            "from" => from,
+            "limit" => limit,
+        };
+        let vec = MySql::fetch(sql, p, RawRelation::from).await?;
+        Ok(vec)
+    }
+
     async fn insert(&self, one: RawRelation) -> Result<u64> {
         let sql = r"INSERT INTO nature.relation
             (from_meta, to_meta, settings, flag)
@@ -124,6 +140,7 @@ impl RelationDao for RelationDaoImpl {
 
     async fn delete_by_biz(&self, from: &str, to: &str) -> Result<u64> {
         let row = RawRelation {
+            id: 0,
             from_meta: from.to_string(),
             to_meta: to.to_string(),
             settings: String::new(),
