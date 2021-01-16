@@ -7,7 +7,7 @@ description = "It's a low code platform, it's a tool of data orchestration. But 
 repository = "https://github.com/llxxbb/Nature"
 readme = "README.md"
 license = "GPL-3.0+"
-keywords = ["platform", "low-code", "stream", "distributed", "data-orchestration"]
+keywords = ["platform", "data", "stream", "distributed", "management"]
 categories = ["network-programming", "database", "asynchronous", "low-code", "development-tools"]
 
 [lib]
