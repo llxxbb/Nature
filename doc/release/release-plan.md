@@ -5,11 +5,9 @@
 - 功能性先于非功能性需求
 - 应用情景支持，内部优先于外部（如网关）
 
-## Release 0.21.0
+## Release 0.21.1
 
-add manager backend
-db:meta add id field
-db:relation add id field
+
 
 ### should commit
 

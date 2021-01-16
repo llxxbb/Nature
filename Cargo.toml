@@ -1,13 +1,13 @@
 [package]
 name = "nature"
-version = "0.20.3"
+version = "0.21.0"
 authors = ["XueBin Li <llxxbb@yeah.net>"]
 edition = "2018"
-description = "It's a low code platform, it's value is to ensure final consistency of data. However, it's mostly like: distribute-stream-engine, business-controll-center, data-center."
+description = "It's a low code platform, it's a tool of data orchestration. But the most important is it goes right to the heart of the business, standardize and simplify the implementation of complex businesses in a simple way."
 repository = "https://github.com/llxxbb/Nature"
 readme = "README.md"
 license = "GPL-3.0+"
-keywords = ["platform", "data", "stream", "distributed", "management"]
+keywords = ["platform", "low-code", "stream", "distributed", "data-orchestration"]
 categories = ["network-programming", "database", "asynchronous", "low-code", "development-tools"]
 
 [lib]

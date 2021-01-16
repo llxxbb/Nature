@@ -1,8 +1,9 @@
 use std::clone::Clone;
 use std::string::ToString;
-use crate::domain::*;
+
 use crate::db::{FlowSelector, MetaCache, MetaDao, RawRelation, RelationSettings};
 use crate::db::models::relation_target::RelationTarget;
+use crate::domain::*;
 
 #[derive(Debug, Clone, Default, PartialEq)]
 pub struct Relation {
@@ -117,6 +118,7 @@ mod test_from_raw {
     #[test]
     fn master_should_have_relation() {
         let raw = RawRelation {
+            id: 0,
             from_meta: "B:from:1".to_string(),
             to_meta: "B:to:1".to_string(),
             settings: "{}".to_string(),
@@ -131,6 +133,7 @@ mod test_from_raw {
     #[test]
     fn setting_error_test() {
         let raw = RawRelation {
+            id: 0,
             from_meta: "B:from:1".to_string(),
             to_meta: "B:to:1".to_string(),
             settings: "dd".to_string(),
@@ -160,6 +163,7 @@ mod test_from_raw {
             id_bridge: false,
         };
         let raw = RawRelation {
+            id: 0,
             from_meta: "B:from:1".to_string(),
             to_meta: "B:to:1".to_string(),
             settings: serde_json::to_string(&settings).unwrap(),
@@ -215,6 +219,9 @@ mod test_from_raw {
         }
 
         async fn delete(&self, _m: &Meta) -> Result<u64> {
+            unimplemented!()
+        }
+        async fn id_great_than(&self, _from: i32, _limit: i32) -> Result<Vec<RawMeta>> {
             unimplemented!()
         }
     }

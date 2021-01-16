@@ -26,7 +26,7 @@ pub struct MetaDaoImpl;
 #[async_trait]
 impl MetaDao for MetaDaoImpl {
     async fn get(&self, meta_str: &str) -> Result<Option<RawMeta>> {
-        let sql = r"SELECT meta_type, meta_key, description, version, states, fields, config, flag, create_time
+        let sql = r"SELECT id, meta_type, meta_key, description, version, states, fields, config, flag, create_time
             FROM meta
             WHERE meta_type = :meta_type and meta_key = :meta_key and version = :version and flag = 1";
 
@@ -119,21 +119,11 @@ mod test {
 
     #[test]
     #[ignore]
-    fn query_test() {
-        env::set_var("DATABASE_URL", CONN_STR);
-        let mut runtime = Runtime::new().unwrap();
-
-        if let Ok(Some(_)) = runtime.block_on(D_M.id_great_than("B:test:100")) {
-            let _ = runtime.block_on(D_M.delete(&m));
-        }
-    }
-
-    #[test]
-    #[ignore]
     fn define_test() {
         // prepare data to insert
         env::set_var("DATABASE_URL", CONN_STR);
         let define = RawMeta {
+            id: 0,
             meta_type: "B".to_string(),
             description: Some("description".to_string()),
             version: 100,

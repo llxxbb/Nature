@@ -32,7 +32,7 @@ pub struct RelationDaoImpl;
 impl RelationDao for RelationDaoImpl {
     async fn get_relations<MC, M>(&self, from: &str, meta_cache_getter: &MC, meta_getter: &M) -> Relations
         where MC: MetaCache, M: MetaDao {
-        let sql = r"SELECT from_meta, to_meta, settings, flag
+        let sql = r"SELECT id, from_meta, to_meta, settings, flag
             FROM nature.relation
             where from_meta = :from_meta and flag = 1";
 

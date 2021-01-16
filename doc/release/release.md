@@ -1,5 +1,12 @@
 # 发布的功能
 
+## Release 0.21.0 2021-01-16
+
+add manager backend(will be used by Nature-Manager-UI)
+db:meta add id field
+db:relation add id field
+
+
 ## Release 0.20.3 2020-11-21
 
 English doc: architecture.md and others
