@@ -4,8 +4,8 @@ use std::time::Duration;
 
 use lru_time_cache::LruCache;
 
-use crate::domain::*;
 use crate::db::MetaDao;
+use crate::domain::*;
 
 lazy_static! {
     pub static ref C_M: MetaCacheImpl = MetaCacheImpl {};
@@ -165,6 +165,7 @@ fn get_master(meta: &Meta) -> Result<Option<String>> {
 #[cfg(test)]
 mod test {
     use std::collections::btree_set::BTreeSet;
+
     use crate::db::RawMeta;
 
     use super::*;
@@ -553,6 +554,9 @@ mod test {
         }
 
         async fn delete(&self, _m: &Meta) -> Result<u64> {
+            unimplemented!()
+        }
+        async fn id_great_than(&self, _from: i32, _limit: i32) -> Result<Vec<RawMeta>> {
             unimplemented!()
         }
     }

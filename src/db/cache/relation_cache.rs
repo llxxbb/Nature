@@ -124,6 +124,9 @@ mod test {
         async fn delete_by_biz(&self, _from: &str, _to: &str) -> Result<u64> {
             unimplemented!()
         }
+        async fn id_great_than(&self, _from: i32, _limit: i32) -> Result<Vec<RawRelation>> {
+            unimplemented!()
+        }
     }
 
     #[async_trait]
@@ -151,6 +154,9 @@ mod test {
         async fn delete_by_biz(&self, _from: &str, _to: &str) -> Result<u64> {
             unimplemented!()
         }
+        async fn id_great_than(&self, _from: i32, _limit: i32) -> Result<Vec<RawRelation>> {
+            unimplemented!()
+        }
     }
 
     #[async_trait]
@@ -176,6 +182,9 @@ mod test {
         }
 
         async fn delete_by_biz(&self, _from: &str, _to: &str) -> Result<u64> {
+            unimplemented!()
+        }
+        async fn id_great_than(&self, _from: i32, _limit: i32) -> Result<Vec<RawRelation>> {
             unimplemented!()
         }
     }
@@ -209,6 +218,9 @@ mod test {
         }
 
         async fn delete(&self, _m: &Meta) -> Result<u64> {
+            unimplemented!()
+        }
+        async fn id_great_than(&self, _from: i32, _limit: i32) -> Result<Vec<RawMeta>> {
             unimplemented!()
         }
     }

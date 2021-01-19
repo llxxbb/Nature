@@ -272,6 +272,7 @@ mod test {
     use super::*;
 
     #[tokio::test]
+    #[ignore]
     async fn insert_test() {
         env::set_var("DATABASE_URL", "mysql://root@localhost/nature");
         let instance = Instance::new("test").unwrap();

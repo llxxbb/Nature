@@ -4,7 +4,7 @@ English|[中文](README.md)
 
 ## What is Nature？
 
-Summary says Nature is a tool to ensure final consistency of data. However, it also is:
+It's a low code platform, it's a tool of data orchestration. But the most important is it goes right to the heart of the business, standardize and simplify the implementation of complex businesses in a simple way. For its design philosophy, please see [Nature architecture](doc/EN/help/architecture.md), Nature has the following technical features:
 
 ### Distributed Stream-Compute-Engine
 
@@ -82,7 +82,7 @@ We need to do the following
 
 ## Learn more about Nature
 
-If you want to understand Nature's view of nature, time and space, mathematical meaning and philosophical meaning, please read: [Nature architecture thought](doc/EN/help/architecture.md)
+If you want to understand Nature's view of nature, time and space, mathematical meaning and philosophical meaning, please read: [Nature architecture](doc/EN/help/architecture.md)
 
 If you want to learn how to apply Nature in actual situations read: [Sample and function explanation](https://github.com/llxxbb/Nature-Demo), [Solutions to some business scenarios](doc/EN/help/use-case.md)
 
