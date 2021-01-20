@@ -83,6 +83,8 @@ Nature 运行时模式中的 `map` 对应 `Relation`  中的 `Executor`。Nature
 
 ## 深入了解Nature
 
+[图形管理客户端](https://github.com/llxxbb/Nature-Manager-UI)
+
 如果您想了解下 Nature 的自然观，时空观，数学意义和哲学意义请阅读：[Nature 架构思想](doc/ZH/help/architecture.md)
 
 如果您想在实际情况中了解如何应用 Nature 请阅读：[示例及功能讲解](https://github.com/llxxbb/Nature-Demo)，[一些业务情景的解决方法](doc/ZH/help/use-case.md)

@@ -82,6 +82,8 @@ We need to do the following
 
 ## Learn more about Nature
 
+[Graphical Management Client](https://github.com/llxxbb/Nature-Manager-UI)
+
 If you want to understand Nature's view of nature, time and space, mathematical meaning and philosophical meaning, please read: [Nature architecture](doc/EN/help/architecture.md)
 
 If you want to learn how to apply Nature in actual situations read: [Sample and function explanation](https://github.com/llxxbb/Nature-Demo), [Solutions to some business scenarios](doc/EN/help/use-case.md)
