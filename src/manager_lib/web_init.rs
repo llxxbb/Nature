@@ -12,13 +12,14 @@ lazy_static! {
         env::var("SERVER_PORT_MANAGER").unwrap_or_else(|_| "8180".to_string())
     };
     static ref CLIENT_URL:String={
-        env::var("MANAGER_CLIENT_URL").unwrap_or_else(|_| "http://localhost:8080".to_string())
+        env::var("MANAGER_CLIENT_URL").unwrap_or_else(|_| "http://localhost:8280".to_string())
     };
 }
 
 pub async fn web_init() -> std::io::Result<()> {
     dotenv().ok();
     let _ = env_logger::init();
+    info!("MANAGER_CLIENT_URL: {:?}", CLIENT_URL.to_string());
     HttpServer::new(|| {
         let cors = Cors::default().allowed_origin(&CLIENT_URL);
         App::new()
