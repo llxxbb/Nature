@@ -8,7 +8,7 @@ repository = "https://github.com/llxxbb/Nature"
 readme = "README.md"
 license = "GPL-3.0+"
 keywords = ["platform", "data", "stream", "distributed", "management"]
-categories = ["network-programming", "database", "asynchronous", "low-code", "development-tools"]
+categories = ["network-programming", "database", "asynchronous", "visualization", "development-tools"]
 
 [lib]
 name = "nature"           # The name of the target.
