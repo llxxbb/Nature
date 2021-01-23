@@ -1,5 +1,9 @@
 # 发布的功能
 
+## Release 0.21.1 2021-01-23
+
+change manage client port to 8280 to avoid conflict with nature.exe
+
 ## Release 0.21.0 2021-01-16
 
 add manager backend(will be used by Nature-Manager-UI)
