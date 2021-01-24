@@ -6,7 +6,7 @@ edition = "2018"
 description = "It's a low code platform, it's a tool of data orchestration. But the most important is it goes right to the heart of the business, standardize and simplify the implementation of complex businesses in a simple way. As long as you're willing, Nature can help you extract the business control logic and centrally manage it so that the system has the brain and says goodbye to the brainless era of traditional systems."
 repository = "https://github.com/llxxbb/Nature"
 readme = "README.md"
-license = "GPL-3.0+"
+license = "MIT"
 keywords = ["platform", "data", "stream", "distributed", "management"]
 categories = ["network-programming", "database", "asynchronous", "visualization", "development-tools"]
 
