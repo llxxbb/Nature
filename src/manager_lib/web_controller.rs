@@ -1,10 +1,18 @@
 use actix_web::{get, HttpResponse, post, web};
 use actix_web::web::Json;
 
-use crate::db::{RawMeta, RawRelation};
+use crate::db::{RawMeta, RawRelation, InstanceDaoImpl};
 use crate::manager_lib::meta_service::MetaService;
-use crate::util::web_result;
 use crate::manager_lib::relation_service::RelationService;
+use crate::util::web_result;
+use crate::domain::*;
+
+#[get("/instance/{meta}/{id}/{para}/{staVer}")]
+async fn get_by_id(web::Path((meta, id, para, sta_ver)): web::Path<(String, u64, String, i32)>) -> HttpResponse {
+    let condition = KeyCondition::new(id, &meta, &para, sta_ver);
+    let x = InstanceDaoImpl::get_by_id(condition).await;
+    web_result(x)
+}
 
 /// batch query the metas, `from` is index of `id`, ascending order
 #[get("/metaIdGreatThan/{from}/{limit}")]

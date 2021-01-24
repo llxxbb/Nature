@@ -5,9 +5,9 @@
 - 功能性先于非功能性需求
 - 应用情景支持，内部优先于外部（如网关）
 
-## Release 0.21.2
+## Release 0.22.0
 
-
+manager: add get_by_id interface
 
 ### should commit
 
