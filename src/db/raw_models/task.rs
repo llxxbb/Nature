@@ -8,7 +8,6 @@ use lazy_static::__Deref;
 use mysql_async::{params, Row, Value};
 use serde::Serialize;
 
-use crate::db::models::define::*;
 use crate::db::TaskDao;
 use crate::domain::*;
 use crate::util::*;

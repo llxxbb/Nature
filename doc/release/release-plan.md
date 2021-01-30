@@ -7,16 +7,11 @@
 
 ## Release 0.22.0
 
-manager: add get_by_id interface
+manager: add instance interface
 
 ### should commit
 
-
-
 ### 未完成
-
-add manager
-
 
 - 文档：将所有的外部请求分为读写两个职能。查询和结算都为读。目前缺少写之前的验证过程。
 
