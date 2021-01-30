@@ -3,10 +3,9 @@ use std::fmt::{Display, Formatter};
 use actix_web::{HttpResponse, post, ResponseError, web};
 use actix_web::web::Json;
 
-use crate::db::{InstanceDaoImpl, RawTask};
+use crate::db::{INS_RANGE, InstanceDaoImpl, RawTask};
 use crate::domain::*;
 use crate::nature_lib::dispatcher::IncomeController;
-use crate::nature_lib::web_init::INS_KEY_GT;
 use crate::util::web_result;
 
 /// **Note** This do not receive System `Meta`'s instances
@@ -51,7 +50,7 @@ async fn get_by_id(para: Json<KeyCondition>) -> HttpResponse {
 /// fuzzy query
 #[post("/get_by_key_range")]
 async fn get_by_key_range(para: Json<KeyCondition>) -> HttpResponse {
-    let x = INS_KEY_GT.clone().get_by_key_range(&para.0).await;
+    let x = INS_RANGE.clone().get_by_key_range(&para.0).await;
     web_result(x)
 }
 

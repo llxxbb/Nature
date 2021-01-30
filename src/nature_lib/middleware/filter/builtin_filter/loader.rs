@@ -136,6 +136,7 @@ fn default_100() -> u16 { 100 }
 mod loader_test {
     use super::*;
 
+    /// if test failed please rebuild the `nature_integrate_test_executor`
     #[tokio::test]
     // #[ignore]
     async fn with_sub_filter() {

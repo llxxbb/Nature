@@ -2,19 +2,13 @@
 extern crate dotenv;
 
 use std::env;
-use std::sync::Arc;
 
 use actix_web::{App, HttpServer};
 use actix_web::middleware::Logger;
 use dotenv::dotenv;
 
-use crate::util::channels::start_receive_threads;
-use crate::db::{InstanceDaoImpl, KeyRange};
 use crate::nature_lib::web_controller::*;
-
-lazy_static! {
-    pub static ref INS_KEY_GT : Arc<dyn KeyRange> = Arc::new(InstanceDaoImpl{});
-}
+use crate::util::channels::start_receive_threads;
 
 lazy_static! {
     pub static ref SERVER_PORT:String={

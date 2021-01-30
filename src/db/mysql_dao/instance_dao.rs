@@ -1,6 +1,6 @@
 use std::collections::HashSet;
 use std::str::FromStr;
-use crate::util::*;
+use std::sync::Arc;
 
 use chrono::{Local, TimeZone};
 use mysql_async::{params, Value};
@@ -9,10 +9,15 @@ use crate::db::{Mission, QUERY_SIZE_LIMIT};
 use crate::db::mysql_dao::MySql;
 use crate::db::raw_models::RawInstance;
 use crate::domain::*;
+use crate::util::*;
 
 #[async_trait]
 pub trait KeyRange: Sync + Send {
     async fn get_by_key_range(&self, f_para: &KeyCondition) -> Result<Vec<Instance>>;
+}
+
+lazy_static! {
+    pub static ref INS_RANGE : Arc<dyn KeyRange> = Arc::new(InstanceDaoImpl{});
 }
 
 pub struct InstanceDaoImpl;
@@ -157,6 +162,7 @@ impl KeyRange for InstanceDaoImpl {
     /// ins_key > and between time range
     async fn get_by_key_range(&self, f_para: &KeyCondition) -> Result<Vec<Instance>> {
         let mut list: Vec<String> = vec![];
+        // used to avoid repeat add conditions
         let mut set: HashSet<String> = HashSet::new();
 
         let meta = if f_para.meta.is_empty() {
@@ -257,8 +263,15 @@ fn build_for_part(set: &mut HashSet<String>, list: &mut Vec<String>, parts: &str
     } else if vec.len() == 2 {
         list.push(" and ins_id ".to_owned() + end_sign + " " + &vec[1])
     }
-    if vec.len() >= 3 {
+    if vec.len() > 3 {
+        if set.insert(vec[0].clone() + &*SEPARATOR_INS_KEY + &vec[1] + &*SEPARATOR_INS_KEY + &vec[2]) {
+            list.push(" and para = '".to_owned() + &vec[2] + "'")
+        }
+    } else if vec.len() == 3 {
         list.push(" and para ".to_owned() + end_sign + " '" + &vec[2] + "'")
+    }
+    if vec.len() == 4 {
+        list.push(" and state_version ".to_owned() + end_sign + " " + &vec[3])
     }
     Ok(())
 }
@@ -443,6 +456,22 @@ mod build_for_part_test {
     }
 
     #[test]
+    fn id_err_test() {
+        let mut list: Vec<String> = vec![];
+        let mut set: HashSet<String> = HashSet::new();
+        let _ = build_for_part(&mut set, &mut list, "m|1", ">");
+        let _ = build_for_part(&mut set, &mut list, "a|5", "<");
+        assert_eq!(2, set.len());
+        assert_eq!(true, set.contains("m"));
+        assert_eq!(true, set.contains("a"));
+        assert_eq!(4, list.len());
+        assert_eq!(" and meta = 'm'", list[0]);
+        assert_eq!(" and ins_id > 1", list[1]);
+        assert_eq!(" and meta = 'a'", list[2]);
+        assert_eq!(" and ins_id < 5", list[3]);
+    }
+
+    #[test]
     fn para_test() {
         let mut list: Vec<String> = vec![];
         let mut set: HashSet<String> = HashSet::new();
@@ -463,14 +492,16 @@ mod build_for_part_test {
         let mut list: Vec<String> = vec![];
         let mut set: HashSet<String> = HashSet::new();
         let _ = build_for_part(&mut set, &mut list, "m|0|a|dfdfd", ">");
-        let _ = build_for_part(&mut set, &mut list, "m|0|b|eeefddi", "<");
-        assert_eq!(2, set.len());
+        let _ = build_for_part(&mut set, &mut list, "m|0|a|eeefddi", "<");
+        assert_eq!(3, set.len());
         assert_eq!(true, set.contains("m"));
         assert_eq!(true, set.contains("m|0"));
-        assert_eq!(4, list.len());
+        assert_eq!(true, set.contains("m|0|a"));
+        assert_eq!(5, list.len());
         assert_eq!(" and meta = 'm'", list[0]);
         assert_eq!(" and ins_id = 0", list[1]);
-        assert_eq!(" and para > 'a'", list[2]);
-        assert_eq!(" and para < 'b'", list[3]);
+        assert_eq!(" and para = 'a'", list[2]);
+        assert_eq!(" and state_version > dfdfd", list[3]);
+        assert_eq!(" and state_version < eeefddi", list[4]);
     }
 }

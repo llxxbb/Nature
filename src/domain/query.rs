@@ -1,7 +1,12 @@
 use crate::domain::*;
-/// used for query instance by id
 use crate::util::*;
 
+/// Condition for querying multi-row of `Instance`
+/// key format [meta|id|para|status_version]
+/// gt: grate than, only valid on the last part of the [key]
+/// ge: grate than or equal, only valid on the last part of the [key]
+/// lt: less than, only valid on the last part of the [key]
+/// le: less than or equal, only valid on the last part of the [key]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct KeyCondition {
     pub id: u64,
