@@ -50,7 +50,7 @@ impl FilterBefore for Loader {
 
         // load
         let condition = KeyCondition {
-            id: 0,
+            id: "0".to_string(),
             meta: "".to_string(),
             key_gt: first,
             key_ge: "".to_string(),
@@ -138,7 +138,6 @@ mod loader_test {
 
     /// if test failed please rebuild the `nature_integrate_test_executor`
     #[tokio::test]
-    // #[ignore]
     async fn with_sub_filter() {
         let loader = Loader { dao: Arc::new(Mocker {}) };
         let mut instance = Instance::default();

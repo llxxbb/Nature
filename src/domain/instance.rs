@@ -1,4 +1,3 @@
-use crate::domain::*;
 use std::collections::HashMap;
 use std::collections::HashSet;
 use std::hash::{Hash, Hasher};
@@ -10,6 +9,7 @@ use futures::Future;
 use itertools::Itertools;
 
 use crate::db::relation_target::RelationTarget;
+use crate::domain::*;
 use crate::util::*;
 
 // sys context define
@@ -29,7 +29,7 @@ pub struct Instance {
     /// A unique value used to distinguish other instance
     #[serde(skip_serializing_if = "is_default")]
     #[serde(default)]
-    pub id: u64,
+    pub id: String,
     pub data: BizObject,
     /// When this instance created in db
     #[serde(skip_serializing_if = "is_default")]
@@ -44,7 +44,7 @@ impl Instance {
         }
         let key = Meta::key_standardize(key)?;
         Ok(Instance {
-            id: 0,
+            id: "".to_string(),
             data: BizObject {
                 meta: format!("{}{}{}{}1", MetaType::default().get_prefix(), *SEPARATOR_META, key, *SEPARATOR_META),
                 content: "".to_string(),
@@ -61,8 +61,8 @@ impl Instance {
 
     pub fn revise(&mut self) -> Result<&mut Self> {
         self.create_time = Local::now().timestamp_millis();
-        if self.para.is_empty() && self.id == 0 {
-            self.id = generate_id(&self.data)? as u64;
+        if self.para.is_empty() && self.id == "" {
+            self.id = generate_id(&self.data)?.to_string();
         }
         Ok(self)
     }
@@ -87,7 +87,7 @@ impl Instance {
             Some(setting) => match setting.master {
                 None => Ok(None),
                 Some(master) => {
-                    let condition = KeyCondition::new(self.id, &master, &self.para, 0);
+                    let condition = KeyCondition::new(&self.id, &master, &self.para, 0);
                     let result = dao(condition);
                     Ok(result.await?)
                 }
@@ -124,7 +124,7 @@ impl DerefMut for Instance {
 impl Into<KeyCondition> for Instance {
     fn into(self) -> KeyCondition {
         KeyCondition {
-            id: self.id,
+            id: self.id.to_string(),
             meta: self.data.meta.to_string(),
             key_gt: "".to_string(),
             key_ge: "".to_string(),
@@ -227,7 +227,7 @@ impl SelfRouteInstance {
     }
     pub fn to_instance(&self) -> Instance {
         Instance {
-            id: 0,
+            id: "0".to_string(),
             data: self.instance.data.clone(),
             create_time: 0,
         }

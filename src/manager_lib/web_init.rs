@@ -22,7 +22,10 @@ pub async fn web_init() -> std::io::Result<()> {
     dotenv().ok();
     let _ = env_logger::init();
     HttpServer::new(|| {
-        let cors = Cors::default().allowed_origin(&CLIENT_URL);
+        let cors = Cors::default()
+            .allowed_origin(&CLIENT_URL)
+            .allow_any_method()
+            .allow_any_header();
         App::new()
             .wrap(Logger::default())
             .wrap(cors)

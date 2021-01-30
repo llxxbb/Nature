@@ -231,7 +231,6 @@ mod test {
     use super::*;
 
     #[test]
-    #[ignore]
     fn para_test() {
         assert_eq!("/a/b/c", "/a/${hello}/c".replace("${hello}", "b"));
         assert_eq!("/a/b/c", "/a/:hello:/c".replace(":hello:", "b"));

@@ -1,10 +1,11 @@
 use std::str::FromStr;
+
 use crate::domain::*;
 use crate::util::*;
 
 #[derive(Serialize, Deserialize, Debug, Default, Clone, PartialEq, Eq, Hash)]
 pub struct FromInstance {
-    pub id: u64,
+    pub id: String,
     pub meta: String,
     #[serde(skip_serializing_if = "is_default")]
     #[serde(default)]
@@ -21,7 +22,7 @@ impl FromInstance {
             return Err(NatureError::VerifyError("format error".to_string()));
         }
         let rtn = FromInstance {
-            id: id_from_hex_str(part[1])?,
+            id: part[1].to_string(),
             meta: part[0].to_string(),
             para: part[2].to_string(),
             state_version: 0,
@@ -33,7 +34,7 @@ impl FromInstance {
 impl From<&Instance> for FromInstance {
     fn from(from: &Instance) -> Self {
         FromInstance {
-            id: from.id,
+            id: from.id.to_string(),
             meta: from.meta.to_string(),
             para: from.para.clone(),
             state_version: from.state_version,
@@ -51,7 +52,7 @@ impl FromStr for FromInstance {
             return Err(NatureError::VerifyError(msg));
         }
         let rtn = FromInstance {
-            id: id_from_hex_str(part[1])?,
+            id: part[1].to_string(),
             meta: part[0].to_string(),
             para: part[2].to_string(),
             state_version: i32::from_str(part[3])?,
@@ -75,7 +76,7 @@ mod test {
     fn to_string_test() {
         let from = FromInstance::default();
         let string = from.to_string();
-        assert_eq!(string, "|0||0");
+        assert_eq!(string, "|||0");
         let rtn = FromInstance::from_str(&string).unwrap();
         assert_eq!(from, rtn);
     }

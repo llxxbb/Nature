@@ -1,5 +1,4 @@
 use std::collections::HashSet;
-use std::str::FromStr;
 use std::sync::Arc;
 
 use chrono::{Local, TimeZone};
@@ -66,7 +65,7 @@ impl InstanceDaoImpl {
             where meta = :meta and ins_id = :ins_id and para = :para
             order by state_version desc
             limit 1";
-        let id = f_para.id;
+        let id = f_para.id.to_string();
         let p = params! {
             "meta" => f_para.meta.to_string(),
             "ins_id" => id,
@@ -105,7 +104,7 @@ impl InstanceDaoImpl {
             WHERE meta = :meta and ins_id = :ins_id and para = :para";
         let p = params! {
             "meta" => ins.meta.to_string(),
-            "ins_id" => ins.id,
+            "ins_id" => ins.id.to_string(),
             "para" => ins.para.to_string(),
         };
         let rtn = MySql::idu(sql, p).await?;
@@ -152,7 +151,7 @@ impl InstanceDaoImpl {
         };
         let meta = mission.to.meta_string();
         debug!("get last state for meta {}", &meta);
-        let qc = KeyCondition::new(u64::from_str(&id)?, &meta, &para_id, 0);
+        let qc = KeyCondition::new(&id, &meta, &para_id, 0);
         Self::get_last_state(&qc).await
     }
 }
@@ -299,7 +298,7 @@ mod test {
     #[allow(dead_code)]
     fn get_last_state_test() {
         env::set_var("DATABASE_URL", "mysql://root@localhost/nature");
-        let para = KeyCondition::new(0, "B:score/trainee/all-subject:1", "002", 0);
+        let para = KeyCondition::new("0", "B:score/trainee/all-subject:1", "002", 0);
         let result = Runtime::new().unwrap().block_on(InstanceDaoImpl::get_last_state(&para));
         let _ = dbg!(result);
     }
@@ -309,7 +308,7 @@ mod test {
     fn query_by_id() {
         env::set_var("DATABASE_URL", "mysql://root@localhost/nature");
         let para = KeyCondition {
-            id: 12345,
+            id: "12345".to_string(),
             meta: "B:sale/order:1".to_string(),
             key_gt: "".to_string(),
             key_ge: "".to_string(),
@@ -331,14 +330,14 @@ mod test {
     async fn query_by_range_test() {
         env::set_var("DATABASE_URL", "mysql://root@localhost/nature");
         let mut ins = Instance::new("sale/order").unwrap();
-        ins.id = 760228;
+        ins.id = "760228".to_string();
         let _ = InstanceDaoImpl::insert(&ins).await;
 
         let ge_t = 1588508143000;
         let ge = Local.timestamp_millis(ge_t);
         dbg!(ge);
         let para = KeyCondition {
-            id: 0,
+            id: "0".to_string(),
             meta: "B:sale/order:1".to_string(),
             key_gt: "".to_string(),
             key_ge: "".to_string(),
@@ -365,7 +364,7 @@ mod test {
     async fn query_by_range() {
         env::set_var("DATABASE_URL", "mysql://root@localhost/nature");
         let para = KeyCondition {
-            id: 0,
+            id: "0".to_string(),
             meta: "".to_string(),
             key_gt: "B:sale/order:1|".to_string(),
             key_ge: "".to_string(),

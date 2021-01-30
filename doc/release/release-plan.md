@@ -7,9 +7,11 @@
 
 ## Release 0.22.0
 
-manager: add instance interface
+Manager: add `instance` interface for UI management
 
-### should commit
+Browser json support: chang id from u64 to string
+
+### It should commit
 
 ### 未完成
 
@@ -19,12 +21,6 @@ manager: add instance interface
     last state check
 
 - use lru-cache for cache
-
-- 使用状态化代替静态化，以减少多线程锁。
-
-- 架构：流式计算：可以理解为只有 map,可以内嵌 filter(两层意思：条件过滤和内容修改) 
-
-- channel_store:17-19 说用 tokio::spawn 任务不启动， 且有个怪问题，前一个任务是如何完成的？
 
 - 修正 prepare.md
 - write the document for summary use
