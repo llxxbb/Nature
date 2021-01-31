@@ -1,13 +1,14 @@
+use std::str::FromStr;
 use std::thread::sleep;
 use std::time::Duration;
 
-use crate::util::channels::CHANNEL_CONVERT;
 use crate::db::{C_M, C_R, D_M, D_R, InstanceDaoImpl, MetaCache, Mission, RawTask, RelationCache};
 use crate::db::flow_tool::{context_check, state_check};
-use crate::nature_lib::dispatcher::channel_stored;
 use crate::domain::*;
+use crate::nature_lib::dispatcher::channel_stored;
 use crate::nature_lib::task::{CachedKey, TaskForConvert, TaskForStore};
 use crate::nature_lib::task::gen_loop_mission;
+use crate::util::channels::CHANNEL_CONVERT;
 
 pub async fn channel_store(task: TaskForStore, carrier: RawTask) -> Result<()> {
     match InstanceDaoImpl::insert(&task.instance).await {
@@ -49,7 +50,10 @@ async fn duplicated_instance(task: TaskForStore, carrier: RawTask) -> Result<()>
         Some(from) => from,
     };
     let para = IDAndFrom {
-        id: task.instance.id,
+        id: match task.instance.id.is_empty() {
+            true => 0,
+            _ => u64::from_str(&task.instance.id)?
+        },
         meta: task.instance.meta.clone(),
         from_key: ins_from.to_string(),
     };

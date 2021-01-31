@@ -3,7 +3,7 @@ use std::time::Duration;
 
 use lru_time_cache::LruCache;
 
-use crate::nature_lib::web_init::CACHE_SAVED_TIME;
+use crate::util::*;
 
 lazy_static! {
     static ref CACHE: Mutex<LruCache<String, u32>> = Mutex::new(LruCache::<String, u32>::with_expiry_duration(Duration::from_secs(*CACHE_SAVED_TIME)));
@@ -19,7 +19,7 @@ impl CachedKey {
             Some(_) => {
                 debug!("cached key: {}", key);
                 true
-            },
+            }
             None => false
         }
     }

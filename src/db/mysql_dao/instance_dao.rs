@@ -1,18 +1,22 @@
 use std::collections::HashSet;
-use std::str::FromStr;
-use crate::util::*;
+use std::sync::Arc;
 
 use chrono::{Local, TimeZone};
 use mysql_async::{params, Value};
 
-use crate::db::{Mission, QUERY_SIZE_LIMIT};
+use crate::db::Mission;
 use crate::db::mysql_dao::MySql;
 use crate::db::raw_models::RawInstance;
 use crate::domain::*;
+use crate::util::*;
 
 #[async_trait]
 pub trait KeyRange: Sync + Send {
     async fn get_by_key_range(&self, f_para: &KeyCondition) -> Result<Vec<Instance>>;
+}
+
+lazy_static! {
+    pub static ref INS_RANGE : Arc<dyn KeyRange> = Arc::new(InstanceDaoImpl{});
 }
 
 pub struct InstanceDaoImpl;
@@ -61,7 +65,7 @@ impl InstanceDaoImpl {
             where meta = :meta and ins_id = :ins_id and para = :para
             order by state_version desc
             limit 1";
-        let id = f_para.id;
+        let id = f_para.id.to_string();
         let p = params! {
             "meta" => f_para.meta.to_string(),
             "ins_id" => id,
@@ -100,7 +104,7 @@ impl InstanceDaoImpl {
             WHERE meta = :meta and ins_id = :ins_id and para = :para";
         let p = params! {
             "meta" => ins.meta.to_string(),
-            "ins_id" => ins.id,
+            "ins_id" => ins.id.to_string(),
             "para" => ins.para.to_string(),
         };
         let rtn = MySql::idu(sql, p).await?;
@@ -147,7 +151,7 @@ impl InstanceDaoImpl {
         };
         let meta = mission.to.meta_string();
         debug!("get last state for meta {}", &meta);
-        let qc = KeyCondition::new(u64::from_str(&id)?, &meta, &para_id, 0);
+        let qc = KeyCondition::new(&id, &meta, &para_id, 0);
         Self::get_last_state(&qc).await
     }
 }
@@ -157,6 +161,7 @@ impl KeyRange for InstanceDaoImpl {
     /// ins_key > and between time range
     async fn get_by_key_range(&self, f_para: &KeyCondition) -> Result<Vec<Instance>> {
         let mut list: Vec<String> = vec![];
+        // used to avoid repeat add conditions
         let mut set: HashSet<String> = HashSet::new();
 
         let meta = if f_para.meta.is_empty() {
@@ -203,7 +208,7 @@ impl KeyRange for InstanceDaoImpl {
         let sql = format!("SELECT meta, ins_id, para, content, context, states, state_version, create_time, sys_context, from_key
             FROM instances
             where 1=1{}{}{}{}
-            order by meta, ins_id, para
+            order by meta, ins_id, para, state_version desc
             limit :limit", time_ge, time_lt, key, meta);
 
         let p = params! {
@@ -257,8 +262,15 @@ fn build_for_part(set: &mut HashSet<String>, list: &mut Vec<String>, parts: &str
     } else if vec.len() == 2 {
         list.push(" and ins_id ".to_owned() + end_sign + " " + &vec[1])
     }
-    if vec.len() >= 3 {
+    if vec.len() > 3 {
+        if set.insert(vec[0].clone() + &*SEPARATOR_INS_KEY + &vec[1] + &*SEPARATOR_INS_KEY + &vec[2]) {
+            list.push(" and para = '".to_owned() + &vec[2] + "'")
+        }
+    } else if vec.len() == 3 {
         list.push(" and para ".to_owned() + end_sign + " '" + &vec[2] + "'")
+    }
+    if vec.len() == 4 {
+        list.push(" and state_version ".to_owned() + end_sign + " " + &vec[3])
     }
     Ok(())
 }
@@ -286,7 +298,7 @@ mod test {
     #[allow(dead_code)]
     fn get_last_state_test() {
         env::set_var("DATABASE_URL", "mysql://root@localhost/nature");
-        let para = KeyCondition::new(0, "B:score/trainee/all-subject:1", "002", 0);
+        let para = KeyCondition::new("0", "B:score/trainee/all-subject:1", "002", 0);
         let result = Runtime::new().unwrap().block_on(InstanceDaoImpl::get_last_state(&para));
         let _ = dbg!(result);
     }
@@ -296,7 +308,7 @@ mod test {
     fn query_by_id() {
         env::set_var("DATABASE_URL", "mysql://root@localhost/nature");
         let para = KeyCondition {
-            id: 12345,
+            id: "12345".to_string(),
             meta: "B:sale/order:1".to_string(),
             key_gt: "".to_string(),
             key_ge: "".to_string(),
@@ -318,14 +330,14 @@ mod test {
     async fn query_by_range_test() {
         env::set_var("DATABASE_URL", "mysql://root@localhost/nature");
         let mut ins = Instance::new("sale/order").unwrap();
-        ins.id = 760228;
+        ins.id = "760228".to_string();
         let _ = InstanceDaoImpl::insert(&ins).await;
 
         let ge_t = 1588508143000;
         let ge = Local.timestamp_millis(ge_t);
         dbg!(ge);
         let para = KeyCondition {
-            id: 0,
+            id: "0".to_string(),
             meta: "B:sale/order:1".to_string(),
             key_gt: "".to_string(),
             key_ge: "".to_string(),
@@ -352,7 +364,7 @@ mod test {
     async fn query_by_range() {
         env::set_var("DATABASE_URL", "mysql://root@localhost/nature");
         let para = KeyCondition {
-            id: 0,
+            id: "0".to_string(),
             meta: "".to_string(),
             key_gt: "B:sale/order:1|".to_string(),
             key_ge: "".to_string(),
@@ -443,6 +455,22 @@ mod build_for_part_test {
     }
 
     #[test]
+    fn id_err_test() {
+        let mut list: Vec<String> = vec![];
+        let mut set: HashSet<String> = HashSet::new();
+        let _ = build_for_part(&mut set, &mut list, "m|1", ">");
+        let _ = build_for_part(&mut set, &mut list, "a|5", "<");
+        assert_eq!(2, set.len());
+        assert_eq!(true, set.contains("m"));
+        assert_eq!(true, set.contains("a"));
+        assert_eq!(4, list.len());
+        assert_eq!(" and meta = 'm'", list[0]);
+        assert_eq!(" and ins_id > 1", list[1]);
+        assert_eq!(" and meta = 'a'", list[2]);
+        assert_eq!(" and ins_id < 5", list[3]);
+    }
+
+    #[test]
     fn para_test() {
         let mut list: Vec<String> = vec![];
         let mut set: HashSet<String> = HashSet::new();
@@ -463,14 +491,16 @@ mod build_for_part_test {
         let mut list: Vec<String> = vec![];
         let mut set: HashSet<String> = HashSet::new();
         let _ = build_for_part(&mut set, &mut list, "m|0|a|dfdfd", ">");
-        let _ = build_for_part(&mut set, &mut list, "m|0|b|eeefddi", "<");
-        assert_eq!(2, set.len());
+        let _ = build_for_part(&mut set, &mut list, "m|0|a|eeefddi", "<");
+        assert_eq!(3, set.len());
         assert_eq!(true, set.contains("m"));
         assert_eq!(true, set.contains("m|0"));
-        assert_eq!(4, list.len());
+        assert_eq!(true, set.contains("m|0|a"));
+        assert_eq!(5, list.len());
         assert_eq!(" and meta = 'm'", list[0]);
         assert_eq!(" and ins_id = 0", list[1]);
-        assert_eq!(" and para > 'a'", list[2]);
-        assert_eq!(" and para < 'b'", list[3]);
+        assert_eq!(" and para = 'a'", list[2]);
+        assert_eq!(" and state_version > dfdfd", list[3]);
+        assert_eq!(" and state_version < eeefddi", list[4]);
     }
 }

@@ -5,18 +5,11 @@
 - 功能性先于非功能性需求
 - 应用情景支持，内部优先于外部（如网关）
 
-## Release 0.21.2
+## Release 0.23.0
 
-
-
-### should commit
-
-
+### It should commit
 
 ### 未完成
-
-add manager
-
 
 - 文档：将所有的外部请求分为读写两个职能。查询和结算都为读。目前缺少写之前的验证过程。
 
@@ -24,12 +17,6 @@ add manager
     last state check
 
 - use lru-cache for cache
-
-- 使用状态化代替静态化，以减少多线程锁。
-
-- 架构：流式计算：可以理解为只有 map,可以内嵌 filter(两层意思：条件过滤和内容修改) 
-
-- channel_store:17-19 说用 tokio::spawn 任务不启动， 且有个怪问题，前一个任务是如何完成的？
 
 - 修正 prepare.md
 - write the document for summary use

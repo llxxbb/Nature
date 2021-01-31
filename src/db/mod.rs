@@ -1,6 +1,5 @@
 pub use cache::*;
 pub use conn::*;
-pub use define::*;
 pub use models::*;
 pub use mysql_dao::*;
 pub use orm::*;

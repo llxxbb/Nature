@@ -1,10 +1,26 @@
 use actix_web::{get, HttpResponse, post, web};
 use actix_web::web::Json;
 
-use crate::db::{RawMeta, RawRelation};
+use crate::db::{INS_RANGE, InstanceDaoImpl, RawMeta, RawRelation};
+use crate::domain::*;
 use crate::manager_lib::meta_service::MetaService;
-use crate::util::web_result;
 use crate::manager_lib::relation_service::RelationService;
+use crate::util::web_result;
+
+#[post("/instance/byId")]
+async fn get_by_id(para: Json<KeyCondition>) -> HttpResponse {
+    debug!("/instance/byId : {:?}", &para.0);
+    let x = InstanceDaoImpl::get_by_id(para.0).await;
+    web_result(x)
+}
+
+/// fuzzy query
+#[post("/instance/byKey")]
+async fn get_by_key_range(para: Json<KeyCondition>) -> HttpResponse {
+    debug!("/instance/byKey : {:?}", &para.0);
+    let x = INS_RANGE.clone().get_by_key_range(&para.0).await;
+    web_result(x)
+}
 
 /// batch query the metas, `from` is index of `id`, ascending order
 #[get("/metaIdGreatThan/{from}/{limit}")]
@@ -76,5 +92,7 @@ pub fn manager_config(cfg: &mut web::ServiceConfig) {
         .service(meta_used)
         .service(meta_delete)
         .service(meta_update)
+        .service(get_by_id)
+        .service(get_by_key_range)
         .service(relation_update);
 }

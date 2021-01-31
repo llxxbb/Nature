@@ -6,8 +6,8 @@ use loader::Loader;
 use para_as_key::ParaAsKey;
 use task_checker::TaskCheckerFilter;
 
+use crate::db::INS_RANGE;
 use crate::domain::*;
-use crate::nature_lib::web_init::INS_KEY_GT;
 
 #[async_trait]
 pub trait FilterBefore: Sync + Send {
@@ -21,7 +21,7 @@ lazy_static! {
 fn init_builtin() -> HashMap<String, Arc<dyn FilterBefore>> {
     info!("BuiltIn filter initialized");
     let mut map: HashMap<String, Arc<dyn FilterBefore>> = HashMap::new();
-    let one = Loader { dao: INS_KEY_GT.clone() };
+    let one = Loader { dao: INS_RANGE.clone() };
     map.insert("instance-loader".to_string(), Arc::new(one));
     let one = TaskCheckerFilter {};
     map.insert("task-checker".to_string(), Arc::new(one));

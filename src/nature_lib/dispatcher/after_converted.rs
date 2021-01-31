@@ -1,9 +1,8 @@
 use std::str::FromStr;
 
 use crate::db::{D_T, Mission, MissionRaw, RawTask, TaskDao, TaskType};
-use crate::nature_lib::dispatcher::{channel_batch, channel_store, get_store_task};
 use crate::domain::*;
-use crate::nature_lib::web_init::SWITCH_SAVE_DIRECTLY_FOR_ONE;
+use crate::nature_lib::dispatcher::{channel_batch, channel_store, get_store_task};
 use crate::nature_lib::task::{Converted, TaskForConvert};
 use crate::util::*;
 
@@ -105,7 +104,7 @@ fn remove_loop_id(ins: &mut Instance, task: &TaskForConvert) -> Result<()> {
 
 /// **Notice** need get sys_context from upstream
 fn gen_instance_for_loop(ins: &mut Instance, task: &TaskForConvert) -> Result<()> {
-    ins.id = task.from.id;
+    ins.id = task.from.id.to_string();
 
     // loop next
     if let Some(next) = task.from.sys_context.get(CONTEXT_LOOP_NEXT) {
