@@ -3,7 +3,7 @@
 ## Release 0.22.0
 
 Manager: add `Instance` interface for UI management
-chang `Instance` id from u64, so that js long will be work fine
+change `Instance` id from u64, so that js long will be work fine
 
 ## Release 0.21.1 2021-01-23
 
