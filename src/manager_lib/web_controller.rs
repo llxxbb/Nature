@@ -9,7 +9,7 @@ use crate::util::web_result;
 
 #[post("/instance/byId")]
 async fn get_by_id(para: Json<KeyCondition>) -> HttpResponse {
-    debug!("get_by_id : {:?}", &para.0);
+    debug!("/instance/byId : {:?}", &para.0);
     let x = InstanceDaoImpl::get_by_id(para.0).await;
     web_result(x)
 }
@@ -17,6 +17,7 @@ async fn get_by_id(para: Json<KeyCondition>) -> HttpResponse {
 /// fuzzy query
 #[post("/instance/byKey")]
 async fn get_by_key_range(para: Json<KeyCondition>) -> HttpResponse {
+    debug!("/instance/byKey : {:?}", &para.0);
     let x = INS_RANGE.clone().get_by_key_range(&para.0).await;
     web_result(x)
 }

@@ -208,7 +208,7 @@ impl KeyRange for InstanceDaoImpl {
         let sql = format!("SELECT meta, ins_id, para, content, context, states, state_version, create_time, sys_context, from_key
             FROM instances
             where 1=1{}{}{}{}
-            order by meta, ins_id, para
+            order by meta, ins_id, para, state_version desc
             limit :limit", time_ge, time_lt, key, meta);
 
         let p = params! {

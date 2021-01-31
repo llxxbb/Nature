@@ -1,5 +1,10 @@
 # 发布的功能
 
+## Release 0.22.0
+
+Manager: add `Instance` interface for UI management
+chang `Instance` id from u64, so that js long will be work fine
+
 ## Release 0.21.1 2021-01-23
 
 change manage client port to 8280 to avoid conflict with nature.exe
