@@ -59,6 +59,23 @@ impl InstanceDaoImpl {
         }
     }
 
+    /// get all downstream by `from`
+    pub async fn get_downstream(from: &str) -> Result<Vec<Instance>> {
+        let sql = r"SELECT meta, ins_id, para, content, context, states, state_version, create_time, sys_context, from_key
+            FROM instances
+            where from_key = :from_key";
+        let p = params! {
+            "from_key" => from.to_string(),
+        };
+
+        let raws = MySql::fetch(sql, p, RawInstance::from).await?;
+        let mut rtn: Vec<Instance> = vec![];
+        for one in raws {
+            rtn.push(one.to()?)
+        }
+        Ok(rtn)
+    }
+
     async fn get_last_state(f_para: &KeyCondition) -> Result<Option<Instance>> {
         let sql = r"SELECT meta, ins_id, para, content, context, states, state_version, create_time, sys_context, from_key
             FROM instances
@@ -293,7 +310,6 @@ mod test {
         let _ = dbg!(rtn);
     }
 
-
     #[test]
     #[allow(dead_code)]
     fn get_last_state_test() {
@@ -383,6 +399,18 @@ mod test {
         let dao = InstanceDaoImpl {};
 
         let result = dao.get_by_key_range(&para).await;
+        assert!(result.is_ok());
+        let vec = result.unwrap();
+        dbg!(&vec);
+    }
+
+    #[allow(dead_code)]
+    #[tokio::test]
+    #[ignore]
+    async fn get_downstream_test() {
+        env::set_var("DATABASE_URL", "mysql://root@localhost/nature");
+
+        let result = InstanceDaoImpl::get_downstream("B:finance/payment:1|1193619470850765623||0").await;
         assert!(result.is_ok());
         let vec = result.unwrap();
         dbg!(&vec);
