@@ -14,10 +14,10 @@ async fn get_by_id(para: Json<KeyCondition>) -> HttpResponse {
     web_result(x)
 }
 
-#[get("/instance/downstream/{from}")]
-async fn get_downstream_instance(para: web::Path<String>) -> HttpResponse {
-    debug!("/instance/downstream : {:?}", &para.0);
-    let x = InstanceDaoImpl::get_downstream(&para.0).await;
+#[post("/instance/downstream")]
+async fn get_downstream_instance(from: String) -> HttpResponse {
+    debug!("/instance/downstream : {:?}", &from);
+    let x = InstanceDaoImpl::get_downstream(&from).await;
     web_result(x)
 }
 
