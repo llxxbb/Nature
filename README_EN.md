@@ -78,11 +78,33 @@ We need to do the following
 
 6. Start natrue.exe and retry.exe.
 
-7. post request to Nature, such as submitting the `order` data to Nature, please refer to [Nature interface definition](doc/EN/help/nature-interface.md)
+7. post request to Nature, such as submitting the `order` data to Nature, please refer to
+
+## Graphical Management User Interface
+
+[Graphical Management Client](https://github.com/llxxbb/Nature-Manager-UI) can let you manage this system in the following modes:
+
+### Relation Mode
+
+In this mode, you can organize how the business to work.
+
+![main](https://raw.githubusercontent.com/llxxbb/Nature-Manager-UI/main/doc/relation.png)
+
+### Domain Mode
+
+In this mode, you can organize the business domain.
+
+![main](https://raw.githubusercontent.com/llxxbb/Nature-Manager-UI/main/doc/domain.png)
+
+### Instance Mode
+
+In this mode, you can see the data flow
+
+![main](https://raw.githubusercontent.com/llxxbb/Nature-Manager-UI/main/doc/instance.png)
 
 ## Learn more about Nature
 
-[Graphical Management Client](https://github.com/llxxbb/Nature-Manager-UI)
+ [Nature interface definition](doc/EN/help/nature-interface.md)
 
 If you want to understand Nature's view of nature, time and space, mathematical meaning and philosophical meaning, please read: [Nature architecture](doc/EN/help/architecture.md)
 
