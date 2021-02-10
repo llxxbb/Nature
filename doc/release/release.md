@@ -1,9 +1,13 @@
 # 发布的功能
 
+## Release 0.22.1
+
+- manager interface: query downstream for `Instance`
+
 ## Release 0.22.0
 
 Manager: add `Instance` interface for UI management
-chang `Instance` id from u64, so that js long will be work fine
+change `Instance` id from u64, so that js long will be work fine
 
 ## Release 0.21.1 2021-01-23
 

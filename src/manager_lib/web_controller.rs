@@ -14,6 +14,13 @@ async fn get_by_id(para: Json<KeyCondition>) -> HttpResponse {
     web_result(x)
 }
 
+#[post("/instance/downstream")]
+async fn get_downstream_instance(from: String) -> HttpResponse {
+    debug!("/instance/downstream : {:?}", &from);
+    let x = InstanceDaoImpl::get_downstream(&from).await;
+    web_result(x)
+}
+
 /// fuzzy query
 #[post("/instance/byKey")]
 async fn get_by_key_range(para: Json<KeyCondition>) -> HttpResponse {
@@ -94,5 +101,6 @@ pub fn manager_config(cfg: &mut web::ServiceConfig) {
         .service(meta_update)
         .service(get_by_id)
         .service(get_by_key_range)
+        .service(get_downstream_instance)
         .service(relation_update);
 }

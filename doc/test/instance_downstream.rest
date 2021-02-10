@@ -1,0 +1,21 @@
+POST
+http://localhost:8180/instance/downstream
+@Content-Type: application/json
+10071269418607538781
+%%%
+# Duration: 7 ms
+# POST
+# http://localhost:8180/instance/downstream
+# Headers
+# @Content-Type: application/json
+# Body
+# 10071269418607538781
+
+
+# status 200
+
+@content-length: 9
+@content-type: application/json
+@date: Tue, 09 Feb 2021 12:47:09 GMT
+
+{"Ok":[]}
