@@ -79,11 +79,33 @@ Nature 运行时模式中的 `map` 对应 `Relation`  中的 `Executor`。Nature
 
 6. 启动 natrue.exe和retry.exe。
 
-7. 对 Nature 发起 http post 请求，如将`订单`数据提交数据到 Nature，请参考[Nature接口定义](doc/ZH/help/nature-interface.md)
+7. 对 Nature 发起 http post 请求，如将`订单`数据提交数据到 Nature，
+
+## 图形化管理界面
+
+[图形化管理界面](https://github.com/llxxbb/Nature-Manager-UI)可实现三种模式下的管理：
+
+### 关系模式
+
+该模式下，你可以设计如何让业务运转起来。
+
+![main](https://raw.githubusercontent.com/llxxbb/Nature-Manager-UI/main/doc/relation.png)
+
+### 领域模式
+
+该模式下，可方便进行业务领域的划分。
+
+![main](https://raw.githubusercontent.com/llxxbb/Nature-Manager-UI/main/doc/domain.png)
+
+### 数据模式
+
+该模式下，你可以方便地看到数据是如何流转的。
+
+![main](https://raw.githubusercontent.com/llxxbb/Nature-Manager-UI/main/doc/instance.png)
 
 ## 深入了解Nature
 
-[图形管理客户端](https://github.com/llxxbb/Nature-Manager-UI)
+[Nature接口定义](doc/ZH/help/nature-interface.md)
 
 如果您想了解下 Nature 的自然观，时空观，数学意义和哲学意义请阅读：[Nature 架构思想](doc/ZH/help/architecture.md)
 

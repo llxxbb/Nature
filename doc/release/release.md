@@ -1,5 +1,9 @@
 # 发布的功能
 
+## Release 0.22.1
+
+- manager interface: query downstream for `Instance`
+
 ## Release 0.22.0
 
 Manager: add `Instance` interface for UI management
