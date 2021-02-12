@@ -5,6 +5,9 @@
 - 功能性先于非功能性需求
 - 应用情景支持，内部优先于外部（如网关）
 
+## Release 0.22.2
+
+Optimize: support recent `Instance` for management UI.
 
 ### It should commit
 
