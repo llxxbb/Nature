@@ -1,0 +1,30 @@
+POST
+http://localhost:8180/instance/byKey
+@Content-Type: application/json
+{
+    "id": "",
+    "meta": "B:finance/orderAccount:1",
+    "limit": 200
+}
+
+%%%
+# Duration: 19 ms
+# POST
+# http://localhost:8180/instance/byKey
+# Headers
+# @Content-Type: application/json
+# Body
+# {
+#     "id": "",
+#     "meta": "B:finance/orderAccount:1",
+#     "limit": 200
+# }
+
+
+# status 200
+
+@content-length: 1237
+@content-type: application/json
+@date: Fri, 12 Feb 2021 13:36:44 GMT
+
+{"Ok":[{"id":"10071269418607538781","data":{"meta":"B:finance/orderAccount:1","content":"{\"receivable\":1000,\"total_paid\":1000,\"last_paid\":700,\"reason\":\"Pay\",\"diff\":0}","states":["paid"],"state_version":4,"from":{"id":"14988181541190564681","meta":"B:finance/payment:1"}},"create_time":1613131828000},{"id":"10071269418607538781","data":{"meta":"B:finance/orderAccount:1","content":"{\"receivable\":1000,\"total_paid\":300,\"last_paid\":200,\"reason\":\"Pay\",\"diff\":-700}","states":["partial"],"state_version":3,"from":{"id":"9586488264335013056","meta":"B:finance/payment:1"}},"create_time":1613131828000},{"id":"10071269418607538781","data":{"meta":"B:finance/orderAccount:1","content":"{\"receivable\":1000,\"total_paid\":100,\"last_paid\":100,\"reason\":\"Pay\",\"diff\":-900}","states":["partial"],"state_version":2,"from":{"id":"2660400057162066413","meta":"B:finance/payment:1"}},"create_time":1613131828000},{"id":"10071269418607538781","data":{"meta":"B:finance/orderAccount:1","content":"{\"receivable\":1000,\"total_paid\":0,\"last_paid\":0,\"reason\":\"NewOrder\",\"diff\":-1000}","states":["unpaid"],"state_version":1,"from":{"id":"10071269418607538781","meta":"B:sale/order:1"}},"create_time":1613131828000}]}
