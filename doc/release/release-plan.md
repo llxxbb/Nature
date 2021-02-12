@@ -8,6 +8,7 @@
 ## Release 0.22.2
 
 Optimize: support recent `Instance` for management UI.
+bug fix: query `Instance` by id 
 
 ### It should commit
 
