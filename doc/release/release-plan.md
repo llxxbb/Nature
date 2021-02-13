@@ -7,7 +7,7 @@
 
 ## Release 0.22.3
 
-bug fix: para missed cause query result err
+bug fix: get_by_key_range
 optimize `KeyCondition`
 
 ### It should commit

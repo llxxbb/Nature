@@ -271,11 +271,13 @@ fn build_for_part(set: &mut HashSet<String>, list: &mut Vec<String>, parts: &str
         list.push(" and meta ".to_owned() + end_sign + " '" + &vec[0] + "'")
     }
     if vec.len() > 2 {
+        let id = if vec[1].is_empty() { "0" } else { &vec[1] };
         if set.insert(vec[0].clone() + &*SEPARATOR_INS_KEY + &vec[1]) {
-            list.push(" and ins_id = ".to_owned() + &vec[1])
+            list.push(" and ins_id = ".to_owned() + id)
         }
     } else if vec.len() == 2 {
-        list.push(" and ins_id ".to_owned() + end_sign + " " + &vec[1])
+        let id = if vec[1].is_empty() { "0" } else { &vec[1] };
+        list.push(" and ins_id ".to_owned() + end_sign + " " + id)
     }
     if vec.len() > 3 {
         if set.insert(vec[0].clone() + &*SEPARATOR_INS_KEY + &vec[1] + &*SEPARATOR_INS_KEY + &vec[2]) {
@@ -497,6 +499,32 @@ mod build_for_part_test {
         assert_eq!(" and ins_id > 1", list[1]);
         assert_eq!(" and meta = 'a'", list[2]);
         assert_eq!(" and ins_id < 5", list[3]);
+    }
+
+    #[test]
+    fn id_empty_end_sign_test() {
+        let mut list: Vec<String> = vec![];
+        let mut set: HashSet<String> = HashSet::new();
+        let _ = build_for_part(&mut set, &mut list, "m|", ">");
+        assert_eq!(1, set.len());
+        assert_eq!(true, set.contains("m"));
+        assert_eq!(2, list.len());
+        assert_eq!(" and meta = 'm'", list[0]);
+        assert_eq!(" and ins_id > 0", list[1]);
+    }
+
+    #[test]
+    fn id_empty_equal_test() {
+        let mut list: Vec<String> = vec![];
+        let mut set: HashSet<String> = HashSet::new();
+        let _ = build_for_part(&mut set, &mut list, "m||a", ">");
+        assert_eq!(2, set.len());
+        assert_eq!(true, set.contains("m"));
+        assert_eq!(true, set.contains("m|"));
+        assert_eq!(3, list.len());
+        assert_eq!(" and meta = 'm'", list[0]);
+        assert_eq!(" and ins_id = 0", list[1]);
+        assert_eq!(" and para > 'a'", list[2]);
     }
 
     #[test]
