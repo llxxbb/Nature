@@ -7,6 +7,7 @@
 
 ## Release 0.22.3
 
+bug fix: para missed cause query result err
 optimize `KeyCondition`
 
 ### It should commit

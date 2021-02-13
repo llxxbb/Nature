@@ -252,9 +252,6 @@ fn key_to_part(key: &str) -> Vec<String> {
     let parts: Vec<&str> = key.split(&*SEPARATOR_INS_KEY).collect();
     let mut rtn: Vec<String> = vec![];
     for part in parts {
-        if part.is_empty() {
-            break;
-        }
         rtn.push(part.to_string());
     }
     rtn
@@ -420,13 +417,16 @@ mod test {
     #[test]
     fn key_to_part_test() {
         let vec = key_to_part("a||b");
-        assert_eq!(1, vec.len());
+        assert_eq!(3, vec.len());
         assert_eq!("a", vec[0]);
+        assert_eq!("", vec[1]);
+        assert_eq!("b", vec[2]);
 
         let vec = key_to_part("a|b|");
-        assert_eq!(2, vec.len());
+        assert_eq!(3, vec.len());
         assert_eq!("a", vec[0]);
         assert_eq!("b", vec[1]);
+        assert_eq!("", vec[2]);
 
         let vec = key_to_part("a|b");
         assert_eq!(2, vec.len());
@@ -516,7 +516,7 @@ mod build_for_part_test {
     }
 
     #[test]
-    fn more_than_three_part_test() {
+    fn status_test() {
         let mut list: Vec<String> = vec![];
         let mut set: HashSet<String> = HashSet::new();
         let _ = build_for_part(&mut set, &mut list, "m|0|a|dfdfd", ">");
@@ -531,5 +531,21 @@ mod build_for_part_test {
         assert_eq!(" and para = 'a'", list[2]);
         assert_eq!(" and state_version > dfdfd", list[3]);
         assert_eq!(" and state_version < eeefddi", list[4]);
+    }
+
+    #[test]
+    fn para_empty_status_test() {
+        let mut list: Vec<String> = vec![];
+        let mut set: HashSet<String> = HashSet::new();
+        let _ = build_for_part(&mut set, &mut list, "m|0||dfdfd", ">");
+        assert_eq!(3, set.len());
+        assert_eq!(true, set.contains("m"));
+        assert_eq!(true, set.contains("m|0"));
+        assert_eq!(true, set.contains("m|0|"));
+        assert_eq!(4, list.len());
+        assert_eq!(" and meta = 'm'", list[0]);
+        assert_eq!(" and ins_id = 0", list[1]);
+        assert_eq!(" and para = ''", list[2]);
+        assert_eq!(" and state_version > dfdfd", list[3]);
     }
 }
