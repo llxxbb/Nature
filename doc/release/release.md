@@ -1,5 +1,11 @@
 # 发布的功能
 
+## Release 0.22.2 2021-02-13
+
+Optimize: support recent `Instance` for management UI.
+bug fix: query `Instance` by id
+Optimize: query `Instance` by key
+
 ## Release 0.22.1
 
 - manager interface: query downstream for `Instance`
