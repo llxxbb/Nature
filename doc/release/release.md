@@ -2,9 +2,9 @@
 
 ## Release 0.22.2 2021-02-13
 
-Optimize: support recent `Instance` for management UI.
-bug fix: query `Instance` by id
-Optimize: query `Instance` by key
+- Optimize: support recent `Instance` for management UI.
+- bug fix: query `Instance` by id
+- Optimize: query `Instance` by key
 
 ## Release 0.22.1
 
@@ -12,8 +12,8 @@ Optimize: query `Instance` by key
 
 ## Release 0.22.0
 
-Manager: add `Instance` interface for UI management
-change `Instance` id from u64, so that js long will be work fine
+- Manager: add `Instance` interface for UI management
+- change `Instance` id from u64, so that js long will be work fine
 
 ## Release 0.21.1 2021-01-23
 
@@ -21,9 +21,9 @@ change manage client port to 8280 to avoid conflict with nature.exe
 
 ## Release 0.21.0 2021-01-16
 
-add manager backend(will be used by Nature-Manager-UI)
-db:meta add id field
-db:relation add id field
+- add manager backend(will be used by Nature-Manager-UI)
+- db:meta add id field
+- db:relation add id field
 
 ## Release 0.20.3 2020-11-21
 
