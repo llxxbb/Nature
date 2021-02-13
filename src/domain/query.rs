@@ -9,6 +9,8 @@ use crate::util::*;
 /// le: less than or equal, only valid on the last part of the [key]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct KeyCondition {
+    #[serde(skip_serializing_if = "is_default")]
+    #[serde(default)]
     pub id: String,
     pub meta: String,
     #[serde(skip_serializing_if = "is_default")]

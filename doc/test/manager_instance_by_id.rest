@@ -2,21 +2,21 @@ POST
 http://localhost:8180/instance/byId
 @Content-Type: application/json
 {
-    "id": "343203022136596708",
+    "id": "14988181541190564681",
     "meta": "B:finance/payment:1",
     "para": "",
     "state_version": 0
 }
 
 %%%
-# Duration: 7 ms
+# Duration: 21 ms
 # POST
 # http://localhost:8180/instance/byId
 # Headers
 # @Content-Type: application/json
 # Body
 # {
-#     "id": "343203022136596708",
+#     "id": "14988181541190564681",
 #     "meta": "B:finance/payment:1",
 #     "para": "",
 #     "state_version": 0
@@ -25,8 +25,8 @@ http://localhost:8180/instance/byId
 
 # status 200
 
-@content-length: 263
+@content-length: 265
 @content-type: application/json
-@date: Sat, 30 Jan 2021 12:02:43 GMT
+@date: Fri, 12 Feb 2021 13:18:27 GMT
 
-{"Ok":{"id":"343203022136596708","data":{"meta":"B:finance/payment:1","content":"{\"order\":\"10071269418607538781\",\"from_account\":\"b\",\"paid\":200,\"pay_time\":1612007992419}","sys_context":{"target.id":"10071269418607538781"}},"create_time":1612007992000}}
+{"Ok":{"id":"14988181541190564681","data":{"meta":"B:finance/payment:1","content":"{\"order\":\"10071269418607538781\",\"from_account\":\"c\",\"paid\":700,\"pay_time\":1613131828711}","sys_context":{"target.id":"10071269418607538781"}},"create_time":1613131828000}}

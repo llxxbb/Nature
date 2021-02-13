@@ -1,4 +1,5 @@
 use std::collections::HashSet;
+use std::str::FromStr;
 use std::sync::Arc;
 
 use chrono::{Local, TimeZone};
@@ -104,7 +105,7 @@ impl InstanceDaoImpl {
             limit 1";
         let p = params! {
             "meta" => f_para.meta.to_string(),
-            "ins_id" => f_para.id,
+            "ins_id" => u64::from_str(&f_para.id)?,
             "para" => f_para.para,
             "state_version" => f_para.state_version,
         };
@@ -225,7 +226,7 @@ impl KeyRange for InstanceDaoImpl {
         let sql = format!("SELECT meta, ins_id, para, content, context, states, state_version, create_time, sys_context, from_key
             FROM instances
             where 1=1{}{}{}{}
-            order by meta, ins_id, para, state_version desc
+            order by meta, create_time desc, state_version desc
             limit :limit", time_ge, time_lt, key, meta);
 
         let p = params! {
