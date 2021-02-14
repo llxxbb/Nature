@@ -5,10 +5,8 @@
 - 功能性先于非功能性需求
 - 应用情景支持，内部优先于外部（如网关）
 
-## Release 0.22.3
+## Release 0.22.4
 
-bug fix: get_by_key_range
-optimize `KeyCondition`
 
 ### It should commit
 

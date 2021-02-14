@@ -1,5 +1,10 @@
 # 发布的功能
 
+## Release 0.22.3 2021-02-14
+
+- bug fix: get_by_key_range
+- optimize `KeyCondition`
+
 ## Release 0.22.2 2021-02-13
 
 - Optimize: support recent `Instance` for management UI.
