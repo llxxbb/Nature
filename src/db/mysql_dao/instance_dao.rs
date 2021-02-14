@@ -98,6 +98,7 @@ impl InstanceDaoImpl {
     }
 
     pub async fn get_by_id(f_para: KeyCondition) -> Result<Option<Instance>> {
+        let id = if f_para.id.is_empty() { "0" } else { &f_para.id };
         let sql = r"SELECT meta, ins_id, para, content, context, states, state_version, create_time, sys_context, from_key
             FROM instances
             where meta = :meta and ins_id = :ins_id and para = :para and state_version = :state_version
@@ -105,7 +106,7 @@ impl InstanceDaoImpl {
             limit 1";
         let p = params! {
             "meta" => f_para.meta.to_string(),
-            "ins_id" => u64::from_str(&f_para.id)?,
+            "ins_id" => u64::from_str(id)?,
             "para" => f_para.para,
             "state_version" => f_para.state_version,
         };
@@ -252,9 +253,6 @@ fn key_to_part(key: &str) -> Vec<String> {
     let parts: Vec<&str> = key.split(&*SEPARATOR_INS_KEY).collect();
     let mut rtn: Vec<String> = vec![];
     for part in parts {
-        if part.is_empty() {
-            break;
-        }
         rtn.push(part.to_string());
     }
     rtn
@@ -274,11 +272,13 @@ fn build_for_part(set: &mut HashSet<String>, list: &mut Vec<String>, parts: &str
         list.push(" and meta ".to_owned() + end_sign + " '" + &vec[0] + "'")
     }
     if vec.len() > 2 {
+        let id = if vec[1].is_empty() { "0" } else { &vec[1] };
         if set.insert(vec[0].clone() + &*SEPARATOR_INS_KEY + &vec[1]) {
-            list.push(" and ins_id = ".to_owned() + &vec[1])
+            list.push(" and ins_id = ".to_owned() + id)
         }
     } else if vec.len() == 2 {
-        list.push(" and ins_id ".to_owned() + end_sign + " " + &vec[1])
+        let id = if vec[1].is_empty() { "0" } else { &vec[1] };
+        list.push(" and ins_id ".to_owned() + end_sign + " " + id)
     }
     if vec.len() > 3 {
         if set.insert(vec[0].clone() + &*SEPARATOR_INS_KEY + &vec[1] + &*SEPARATOR_INS_KEY + &vec[2]) {
@@ -320,7 +320,7 @@ mod test {
         let _ = dbg!(result);
     }
 
-    #[test]
+    #[ignore]
     #[allow(dead_code)]
     fn query_by_id() {
         env::set_var("DATABASE_URL", "mysql://root@localhost/nature");
@@ -420,13 +420,16 @@ mod test {
     #[test]
     fn key_to_part_test() {
         let vec = key_to_part("a||b");
-        assert_eq!(1, vec.len());
+        assert_eq!(3, vec.len());
         assert_eq!("a", vec[0]);
+        assert_eq!("", vec[1]);
+        assert_eq!("b", vec[2]);
 
         let vec = key_to_part("a|b|");
-        assert_eq!(2, vec.len());
+        assert_eq!(3, vec.len());
         assert_eq!("a", vec[0]);
         assert_eq!("b", vec[1]);
+        assert_eq!("", vec[2]);
 
         let vec = key_to_part("a|b");
         assert_eq!(2, vec.len());
@@ -500,6 +503,32 @@ mod build_for_part_test {
     }
 
     #[test]
+    fn id_empty_end_sign_test() {
+        let mut list: Vec<String> = vec![];
+        let mut set: HashSet<String> = HashSet::new();
+        let _ = build_for_part(&mut set, &mut list, "m|", ">");
+        assert_eq!(1, set.len());
+        assert_eq!(true, set.contains("m"));
+        assert_eq!(2, list.len());
+        assert_eq!(" and meta = 'm'", list[0]);
+        assert_eq!(" and ins_id > 0", list[1]);
+    }
+
+    #[test]
+    fn id_empty_equal_test() {
+        let mut list: Vec<String> = vec![];
+        let mut set: HashSet<String> = HashSet::new();
+        let _ = build_for_part(&mut set, &mut list, "m||a", ">");
+        assert_eq!(2, set.len());
+        assert_eq!(true, set.contains("m"));
+        assert_eq!(true, set.contains("m|"));
+        assert_eq!(3, list.len());
+        assert_eq!(" and meta = 'm'", list[0]);
+        assert_eq!(" and ins_id = 0", list[1]);
+        assert_eq!(" and para > 'a'", list[2]);
+    }
+
+    #[test]
     fn para_test() {
         let mut list: Vec<String> = vec![];
         let mut set: HashSet<String> = HashSet::new();
@@ -516,7 +545,7 @@ mod build_for_part_test {
     }
 
     #[test]
-    fn more_than_three_part_test() {
+    fn status_test() {
         let mut list: Vec<String> = vec![];
         let mut set: HashSet<String> = HashSet::new();
         let _ = build_for_part(&mut set, &mut list, "m|0|a|dfdfd", ">");
@@ -531,5 +560,21 @@ mod build_for_part_test {
         assert_eq!(" and para = 'a'", list[2]);
         assert_eq!(" and state_version > dfdfd", list[3]);
         assert_eq!(" and state_version < eeefddi", list[4]);
+    }
+
+    #[test]
+    fn para_empty_status_test() {
+        let mut list: Vec<String> = vec![];
+        let mut set: HashSet<String> = HashSet::new();
+        let _ = build_for_part(&mut set, &mut list, "m|0||dfdfd", ">");
+        assert_eq!(3, set.len());
+        assert_eq!(true, set.contains("m"));
+        assert_eq!(true, set.contains("m|0"));
+        assert_eq!(true, set.contains("m|0|"));
+        assert_eq!(4, list.len());
+        assert_eq!(" and meta = 'm'", list[0]);
+        assert_eq!(" and ins_id = 0", list[1]);
+        assert_eq!(" and para = ''", list[2]);
+        assert_eq!(" and state_version > dfdfd", list[3]);
     }
 }

@@ -12,6 +12,8 @@ pub struct KeyCondition {
     #[serde(skip_serializing_if = "is_default")]
     #[serde(default)]
     pub id: String,
+    #[serde(skip_serializing_if = "is_default")]
+    #[serde(default)]
     pub meta: String,
     #[serde(skip_serializing_if = "is_default")]
     #[serde(default)]

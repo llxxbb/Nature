@@ -4,7 +4,11 @@ English|[中文](README.md)
 
 ## What is Nature？
 
-It's a low code platform, it's a tool of data orchestration. But the most important is it goes right to the heart of the business, standardize and simplify the implementation of complex businesses in a simple way. As long as you're willing, Nature can help you extract the business control logic and centrally manage it so that the system has the brain and says goodbye to the brainless era of traditional systems. For its design philosophy, please see [Nature architecture](doc/EN/help/architecture.md), Nature has the following technical features:
+It's a low code platform, and a tool of data orchestration. But the most important is it goes right to the heart of the business, standardize and simplify the implementation of complex businesses in a simple way. As long as you're willing, Nature can help you extract the business control logic and centrally manage it so that the system has the brain and says goodbye to the brainless era of traditional systems. 
+
+Why Nature can simplify system design, please refer to [The problem of existing development mechanism analysis and solving methods](doc/ZH/natureBusinessValue.md). Nature's view of Nature, time-space view, philosophy and mathematics expression see:  [Nature architecture](doc/EN/help/architecture.md).
+
+Nature has the following technical features:
 
 ### Distributed Stream-Compute-Engine
 
@@ -88,19 +92,19 @@ We need to do the following
 
 In this mode, you can organize how the business to work.
 
-![main](https://raw.githubusercontent.com/llxxbb/Nature-Manager-UI/main/doc/relation.png)
+![main](https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/220df8638696ef9367b1c925f0a346125ba65d89414d9e4023ba5264c0eb7d821634726567acb1af547364aa257c97d7?pictype=scale&from=30113&version=3.3.3.3&uin=309577603&fname=relation.png&size=750)
 
 ### Domain Mode
 
 In this mode, you can organize the business domain.
 
-![main](https://raw.githubusercontent.com/llxxbb/Nature-Manager-UI/main/doc/domain.png)
+![main](https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/c3daeb79f2ef30b58c10d1a1bd2d7ea2d7e2bf5eda7c4e959e1c9c1dd78d894428758e02d24438a0f97be3c83b8e3e11?pictype=scale&from=30113&version=3.3.3.3&uin=309577603&fname=domain.png&size=750)
 
 ### Instance Mode
 
 In this mode, you can see the data flow
 
-![main](https://raw.githubusercontent.com/llxxbb/Nature-Manager-UI/main/doc/instance.png)
+![main](https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/e601da14497c958843e818fec49d81d5f9142c721a9e8da2e776188bd0e61f6a303aa16a1306d556211ab4118d32ce28?pictype=scale&from=30113&version=3.3.3.3&uin=309577603&fname=instance.png&size=750)
 
 ## Learn more about Nature
 

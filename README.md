@@ -4,7 +4,11 @@
 
 ## Nature 是什么？
 
-Nature 是一个低代码平台，Nature 是一个数据编排工具，然而最为重要的是它可以直达业务核心，用简单的方式来规范和简化复杂的业务的实现。只要你愿意 Nature 能帮助你抽取所以的业务控制逻辑并集中管理，让的系统拥有大脑，告别传统系统的无脑时代。其设计理念请参见：[Nature 架构思想](doc/ZH/help/architecture.md)，Nature 具有下面的技术特性：
+Nature 是一个低代码平台，也是一个数据编排工具，然而最为重要的是它可以直达业务核心，用简单的方式来规范和简化复杂的业务的实现。只要你愿意 Nature 能帮助你抽取所以的业务控制逻辑并集中管理，让的系统拥有大脑，告别传统系统的无脑时代。
+
+Nature 为什么能够简化系统的设计请参考，[现有开发模式的问题分析及解决方法](doc/ZH/natureBusinessValue.md)。Nature 的自然观、时空观、哲学观以及数学表达请参见：[Nature 架构思想](doc/ZH/help/architecture.md)。
+
+Nature 具有下面的技术特性：
 
 ### 分布式流式计算引擎
 
@@ -89,19 +93,19 @@ Nature 运行时模式中的 `map` 对应 `Relation`  中的 `Executor`。Nature
 
 该模式下，你可以设计如何让业务运转起来。
 
-![main](https://raw.githubusercontent.com/llxxbb/Nature-Manager-UI/main/doc/relation.png)
+![main](https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/220df8638696ef9367b1c925f0a346125ba65d89414d9e4023ba5264c0eb7d821634726567acb1af547364aa257c97d7?pictype=scale&from=30113&version=3.3.3.3&uin=309577603&fname=relation.png&size=750)
 
 ### 领域模式
 
 该模式下，可方便进行业务领域的划分。
 
-![main](https://raw.githubusercontent.com/llxxbb/Nature-Manager-UI/main/doc/domain.png)
+![main](https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/c3daeb79f2ef30b58c10d1a1bd2d7ea2d7e2bf5eda7c4e959e1c9c1dd78d894428758e02d24438a0f97be3c83b8e3e11?pictype=scale&from=30113&version=3.3.3.3&uin=309577603&fname=domain.png&size=750)
 
 ### 数据模式
 
 该模式下，你可以方便地看到数据是如何流转的。
 
-![main](https://raw.githubusercontent.com/llxxbb/Nature-Manager-UI/main/doc/instance.png)
+![main](https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/e601da14497c958843e818fec49d81d5f9142c721a9e8da2e776188bd0e61f6a303aa16a1306d556211ab4118d32ce28?pictype=scale&from=30113&version=3.3.3.3&uin=309577603&fname=instance.png&size=750)
 
 ## 深入了解Nature
 
