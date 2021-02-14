@@ -4,7 +4,11 @@ English|[中文](README.md)
 
 ## What is Nature？
 
-It's a low code platform, it's a tool of data orchestration. But the most important is it goes right to the heart of the business, standardize and simplify the implementation of complex businesses in a simple way. As long as you're willing, Nature can help you extract the business control logic and centrally manage it so that the system has the brain and says goodbye to the brainless era of traditional systems. For its design philosophy, please see [Nature architecture](doc/EN/help/architecture.md), Nature has the following technical features:
+It's a low code platform, and a tool of data orchestration. But the most important is it goes right to the heart of the business, standardize and simplify the implementation of complex businesses in a simple way. As long as you're willing, Nature can help you extract the business control logic and centrally manage it so that the system has the brain and says goodbye to the brainless era of traditional systems. 
+
+Why Nature can simplify system design, please refer to [The problem of existing development mechanism analysis and solving methods](doc/ZH/natureBusinessValue.md). Nature's view of Nature, time-space view, philosophy and mathematics expression see:  [Nature architecture](doc/EN/help/architecture.md).
+
+Nature has the following technical features:
 
 ### Distributed Stream-Compute-Engine
 
