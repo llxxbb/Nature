@@ -1,5 +1,4 @@
 use std::collections::HashSet;
-use std::str::FromStr;
 use std::sync::Arc;
 
 use chrono::{Local, TimeZone};
@@ -83,10 +82,9 @@ impl InstanceDaoImpl {
             where meta = :meta and ins_id = :ins_id and para = :para
             order by state_version desc
             limit 1";
-        let id = f_para.id.to_string();
         let p = params! {
             "meta" => f_para.meta.to_string(),
-            "ins_id" => id,
+            "ins_id" => f_para.get_id()?,
             "para" => f_para.para.to_string(),
         };
         let rtn = MySql::fetch(sql, p, RawInstance::from).await?;
@@ -98,7 +96,6 @@ impl InstanceDaoImpl {
     }
 
     pub async fn get_by_id(f_para: KeyCondition) -> Result<Option<Instance>> {
-        let id = if f_para.id.is_empty() { "0" } else { &f_para.id };
         let sql = r"SELECT meta, ins_id, para, content, context, states, state_version, create_time, sys_context, from_key
             FROM instances
             where meta = :meta and ins_id = :ins_id and para = :para and state_version = :state_version
@@ -106,7 +103,7 @@ impl InstanceDaoImpl {
             limit 1";
         let p = params! {
             "meta" => f_para.meta.to_string(),
-            "ins_id" => u64::from_str(id)?,
+            "ins_id" => f_para.get_id()?,
             "para" => f_para.para,
             "state_version" => f_para.state_version,
         };
@@ -123,7 +120,7 @@ impl InstanceDaoImpl {
             WHERE meta = :meta and ins_id = :ins_id and para = :para";
         let p = params! {
             "meta" => ins.meta.to_string(),
-            "ins_id" => ins.id.to_string(),
+            "ins_id" => ins.get_id()?,
             "para" => ins.para.to_string(),
         };
         let rtn = MySql::idu(sql, p).await?;
@@ -312,6 +309,7 @@ mod test {
     }
 
     #[test]
+    #[ignore]
     #[allow(dead_code)]
     fn get_last_state_test() {
         env::set_var("DATABASE_URL", "mysql://root@localhost/nature");
@@ -320,6 +318,7 @@ mod test {
         let _ = dbg!(result);
     }
 
+    #[test]
     #[ignore]
     #[allow(dead_code)]
     fn query_by_id() {

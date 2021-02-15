@@ -67,10 +67,7 @@ impl RawInstance {
     pub fn new(instance: &Instance) -> Result<RawInstance> {
         Ok(RawInstance {
             meta: instance.meta.to_string(),
-            ins_id: match instance.id.is_empty() {
-                true => 0,
-                _ => u64::from_str(&instance.id)?,
-            },
+            ins_id: instance.get_id()?,
             para: instance.para.to_string(),
             content: {
                 if instance.content.len() > *INSTANCE_CONTENT_MAX_LENGTH.deref() {

@@ -10,6 +10,11 @@
 
 ### It should commit
 
+- bug fix : FromInstance id problem
+  
+- optimize for the using of KeyCondition.id
+- optimize for the using of Instance.id
+  
 
 ### 未完成
 

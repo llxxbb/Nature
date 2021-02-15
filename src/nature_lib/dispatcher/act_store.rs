@@ -1,4 +1,3 @@
-use std::str::FromStr;
 use std::thread::sleep;
 use std::time::Duration;
 
@@ -50,10 +49,7 @@ async fn duplicated_instance(task: TaskForStore, carrier: RawTask) -> Result<()>
         Some(from) => from,
     };
     let para = IDAndFrom {
-        id: match task.instance.id.is_empty() {
-            true => 0,
-            _ => u64::from_str(&task.instance.id)?
-        },
+        id: task.instance.get_id()?,
         meta: task.instance.meta.clone(),
         from_key: ins_from.to_string(),
     };

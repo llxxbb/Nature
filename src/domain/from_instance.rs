@@ -5,6 +5,8 @@ use crate::util::*;
 
 #[derive(Serialize, Deserialize, Debug, Default, Clone, PartialEq, Eq, Hash)]
 pub struct FromInstance {
+    #[serde(skip_serializing_if = "is_default")]
+    #[serde(default)]
     pub id: String,
     pub meta: String,
     #[serde(skip_serializing_if = "is_default")]
@@ -28,6 +30,9 @@ impl FromInstance {
             state_version: 0,
         };
         Ok(rtn)
+    }
+    pub fn get_id(&self) -> Result<u64> {
+        if self.id.is_empty() { Ok(0) } else { Ok(u64::from_str(&self.id)?) }
     }
 }
 
@@ -64,7 +69,8 @@ impl FromStr for FromInstance {
 impl ToString for FromInstance {
     fn to_string(&self) -> String {
         let sep: &str = &*SEPARATOR_INS_KEY;
-        format!("{}{}{}{}{}{}{}", self.meta, sep, self.id, sep, self.para, sep, self.state_version)
+        let id = if self.id == "0" { "" } else { &self.id };
+        format!("{}{}{}{}{}{}{}", self.meta, sep, id, sep, self.para, sep, self.state_version)
     }
 }
 

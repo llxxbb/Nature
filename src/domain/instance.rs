@@ -3,6 +3,7 @@ use std::collections::HashSet;
 use std::hash::{Hash, Hasher};
 use std::iter::Iterator;
 use std::ops::{Deref, DerefMut};
+use std::str::FromStr;
 
 use chrono::prelude::*;
 use futures::Future;
@@ -61,7 +62,7 @@ impl Instance {
 
     pub fn revise(&mut self) -> Result<&mut Self> {
         self.create_time = Local::now().timestamp_millis();
-        if self.para.is_empty() && self.id == "" {
+        if self.para.is_empty() && self.get_id()? == 0 {
             self.id = generate_id(&self.data)?.to_string();
         }
         Ok(self)
@@ -97,12 +98,17 @@ impl Instance {
 
     pub fn get_key(&self) -> String {
         let sep: &str = &*SEPARATOR_INS_KEY;
-        format!("{}{}{}{}{}{}{}", self.meta, sep, self.id, sep, self.para, sep, self.state_version)
+        let id = if self.id == "0" { "" } else { &self.id };
+        format!("{}{}{}{}{}{}{}", self.meta, sep, id, sep, self.para, sep, self.state_version)
     }
 
     pub fn key_no_state(&self) -> String {
         let sep: &str = &*SEPARATOR_INS_KEY;
-        format!("{}{}{}{}{}", self.meta, sep, self.id, sep, self.para)
+        let id = if self.id == "0" { "" } else { &self.id };
+        format!("{}{}{}{}{}", self.meta, sep, id, sep, self.para)
+    }
+    pub fn get_id(&self) -> Result<u64> {
+        if self.id.is_empty() { Ok(0) } else { Ok(u64::from_str(&self.id)?) }
     }
 }
 
@@ -227,7 +233,7 @@ impl SelfRouteInstance {
     }
     pub fn to_instance(&self) -> Instance {
         Instance {
-            id: "0".to_string(),
+            id: "".to_string(),
             data: self.instance.data.clone(),
             create_time: 0,
         }

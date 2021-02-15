@@ -1,5 +1,6 @@
 use crate::domain::*;
 use crate::util::*;
+use std::str::FromStr;
 
 /// Condition for querying multi-row of `Instance`
 /// key format [meta|id|para|status_version]
@@ -66,11 +67,16 @@ impl KeyCondition {
     }
     pub fn para_like(&self) -> String {
         let sep: &str = &*SEPARATOR_INS_KEY;
-        format!("{}{}{}{}%", self.meta, sep, self.id, sep)
+        let id = if self.id == "0" { "" } else { &self.id };
+        format!("{}{}{}{}%", self.meta, sep, id, sep)
     }
     pub fn get_key(&self) -> String {
         let sep: &str = &*SEPARATOR_INS_KEY;
-        format!("{}{}{}{}{}", self.meta, sep, self.id, sep, self.para)
+        let id = if self.id == "0" { "" } else { &self.id };
+        format!("{}{}{}{}{}", self.meta, sep, id, sep, self.para)
+    }
+    pub fn get_id(&self) -> Result<u64> {
+        if self.id.is_empty() { Ok(0) } else { Ok(u64::from_str(&self.id)?) }
     }
 }
 

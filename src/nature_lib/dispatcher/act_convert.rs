@@ -1,8 +1,8 @@
 use actix_rt::Runtime;
 
 use crate::db::{C_M, D_M, D_T, InstanceDaoImpl, MetaCache, Mission, RawTask, TaskDao};
-use crate::nature_lib::dispatcher::{after_converted, process_null, received_self_route};
 use crate::domain::*;
+use crate::nature_lib::dispatcher::{after_converted, process_null, received_self_route};
 use crate::nature_lib::middleware::filter::convert_after;
 use crate::nature_lib::task::{call_executor, TaskForConvert};
 
@@ -108,7 +108,7 @@ async fn init_target_id_for_sys_context(task: &mut TaskForConvert, from_instance
     }
     let master = setting.master.unwrap();
     if master.eq(&from_instance.meta) {
-        task.target.sys_context.insert(CONTEXT_TARGET_INSTANCE_ID.to_string(), format!("{}", from_instance.id));
+        task.target.sys_context.insert(CONTEXT_TARGET_INSTANCE_ID.to_string(), from_instance.id.to_string());
         return;
     }
     let f_meta: Meta = C_M.get(&task.from.meta, &*D_M).await.unwrap();
