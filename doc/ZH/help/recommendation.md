@@ -20,7 +20,7 @@
 
 ### 生成具有不同 MetaType 的多个实例
 
-可以使用 `MetaType::Multi`来作为下游的输出。请参考 [demo](https://github.com/llxxbb/Nature-Demo) 中的 销售统计部分
+可以使用 `MetaType::Multi`来作为下游的输出。请参考 [demo](../../../nature-demo/README.md) 中的 销售统计部分
 
 ### 重复生成相同实例
 
@@ -28,7 +28,7 @@
 
 ## 海量数据统计
 
-如需要进行海量数据的统计，请考虑使用 `MetaType::Loop` （参考[meta.md](meta.md)）并结合 [内置过滤器](built-in.md) `instance-loader`来实现。请参考 [demo](https://github.com/llxxbb/Nature-Demo) 中的 销售统计部分
+如需要进行海量数据的统计，请考虑使用 `MetaType::Loop` （参考[meta.md](meta.md)）并结合 [内置过滤器](built-in.md) `instance-loader`来实现。请参考 [demo](../../../nature-demo/README.md) 中的 销售统计部分
 
 ## 避免多次触发重型任务
 

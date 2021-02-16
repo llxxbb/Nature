@@ -9,11 +9,7 @@ Nature 缺省使用  mysql 数据库，请自行准备，下面是自行编译�
 
 ### 下载代码
 
-下载下面项目的代码到同一个目录下
-
-- https://github.com/llxxbb/Nature
-- https://github.com/llxxbb/Nature-Integrate-Test-Executor
-- https://github.com/llxxbb/Nature-Demo
+下载项目代码: https://github.com/llxxbb/Nature
 
 ### 编译项目
 

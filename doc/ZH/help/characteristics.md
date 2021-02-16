@@ -16,7 +16,7 @@ Nature 只能插入数据不能变更数据，`Instance`一旦生成既被永久
 - 预分配ID：在调用Nature 之前预先生成一个ID，或许 facebook 的 snowflake ID 生成器算法是一个不错的选择。使用此ID作为`Instance`的ID，这样当出现环境问题时使用相同的ID提交数据到 Nature 就不会存储多条数据了。如果你不提供ID，Nature 会使用哈希算法为你生成一个。
 - para: 外部已经存在的数据导入 Nature 时 para 会很有用。此时 Para 可以是唯一标识外部数据的ID。如果使用 para，一般情况下 `Instance` 的 ID 置0。
 
-Nature 是支持状态数据的，那么 Nature 如何保证数据不被修改？答案是版本。Nature 为状态数据的每一次状态变更都会生成一个新的`Instance`，但这些不同状态的`Instance`拥有相同的ID和`Meta`，只是版本号是不同的。如 [Demo](https://github.com/llxxbb/Nature-Demo) 中的订单状态。
+Nature 是支持状态数据的，那么 Nature 如何保证数据不被修改？答案是版本。Nature 为状态数据的每一次状态变更都会生成一个新的`Instance`，但这些不同状态的`Instance`拥有相同的ID和`Meta`，只是版本号是不同的。如 [Demo](../../../nature-demo/README.md) 中的订单状态。
 
 ## 防重机制
 
@@ -99,7 +99,7 @@ Loop -> downstream
 
 **注意**：对于 `MetaType::Loop` 来讲 `MetaSetting.only_one`如果设置为 true, Nature 会将要输出的 Instance 视为有状态的，只有这样才能实现结果的叠加，才能完成形如 input + old = new 这种形式的数据处理。但你不能把`MetaType::Loop` 的目标 Meta 设置为有状态的！因为从 Nature 外部来看我们只要一个最终结果而不是中间结果，如果置为状态数据会让人感觉到非常奇怪。为了实现这种效果，Nature会把中间结果作为 last_state 数据并带到下一个批次里处理直到完成为止。
 
-批量的控制来源于 Nature 的一个[内置Executor](built-in.md)：`instance-loader` 后面有这样的示例，请参考：[示例及功能讲解](https://github.com/llxxbb/Nature-Demo)。
+批量的控制来源于 Nature 的一个[内置Executor](built-in.md)：`instance-loader` 后面有这样的示例，请参考：[示例及功能讲解](../../../nature-demo/README.md)。
 
 ## 上下文
 
@@ -111,7 +111,7 @@ Loop -> downstream
 - loop.task：用于传递批数据的处理规则，只有第一个批次可以取得处理规则。
 - loop.finished：标记所有批次是否处理完成。
 
-除了这些外，还有用于桥接的系统上下文：`target.id` 和 `target.para`。当有 A->B->C的链路时，C想使用A的ID作为自己的ID,而B没有使用A的ID，这时候就需要B架一个桥了。当B为另一个体系的数据时会有这个问题。请参考：[示例及功能讲解](https://github.com/llxxbb/Nature-Demo)。
+除了这些外，还有用于桥接的系统上下文：`target.id` 和 `target.para`。当有 A->B->C的链路时，C想使用A的ID作为自己的ID,而B没有使用A的ID，这时候就需要B架一个桥了。当B为另一个体系的数据时会有这个问题。请参考：[示例及功能讲解](../../../nature-demo/README.md)。
 
 还有用于动态参数替换的系统上下文：`para.dynamic`。一般我们在配置 Relation 数据时，都是定义好的固定内容。但有时候我们需要运行时确定一些参数，这时候就需要该上下文了。
 

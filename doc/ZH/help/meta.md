@@ -78,9 +78,9 @@ s1[s1-1,s1-2,s1-3|s1-4],s2|s3,s4
 }
 ```
 
-- master: 为指向另一个 `Meta` 的 `Meta-String` 。master 所对应的 `Instance` 有几个作用：一是作用 `master` 属性传递给 `Executor`, 这点对于业务的基本信息与状态信息分离是非常便利的，如[示例](https://github.com/llxxbb/Nature-Demo)里的订单与订单状态数据的分离。 二是其id会作为当前`instance`的id。 三是 Nature 实现自动 `Executor` 魔法的依据。注意：如果 [`Relation`](relation.md) 的设置中使用了 `use_upstream_id` ，则优先使用 上游 `Instance`的id。
+- master: 为指向另一个 `Meta` 的 `Meta-String` 。master 所对应的 `Instance` 有几个作用：一是作用 `master` 属性传递给 `Executor`, 这点对于业务的基本信息与状态信息分离是非常便利的，如[示例](../../../nature-demo/README.md)里的订单与订单状态数据的分离。 二是其id会作为当前`instance`的id。 三是 Nature 实现自动 `Executor` 魔法的依据。注意：如果 [`Relation`](relation.md) 的设置中使用了 `use_upstream_id` ，则优先使用 上游 `Instance`的id。
 - multi_meta： 为 `Meta-String` 数组。`MetaType` 为 M 的 `Meta` 可以允许`Executor` 返回多个不同`Meta`的`Instance`。而这些用于返回的 `Meta` 必须在这里定义，且也必须作为独立的 `Meta` 进行定义。**注意**：`multi_meta` 不能含有状态 `Meta`。**注意**：如果`multi_meta` 只有一个值（一般常见于MetaType为L的`Meta`），则`Executor` 无需明确给出出参 `Instance` 的 `meta` 属性， Nature会自动填充；如果`multi_meta` 多于一个值，则 `Executor` 的出参必须明确给出 `Instance.meta` 的值。
-- cache_saved：为 true 则将生成的 `Instance` 缓存一小段时间，用于避免重复写库以提升效率。常见于不同上游生成相同下游的情况，如[示例](https://github.com/llxxbb/Nature-Demo)中的生成的定时统计任务`Instance`。**危险提醒**：错误地使用此选项可能会消耗大量内存，甚至溢出！缓存时间由 `.env` 文件中的 `CACHE_SAVED_TIME` 选项指定。
+- cache_saved：为 true 则将生成的 `Instance` 缓存一小段时间，用于避免重复写库以提升效率。常见于不同上游生成相同下游的情况，如[示例](../../../nature-demo/README.md)中的生成的定时统计任务`Instance`。**危险提醒**：错误地使用此选项可能会消耗大量内存，甚至溢出！缓存时间由 `.env` 文件中的 `CACHE_SAVED_TIME` 选项指定。
 - only_one：只对`MetaType` 为 L 的 `Meta` 有效，用于标记 Loop 是否只有一个下游 `Instance` 输出。如果为 false，则 Loop 的每次调用都可以生成多个不同 Meta 的 `Instance`, 而这些 Meta 由 `multi_meta` 属性给出。 如果为 true ，Nature 则视当前定义的 `Meta` 为一个状态 `Meta`，用于 Loop 每次调用时存放状态数据(内容为 `multi_meta` 指定的 `Meta` 对应的 `Instance` ) 以服务于下次 Loop，注意此种情况下`multi_meta` 只能定义一个元素，之所以用这种方式处理是因为：
   - `multi_meta`  不能接受状态数据，因为同时处理多个状态数据在架构支持上极其复杂。
   - 从用户角度来看用户并不期待 Loop 的中间结果，所以 `multi_meta` 里没有必要是状态数据。

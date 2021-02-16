@@ -1,4 +1,4 @@
-# A concrete example
+# Concrete examples
 
 English|[中文](README.md)
 
@@ -13,15 +13,6 @@ If you are the first time to know Nature,  It's best to view this demo from top 
 Each chapter include little key-points of Nature, this let you come to know Nature.
 
 In the whole demo description. there are some sections titled with **"Nature key points"** that would mind your attention how to do the thing in Nature way.
-
-## Demo projects
-
-Nature have provide all implement for this demo. you will find all of them in the following projects.
-
-- [test entry](https://github.com/llxxbb/Nature-Demo)
-- [common defines](https://github.com/llxxbb/Nature-Demo-Common)
-- [converter](https://github.com/llxxbb/Nature-Demo-Converter)
-- [restful-converter](https://github.com/llxxbb/Nature-Demo-Converter-Restful)
 
 ## Let‘s begin
 

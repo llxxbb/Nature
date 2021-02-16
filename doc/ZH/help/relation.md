@@ -178,4 +178,4 @@ para.dynamic = "[[\"(item_id)\":\"123\"]]"
 {"para.dynamic":"[[\"key\",\"value\"]]"}
 ```
 
-其中的 key 来源于 `dynamic_para`  对应的值，而 value 则来源于 `append_para` 生成的附加值。`para.dynamic` 的作用为替换`Executor.settings`中的变量，请参考 [Demo](https://github.com/llxxbb/Nature-Demo) 中的销售统计。
+其中的 key 来源于 `dynamic_para`  对应的值，而 value 则来源于 `append_para` 生成的附加值。`para.dynamic` 的作用为替换`Executor.settings`中的变量，请参考 [Demo](../../../nature-demo/README.md) 中的销售统计。

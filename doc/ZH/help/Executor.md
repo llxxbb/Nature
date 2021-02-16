@@ -6,7 +6,7 @@
 - convert_before: 用于 `Instance` 转换前的预处理，如数据格式的修正，数据加载等。
 - convert_after: 用于转换后 `Instance` 的后置处理。
 
-这三种形式的 `Executor` 都可以在 [Nature-Demo](https://github.com/llxxbb/Nature-Demo) 项目中找到对应的示例。
+这三种形式的 `Executor` 都可以在 [Nature-Demo](../../../nature-demo/README.md) 项目中找到对应的示例。
 
 其实从功能上讲 `convert_before` 和 `convert_after` 完全可以用 `converter` 形式来替换，但 Nature 不建议这样做，有下面的原因：
 
