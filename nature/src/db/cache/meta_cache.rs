@@ -553,6 +553,10 @@ mod test {
             unimplemented!()
         }
 
+        async fn edit(&self, _define: &RawMeta) -> Result<u64> {
+            unimplemented!()
+        }
+
         async fn delete(&self, _m: &Meta) -> Result<u64> {
             unimplemented!()
         }

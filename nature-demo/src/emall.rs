@@ -4,6 +4,7 @@ use crate::emall::warehouse::outbound;
 use crate::wait_for_order_state;
 
 #[test]
+#[ignore]
 fn emall_test() {
     dbg!("generate order");
     let id = send_order_to_nature();

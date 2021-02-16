@@ -1,6 +1,7 @@
 use crate::send_business_object;
 
 #[test]
+#[ignore]
 fn score_test() {
     let _id = send_business_object("score/table", &class5_subject1()).unwrap();
     let _id = send_business_object("score/table", &class5_subject2()).unwrap();

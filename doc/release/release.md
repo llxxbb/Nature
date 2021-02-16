@@ -1,5 +1,9 @@
 # 发布的功能
 
+## Release 0.23.0 2021-02-16
+
+- support `meta` edit for Management UI
+
 ## Release 0.22.4 2021-02-16
 
 - bug fix : FromInstance id problem

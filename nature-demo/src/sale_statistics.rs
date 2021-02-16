@@ -6,6 +6,7 @@ use crate::entry::{Commodity, Order, SelectedCommodity};
 use crate::send_business_object;
 
 #[test]
+#[ignore]
 fn sale_statistics_test() {
     // create an order
     let order = order_1();

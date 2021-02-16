@@ -2,6 +2,7 @@ use std::collections::HashMap;
 
 use crate::send_with_context;
 
+#[ignore]
 #[test]
 fn multi_warehouse() {
     #[derive(Serialize)]

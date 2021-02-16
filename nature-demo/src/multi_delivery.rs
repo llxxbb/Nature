@@ -3,6 +3,7 @@ use nature::domain::Instance;
 use crate::{loop_get_by_key, send_instance};
 
 #[test]
+#[ignore]
 fn test() {
     #[derive(Serialize)]
     struct Delivery;

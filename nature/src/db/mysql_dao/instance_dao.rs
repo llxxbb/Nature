@@ -2,7 +2,7 @@ use std::collections::HashSet;
 use std::sync::Arc;
 
 use chrono::{Local, TimeZone};
-use mysql_async::{params, Value};
+use mysql_async::{params, Row, Value};
 
 use crate::db::Mission;
 use crate::db::mysql_dao::MySql;
@@ -170,6 +170,19 @@ impl InstanceDaoImpl {
         let qc = KeyCondition::new(&id, &meta, &para_id, 0);
         Self::get_last_state(&qc).await
     }
+
+    pub async fn meta_exists(meta: &str) -> Result<bool> {
+        let sql = "SELECT 1 FROM instances WHERE meta=:meta limit 1;";
+        let p = params! {
+            "meta" => meta.to_string(),
+        };
+        let rtn = MySql::fetch(sql, p, raw_to_number).await?;
+        if rtn.len() > 0 { Ok(true) } else { Ok(false) }
+    }
+}
+
+fn raw_to_number(row: Row) -> i32 {
+    mysql_async::from_row(row)
 }
 
 #[async_trait]
@@ -306,6 +319,12 @@ mod test {
         let rtn = InstanceDaoImpl::insert(&instance).await.unwrap();
         assert_eq!(true, rtn > 0);
         let _ = dbg!(rtn);
+
+        // meta_exists test---------------
+        let rtn = InstanceDaoImpl::meta_exists("B:test:1").await.unwrap();
+        assert_eq!(true, rtn);
+        let rtn = InstanceDaoImpl::meta_exists("B:test:2").await.unwrap();
+        assert_eq!(false, rtn);
     }
 
     #[test]

@@ -114,6 +114,7 @@ impl Into<Vec<(String, Value)>> for RawMeta {
             "config" => self.config,
             "flag" => self.flag,
             "create_time" => self.create_time,
+            "id" => self.id,
         }
     }
 }

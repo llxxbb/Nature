@@ -138,6 +138,7 @@ mod test {
     }
 
     #[test]
+    #[ignore]
     fn order_state_test() {
         let rtn = get_state_instance_by_id("1", "B:sale/orderState:1", 1);
         dbg!(rtn);

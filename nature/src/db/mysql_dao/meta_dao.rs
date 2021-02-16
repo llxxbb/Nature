@@ -17,6 +17,7 @@ pub trait MetaDao: Sync + Send {
     async fn get(&self, meta_str: &str) -> Result<Option<RawMeta>>;
     async fn insert(&self, define: &RawMeta) -> Result<u64>;
     async fn update_flag(&self, meta_str: &str, flag_f: i32) -> Result<u64>;
+    async fn edit(&self, define: &RawMeta) -> Result<u64>;
     async fn delete(&self, m: &Meta) -> Result<u64>;
     async fn id_great_than(&self, from: i32, limit: i32) -> Result<Vec<RawMeta>>;
 }
@@ -73,6 +74,22 @@ impl MetaDao for MetaDaoImpl {
         Ok(rtn)
     }
 
+    async fn edit(&self, define: &RawMeta) -> Result<u64> {
+        let sql = r"UPDATE meta SET
+            description=:description,
+            states=:states,
+            fields=:fields,
+            config=:config,
+            flag=:flag,
+            meta_type=:meta_type,
+            meta_key=:meta_key
+        WHERE id=:id AND version=:version;";
+        let p: Vec<(String, Value)> = define.clone().into();
+        let rtn = MySql::idu(sql, p).await?;
+        debug!("updated meta : {}:{}:{}", define.meta_type, define.meta_key, define.version);
+        Ok(rtn)
+    }
+
     async fn update_flag(&self, meta_str: &str, flag_f: i32) -> Result<u64> {
         let sql = r"UPDATE meta
             SET flag=:flag
@@ -122,7 +139,7 @@ mod test {
     fn define_test() {
         // prepare data to insert
         env::set_var("DATABASE_URL", CONN_STR);
-        let define = RawMeta {
+        let mut define = RawMeta {
             id: 0,
             meta_type: "B".to_string(),
             description: Some("description".to_string()),
@@ -143,17 +160,23 @@ mod test {
         }
 
         // insert
-        let rtn = runtime.block_on(D_M.insert(&define));
-        assert_eq!(rtn.unwrap(), 1);
+        let rtn = runtime.block_on(D_M.insert(&define)).unwrap();
+        assert_eq!(rtn > 0, true);
+        define.id = rtn as i32;
+
         // repeat insert
         let rtn = runtime.block_on(D_M.insert(&define));
-        let _ = match rtn {
+        let _ = match &rtn {
             Err(err) => match err {
                 NatureError::DaoDuplicated(_) => (),
                 _ => panic!("match error"),
             }
             _ => panic!("match error")
         };
+        // update
+        define.fields = Some("hello".to_string());
+        let _ = runtime.block_on(D_M.edit(&define));
+
         // find inserted
         let mut row: RawMeta = runtime.block_on(D_M.get(meta)).unwrap().unwrap();
         row.create_time = define.create_time;
