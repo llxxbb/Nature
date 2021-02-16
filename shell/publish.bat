@@ -1,4 +1,3 @@
-cargo publish --no-verify --manifest-path ..\Cargo.toml
-timeout 10
-cargo publish --no-verify --manifest-path ..\..\Nature-Demo\Cargo.toml
-cargo publish --no-verify --manifest-path ..\..\Nature-Integrate-Test-Executor\Cargo.toml
+cargo publish --no-verify --manifest-path ..\nature\Cargo.toml
+cargo publish --no-verify --manifest-path ..\test-executor\Cargo.toml
+cargo publish --no-verify --manifest-path ..\nature-demo\Cargo.toml

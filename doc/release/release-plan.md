@@ -5,16 +5,13 @@
 - 功能性先于非功能性需求
 - 应用情景支持，内部优先于外部（如网关）
 
-## Release 0.22.4
+## Release 0.22.5
+
 
 
 ### It should commit
 
-- bug fix : FromInstance id problem
-  
-- optimize for the using of KeyCondition.id
-- optimize for the using of Instance.id
-  
+
 
 ### 未完成
 
