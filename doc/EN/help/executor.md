@@ -6,7 +6,7 @@ Except for [built-in Executor](built-in.md) and automated `Executor`, you need t
 - convert_before: Used for preprocessing before the `Instance` conversion, such as data format modification, data loading, etc.
 - convert_after: Used for post-processing the `Instance`s after conversion.
 
-The three forms of `Executor` can all be found in the [Nature-Demo](https://github.com/llxxbb/Nature-Demo) project.
+The three forms of `Executor` can all be found in the [Nature-Demo](../../../nature-demo/README_EN.md) project.
 
 In fact, functionally speaking, `convert_before` and `convert_after` can be replaced by `converter` form, but Nature does not recommend, for the following reasons:
 

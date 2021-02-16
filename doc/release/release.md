@@ -1,5 +1,10 @@
 # 发布的功能
 
+## Release 0.22.4 2021-02-16
+
+- bug fix : FromInstance id problem
+- some optimize
+
 ## Release 0.22.3 2021-02-14
 
 - bug fix: get_by_key_range

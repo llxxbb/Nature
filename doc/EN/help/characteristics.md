@@ -16,7 +16,7 @@ In order to achieve idempotence, Nature provides the following measures and sugg
 - Pre-allocated ID: Generate an ID before calling Nature. Maybe facebook's snowflake ID generator algorithm is a good choice. Use this ID as the ID of the `Instance`, so that when there is an environmental problem, using the same ID to submit data to Nature will not store multiple data. If you do not provide an ID, Nature will use a hash algorithm to generate one for you.
 - Para: para is useful when importing external data into Nature. At this time, Para can be the external data's ID that uniquely identifies the external data. If para is used, the ID of `Instance` is set to 0 in general.
 
-Nature supports state data, so how does Nature ensure that the data is not modified? The answer is version. Nature generates a new `Instance` for each change of the state data, but these `Instance`s in different states, they have the same ID and `Meta`, but the version number is different. Such as the order status in [Demo](https://github.com/llxxbb/Nature-Demo).
+Nature supports state data, so how does Nature ensure that the data is not modified? The answer is version. Nature generates a new `Instance` for each change of the state data, but these `Instance`s in different states, they have the same ID and `Meta`, but the version number is different. Such as the order status in [Demo](../../../nature-demo/README_EN.md).
 
 ## Rewriting protection
 
@@ -100,7 +100,7 @@ Loop -> downstream
 
 **Note**: For `MetaType::Loop`, if `MetaSetting.only_one` is set to true, Nature will treat the Instance to be output as stateful. Only in this way can the result be superimposed and can achieve input + old = new. But you cannot set the target Meta of `MetaType::Loop` as stateful! Because from the outside of Nature, we only need a final result instead of an intermediate result. It would be very strange if set to state data. In order to achieve this effect, Nature will use the intermediate result as last_state data and take it to the next batch for processing until it is completed.
 
-The batch control comes from a [built-in Executor](built-in.md) of Nature: `instance-loader`. There are some examples behind, please refer to: [demo](https://github.com/llxxbb /Nature-Demo).
+The batch control comes from a [built-in Executor](built-in.md) of Nature: `instance-loader`. There are some examples behind, please refer to: [demo](../../../nature-demo/README_EN.md).
 
 ## Context
 
@@ -112,7 +112,7 @@ The context is divided into `system context` and `user context`. User context ca
 - loop.task: used to transfer the rules between batch data, only the first batch can get the processing rules.
 - loop.finished: mark whether all batches are processed.
 
-In addition to these, there are system contexts for bridging: `target.id` and `target.para`. When there is a link A->B->C, C wants to use A's ID as its own ID, but B does not use A's ID, then B needs to build a bridge. This problem occurs when B is the data of another system. Please refer to: [Demo](https://github.com/llxxbb/Nature-Demo).
+In addition to these, there are system contexts for bridging: `target.id` and `target.para`. When there is a link A->B->C, C wants to use A's ID as its own ID, but B does not use A's ID, then B needs to build a bridge. This problem occurs when B is the data of another system. Please refer to: [Demo](../../../nature-demo/README_EN.md).
 
 There is also a system context for dynamic parameter substitution: `para.dynamic`. Generally, when configuring Relation data, we always define fixed content. But sometimes we need to determine some parameters at runtime, this time we need the context.
 
