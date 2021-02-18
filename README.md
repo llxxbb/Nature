@@ -93,7 +93,7 @@ Nature 运行时模式中的 `map` 对应 `Relation`  中的 `Executor`。Nature
 
 该模式下，你可以设计如何让业务运转起来。
 
-![main](https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/220df8638696ef9367b1c925f0a346125ba65d89414d9e4023ba5264c0eb7d821634726567acb1af547364aa257c97d7?pictype=scale&from=30113&version=3.3.3.3&uin=309577603&fname=relation.png&size=750)
+![main](https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/91bec042a199e48e3ec85f3c8e75f35da0fe23538371fe6b14b361d78d9210ae886d5e96a399fb500d6bc2e211d87aba?pictype=scale&from=30113&version=3.3.3.3&uin=309577603&fname=relation.png&size=750)
 
 ### 领域模式
 
@@ -101,11 +101,11 @@ Nature 运行时模式中的 `map` 对应 `Relation`  中的 `Executor`。Nature
 
 ![main](https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/c3daeb79f2ef30b58c10d1a1bd2d7ea2d7e2bf5eda7c4e959e1c9c1dd78d894428758e02d24438a0f97be3c83b8e3e11?pictype=scale&from=30113&version=3.3.3.3&uin=309577603&fname=domain.png&size=750)
 
-### 数据模式
+### 数据流模式
 
-该模式下，你可以方便地看到数据是如何流转的。
+该模式下，你可以方便地看到数据之间是如何流转的。
 
-![main](https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/e601da14497c958843e818fec49d81d5f9142c721a9e8da2e776188bd0e61f6a303aa16a1306d556211ab4118d32ce28?pictype=scale&from=30113&version=3.3.3.3&uin=309577603&fname=instance.png&size=750)
+![main](https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/a743a60f811309429113f126381e9b4c465276dcb0c5a6ad2dab4dcd2c4602db658c9fc0d27dc52e149bc5b8381732a1?pictype=scale&from=30113&version=3.3.3.3&uin=309577603&fname=instance.png&size=750)
 
 ## 深入了解Nature
 

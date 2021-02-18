@@ -92,7 +92,7 @@ We need to do the following
 
 In this mode, you can organize how the business to work.
 
-![main](https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/220df8638696ef9367b1c925f0a346125ba65d89414d9e4023ba5264c0eb7d821634726567acb1af547364aa257c97d7?pictype=scale&from=30113&version=3.3.3.3&uin=309577603&fname=relation.png&size=750)
+![main](https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/91bec042a199e48e3ec85f3c8e75f35da0fe23538371fe6b14b361d78d9210ae886d5e96a399fb500d6bc2e211d87aba?pictype=scale&from=30113&version=3.3.3.3&uin=309577603&fname=relation.png&size=750)
 
 ### Domain Mode
 
@@ -100,11 +100,11 @@ In this mode, you can organize the business domain.
 
 ![main](https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/c3daeb79f2ef30b58c10d1a1bd2d7ea2d7e2bf5eda7c4e959e1c9c1dd78d894428758e02d24438a0f97be3c83b8e3e11?pictype=scale&from=30113&version=3.3.3.3&uin=309577603&fname=domain.png&size=750)
 
-### Instance Mode
+### Data-Flow Mode
 
 In this mode, you can see the data flow
 
-![main](https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/e601da14497c958843e818fec49d81d5f9142c721a9e8da2e776188bd0e61f6a303aa16a1306d556211ab4118d32ce28?pictype=scale&from=30113&version=3.3.3.3&uin=309577603&fname=instance.png&size=750)
+![main](https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/b05fc52333622cbb6cb5b426efb80459a5c61dc2248a84734336fa9cc07dd493245f0a7cf5cab680d93639ca0185080e?pictype=scale&from=30113&version=3.3.3.3&uin=309577603&fname=instance.png&size=750)
 
 ## Learn more about Nature
 
