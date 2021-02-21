@@ -93,19 +93,19 @@ Nature 运行时模式中的 `map` 对应 `Relation`  中的 `Executor`。Nature
 
 该模式下，你可以设计如何让业务运转起来。
 
-![main](/llxxbb/Nature-Manager-UI/raw/main/doc/relation.png?raw=true)
+![main](https://raw.githubusercontent.com/llxxbb/Nature-Manager-UI/main/doc/relation.png)
 
 ### 领域模式
 
 该模式下，可方便进行业务领域的划分。
 
-![main](/llxxbb/Nature-Manager-UI/raw/main/doc/domain.png?raw=true)
+![main](https://raw.githubusercontent.com/llxxbb/Nature-Manager-UI/main/doc/domain.png)
 
 ### 数据流模式
 
 该模式下，你可以方便地看到数据之间是如何流转的。
 
-![main](/llxxbb/Nature-Manager-UI/raw/main/doc/instance.png?raw=true)
+![main](https://raw.githubusercontent.com/llxxbb/Nature-Manager-UI/main/doc/instance.png)
 
 ## 深入了解Nature
 
