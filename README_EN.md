@@ -120,6 +120,6 @@ If you want to understand differences between Nature and streaming computing, me
 
 If you want to use Nature better, read: [Use Meta](doc/EN/help/meta.md), [Use Relation](doc/EN/help/relation.md), [Built-in executor](doc/EN/help/built-in.md)
 
-## Note
+## Other explanation
 
 The main function of this project has been completed. Now I'm looking for cooperation. If you are interested, please email 309577603@qq.com, WeChat: llxxbb76
