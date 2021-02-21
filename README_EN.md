@@ -92,19 +92,19 @@ We need to do the following
 
 In this mode, you can organize how the business to work.
 
-![main](https://raw.githubusercontent.com/llxxbb/Nature-Manager-UI/main/doc/relation.png)
+![main](/llxxbb/Nature-Manager-UI/raw/main/doc/relation.png?raw=true)
 
 ### Domain Mode
 
 In this mode, you can organize the business domain.
 
-![main](https://raw.githubusercontent.com/llxxbb/Nature-Manager-UI/main/doc/domain.png)
+![main](/llxxbb/Nature-Manager-UI/raw/main/doc/domain.png?raw=true)
 
 ### Data-Flow Mode
 
 In this mode, you can see the data flow
 
-![main](https://raw.githubusercontent.com/llxxbb/Nature-Manager-UI/main/doc/instance.png)
+![main](/llxxbb/Nature-Manager-UI/raw/main/doc/instance.png?raw=true)
 
 ## Learn more about Nature
 
@@ -120,6 +120,6 @@ If you want to understand differences between Nature and streaming computing, me
 
 If you want to use Nature better, read: [Use Meta](doc/EN/help/meta.md), [Use Relation](doc/EN/help/relation.md), [Built-in executor](doc/EN/help/built-in.md)
 
-## Other explanation
+## Note
 
 The main function of this project has been completed. Now I'm looking for cooperation. If you are interested, please email 309577603@qq.com, WeChat: llxxbb76
