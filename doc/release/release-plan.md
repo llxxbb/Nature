@@ -32,7 +32,7 @@ support edit relation
 ## Release 1.0.0
 
 - 行使网关职能，充当所以业务系统的入口。
-  - 查询外系统接口：queryThird
+  - 查询接口，支持查询外系统接口：queryThird
   - Demo : 获取平均分（）
 - 读取优化
   - Executor 支持内置缓存 适用于网关

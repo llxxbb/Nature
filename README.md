@@ -93,19 +93,19 @@ Nature 运行时模式中的 `map` 对应 `Relation`  中的 `Executor`。Nature
 
 该模式下，你可以设计如何让业务运转起来。
 
-![main](https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/91bec042a199e48e3ec85f3c8e75f35da0fe23538371fe6b14b361d78d9210ae886d5e96a399fb500d6bc2e211d87aba?pictype=scale&from=30113&version=3.3.3.3&uin=309577603&fname=relation.png&size=750)
+![main](/llxxbb/Nature-Manager-UI/raw/main/doc/relation.png?raw=true)
 
 ### 领域模式
 
 该模式下，可方便进行业务领域的划分。
 
-![main](https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/c3daeb79f2ef30b58c10d1a1bd2d7ea2d7e2bf5eda7c4e959e1c9c1dd78d894428758e02d24438a0f97be3c83b8e3e11?pictype=scale&from=30113&version=3.3.3.3&uin=309577603&fname=domain.png&size=750)
+![main](/llxxbb/Nature-Manager-UI/raw/main/doc/domain.png?raw=true)
 
 ### 数据流模式
 
 该模式下，你可以方便地看到数据之间是如何流转的。
 
-![main](https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/a743a60f811309429113f126381e9b4c465276dcb0c5a6ad2dab4dcd2c4602db658c9fc0d27dc52e149bc5b8381732a1?pictype=scale&from=30113&version=3.3.3.3&uin=309577603&fname=instance.png&size=750)
+![main](/llxxbb/Nature-Manager-UI/raw/main/doc/instance.png?raw=true)
 
 ## 深入了解Nature
 
@@ -121,6 +121,7 @@ Nature 运行时模式中的 `map` 对应 `Relation`  中的 `Executor`。Nature
 
 如果您想使用好 Nature 请阅读：[使用 Meta](doc/ZH/help/meta.md)，[使用 Relation](doc/ZH/help/relation.md)，[内置执行器](doc/ZH/help/built-in.md)
 
-## 注意
+## 其它说明
 
-本系统还处于早期阶段，尤其是文档还需要不断的完善，有不妥之处，还请多提建议。
+本项目的主体功能已经完善，现正在寻求合作，有意者请发邮件309577603@qq.com，微信： llxxbb76
+
