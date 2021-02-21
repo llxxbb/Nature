@@ -92,19 +92,19 @@ We need to do the following
 
 In this mode, you can organize how the business to work.
 
-![main](/llxxbb/Nature-Manager-UI/raw/main/doc/relation.png?raw=true)
+![main](https://raw.githubusercontent.com/llxxbb/Nature-Manager-UI/main/doc/relation.png)
 
 ### Domain Mode
 
 In this mode, you can organize the business domain.
 
-![main](/llxxbb/Nature-Manager-UI/raw/main/doc/domain.png?raw=true)
+![main](https://raw.githubusercontent.com/llxxbb/Nature-Manager-UI/main/doc/domain.png)
 
 ### Data-Flow Mode
 
 In this mode, you can see the data flow
 
-![main](/llxxbb/Nature-Manager-UI/raw/main/doc/instance.png?raw=true)
+![main](https://raw.githubusercontent.com/llxxbb/Nature-Manager-UI/main/doc/instance.png)
 
 ## Learn more about Nature
 
