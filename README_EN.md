@@ -92,19 +92,19 @@ We need to do the following
 
 In this mode, you can organize how the business to work.
 
-![main](https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/91bec042a199e48e3ec85f3c8e75f35da0fe23538371fe6b14b361d78d9210ae886d5e96a399fb500d6bc2e211d87aba?pictype=scale&from=30113&version=3.3.3.3&uin=309577603&fname=relation.png&size=750)
+![main](https://raw.githubusercontent.com/llxxbb/Nature-Manager-UI/main/doc/relation.png)
 
 ### Domain Mode
 
 In this mode, you can organize the business domain.
 
-![main](https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/c3daeb79f2ef30b58c10d1a1bd2d7ea2d7e2bf5eda7c4e959e1c9c1dd78d894428758e02d24438a0f97be3c83b8e3e11?pictype=scale&from=30113&version=3.3.3.3&uin=309577603&fname=domain.png&size=750)
+![main](https://raw.githubusercontent.com/llxxbb/Nature-Manager-UI/main/doc/domain.png)
 
 ### Data-Flow Mode
 
 In this mode, you can see the data flow
 
-![main](https://picabstract-preview-ftn.weiyun.com/ftn_pic_abs_v3/b05fc52333622cbb6cb5b426efb80459a5c61dc2248a84734336fa9cc07dd493245f0a7cf5cab680d93639ca0185080e?pictype=scale&from=30113&version=3.3.3.3&uin=309577603&fname=instance.png&size=750)
+![main](https://raw.githubusercontent.com/llxxbb/Nature-Manager-UI/main/doc/instance.png)
 
 ## Learn more about Nature
 
@@ -120,6 +120,6 @@ If you want to understand differences between Nature and streaming computing, me
 
 If you want to use Nature better, read: [Use Meta](doc/EN/help/meta.md), [Use Relation](doc/EN/help/relation.md), [Built-in executor](doc/EN/help/built-in.md)
 
-## Note
+## Other explanation
 
-The system is still in its early stage, especially the documentation needs to be continuously improved. If there are any improprieties, please provide more suggestions.
+The main function of this project has been completed. Now I'm looking for cooperation. If you are interested, please email 309577603@qq.com, WeChat: llxxbb76
