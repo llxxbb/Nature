@@ -4,35 +4,29 @@ English|[中文](README.md)
 
 ## What is Nature？
 
-It's a low code platform, and a tool of data orchestration. But the most important is it goes right to the heart of the business, standardize and simplify the implementation of complex businesses in a simple way. As long as you're willing, Nature can help you extract the business control logic and centrally manage it so that the system has the brain and says goodbye to the brainless era of traditional systems. 
+**High-level service governance platform**: Nature believes that the core contradiction of current service governance lies in the contradiction between the single responsibility of services and the complicated relationship between services, which makes it difficult to maintain. The essential problem of complicated relationship is the **direct control** between services, and the powerful way of control is cohesion rather than coupling; coupling implies equal cooperation rather than unequal control. Nature takes over control, thus improving service governance qualitatively. Please refer to: [Why is service governance so difficult? I think it's time for a change of treatment](https://www.cnblogs.com/llxxbb/p/serviceGovernance.html))
 
-Why Nature can simplify system design, please refer to [The problem of existing development mechanism analysis and solving methods](doc/ZH/natureBusinessValue.md). Nature's view of Nature, time-space view, philosophy and mathematics expression see:  [Nature architecture](doc/EN/help/architecture.md).
+**process orchestration tool**: Nature can use data to orchestrate business processes. Trust your eyes, it is not choreographed by functions, because the data can go directly to the business core. Nature **connects the world with data** to prevent you from getting stuck in the quagmire of functionality and losing your goal. Nature replaces concrete and changeable control with simple and unified rules. Nature can help you extract all the business control logic problems and let your system evolve into a brain if you want. For Nature's views on nature, time and space, philosophy and mathematics, see [Nature Architecture thought](doc/EN/help/architecture.md).
+
+**low-code platform**: non-functional development is the most time-consuming, most complex, most difficult to maintain and least revealing in business systems, and Nature can help you reduce the cost by 80%. Please refer to: [problem Analysis and Solutions of existing Development models](doc/ZH/natureBusinessValue.md).
 
 Nature has the following technical features:
 
-### Distributed Stream-Compute-Engine
+## Distributed Stream-Compute-Engine
 
 Traditional stream-compute is proposed to solve the timeliness of data processing, emphasizing calculation logic, and emphasizing `map-reduce`. Nature is also a stream-compute framework, and its core processing mode is: **Data--map--> Data--map-->Data...**, which simplifies `map-reduce` to `map` (It is not that `reduce` is discarded, but it can be embedded into `map` for processing). This simplified mode allows us to more easily focus on the data itself rather than the process, so **Nature emphasize data**, but not calculation logic. This point will be further explained below.
 
-### Business Control Center
+## Business Control Center
 
 **Data--map--> Data--map--> Data** is **Nature's runtime mode**. From a management point of view, we pay more attention to results rather than processes, so Nature simplifies this mode further, the map is removed, and the new mode becomes: **Data-->Data-->Data...**. This is **Nature's design-time mode**. This also proves that Nature is a data-centric Stream-Compute-Engine.
 
 Nature uses `Meta` and `Relation` to represent data and the relationship between them respectively. In this way, within Nature system, only Nature knows what business the data represents and how to find downstream businesses through `Relation` for all business systems involved in collaboration, so Nature becomes the actual business control center.
 
-### Dispatching Center
+## Dispatching Center
 
 The `map` in Nature runtime mode corresponds to the `Executor` in `Relation`. Nature will follow the data flow in the design-time mode to schedule Executor. These schedules include pre-processing, post-processing, idempotence, delay processing, timing processing, and batch processing. If it is timeout or encounters an abnormal environment, Nature will retry multiple times under the retry strategy, and try its best to ensure the final consistency of the data. Even if the final retry fails or a logical exception is encountered, Nature will not discard the task, but will put it in the error data table. After problem fixed, you can re-import the data from the error data table to the task data table, and Nature will retry these tasks again until they are successfully completed.
 
-### Data Center
-
-`Executor` generates `Instance` at runtime. The initial data submitted to Nature by the external system is also `Instance`. `Instance` is the runtime expression of `Meta`, which is also the instance data of the business. If you want, you can hand over as much `Meta` to Nature as possible. Nature will provide unified and centralized storage for the `Instance` generated by `Meta` and provide query interfaces for them, so that Nature will played the role of a Data Center. Here are a few notes:
-
-- Data retrieval: Nature's business objects are all stored unstructured, much like the `Key-Value` database. If you want to perform statistics on the data in the business object. It can be convenient to utilize Nature’s Stream-Compute-Engine to process any data you want. Please refer to the demo of sales statistics in [Example](nature-demo/README_EN.md).
-
-- Database capacity: Nature uses mysql as the back-end storage by default. If you have a large amount of data, you can consider using [Tidb](https://pingcap.com/en/).
-
-### Low Code Platform
+## Low Code Platform
 
 You can see that Nature integrates many heavyweight elements, and the purpose of integration is to simplify our programming and enable developers to better focus on the business itself. It is embodied in the following aspects:
 
