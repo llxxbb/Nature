@@ -1,4 +1,4 @@
-下面的内容也可以通过下载 [natureValue.pptx](natureValue.pptx) 进行查阅
+下面的内容也可以通过下载 [natureValue.pptx](NatureValue.pptx) 进行查阅
 
 ![slide](NatureValue/Slide1.png?raw=true)
 ![slide](NatureValue/Slide2.png?raw=true)
