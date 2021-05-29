@@ -1,5 +1,9 @@
 # 发布的功能
 
+## Release 1.0.0 2021-05-29
+
+- add roadmap
+
 ## Release 0.23.0 2021-02-16
 
 - support `meta` edit for Management UI
