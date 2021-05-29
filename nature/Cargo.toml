@@ -1,6 +1,6 @@
 [package]
 name = "nature"
-version = "0.23.0"
+version = "1.0.0"
 authors = ["XueBin Li <llxxbb@yeah.net>"]
 edition = "2018"
 description = "It's a high-level service governance platform, a process orchestration tool, and a low-code platform."

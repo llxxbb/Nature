@@ -4,45 +4,52 @@ English|[中文](README.md)
 
 ## What is Nature？
 
-**High-level service governance platform**: Nature believes that the core contradiction of current service governance lies in the contradiction between the single responsibility of services and the complicated relationship between services, which makes it difficult to maintain. The essential problem of complicated relationship is the **direct control** between services, and the powerful way of control is cohesion rather than coupling; coupling implies equal cooperation rather than unequal control. Nature takes over control, thus improving service governance qualitatively. Please refer to: [Why is service governance so difficult? I think it's time for a change of treatment](https://www.cnblogs.com/llxxbb/p/serviceGovernance.html))
+Nature allows you to **fully understand, control and plan data** at the macro level, and present production data to decision makers in the most intuitive and concise way. It can orchestrate **data flow**, which is a system-understandable **strongly constrained requirement**, which can directly affect the development of application systems, thus avoiding the uncertainty of traditional requirements and the cost of communication and transformation. Note that this is not a functional orchestration. Nature **connects the world with data** to prevent you from getting stuck in a functional quagmire and losing your goal, so your management will be very direct, concise and effective.
 
-**process orchestration tool**: Nature can use data to orchestrate business processes. Trust your eyes, it is not choreographed by functions, because the data can go directly to the business core. Nature **connects the world with data** to prevent you from getting stuck in the quagmire of functionality and losing your goal. Nature replaces concrete and changeable control with simple and unified rules. Nature can help you extract all the business control logic problems and let your system evolve into a brain if you want. For Nature's views on nature, time and space, philosophy and mathematics, see [Nature Architecture thought](doc/EN/help/architecture.md).
+Nature believes that the **core contradiction of current service governance** lies in the contradiction between the single responsibility of services and the large number of services and complex interactions. Although the concept of central platform has emerged to make the interaction have a clear hierarchical layering, it is only the organization of the business and can not bring essential simplification in the form of technology. because the essential problem of **complex interaction** is the **direct control** between services, and the powerful way of control is cohesion rather than coupling, but the invocation between services precisely reflects coupling rather than cohesion. Because services are independent individuals and equal in status, there is a contradiction that the will is to control but the form is cooperation. Please refer to: [Why is service governance so difficult? I think it's time for a change of treatment](https://www.cnblogs.com/llxxbb/p/serviceGovernance.html)
 
-**low-code platform**: non-functional development is the most time-consuming, most complex, most difficult to maintain and least revealing in business systems, and Nature can help you reduce the cost by 80%. Please refer to: [problem Analysis and Solutions of existing Development models](doc/ZH/natureBusinessValue.md).
+Nature takes a different approach, getting rid of service restrictions and goal-oriented, and abstracts **diversified functions** into converters, because the essence of the system work is to string different small goals together to achieve our final demands, and the converter performs the responsibility of "stringing together". The goal here is the data, and the converter is the function; Nature manages the data and the symbolized converter, so that Nature can separate the core process control from the traditional service and form an independent control center: the brain. This can greatly simplify the overall complexity of the system. Nature provides a new set of simple, unified and standardized development model for this purpose. For the architecture thought, nature view, time-space view, philosophy view and mathematics view of Nature, please see: [Nature Architecture thought](doc/ZH/help/architecture.md).
 
-Nature has the following technical features:
+With this unified and standardized model, we can standardize some functions that previously need to be customized, which are often the most time-consuming, complex, difficult to maintain and least revealing in the business system, such as idempotence, retry, high concurrency, final data consistency, and so on. This will further simplify your services and greatly improve the robustness and maintainability of the entire system. Please refer to: [problem Analysis and Solutions of existing Development models](doc/ZH/natureBusinessValue.md).
 
-## Distributed Stream-Compute-Engine
+## Theoretical basis
 
-Traditional stream-compute is proposed to solve the timeliness of data processing, emphasizing calculation logic, and emphasizing `map-reduce`. Nature is also a stream-compute framework, and its core processing mode is: **Data--map--> Data--map-->Data...**, which simplifies `map-reduce` to `map` (It is not that `reduce` is discarded, but it can be embedded into `map` for processing). This simplified mode allows us to more easily focus on the data itself rather than the process, so **Nature emphasize data**, but not calculation logic. This point will be further explained below.
+We only set up the system to process the data. Google, the massively parallel processing of data, gives a MapReduce scheme. Nature has improved on this basis, its processing mode is: **data --map--> data--map--> data...** It simplifies MapReduce to Map, Nature does not discard reduce,, in Nature's view, reduce is a mapping of multiple data to a piece of data and can be regarded as a special case of Map. This simplified pattern makes it easier to focus on data and the relationships between them, rather than on how to deal with them.
 
-## Business Control Center
+Because map is an action, it contains the meaning of transformation, it is functionalized is the abstraction of function by Nature, and Nature uses it to control the data flow during operation, so **data -- map--> data is the runtime mode of Nature**. But from a management point of view, we focus more on the results than on the process. So Nature further simplifies the schema, removing the map, and the new schema becomes: **data --> data --> data**. This is the **design-time mode of Nature**. This pattern allows us to focus more succinctly on the internal relationships between data, which are the basis for the operation of the system.
 
-**Data--map--> Data--map--> Data** is **Nature's runtime mode**. From a management point of view, we pay more attention to results rather than processes, so Nature simplifies this mode further, the map is removed, and the new mode becomes: **Data-->Data-->Data...**. This is **Nature's design-time mode**. This also proves that Nature is a data-centric Stream-Compute-Engine.
+In other words, the relationship between data and data is the top-level design of the whole system, and it is the guidance and constraint to the realization of the function. On this basis, as long as we add a map function to the relationship, the system can run. In this way, any complex process can be concatenated through this simple mechanism to form functions. Nature uses `Meta` to represent data, `Relation` to represent the relationship between data, and `Executor` to indicate that map,Nature mainly uses these three elements to control the operation of the entire system.
 
-Nature uses `Meta` and `Relation` to represent data and the relationship between them respectively. In this way, within Nature system, only Nature knows what business the data represents and how to find downstream businesses through `Relation` for all business systems involved in collaboration, so Nature becomes the actual business control center.
+## keywords
+Data governance, service governance, process orchestration, low code platform
 
-## Dispatching Center
+## Technical Features
+- **High-order reusing**: unlike the reuse of methods, modules, classes in a program, which can be docked only through coding, but Nature reuse does not need coding. For example, notification capability can be configured to interface with audit, reminder, promotion and other different business areas. Nature has this capability because Nature standardizes the data. 
+- **short process**: since an `Relation` is a process, it is very lightweight and provides great flexibility for process stitching. 
+- **Fast business iteration**: Nature provides version capability for `Meta`, based on which you can build new processes and facilitate switching without affecting existing processes, which makes it very easy for you to adjust your business. 
+- **data immutability**: Nature only adds data but does not change data, because changes may lead to data inconsistencies. For state data Nature provides version capabilities for changes to support the immutability of the data, and this is done by Nature itself. 
+- **traceability of data processing**: the Nature runtime automatically records the relationship between data instances, making all data traceable. 
+- **automatic retry**: Nature defines and regulates environment exceptions and logic exceptions, and automatically redoes the task when an environment exception is encountered. 
+- **error data transfer**: Nature will not lose any data. Even if it encounters a logic error, it can save it for review. After troubleshooting, you can re-import the interrupted tasks into the task data table, and Nature will execute these tasks again until they are completed successfully. 
+- **delay and timing processing**: Nature allows you to specify the time for data conversion, which is very meaningful for statistical analysis of data. 
+- **idempotent**: Nature has no idempotent requirements for all systems involved in data conversion cooperation, but Nature will remember and use the results of their first successful processing, based on which Nature achieves its own idempotency. 
+- **data consistency**: Nature supports the final consistency of data. 
+- **selector**: the selector provides conditions for triggering data conversion. 
+  Nature provides flexible and extensible selector settings. 
+- **Executor**: Nature provides extensible executors based on different protocols. Currently, both rust local package and http executors are supported. 
+- **pre-processing**: used for pre-data-conversion processing, such as data format adjustment. 
+  Nature provides some built-in preprocessors, and you can also define your own preprocessors. 
+  This is generally a technical process without introducing another business object: `Meta`. 
+- **Post processing**: it is the same as the pre-processor, but it is only applied to the converted data processing. 
+- **batch**: Nature provides a mechanism for managing the intermediate state in the process of massive data processing, so that the processing can be carried out in batches. 
+  For a detailed description of the technical features, please refer to [Technical Features of Nature](doc/ZH/help/characteristics.md)
 
-The `map` in Nature runtime mode corresponds to the `Executor` in `Relation`. Nature will follow the data flow in the design-time mode to schedule Executor. These schedules include pre-processing, post-processing, idempotence, delay processing, timing processing, and batch processing. If it is timeout or encounters an abnormal environment, Nature will retry multiple times under the retry strategy, and try its best to ensure the final consistency of the data. Even if the final retry fails or a logical exception is encountered, Nature will not discard the task, but will put it in the error data table. After problem fixed, you can re-import the data from the error data table to the task data table, and Nature will retry these tasks again until they are successfully completed.
+## impact on existing development models. 
+It is mainly reflected in the following aspects. 
 
-## Low Code Platform
-
-You can see that Nature integrates many heavyweight elements, and the purpose of integration is to simplify our programming and enable developers to better focus on the business itself. It is embodied in the following aspects:
-
-- Data driven
-  Traditional function-oriented development will mix business data, technical data, control data, and temporary data together, creating unnecessary coupling, and unintentionally increasing the complexity and maintenance cost of the system; worse more, the key business Data may be "kidnapped" by the system, which becomes bloated, inefficient and difficult to change.
-  Nature's design-time model is entirely composed of business data, without the smallest amount of function, which ensures the purity, intuitiveness and simplicity of the business, and can guarantee the absolute control of the business on the system. Nature's `Executor` divides the entire business system into the smallest collaborative units that are not coupled with each other, ensuring the simplicity of development and maintenance.
-
-- Significantly reduce interface and storage related work
-
-  Nature’s business process control is achieved through [Configuration](doc/EN/help/relation.md), and developers do not need to care about upstream and downstream process control issues. Reflected in two aspects: one is the definition of the interface, compared with the complex and a large number of personalized interface definitions in traditional projects, Nature only provides a limited number of interfaces; the other is the use of interfaces. Traditional projects need to write logic in the code for the calling of the interfaces, but for Nature, except submitting data to Nature, all interface calls are handled by Nature, which greatly simplifies interface-related design, development, debugging and follow-up maintenance work.
-
-  Similarly, Nature adopts a centralized and unified data storage mechanism, and developers do not need to care about the design of data tables and indexes and subsequent development and maintenance work.
-
-- Significantly reduce non-functional development related work
-
-  Nature has done a lot of work for the availability (such as idempotence, eventual consistency of data) and reliability (such as retries, exception records) for the system. In addition, Nature also supports the business in terms of scalability , Such as the version technology of `Meta`. According to Pareto Principle (the 80/20 Rule), these 80% of the heavy and important work can now be undertaken by Nature.
+- **data-driven** (goal-driven): traditional development is mostly function-oriented, and functions generally provide services through interfaces. There are often a large number of interfaces in a system, so it is difficult to develop and maintain. And it is easy to make people fall into a functional whirlpool and lose their goals, especially the lack of large-scale collaborative systems from a global perspective. 
+  On the other hand, Nature eliminates the interference of the function, makes the goal concise and comprehensive, and ensures the business's **absolute contro**l over the system. At the same time, there is no need to worry too much about the realization of the function. 
+- **data purification**: traditional development can easily lead to **business data, technical data, control data and temporary data mixed together**, resulting in unnecessary coupling and sometimes difficult to separate, inadvertently increasing the complexity and maintenance costs of the system, to make matters worse, critical business data may be "kidnapped" by the system, and the system becomes bloated, inefficient and difficult to change. While the design-time pattern of Nature is composed entirely of business data, without any function, which ensures the purity, intuition and simplicity of the business.
 
 ## how to use
 
@@ -86,19 +93,19 @@ We need to do the following
 
 In this mode, you can organize how the business to work.
 
-![main](https://raw.githubusercontent.com/llxxbb/Nature-Manager-UI/main/doc/relation.png)
+![relation.png (1769×1036) (gitee.com)](https://gitee.com/xb_li/Nature-Manager-UI/raw/dev/doc/relation.png?raw=true)
 
 ### Domain Mode
 
 In this mode, you can organize the business domain.
 
-![main](https://raw.githubusercontent.com/llxxbb/Nature-Manager-UI/main/doc/domain.png)
+![domain.png (933×428) (gitee.com)](https://gitee.com/xb_li/Nature-Manager-UI/raw/dev/doc/domain.png?raw=true)
 
 ### Data-Flow Mode
 
 In this mode, you can see the data flow
 
-![main](https://raw.githubusercontent.com/llxxbb/Nature-Manager-UI/main/doc/instance.png)
+![instance.png (1507×1068) (gitee.com)](https://gitee.com/xb_li/Nature-Manager-UI/raw/dev/doc/instance.png?raw=true)
 
 ## Learn more about Nature
 
@@ -117,3 +124,50 @@ If you want to use Nature better, read: [Use Meta](doc/EN/help/meta.md), [Use Re
 ## Other explanation
 
 The main function of this project has been completed. Now I'm looking for cooperation. If you are interested, please email 309577603@qq.com, WeChat: llxxbb76
+
+## Roadmap
+
+### core functions
+
+#### meta
+
+- add the field name: friendly name. 
+- meta template: the meta type is T (emplate), which is used to provide reused meta information. 
+  Meta of template type cannot generate Instance, the states, fields, and config can be used as templates. Other meta can use the `from` attribute to associate a template, or you can associate the non-template meta, which is a specification rather than a mandatory measure, and the template user can overwrite or append the content. 
+- accompanying meta: is used to represent instances with bidirectional relationships. For example, a user belongs to a group and there is a user in the group. Concomitant objects are used to facilitate data retrieval. Concomitant objects are automatically maintained by Nature and no additional relation is required. It is in the form of [meta_name]_R, where R is the first letter of Reverse. Condition: para has two and only two parameters. 
+- the lifecycle of instance can be defined to facilitate the automation of data migration. 
+- Private status: used to reduce the number of domain objects. For example, order and order status can be managed by one domain object in the business. It is in the form of [meta_name]_S, and you can define the initial state. What corresponds to the private status is that the independent status meta, such as [responsible person] meta, [responsible person] can be changed, so [responsible person] is a status data.
+
+#### relation
+- add field: description, describes the role of the relationship. 
+- relation template: the template only provides information in settings except `is_template` and `from`. Please set the `from` attribute to an exists relation.
+
+#### selector
+
+Make it convenient to support external extensions.
+
+#### built-in converter
+
+Random generator: can specify the number of digits generated, in the form of optional numbers, letters + numbers, letters
+
+#### database
+
+Support for elasticSearch, mongodb.
+
+### demo
+
+To show that Nature can avoid coding, We will try to implement the most commonly used and complex enough business scenario: auditing,  to dig the potential of Nature's non-coding capability out.
+we will simulate the following audit scenario: 
+
+- Business type: leave, reimbursement, loan. 
+- Audit method: multi-level audit, multi-person audit, agent audit, designated leader audit.
+
+### GUI
+
+- Support the creation of `Meta` and `Relation`
+- `Meta template` can be marked and be filtered  to be shown.
+- You can copy from a `Meta`.
+- Prompt whether to generate a new version of `Meta` when `Meta` changed
+- The `companion-meta` will not be displayed in the GUI as a separate `Meta`, but the primary object to which it is attached will be marked
+- `private-state-meta` is not displayed independently, but the master object to which it depends is marked. When creating a relationship, you need to choose whether to create it from master data or private state data.
+- You can copy from a `Relation`. 
