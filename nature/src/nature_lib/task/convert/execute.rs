@@ -22,7 +22,6 @@ pub async fn call_executor(task: &mut TaskForConvert, raw: &RawTask, last_target
             }
         };
     };
-    &task.from;
     match convert_before(&mut task.from, task.target.convert_before.clone()).await {
         Err(NatureError::EnvironmentError(e)) => return ConverterReturned::EnvError { msg: e },
         Err(e) => return ConverterReturned::LogicalError { msg: e.to_string() },
