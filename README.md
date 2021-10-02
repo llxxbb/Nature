@@ -1,6 +1,6 @@
 # Nature
 
-此项目由[Select](https://github.com/llxxbb/Select)项目代替，不在维护，
+此项目由[Select](https://github.com/llxxbb/Select)项目代替，不在维护。
 
 [English](README_EN.md)|中文
 
