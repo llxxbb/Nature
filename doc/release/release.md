@@ -1,5 +1,12 @@
 # 发布的功能
 
+## Release 1.1.0 2021-10-24
+
+- Incompatible change: Split  `selector` to `selector` and `down_selector`
+- Optimize : MetaSetting: check type when set
+- Meta : add friendly name in config field
+
+
 ## Release 1.0.0 2021-05-29
 
 - add roadmap

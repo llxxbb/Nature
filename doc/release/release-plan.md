@@ -5,21 +5,19 @@
 - 功能性先于非功能性需求
 - 应用情景支持，内部优先于外部（如网关）
 
+下面为正在开发的内容
 ## Release 1.1.0
 
-Incompatible change: Split  `RelationSetting:selector` to `RelationSetting:selector` and `RelationSetting:down_selector`
 
 ### It should commit
 
+
 ### 未完成
 
-relation_dao.get_relations 应该不需要meta_cache
-
-support edit relation
-
-- 文档：将所有的外部请求分为读写两个职能。查询和结算都为读。目前缺少写之前的验证过程。
 
 
-- demo java(leave application: 请假)
-  last state check
+
+
+
+
 

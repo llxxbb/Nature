@@ -70,6 +70,7 @@ s1[s1-1,s1-2,s1-3|s1-4],s2|s3,s4
 
 ```rust
 {
+    "name": null			// Meta 的友好名称
     "is_state": false,		// 缺省false, 如果`Meta`的 `state` 属性为空但又需要成为状态数据时，可以将这个属性设置为true。如一个计数器 `Meta` 是需要状态的。
     "master": null,			// 缺省null，见下面的说明
     "multi_meta": [],		// 缺省null，见下面的说明

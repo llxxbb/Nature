@@ -1,9 +1,9 @@
 [package]
 name = "nature"
-version = "1.0.0"
+version = "1.1.0"
 authors = ["XueBin Li <llxxbb@yeah.net>"]
 edition = "2018"
-description = "It's a high-level service governance platform, a process orchestration tool, and a low-code platform."
+description = "Nature is a development support platform, it separates data definition from code, so it decouple the data from business system."
 repository = "https://github.com/llxxbb/Nature"
 readme = "../README.md"
 license = "MIT"

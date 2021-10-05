@@ -403,6 +403,7 @@ mod verify_test {
     fn none_states() {
         let mut meta = Meta::new("/hello", 1, MetaType::Business).unwrap();
         let setting = MetaSetting {
+            name: None,
             is_state: true,
             master: None,
             multi_meta: Default::default(),

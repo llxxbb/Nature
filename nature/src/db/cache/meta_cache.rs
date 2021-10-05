@@ -79,7 +79,7 @@ impl MetaCache for MetaCacheImpl {
                         sub.into_iter().for_each(|one| input.push((one, ProcessType::NotState)));
                     }
                     _ => {
-                        match get_master(&meta)? {
+                        match get_master(&meta) {
                             None => {}
                             Some(master) => input.push((master, ProcessType::Any)),
                         }
@@ -135,13 +135,6 @@ fn get_sub(m: &Meta) -> Result<Vec<String>> {
         None => Err(NatureError::VerifyError("Multi-Meta must define sub-metas".to_string())),
         Some(setting) => {
             let vec: Vec<String> = setting.multi_meta.into_iter().collect();
-            let err = vec.iter().any(|one| {
-                MetaType::check_type(one, MetaType::Loop).is_ok()
-                    || MetaType::check_type(one, MetaType::Multi).is_ok()
-            });
-            if err {
-                return Err(NatureError::VerifyError("MetaType: Multi or Loop can't be as sub meta".to_string()));
-            }
             match vec.len() {
                 0 => Err(NatureError::VerifyError("sub-meta number should great than 0".to_string())),
                 _n => Ok(vec)
@@ -150,15 +143,10 @@ fn get_sub(m: &Meta) -> Result<Vec<String>> {
     }
 }
 
-fn get_master(meta: &Meta) -> Result<Option<String>> {
+fn get_master(meta: &Meta) -> Option<String> {
     match meta.get_setting() {
-        None => Ok(None),
-        Some(setting) => match setting.master {
-            None => Ok(None),
-            Some(master) => {
-                Ok(Some(master))
-            }
-        },
+        None => None,
+        Some(setting) => setting.master
     }
 }
 
@@ -320,47 +308,6 @@ mod test {
         }
     }
 
-    #[test]
-    fn get_master_test() {
-        let mut setting = MetaSetting {
-            is_state: false,
-            master: Some("abc".to_string()),
-            multi_meta: Default::default(),
-            cache_saved: false,
-            only_one: false,
-        };
-        let mut m = Meta::from_string("B:test:3").unwrap();
-        let _ = m.set_setting(&setting.to_json().unwrap());
-        let rtn = get_master(&m).unwrap().unwrap();
-        assert_eq!("abc", rtn);
-
-        // for none
-        setting.master = None;
-        let _ = m.set_setting(&setting.to_json().unwrap());
-        let rtn = get_master(&m).unwrap();
-        assert_eq!(None, rtn);
-    }
-
-    #[test]
-    fn get_sub_test() {
-        let mut set: BTreeSet<String> = BTreeSet::new();
-        set.insert("B:p/a:1".to_owned());
-        set.insert("B:p/b:1".to_owned());
-        let setting = MetaSetting {
-            is_state: false,
-            master: None,
-            multi_meta: set,
-            cache_saved: false,
-            only_one: false,
-        };
-        let mut m = Meta::from_string("B:test:3").unwrap();
-        let _ = m.set_setting(&setting.to_json().unwrap());
-        let rtn = get_sub(&m).unwrap();
-        assert_eq!(2, rtn.len());
-        assert_eq!(true, rtn.contains(&"B:p/a:1".to_string()));
-        assert_eq!(true, rtn.contains(&"B:p/b:1".to_string()));
-    }
-
     #[derive(Copy, Clone)]
     struct MetaMock;
 
@@ -386,6 +333,7 @@ mod test {
                     set.insert("B:sub-1:1".to_owned());
                     set.insert("B:sub-state:1".to_owned());
                     let setting = MetaSetting {
+                        name: None,
                         is_state: false,
                         master: None,
                         multi_meta: set,
@@ -402,6 +350,7 @@ mod test {
                     let mut set: BTreeSet<String> = BTreeSet::new();
                     set.insert("B:sub-state:1".to_owned());
                     let setting = MetaSetting {
+                        name: None,
                         is_state: false,
                         master: None,
                         multi_meta: set,
@@ -419,6 +368,7 @@ mod test {
                     set.insert("B:sub-1:1".to_owned());
                     set.insert("B:sub-end:1".to_owned());
                     let setting = MetaSetting {
+                        name: None,
                         is_state: false,
                         master: None,
                         multi_meta: set,
@@ -448,6 +398,7 @@ mod test {
                     let mut set: BTreeSet<String> = BTreeSet::new();
                     set.insert("B:sub-state:1".to_owned());
                     let setting = MetaSetting {
+                        name: None,
                         is_state: false,
                         master: None,
                         multi_meta: set,
@@ -465,6 +416,7 @@ mod test {
                     set.insert("B:sub-1:1".to_owned());
                     set.insert("M:sub-2:1".to_owned());
                     let setting = MetaSetting {
+                        name: None,
                         is_state: false,
                         master: None,
                         multi_meta: set,
@@ -486,6 +438,7 @@ mod test {
                     let mut set: BTreeSet<String> = BTreeSet::new();
                     set.insert("B:sub-end:1".to_owned());
                     let setting = MetaSetting {
+                        name: None,
                         is_state: false,
                         master: None,
                         multi_meta: set,
@@ -511,6 +464,7 @@ mod test {
                 }
                 "B:child:1" => {
                     let setting = MetaSetting {
+                        name: None,
                         is_state: false,
                         master: Some("B:master:1".to_string()),
                         multi_meta: Default::default(),
@@ -524,6 +478,7 @@ mod test {
                 }
                 "B:master:1" => {
                     let setting = MetaSetting {
+                        name: None,
                         is_state: false,
                         master: Some("B:master-master:1".to_string()),
                         multi_meta: Default::default(),
