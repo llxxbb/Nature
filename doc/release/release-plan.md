@@ -14,9 +14,6 @@
 
 ### 未完成
 
-对关系的作用进行描述，在设置中增加 description 属性。
-    relation.md
-    test
 
 
 

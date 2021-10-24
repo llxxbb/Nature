@@ -58,21 +58,6 @@ impl RelationDao for RelationDaoImpl {
             ))
         }
     }
-    async fn id_great_than(&self, from: i32, limit: i32) -> Result<Vec<RawRelation>> {
-        let sql = r"SELECT id, from_meta, to_meta, settings, flag
-            FROM nature.relation
-            WHERE id > :from
-            order by id
-            limit :limit";
-
-        let p = params! {
-            "from" => from,
-            "limit" => limit,
-        };
-        let vec = MySql::fetch(sql, p, RawRelation::from).await?;
-        Ok(vec)
-    }
-
     async fn insert(&self, one: RawRelation) -> Result<u64> {
         let sql = r"INSERT INTO nature.relation
             (from_meta, to_meta, settings, flag)
@@ -83,6 +68,7 @@ impl RelationDao for RelationDaoImpl {
         debug!("Saved relation : {} -> {}", one.from_meta, one.to_meta);
         Ok(rtn)
     }
+
     async fn delete(&self, one: RawRelation) -> Result<u64> {
         let sql = r"DELETE FROM nature.relation
             WHERE from_meta=:from_meta AND to_meta=:to_meta";
@@ -96,7 +82,6 @@ impl RelationDao for RelationDaoImpl {
         debug!("relation deleted : {} -> {}", one.from_meta, one.to_meta);
         Ok(rtn)
     }
-
     /// `from` and `to`'s form are full_key:version
     async fn update_flag(&self, from: &str, to: &str, flag_f: i32) -> Result<u64> {
         let sql = r"UPDATE nature.relation
@@ -120,6 +105,7 @@ impl RelationDao for RelationDaoImpl {
             from,
             to,
             &RelationSettings {
+                description: None,
                 selector: None,
                 down_selector: None,
                 executor: Some(Executor {
@@ -149,6 +135,21 @@ impl RelationDao for RelationDaoImpl {
             flag: 1,
         };
         D_R.delete(row).await
+    }
+
+    async fn id_great_than(&self, from: i32, limit: i32) -> Result<Vec<RawRelation>> {
+        let sql = r"SELECT id, from_meta, to_meta, settings, flag
+            FROM nature.relation
+            WHERE id > :from
+            order by id
+            limit :limit";
+
+        let p = params! {
+            "from" => from,
+            "limit" => limit,
+        };
+        let vec = MySql::fetch(sql, p, RawRelation::from).await?;
+        Ok(vec)
     }
 }
 

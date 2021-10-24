@@ -163,6 +163,7 @@ mod test_from_raw {
     #[test]
     fn one_group_is_ok() {
         let settings = RelationSettings {
+            description: None,
             selector: None,
             down_selector: None,
             executor: Some(Executor {

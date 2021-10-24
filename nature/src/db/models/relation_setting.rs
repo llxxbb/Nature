@@ -7,6 +7,9 @@ use crate::util::*;
 pub struct RelationSettings {
     #[serde(skip_serializing_if = "is_default")]
     #[serde(default)]
+    pub description: Option<String>,
+    #[serde(skip_serializing_if = "is_default")]
+    #[serde(default)]
     pub selector: Option<UpstreamSelector>,
     #[serde(skip_serializing_if = "is_default")]
     #[serde(default)]
@@ -65,6 +68,16 @@ mod test {
         settings.delay_on_para = (100, 20);
         let result = serde_json::to_string(&settings).unwrap();
         assert_eq!(result, r#"{"delay_on_para":[100,20]}"#);
+        let rtn = serde_json::from_str::<RelationSettings>(&result).unwrap();
+        assert_eq!(rtn, settings);
+    }
+
+    #[test]
+    fn description_test() {
+        let mut settings = RelationSettings::default();
+        settings.description = Some("lxb".to_string());
+        let result = serde_json::to_string(&settings).unwrap();
+        assert_eq!(result, r#"{"description":"lxb"}"#);
         let rtn = serde_json::from_str::<RelationSettings>(&result).unwrap();
         assert_eq!(rtn, settings);
     }

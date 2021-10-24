@@ -2,6 +2,7 @@
 
 ## Release 1.2.0 2021-10-24
 
+- add relation description config field
 
 ## Release 1.1.0 2021-10-24
 

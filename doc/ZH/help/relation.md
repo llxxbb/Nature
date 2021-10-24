@@ -18,6 +18,7 @@ VALUES('B:sale/order:1', 'B:sale/orderState:1', '{"target_states":{"add":["new"]
 
 ```json
 {
+    "description": null,	// 对关系进行说明
     "selector": {...},		// 缺省为 null, 选择符合条件的上游。见下面的“selector”
     "down_selector": {...},// 缺省为 null, 选择符合条件的下游。见下面的“down_selector”
     "executor": {...},		// 缺省为 null, 指定 Executor。见下面的 “Executor”
