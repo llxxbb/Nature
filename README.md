@@ -142,7 +142,6 @@ Nature 是一个开发支撑平台，它将数据定义从代码中剥离出来�
 
 #### meta
 
-- 在设置中添加友好名称 name :  。
 - meta 模板: meta 类型为 T(emplate)，用于提供复用的 meta 信息。 模板类型的 Meta 不能生成Instance，模板可将 states、fields、 config 的内容作为模板使用。其它 meta 可使用 `from` 属性来关联模板来使用模板中的内容，也可以关联非模板meta，这是一种规范而不是强制措施，模板使用者可覆盖或追加内容。
 - 伴生 meta：用于表示具有双向关系的实例，如用户属于某个组，组内有某个用户。伴生对象用于方便数据检索。伴生对象由 Nature 自动维护，不需要额外建立 relation。 其形式为 [meta_name]_R, 其中R为 Reverse 的首字母。条件：para 有且只有两个参数。
 - 可定义 instance 的生命周期，便于数据迁移自动化。
@@ -153,7 +152,6 @@ Nature 是一个开发支撑平台，它将数据定义从代码中剥离出来�
 
 #### ralation
 
-- 对关系的作用进行描述，在设置中增加 description 属性。
 - relation 模板：模板只提供 settings 中除 is_template 和 from 之外的信息 。请设置 from 属性关联到一个已经存在的 `relation` 上。
 - 动态路由，开关：出于安全上的考虑，在处理过程中，动态路由不能回归到静态路由。
 

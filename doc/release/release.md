@@ -1,5 +1,8 @@
 # 发布的功能
 
+## Release 1.2.0 2021-10-24
+
+
 ## Release 1.1.0 2021-10-24
 
 - Incompatible change: Split  `selector` to `selector` and `down_selector`

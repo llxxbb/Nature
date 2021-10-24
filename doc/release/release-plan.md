@@ -6,7 +6,7 @@
 - 应用情景支持，内部优先于外部（如网关）
 
 下面为正在开发的内容
-## Release 1.1.0
+## Release 1.2.0
 
 
 ### It should commit
@@ -14,6 +14,9 @@
 
 ### 未完成
 
+对关系的作用进行描述，在设置中增加 description 属性。
+    relation.md
+    test
 
 
 
