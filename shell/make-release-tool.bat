@@ -2,7 +2,7 @@ set RELEASE_PATH="..\\..\\Nature-Release"
 
 if not exist %RELEASE_PATH% md %RELEASE_PATH%
 
-copy /Y ..\.env %RELEASE_PATH%
+copy /Y ..\NATURE\.env %RELEASE_PATH%
 copy /Y ..\target\debug\nature.exe %RELEASE_PATH%
 copy /Y ..\target\debug\retry.exe %RELEASE_PATH%
 copy /Y ..\target\debug\nature_demo.dll %RELEASE_PATH%
