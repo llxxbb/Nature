@@ -3,7 +3,6 @@ use std::collections::HashSet;
 use std::hash::{Hash, Hasher};
 use std::iter::Iterator;
 use std::ops::{Deref, DerefMut};
-use std::str::FromStr;
 
 use chrono::prelude::*;
 use futures::Future;
@@ -30,7 +29,7 @@ pub struct Instance {
     /// A unique value used to distinguish other instance
     #[serde(skip_serializing_if = "is_default")]
     #[serde(default)]
-    pub id: String,
+    pub id: u64,
     pub data: BizObject,
     /// When this instance created in db
     #[serde(skip_serializing_if = "is_default")]
@@ -45,7 +44,7 @@ impl Instance {
         }
         let key = Meta::key_standardize(key)?;
         Ok(Instance {
-            id: "".to_string(),
+            id: 0,
             data: BizObject {
                 meta: format!("{}{}{}{}1", MetaType::default().get_prefix(), *SEPARATOR_META, key, *SEPARATOR_META),
                 content: "".to_string(),
@@ -62,8 +61,8 @@ impl Instance {
 
     pub fn revise(&mut self) -> Result<&mut Self> {
         self.create_time = Local::now().timestamp_millis();
-        if self.para.is_empty() && self.get_id()? == 0 {
-            self.id = generate_id(&self.data)?.to_string();
+        if self.para.is_empty() && self.id == 0 {
+            self.id = generate_id(&self.data)?;
         }
         Ok(self)
     }
@@ -88,7 +87,7 @@ impl Instance {
             Some(setting) => match setting.master {
                 None => Ok(None),
                 Some(master) => {
-                    let condition = KeyCondition::new(&self.id, &master, &self.para, 0);
+                    let condition = KeyCondition::new(self.id, &master, &self.para, 0);
                     let result = dao(condition);
                     Ok(result.await?)
                 }
@@ -98,17 +97,12 @@ impl Instance {
 
     pub fn get_key(&self) -> String {
         let sep: &str = &*SEPARATOR_INS_KEY;
-        let id = if self.id == "0" { "" } else { &self.id };
-        format!("{}{}{}{}{}{}{}", self.meta, sep, id, sep, self.para, sep, self.state_version)
+        format!("{}{}{}{}{}{}{}", self.meta, sep, self.id, sep, self.para, sep, self.state_version)
     }
 
     pub fn key_no_state(&self) -> String {
         let sep: &str = &*SEPARATOR_INS_KEY;
-        let id = if self.id == "0" { "" } else { &self.id };
-        format!("{}{}{}{}{}", self.meta, sep, id, sep, self.para)
-    }
-    pub fn get_id(&self) -> Result<u64> {
-        if self.id.is_empty() { Ok(0) } else { Ok(u64::from_str(&self.id)?) }
+        format!("{}{}{}{}{}", self.meta, sep, self.id, sep, self.para)
     }
 }
 
@@ -130,7 +124,7 @@ impl DerefMut for Instance {
 impl Into<KeyCondition> for Instance {
     fn into(self) -> KeyCondition {
         KeyCondition {
-            id: self.id.to_string(),
+            id: self.id,
             meta: self.data.meta.to_string(),
             key_gt: "".to_string(),
             key_ge: "".to_string(),
@@ -233,7 +227,7 @@ impl SelfRouteInstance {
     }
     pub fn to_instance(&self) -> Instance {
         Instance {
-            id: "".to_string(),
+            id: 0,
             data: self.instance.data.clone(),
             create_time: 0,
         }

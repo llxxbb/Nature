@@ -39,7 +39,7 @@ impl InstanceDaoImpl {
     }
 
     /// check whether source stored earlier
-    pub async fn get_by_from(f_para: &IDAndFrom) -> Result<Option<Instance>> {
+    pub async fn select_by_from(f_para: &IDAndFrom) -> Result<Option<Instance>> {
         let sql = r"SELECT meta, ins_id, para, content, context, states, state_version, create_time, sys_context, from_key
             FROM instances
             where meta = :meta and ins_id = :ins_id and from_key = :from_key
@@ -60,7 +60,7 @@ impl InstanceDaoImpl {
     }
 
     /// get all downstream by `from`
-    pub async fn get_downstream(from: &str) -> Result<Vec<Instance>> {
+    pub async fn select_downstream(from: &str) -> Result<Vec<Instance>> {
         let sql = r"SELECT meta, ins_id, para, content, context, states, state_version, create_time, sys_context, from_key
             FROM instances
             where from_key = :from_key";
@@ -76,7 +76,7 @@ impl InstanceDaoImpl {
         Ok(rtn)
     }
 
-    async fn get_last_state(f_para: &KeyCondition) -> Result<Option<Instance>> {
+    async fn select_last_state(f_para: &KeyCondition) -> Result<Option<Instance>> {
         let sql = r"SELECT meta, ins_id, para, content, context, states, state_version, create_time, sys_context, from_key
             FROM instances
             where meta = :meta and ins_id = :ins_id and para = :para
@@ -84,7 +84,7 @@ impl InstanceDaoImpl {
             limit 1";
         let p = params! {
             "meta" => f_para.meta.to_string(),
-            "ins_id" => f_para.get_id()?,
+            "ins_id" => f_para.id,
             "para" => f_para.para.to_string(),
         };
         let rtn = MySql::fetch(sql, p, RawInstance::from).await?;
@@ -95,7 +95,7 @@ impl InstanceDaoImpl {
         }
     }
 
-    pub async fn get_by_id(f_para: KeyCondition) -> Result<Option<Instance>> {
+    pub async fn select_by_id(f_para: KeyCondition) -> Result<Option<Instance>> {
         let sql = r"SELECT meta, ins_id, para, content, context, states, state_version, create_time, sys_context, from_key
             FROM instances
             where meta = :meta and ins_id = :ins_id and para = :para and state_version = :state_version
@@ -103,7 +103,7 @@ impl InstanceDaoImpl {
             limit 1";
         let p = params! {
             "meta" => f_para.meta.to_string(),
-            "ins_id" => f_para.get_id()?,
+            "ins_id" => f_para.id,
             "para" => f_para.para,
             "state_version" => f_para.state_version,
         };
@@ -120,7 +120,7 @@ impl InstanceDaoImpl {
             WHERE meta = :meta and ins_id = :ins_id and para = :para";
         let p = params! {
             "meta" => ins.meta.to_string(),
-            "ins_id" => ins.get_id()?,
+            "ins_id" => ins.id,
             "para" => ins.para.to_string(),
         };
         let rtn = MySql::idu(sql, p).await?;
@@ -129,7 +129,7 @@ impl InstanceDaoImpl {
     }
 
     /// get downstream instance through upstream instance
-    pub async fn get_last_target(from: &Instance, mission: &mut Mission) -> Result<Option<Instance>> {
+    pub async fn select_last_target(from: &Instance, mission: &mut Mission) -> Result<Option<Instance>> {
         // init for MetaType::loop --------------------
         if mission.to.get_meta_type() == MetaType::Loop
             && mission.to.meta_string() == from.meta {
@@ -167,8 +167,8 @@ impl InstanceDaoImpl {
         };
         let meta = mission.to.meta_string();
         debug!("get last state for meta {}", &meta);
-        let qc = KeyCondition::new(&id, &meta, &para_id, 0);
-        Self::get_last_state(&qc).await
+        let qc = KeyCondition::new(id.parse()?, &meta, &para_id, 0);
+        Self::select_last_state(&qc).await
     }
 
     pub async fn meta_exists(meta: &str) -> Result<bool> {
@@ -332,8 +332,8 @@ mod test {
     #[allow(dead_code)]
     fn get_last_state_test() {
         env::set_var("DATABASE_URL", "mysql://root@localhost/nature");
-        let para = KeyCondition::new("0", "B:score/trainee/all-subject:1", "002", 0);
-        let result = Runtime::new().unwrap().block_on(InstanceDaoImpl::get_last_state(&para));
+        let para = KeyCondition::new(0, "B:score/trainee/all-subject:1", "002", 0);
+        let result = Runtime::new().unwrap().block_on(InstanceDaoImpl::select_last_state(&para));
         let _ = dbg!(result);
     }
 
@@ -343,7 +343,7 @@ mod test {
     fn query_by_id() {
         env::set_var("DATABASE_URL", "mysql://root@localhost/nature");
         let para = KeyCondition {
-            id: "12345".to_string(),
+            id: 12345,
             meta: "B:sale/order:1".to_string(),
             key_gt: "".to_string(),
             key_ge: "".to_string(),
@@ -355,7 +355,7 @@ mod test {
             time_lt: None,
             limit: 1,
         };
-        let result = Runtime::new().unwrap().block_on(InstanceDaoImpl::get_by_id(para));
+        let result = Runtime::new().unwrap().block_on(InstanceDaoImpl::select_by_id(para));
         let _ = dbg!(result);
     }
 
@@ -365,14 +365,14 @@ mod test {
     async fn query_by_range_test() {
         env::set_var("DATABASE_URL", "mysql://root@localhost/nature");
         let mut ins = Instance::new("sale/order").unwrap();
-        ins.id = "760228".to_string();
+        ins.id = 760228;
         let _ = InstanceDaoImpl::insert(&ins).await;
 
         let ge_t = 1588508143000;
         let ge = Local.timestamp_millis(ge_t);
         dbg!(ge);
         let para = KeyCondition {
-            id: "0".to_string(),
+            id: 0,
             meta: "B:sale/order:1".to_string(),
             key_gt: "".to_string(),
             key_ge: "".to_string(),
@@ -399,7 +399,7 @@ mod test {
     async fn query_by_range() {
         env::set_var("DATABASE_URL", "mysql://root@localhost/nature");
         let para = KeyCondition {
-            id: "0".to_string(),
+            id: 0,
             meta: "".to_string(),
             key_gt: "B:sale/order:1|".to_string(),
             key_ge: "".to_string(),
@@ -429,7 +429,7 @@ mod test {
     async fn get_downstream_test() {
         env::set_var("DATABASE_URL", "mysql://root@localhost/nature");
 
-        let result = InstanceDaoImpl::get_downstream("B:finance/payment:1|1193619470850765623||0").await;
+        let result = InstanceDaoImpl::select_downstream("B:finance/payment:1|1193619470850765623||0").await;
         assert!(result.is_ok());
         let vec = result.unwrap();
         dbg!(&vec);

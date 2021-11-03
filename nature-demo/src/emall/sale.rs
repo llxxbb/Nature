@@ -4,7 +4,7 @@ use std::time::Duration;
 use crate::{get_state_instance_by_id, send_business_object};
 use crate::entry::{Commodity, Order, SelectedCommodity};
 
-pub fn send_order_to_nature() -> String {
+pub fn send_order_to_nature() -> u64 {
     // create an order
     let order = create_order_object();
     let id = send_business_object("/sale/order", &order).unwrap();
@@ -14,10 +14,10 @@ pub fn send_order_to_nature() -> String {
     assert_eq!(id2, id);
 
     // check created instance for order state
-    wait_until_order_state_is_ready(&id)
+    wait_until_order_state_is_ready(id)
 }
 
-fn wait_until_order_state_is_ready(order_id: &str) -> String {
+fn wait_until_order_state_is_ready(order_id: u64) -> u64 {
     loop {
         if let Some(ins) = get_state_instance_by_id(order_id, "B:sale/orderState:1", 1) {
             assert_eq!(ins.id, order_id);

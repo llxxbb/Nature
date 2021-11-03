@@ -143,7 +143,7 @@ impl TryInto<KeyCondition> for &RawTask {
             return Err(NatureError::VerifyError("error key format for task".to_string()));
         }
         let rtn = KeyCondition {
-            id: temp[1].to_string(),
+            id: temp[1].parse()?,
             meta: temp[0].to_string(),
             key_gt: "".to_string(),
             key_ge: "".to_string(),

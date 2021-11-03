@@ -49,7 +49,7 @@ impl RawInstance {
             }
         };
         Ok(Instance {
-            id: self.ins_id.to_string(),
+            id: self.ins_id,
             data: BizObject {
                 meta: self.meta.clone(),
                 content: self.content.clone(),
@@ -67,7 +67,7 @@ impl RawInstance {
     pub fn new(instance: &Instance) -> Result<RawInstance> {
         Ok(RawInstance {
             meta: instance.meta.to_string(),
-            ins_id: instance.get_id()?,
+            ins_id: instance.id,
             para: instance.para.to_string(),
             content: {
                 if instance.content.len() > *INSTANCE_CONTENT_MAX_LENGTH.deref() {

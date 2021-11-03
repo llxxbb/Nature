@@ -1,5 +1,9 @@
 # 发布的功能
 
+## Release 1.3.0 2021-11-02
+
+- change id from string to u64
+
 ## Release 1.2.0 2021-10-24
 
 - add relation description config field

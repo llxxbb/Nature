@@ -7,7 +7,7 @@ use crate::util::*;
 pub struct FromInstance {
     #[serde(skip_serializing_if = "is_default")]
     #[serde(default)]
-    pub id: String,
+    pub id: u64,
     pub meta: String,
     #[serde(skip_serializing_if = "is_default")]
     #[serde(default)]
@@ -24,22 +24,22 @@ impl FromInstance {
             return Err(NatureError::VerifyError("format error".to_string()));
         }
         let rtn = FromInstance {
-            id: part[1].to_string(),
+            id: part[1].parse()?,
             meta: part[0].to_string(),
             para: part[2].to_string(),
             state_version: 0,
         };
         Ok(rtn)
     }
-    pub fn get_id(&self) -> Result<u64> {
-        if self.id.is_empty() { Ok(0) } else { Ok(u64::from_str(&self.id)?) }
+    fn get_id_str(&self) -> String {
+        return if self.id == 0 { "".to_string() } else { self.id.to_string() };
     }
 }
 
 impl From<&Instance> for FromInstance {
     fn from(from: &Instance) -> Self {
         FromInstance {
-            id: from.id.to_string(),
+            id: from.id,
             meta: from.meta.to_string(),
             para: from.para.clone(),
             state_version: from.state_version,
@@ -56,8 +56,9 @@ impl FromStr for FromInstance {
             let msg = format!("FromInstance::from_str : error input [{}]", s);
             return Err(NatureError::VerifyError(msg));
         }
+        let id: u64 = if part[1].len() == 0 { 0 } else { part[1].parse()? };
         let rtn = FromInstance {
-            id: part[1].to_string(),
+            id,
             meta: part[0].to_string(),
             para: part[2].to_string(),
             state_version: i32::from_str(part[3])?,
@@ -69,8 +70,7 @@ impl FromStr for FromInstance {
 impl ToString for FromInstance {
     fn to_string(&self) -> String {
         let sep: &str = &*SEPARATOR_INS_KEY;
-        let id = if self.id == "0" { "" } else { &self.id };
-        format!("{}{}{}{}{}{}{}", self.meta, sep, id, sep, self.para, sep, self.state_version)
+        format!("{}{}{}{}{}{}{}", self.meta, sep, self.get_id_str(), sep, self.para, sep, self.state_version)
     }
 }
 

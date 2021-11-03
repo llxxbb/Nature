@@ -8,7 +8,7 @@ use crate::nature_lib::middleware::filter::convert_before;
 use crate::util::*;
 
 pub struct Loader {
-    pub dao: Arc<dyn KeyRange>
+    pub dao: Arc<dyn KeyRange>,
 }
 
 /// **notice** can only load one page data! more page consider use with `MetaType::Loop`
@@ -50,7 +50,7 @@ impl FilterBefore for Loader {
 
         // load
         let condition = KeyCondition {
-            id: "".to_string(),
+            id: 0,
             meta: "".to_string(),
             key_gt: first,
             key_ge: "".to_string(),

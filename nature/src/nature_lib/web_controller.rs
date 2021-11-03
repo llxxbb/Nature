@@ -43,7 +43,7 @@ async fn redo_task(task: Json<RawTask>) -> HttpResponse {
 /// exactly query
 #[post("/get_by_id")]
 async fn get_by_id(para: Json<KeyCondition>) -> HttpResponse {
-    let x = InstanceDaoImpl::get_by_id(para.0).await;
+    let x = InstanceDaoImpl::select_by_id(para.0).await;
     web_result(x)
 }
 

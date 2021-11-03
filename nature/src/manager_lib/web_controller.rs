@@ -11,14 +11,14 @@ use crate::util::web_result;
 #[post("/instance/byId")]
 async fn get_by_id(para: Json<KeyCondition>) -> HttpResponse {
     debug!("/instance/byId : {:?}", &para.0);
-    let x = InstanceDaoImpl::get_by_id(para.0).await;
+    let x = InstanceDaoImpl::select_by_id(para.0).await;
     web_result(x)
 }
 
 #[post("/instance/downstream")]
 async fn get_downstream_instance(from: String) -> HttpResponse {
     debug!("/instance/downstream : {:?}", &from);
-    let x = InstanceDaoImpl::get_downstream(&from).await;
+    let x = InstanceDaoImpl::select_downstream(&from).await;
     web_result(x)
 }
 

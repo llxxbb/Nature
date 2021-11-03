@@ -2,11 +2,11 @@ use nature::domain::Instance;
 
 use crate::{send_instance, wait_for_order_state};
 
-pub fn outbound(order_id: &str) {
+pub fn outbound(order_id: u64) {
     // for package
     let last = wait_for_order_state(order_id, 3);
     let mut instance = Instance::new("sale/orderState").unwrap();
-    instance.id = last.id.to_string();
+    instance.id = last.id;
     instance.state_version = last.state_version + 1;
     instance.states.clear();
     instance.states.insert("outbound".to_string());

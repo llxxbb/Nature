@@ -108,7 +108,7 @@ pub fn merge(input: &ConverterParameter) -> ConverterReturned {
             }
         }
     };
-    ins.id = input.from.id.to_string();
+    ins.id = input.from.id;
     ins.para = input.from.para.clone();
     ConverterReturned::Instances { ins: vec![ins] }
 }

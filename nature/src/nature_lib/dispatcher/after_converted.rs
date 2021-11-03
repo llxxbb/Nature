@@ -104,7 +104,7 @@ fn remove_loop_id(ins: &mut Instance, task: &TaskForConvert) -> Result<()> {
 
 /// **Notice** need get sys_context from upstream
 fn gen_instance_for_loop(ins: &mut Instance, task: &TaskForConvert) -> Result<()> {
-    ins.id = task.from.id.to_string();
+    ins.id = task.from.id;
 
     // loop next
     if let Some(next) = task.from.sys_context.get(CONTEXT_LOOP_NEXT) {

@@ -87,7 +87,7 @@ fn check_id(ins: &mut Vec<Instance>, from: &FromInstance, target: &Mission) -> R
     // handle state-instance, the id and para had put to the sys_context before convert
     if target.to.is_state() {
         if let Some(id) = target.sys_context.get(CONTEXT_TARGET_INSTANCE_ID) {
-            ins[0].id = id.to_string();
+            ins[0].id = id.parse()?;
         }
         if let Some(para) = target.sys_context.get(CONTEXT_TARGET_INSTANCE_PARA) {
             ins[0].para = para.to_string();
@@ -118,7 +118,7 @@ fn check_id(ins: &mut Vec<Instance>, from: &FromInstance, target: &Mission) -> R
             }
         }
         if let Some(ref id_u) = id {
-            one.id = id_u.to_string();
+            one.id = id_u.parse()?;
         }
         one.revise()?;
     }
@@ -210,7 +210,7 @@ mod sys_context_test {
         let mut mission = Mission::default();
         mission.id_bridge = true;
         let mut from = FromInstance::default();
-        from.id = "123".to_string();
+        from.id = 123;
         bridge_context_id(&mut ins, &mission, &from);
         assert_eq!("123", ins[0].sys_context.get("target.id").unwrap());
     }
@@ -238,7 +238,7 @@ mod test {
     #[test]
     fn upstream_test() {
         let mut from_ins = Instance::default();
-        from_ins.id = "567".to_string();
+        from_ins.id = 567;
         from_ins.meta = "B:from:1".to_string();
         from_ins.state_version = 2;
         let meta = Meta::new("to", 1, MetaType::Business).unwrap();
@@ -273,16 +273,16 @@ mod test {
             task_state: 0,
         };
         let mut ins = Instance::default();
-        ins.id = "123".to_string();
+        ins.id = 123;
         let ins = vec![ins];
 
         let result = Converted::gen(&task, &raw, ins.clone(), &None).unwrap();
         let c = &result.converted[0];
         let from = c.from.as_ref().unwrap();
-        assert_eq!(from.id, "567".to_string());
+        assert_eq!(from.id, 567);
         assert_eq!(from.meta, "B:from:1");
         assert_eq!(from.state_version, 2);
-        assert_eq!(result.converted[0].id, "567".to_string());
+        assert_eq!(result.converted[0].id, 567);
     }
 
     #[test]
@@ -337,10 +337,10 @@ mod check_id_for_state {
         let (from, mission) = init_input();
         let sta = Instance::default();
         let vec = &mut vec![sta];
-        assert_eq!(vec[0].id, "");
+        assert_eq!(vec[0].id, 0);
         let rtn = check_id(vec, &from, &mission);
         assert_eq!(rtn.is_ok(), true);
-        assert_eq!(vec[0].id.len() > 0, true)
+        assert_eq!(vec[0].id > 0, true)
     }
 
     #[test]
@@ -349,10 +349,10 @@ mod check_id_for_state {
         let sta = Instance::default();
         mission.sys_context.insert("target.id".to_string(), "5".to_string());
         let vec = &mut vec![sta];
-        assert_eq!(vec[0].id, "");
+        assert_eq!(vec[0].id, 0);
         let rtn = check_id(vec, &from, &mission);
         assert_eq!(rtn.is_ok(), true);
-        assert_eq!(vec[0].id, "5")
+        assert_eq!(vec[0].id, 5)
     }
 
     #[test]
@@ -363,7 +363,7 @@ mod check_id_for_state {
         let vec = &mut vec![sta];
         let rtn = check_id(vec, &from, &mission);
         assert_eq!(rtn.is_ok(), true);
-        assert_eq!(vec[0].id, "");
+        assert_eq!(vec[0].id, 0);
         assert_eq!(vec[0].para, "a")
     }
 
@@ -395,8 +395,8 @@ mod check_id_for_normal {
         let one = Instance::new("one").unwrap();
         let mut input = vec![one];
         let _ = check_id(&mut input, &from, &mission);
-        assert_eq!(input[0].id != "123", true);
-        assert_eq!(input[0].id != "0", true);
+        assert_eq!(input[0].id != 123, true);
+        assert_eq!(input[0].id != 0, true);
     }
 
     #[test]
@@ -422,7 +422,7 @@ mod check_id_for_normal {
         let one = Instance::new("one").unwrap();
         let mut input = vec![one];
         let _ = check_id(&mut input, &from, &mission);
-        assert_eq!(input[0].id, "123");
+        assert_eq!(input[0].id, 123);
     }
 
 
@@ -433,13 +433,13 @@ mod check_id_for_normal {
         let one = Instance::new("one").unwrap();
         let mut input = vec![one];
         let _ = check_id(&mut input, &from, &mission);
-        assert_eq!(input[0].id, "123");
+        assert_eq!(input[0].id, 123);
     }
 
     /// master is from
     fn init_input() -> (FromInstance, Mission) {
         let from = FromInstance {
-            id: "123".to_string(),
+            id: 123,
             meta: "from".to_string(),
             para: "".to_string(),
             state_version: 1,

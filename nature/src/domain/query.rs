@@ -1,6 +1,5 @@
 use crate::domain::*;
 use crate::util::*;
-use std::str::FromStr;
 
 /// Condition for querying multi-row of `Instance`
 /// key format [meta|id|para|status_version]
@@ -12,7 +11,7 @@ use std::str::FromStr;
 pub struct KeyCondition {
     #[serde(skip_serializing_if = "is_default")]
     #[serde(default)]
-    pub id: String,
+    pub id: u64,
     #[serde(skip_serializing_if = "is_default")]
     #[serde(default)]
     pub meta: String,
@@ -46,9 +45,9 @@ pub struct KeyCondition {
 }
 
 impl KeyCondition {
-    pub fn new(id: &str, meta: &str, para: &str, state_version: i32) -> Self {
+    pub fn new(id: u64, meta: &str, para: &str, state_version: i32) -> Self {
         KeyCondition {
-            id: id.to_string(),
+            id: id,
             meta: meta.to_string(),
             key_gt: "".to_string(),
             key_ge: "".to_string(),
@@ -61,29 +60,27 @@ impl KeyCondition {
             limit: 1,
         }
     }
+    fn get_id_str(&self) -> String {
+        return if self.id == 0 { "".to_string() } else { self.id.to_string() };
+    }
     pub fn id_like(&self) -> String {
         let sep: &str = &*SEPARATOR_INS_KEY;
         format!("{}{}%", self.meta, sep)
     }
     pub fn para_like(&self) -> String {
         let sep: &str = &*SEPARATOR_INS_KEY;
-        let id = if self.id == "0" { "" } else { &self.id };
-        format!("{}{}{}{}%", self.meta, sep, id, sep)
+        format!("{}{}{}{}%", self.meta, sep, self.get_id_str(), sep)
     }
     pub fn get_key(&self) -> String {
         let sep: &str = &*SEPARATOR_INS_KEY;
-        let id = if self.id == "0" { "" } else { &self.id };
-        format!("{}{}{}{}{}", self.meta, sep, id, sep, self.para)
-    }
-    pub fn get_id(&self) -> Result<u64> {
-        if self.id.is_empty() { Ok(0) } else { Ok(u64::from_str(&self.id)?) }
+        format!("{}{}{}{}{}", self.meta, sep, self.get_id_str(), sep, self.para)
     }
 }
 
 impl From<&Instance> for KeyCondition {
     fn from(input: &Instance) -> Self {
         KeyCondition {
-            id: input.id.to_string(),
+            id: input.id,
             meta: input.meta.to_string(),
             key_gt: "".to_string(),
             key_ge: "".to_string(),
@@ -101,7 +98,7 @@ impl From<&Instance> for KeyCondition {
 impl From<&FromInstance> for KeyCondition {
     fn from(input: &FromInstance) -> Self {
         KeyCondition {
-            id: input.id.to_string(),
+            id: input.id,
             meta: input.meta.to_string(),
             key_gt: "".to_string(),
             key_ge: "".to_string(),
@@ -157,21 +154,21 @@ mod key_condition_test {
     fn from_json() {
         let condition = r#"
             {
-                "id": "1",
+                "id": 1,
                 "meta": "B:finance/payment:1",
                 "para": "a",
                 "state_version": 0
             }
         "#;
         let rtn = serde_json::from_str::<KeyCondition>(condition).unwrap();
-        assert_eq!(rtn.id, "1")
+        assert_eq!(rtn.id, 1)
     }
 
     #[test]
     #[ignore]
     fn to_json() {
         let condition = KeyCondition {
-            id: "0".to_string(),
+            id: 0,
             meta: "$meta".to_string(),
             key_gt: "".to_string(),
             key_ge: "".to_string(),

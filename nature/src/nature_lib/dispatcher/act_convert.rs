@@ -30,7 +30,7 @@ pub(crate) async fn do_convert(task: TaskForConvert, raw: RawTask) {
     }
     // -----end
     let mut task = task;
-    let last = match InstanceDaoImpl::get_last_target(&from_instance, &mut task.target).await {
+    let last = match InstanceDaoImpl::select_last_target(&from_instance, &mut task.target).await {
         Err(_) => { return; }
         Ok(last) => last
     };
@@ -47,7 +47,7 @@ pub(crate) async fn do_convert(task: TaskForConvert, raw: RawTask) {
             return;
         }
     };
-    let master = match task.from.get_master(&meta, InstanceDaoImpl::get_by_id).await {
+    let master = match task.from.get_master(&meta, InstanceDaoImpl::select_by_id).await {
         Ok(m) => m,
         Err(e) => {
             warn!("get master instance error: {}", e);

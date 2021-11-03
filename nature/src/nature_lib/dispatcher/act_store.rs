@@ -49,11 +49,11 @@ async fn duplicated_instance(task: TaskForStore, carrier: RawTask) -> Result<()>
         Some(from) => from,
     };
     let para = IDAndFrom {
-        id: task.instance.get_id()?,
+        id: task.instance.id,
         meta: task.instance.meta.clone(),
         from_key: ins_from.to_string(),
     };
-    let old = InstanceDaoImpl::get_by_from(&para).await?;
+    let old = InstanceDaoImpl::select_by_from(&para).await?;
     if let Some(ins) = old {
         // same from instance
         warn!("same source for meta: {}, replaced with old instance", &task.instance.meta);
@@ -64,7 +64,7 @@ async fn duplicated_instance(task: TaskForStore, carrier: RawTask) -> Result<()>
     } else {
         warn!("conflict for state-meta: [{}] on version : {}", &task.instance.meta, task.instance.state_version);
         sleep(Duration::from_millis(10));
-        let mut rtn = TaskForConvert::from_raw(&carrier, InstanceDaoImpl::get_by_id, &*C_M, &*D_M).await?;
+        let mut rtn = TaskForConvert::from_raw(&carrier, InstanceDaoImpl::select_by_id, &*C_M, &*D_M).await?;
         rtn.conflict_version = task.instance.state_version;
         CHANNEL_CONVERT.sender.lock().unwrap().send((rtn, carrier))?;
         Ok(())
