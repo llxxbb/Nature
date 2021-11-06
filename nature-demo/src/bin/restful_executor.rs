@@ -55,7 +55,7 @@ pub fn start_actrix() -> Server {
         || App::new()
             .route("/send_to_warehouse", web::post().to(send_to_warehouse))
             .route("/add_score", web::post().to(add_score))
-    ).bind("127.0.0.1:".to_owned() + &port).unwrap()
+    ).bind("0.0.0.0:".to_owned() + &port).unwrap()
         .run()
 }
 

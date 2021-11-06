@@ -3,6 +3,7 @@ extern crate dotenv;
 
 use std::env;
 
+use actix_cors::Cors;
 use actix_web::{App, HttpServer};
 use actix_web::middleware::Logger;
 use dotenv::dotenv;
@@ -22,9 +23,13 @@ pub async fn web_init() -> std::io::Result<()> {
     let _ = env_logger::init();
     show_config();
     let _ = start_receive_threads();
-    HttpServer::new(|| App::new()
-        .wrap(Logger::default())
-        .configure(web_config))
-        .bind("127.0.0.1:".to_owned() + &SERVER_PORT).unwrap()
+    HttpServer::new(|| {
+        let cors = Cors::permissive();
+        App::new()
+            .wrap(Logger::default())
+            .wrap(cors)
+            .configure(web_config)
+    })
+        .bind("0.0.0.0:".to_owned() + &SERVER_PORT).unwrap()
         .run().await
 }
