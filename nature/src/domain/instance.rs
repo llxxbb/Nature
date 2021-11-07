@@ -24,18 +24,23 @@ pub static CONTEXT_LOOP_FINISHED: &str = "loop.finished";
 pub static CONTEXT_DYNAMIC_PARA: &str = "para.dynamic";
 
 /// A snapshot for a particular `Meta`
-#[derive(Serialize, Deserialize, Debug, Default, Clone, PartialEq, Eq, Hash)]
+#[derive(Serialize, Deserialize, Debug, Default, Clone, PartialEq, Eq)]
 pub struct Instance {
-    /// A unique value used to distinguish other instance
     #[serde(skip_serializing_if = "is_default")]
     #[serde(default)]
     pub id: u64,
+    pub path: Modifier,
+    /// data Nature can't controlled
     pub data: BizObject,
+    #[serde(skip_serializing_if = "is_default")]
+    #[serde(default)]
+    pub from: Option<InstanceLocator>,
     /// When this instance created in db
     #[serde(skip_serializing_if = "is_default")]
     #[serde(default)]
     pub create_time: i64,
 }
+
 
 impl Instance {
     pub fn new(key: &str) -> Result<Self> {
@@ -45,23 +50,25 @@ impl Instance {
         let key = Meta::key_standardize(key)?;
         Ok(Instance {
             id: 0,
-            data: BizObject {
+            path: Modifier {
                 meta: format!("{}{}{}{}1", MetaType::default().get_prefix(), *SEPARATOR_META, key, *SEPARATOR_META),
+                para: "".to_string(),
+                state_version: 0,
+            },
+            data: BizObject {
                 content: "".to_string(),
                 context: HashMap::new(),
                 sys_context: HashMap::new(),
                 states: HashSet::new(),
-                state_version: 0,
-                from: None,
-                para: String::new(),
             },
+            from: None,
             create_time: 0,
         })
     }
 
     pub fn revise(&mut self) -> Result<&mut Self> {
         self.create_time = Local::now().timestamp_millis();
-        if self.para.is_empty() && self.id == 0 {
+        if self.path.para.is_empty() && self.id == 0 {
             self.id = generate_id(&self.data)?;
         }
         Ok(self)
@@ -71,7 +78,7 @@ impl Instance {
         if is.len() < 2 {
             return Ok(());
         }
-        let option = is[1..].iter().find(|x| { !x.meta.eq(&is[0].meta) });
+        let option = is[1..].iter().find(|x| { !x.path.meta.eq(&is[0].path.meta) });
         match option {
             Some(_) => Err(NatureError::VerifyError("instances meta must be same!".to_string())),
             None => Ok(())
@@ -87,7 +94,7 @@ impl Instance {
             Some(setting) => match setting.master {
                 None => Ok(None),
                 Some(master) => {
-                    let condition = InsCond::new(self.id, &master, &self.para, 0);
+                    let condition = InsCond::new(self.id, &master, &self.path.para, 0);
                     let result = dao(condition);
                     Ok(result.await?)
                 }
@@ -97,15 +104,44 @@ impl Instance {
 
     pub fn get_key(&self) -> String {
         let sep: &str = &*SEPARATOR_INS_KEY;
-        format!("{}{}{}{}{}{}{}", self.meta, sep, self.id, sep, self.para, sep, self.state_version)
+        format!("{}{}{}{}{}{}{}", self.path.meta, sep, self.id, sep, self.path.para, sep, self.path.state_version)
     }
 
     pub fn key_no_state(&self) -> String {
         let sep: &str = &*SEPARATOR_INS_KEY;
-        format!("{}{}{}{}{}", self.meta, sep, self.id, sep, self.para)
+        format!("{}{}{}{}{}", self.path.meta, sep, self.id, sep, self.path.para)
+    }
+
+    pub fn init_meta(meta_setting: &MetaSetting, instances: &mut Vec<Instance>, from: &InstanceLocator) -> Result<()> {
+        // when has one then use it.
+        if meta_setting.multi_meta.len() == 1 {
+            let meta = meta_setting.multi_meta.iter().next().unwrap();
+            for instance in instances {
+                instance.path.meta = meta.to_string();
+                instance.from = Some(from.clone());
+            }
+            return Ok(());
+        }
+        // otherwise check each meta
+        for instance in instances {
+            if !meta_setting.multi_meta.contains(&instance.path.meta) {
+                let msg = format!("undefined meta:{} ", instance.path.meta);
+                return Err(NatureError::VerifyError(msg));
+            }
+            instance.from = Some(from.clone());
+        }
+        Ok(())
     }
 }
 
+impl Hash for Instance {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.path.hash(state);
+        self.data.hash(state);
+        self.from.hash(state);
+        self.create_time.hash(state);
+    }
+}
 
 impl Deref for Instance {
     type Target = BizObject;
@@ -125,13 +161,13 @@ impl Into<InsCond> for Instance {
     fn into(self) -> InsCond {
         InsCond {
             id: self.id,
-            meta: self.data.meta.to_string(),
+            meta: self.path.meta.to_string(),
             key_gt: "".to_string(),
             key_ge: "".to_string(),
             key_lt: "".to_string(),
             key_le: "".to_string(),
-            para: self.data.para.to_string(),
-            state_version: self.data.state_version,
+            para: self.path.para.to_string(),
+            state_version: self.path.state_version,
             time_ge: None,
             time_lt: None,
             limit: 1,
@@ -150,8 +186,6 @@ impl Iterator for Instance {
 /// A snapshot for a particular `Meta`
 #[derive(Serialize, Deserialize, Debug, Default, Clone, PartialEq, Eq)]
 pub struct BizObject {
-    /// This instance's Type
-    pub meta: String,
     /// What contend in this instance for the `Meta`
     #[serde(skip_serializing_if = "is_default")]
     #[serde(default)]
@@ -167,24 +201,11 @@ pub struct BizObject {
     #[serde(skip_serializing_if = "is_default")]
     #[serde(default)]
     pub states: HashSet<String>,
-    #[serde(skip_serializing_if = "is_default")]
-    #[serde(default)]
-    pub state_version: i32,
-    #[serde(skip_serializing_if = "is_default")]
-    #[serde(default)]
-    pub from: Option<FromInstance>,
-    #[serde(skip_serializing_if = "is_default")]
-    #[serde(default)]
-    pub para: String,
 }
 
 impl Hash for BizObject {
     fn hash<H: Hasher>(&self, s: &mut H) {
-        self.meta.hash(s);
         self.content.hash(s);
-        self.state_version.hash(s);
-        self.from.hash(s);
-        self.para.hash(s);
         self.context.iter().sorted().for_each(|one| {
             one.0.hash(s);
             one.1.hash(s)
@@ -228,7 +249,9 @@ impl SelfRouteInstance {
     pub fn to_instance(&self) -> Instance {
         Instance {
             id: 0,
+            path: self.instance.path.clone(),
             data: self.instance.data.clone(),
+            from: None,
             create_time: 0,
         }
     }
@@ -240,6 +263,8 @@ impl SelfRouteInstance {
 
 #[cfg(test)]
 mod test {
+    use std::collections::BTreeSet;
+
     use super::*;
 
     #[test]
@@ -253,9 +278,9 @@ mod test {
     #[test]
     fn instance_new_test() {
         let ins = Instance::new("hello").unwrap();
-        assert_eq!(ins.meta, "B:hello:1");
+        assert_eq!(ins.path.meta, "B:hello:1");
         let ins = Instance::new("/hello").unwrap();
-        assert_eq!(ins.meta, "B:hello:1");
+        assert_eq!(ins.path.meta, "B:hello:1");
     }
 
     #[test]
@@ -263,7 +288,7 @@ mod test {
         let mut order = Instance::new("sale/order").unwrap();
         order.data.content = "my order detail".to_string();
         let rtn = serde_json::to_string(&order).unwrap();
-        assert_eq!(rtn, r#"{"data":{"meta":"B:sale/order:1","content":"my order detail"}}"#);
+        assert_eq!(rtn, r#"{"path":{"meta":"B:sale/order:1"},"data":{"content":"my order detail"}}"#);
     }
 
     #[test]
@@ -285,6 +310,57 @@ mod test {
         println!("{}", result);
         let result: Result<Instance> = serde_json::from_str(&result).unwrap();
         assert_eq!(result, ok_ins)
+    }
+
+    #[test]
+    fn check_multi_meta() {
+        let mut set: BTreeSet<String> = BTreeSet::new();
+        set.insert("B:a:1".to_string());
+        set.insert("B:b:1".to_string());
+
+        let ms = MetaSetting {
+            name: None,
+            is_state: false,
+            master: None,
+            multi_meta: set,
+            cache_saved: false,
+            only_one: false,
+        };
+        let a = Instance::new("a").unwrap();
+        let b = Instance::new("b").unwrap();
+        let c = Instance::new("d").unwrap();
+        assert_eq!(Instance::init_meta(&ms, &mut vec![a.clone()], &InstanceLocator::default()).is_ok(), true);
+        assert_eq!(Instance::init_meta(&ms, &mut vec![b.clone()], &InstanceLocator::default()).is_ok(), true);
+        assert_eq!(Instance::init_meta(&ms, &mut vec![a.clone(), b.clone()], &InstanceLocator::default()).is_ok(), true);
+        assert_eq!(Instance::init_meta(&ms, &mut vec![c.clone()], &InstanceLocator::default()).is_err(), true);
+        assert_eq!(Instance::init_meta(&ms, &mut vec![c.clone(), a.clone()], &InstanceLocator::default()).is_err(), true);
+        assert_eq!(Instance::init_meta(&ms, &mut vec![a.clone(), c.clone()], &InstanceLocator::default()).is_err(), true);
+        assert_eq!(Instance::init_meta(&ms, &mut vec![b.clone(), c.clone()], &InstanceLocator::default()).is_err(), true);
+        assert_eq!(Instance::init_meta(&ms, &mut vec![c.clone(), b.clone()], &InstanceLocator::default()).is_err(), true);
+        assert_eq!(Instance::init_meta(&ms, &mut vec![a, b, c], &InstanceLocator::default()).is_err(), true);
+    }
+
+    #[test]
+    fn set_meta_for_multi_meta() {
+        let mut set: BTreeSet<String> = BTreeSet::new();
+        set.insert("B:a:1".to_string());
+
+        let ms = MetaSetting {
+            name: None,
+            is_state: false,
+            master: None,
+            multi_meta: set,
+            cache_saved: false,
+            only_one: false,
+        };
+        let a = Instance::default();
+        let b = Instance::default();
+        let c = Instance::default();
+        let ins = &mut vec![a, b, c];
+        let _ = Instance::init_meta(&ms, ins, &InstanceLocator::default());
+        assert_eq!("B:a:1", ins[0].path.meta);
+        assert_eq!("B:a:1", ins[1].path.meta);
+        assert_eq!("B:a:1", ins[2].path.meta);
     }
 }
 

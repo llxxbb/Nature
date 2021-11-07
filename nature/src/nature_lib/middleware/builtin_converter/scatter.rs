@@ -57,9 +57,9 @@ pub fn scatter(para: &ConverterParameter) -> ConverterReturned {
     for one in input {
         let mut ins = Instance::default();
         if need_replace {
-            ins.para = one.key.replace(&set.dimension_separator, &*SEPARATOR_INS_PARA);
+            ins.path.para = one.key.replace(&set.dimension_separator, &*SEPARATOR_INS_PARA);
         } else {
-            ins.para = one.key.to_string();
+            ins.path.para = one.key.to_string();
         }
         ins.content = one.value.to_string();
         rtn.push(ins);
@@ -98,7 +98,7 @@ mod test {
         if let ConverterReturned::Instances { ins } = rtn {
             assert_eq!(ins.len(), 3);
             let one = &ins[0];
-            assert_eq!(one.para, "class5/name1/subject1");
+            assert_eq!(one.path.para, "class5/name1/subject1");
             assert_eq!(one.content, "92");
         };
     }

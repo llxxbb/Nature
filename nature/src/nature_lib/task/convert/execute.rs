@@ -34,7 +34,7 @@ pub async fn call_executor(task: &mut TaskForConvert, raw: &RawTask, last_target
         master,
         cfg: task.target.executor.settings.to_string(),
     };
-    debug!("execute: from: {}, to : {}, executor: {}", task.from.meta, task.target.to.meta_string(), &task.target.executor.url);
+    debug!("execute: from: {}, to : {}, executor: {}", task.from.path.meta, task.target.to.meta_string(), &task.target.executor.url);
     let rtn = match &task.target.executor.protocol {
         Protocol::Http => http_execute_async(&task.target.executor.url, &para).await,
         Protocol::LocalRust => match local_execute(&task.target.executor.url, &para).await {

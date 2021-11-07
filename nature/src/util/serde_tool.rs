@@ -41,7 +41,7 @@ mod test {
         assert_eq!(is_default(&true), false);
         let mut ins = Instance::default();
         assert_eq!(is_default(&ins), true);
-        ins.para = "hello".to_string();
+        ins.path.para = "hello".to_string();
         assert_eq!(is_default(&ins), false);
     }
 }

@@ -52,7 +52,7 @@ impl Setting {
     fn to_condition(&self, ins: &Instance) -> Result<Condition> {
         // get time info from para
         let part = match &self.time_part {
-            Some(part) => match get_para_part(&ins.para, part) {
+            Some(part) => match get_para_part(&ins.path.para, part) {
                 Ok(rtn) => {
                     let t_ge = i64::from_str(&rtn[0])? * 1000;
                     let t_lt = i64::from_str(&rtn[1])? * 1000;
@@ -61,7 +61,7 @@ impl Setting {
                     (Some(t_ge), Some(t_lt))
                 }
                 Err(e) => {
-                    let msg = format!("TaskCheckerFilter: instance's para has no time info: {}， para: {}", e.to_string(), ins.para);
+                    let msg = format!("TaskCheckerFilter: instance's para has no time info: {}， para: {}", e.to_string(), ins.path.para);
                     return Err(NatureError::VerifyError(msg));
                 }
             }

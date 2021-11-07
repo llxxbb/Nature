@@ -49,27 +49,6 @@ impl FromStr for MetaSetting {
 }
 
 impl MetaSetting {
-    pub fn set_instance_meta(&self, instances: &mut Vec<Instance>, from: &FromInstance) -> Result<()> {
-        // when has one then use it.
-        if self.multi_meta.len() == 1 {
-            let meta = self.multi_meta.iter().next().unwrap();
-            for instance in instances {
-                instance.meta = meta.to_string();
-                instance.from = Some(from.clone());
-            }
-            return Ok(());
-        }
-        // otherwise check each meta
-        for instance in instances {
-            if !self.multi_meta.contains(&instance.meta) {
-                let msg = format!("undefined meta:{} ", instance.meta);
-                return Err(NatureError::VerifyError(msg));
-            }
-            instance.from = Some(from.clone());
-        }
-        Ok(())
-    }
-
     pub fn to_json(&self) -> Result<String> {
         let rtn = serde_json::to_string(&self)?;
         Ok(rtn)
@@ -129,57 +108,6 @@ mod test {
         set.master = Some("B:from:1".to_string());
         let result = serde_json::to_string(&set).unwrap();
         assert_eq!(result, r#"{"master":"B:from:1"}"#)
-    }
-
-    #[test]
-    fn check_multi_meta() {
-        let mut set: BTreeSet<String> = BTreeSet::new();
-        set.insert("B:a:1".to_string());
-        set.insert("B:b:1".to_string());
-
-        let ms = MetaSetting {
-            name: None,
-            is_state: false,
-            master: None,
-            multi_meta: set,
-            cache_saved: false,
-            only_one: false,
-        };
-        let a = Instance::new("a").unwrap();
-        let b = Instance::new("b").unwrap();
-        let c = Instance::new("d").unwrap();
-        assert_eq!(ms.set_instance_meta(&mut vec![a.clone()], &FromInstance::default()).is_ok(), true);
-        assert_eq!(ms.set_instance_meta(&mut vec![b.clone()], &FromInstance::default()).is_ok(), true);
-        assert_eq!(ms.set_instance_meta(&mut vec![a.clone(), b.clone()], &FromInstance::default()).is_ok(), true);
-        assert_eq!(ms.set_instance_meta(&mut vec![c.clone()], &FromInstance::default()).is_err(), true);
-        assert_eq!(ms.set_instance_meta(&mut vec![c.clone(), a.clone()], &FromInstance::default()).is_err(), true);
-        assert_eq!(ms.set_instance_meta(&mut vec![a.clone(), c.clone()], &FromInstance::default()).is_err(), true);
-        assert_eq!(ms.set_instance_meta(&mut vec![b.clone(), c.clone()], &FromInstance::default()).is_err(), true);
-        assert_eq!(ms.set_instance_meta(&mut vec![c.clone(), b.clone()], &FromInstance::default()).is_err(), true);
-        assert_eq!(ms.set_instance_meta(&mut vec![a, b, c], &FromInstance::default()).is_err(), true);
-    }
-
-    #[test]
-    fn set_meta_for_multi_meta() {
-        let mut set: BTreeSet<String> = BTreeSet::new();
-        set.insert("B:a:1".to_string());
-
-        let ms = MetaSetting {
-            name: None,
-            is_state: false,
-            master: None,
-            multi_meta: set,
-            cache_saved: false,
-            only_one: false,
-        };
-        let a = Instance::default();
-        let b = Instance::default();
-        let c = Instance::default();
-        let ins = &mut vec![a, b, c];
-        let _ = ms.set_instance_meta(ins, &FromInstance::default());
-        assert_eq!("B:a:1", ins[0].meta);
-        assert_eq!("B:a:1", ins[1].meta);
-        assert_eq!("B:a:1", ins[2].meta);
     }
 
     #[test]

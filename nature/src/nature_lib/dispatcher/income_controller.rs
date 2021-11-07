@@ -15,7 +15,7 @@ impl IncomeController {
     pub async fn input(mut instance: Instance) -> Result<u64> {
         let meta = check_and_revise(&mut instance).await?;
         let relations = C_R.get(&meta, &*D_R, &*C_M, &*D_M).await?;
-        let mission = Mission::get_by_instance(&instance, &relations, context_check, state_check);
+        let mission = Mission::load_by_instance(&instance, &relations, context_check, state_check);
         // for o in &mission {
         //     debug!("--generate mission from:{},to:{}", &instance.meta, o.to.meta_string());
         // }
@@ -35,7 +35,7 @@ impl IncomeController {
         let _ = instance.verify()?;
         // Convert a Self-Route-Instance to Normal Instance
         let mut ins = instance.to_instance();
-        MetaType::check_type(&ins.meta, MetaType::Dynamic)?;
+        MetaType::check_type(&ins.path.meta, MetaType::Dynamic)?;
         let uuid = ins.revise()?.id.to_string();
         let task = TaskForStore::for_dynamic(&ins, instance.converter, None, false)?;
         let mut raw = task.to_raw()?;
@@ -95,7 +95,7 @@ impl IncomeController {
             }
             TaskType::Convert => {
                 let rtn = TaskForConvert::from_raw(&raw, InstanceDaoImpl::select_by_id, &*C_M, &*D_M).await?;
-                debug!("--redo convert task: from:{}, to:{}", rtn.from.meta, rtn.target.to.meta_string());
+                debug!("--redo convert task: from:{}, to:{}", rtn.from.path.meta, rtn.target.to.meta_string());
                 CHANNEL_CONVERT.sender.lock().unwrap().send((rtn, raw))?;
             }
             TaskType::Batch => {
@@ -109,7 +109,7 @@ impl IncomeController {
 
     pub async fn batch(batch: Vec<Instance>) -> Result<()> {
         let id = generate_id(&batch)?;
-        let mut raw = RawTask::new(&batch, &id.to_string(), TaskType::Batch as i8, &batch[0].meta)?;
+        let mut raw = RawTask::new(&batch, &id.to_string(), TaskType::Batch as i8, &batch[0].path.meta)?;
         let num = D_T.insert(&raw).await?;
         if num < 1 {
             return Ok(());
@@ -127,11 +127,11 @@ async fn get_task_and_last(task: &RawTask) -> Result<(TaskForConvert, Option<Ins
 }
 
 async fn check_and_revise(instance: &mut Instance) -> Result<Meta> {
-    let meta: Meta = C_M.get(&instance.meta, &*D_M).await?;    // verify meta
+    let meta: Meta = C_M.get(&instance.path.meta, &*D_M).await?;    // verify meta
     // normalize meta
-    instance.meta = meta.meta_string();
+    instance.path.meta = meta.meta_string();
     // check previous state version
-    let version = instance.state_version;
+    let version = instance.path.state_version;
     if meta.is_state() && version > 1 {
         let mut kc: InsCond = instance.clone().into();
         kc.state_version = version - 1;

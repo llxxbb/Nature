@@ -22,7 +22,7 @@ pub fn merge(input: &ConverterParameter) -> ConverterReturned {
     };
     // make input
     let items = match &cfg.key {
-        KeyType::Para(part) => match one_to_vec(&input.from.para, &part, &input.from.content) {
+        KeyType::Para(part) => match one_to_vec(&input.from.path.para, &part, &input.from.content) {
             Ok(rtn) => rtn,
             Err(e) => return ConverterReturned::LogicalError { msg: e.to_string() }
         },
@@ -109,7 +109,7 @@ pub fn merge(input: &ConverterParameter) -> ConverterReturned {
         }
     };
     ins.id = input.from.id;
-    ins.para = input.from.para.clone();
+    ins.path.para = input.from.path.para.clone();
     ConverterReturned::Instances { ins: vec![ins] }
 }
 
@@ -354,7 +354,7 @@ mod para_type_test {
         let input = ConverterParameter {
             from: {
                 let mut rtn = Instance::default();
-                rtn.para = "a/b/c".to_string();
+                rtn.path.para = "a/b/c".to_string();
                 rtn
             },
             last_state: None,
@@ -379,7 +379,7 @@ mod para_type_test {
         let input = ConverterParameter {
             from: {
                 let mut rtn = Instance::default();
-                rtn.para = "a/b/c".to_string();
+                rtn.path.para = "a/b/c".to_string();
                 rtn.content = "123".to_string();
                 rtn
             },
@@ -406,7 +406,7 @@ mod para_type_test {
         let mut input = ConverterParameter {
             from: {
                 let mut rtn = Instance::default();
-                rtn.para = "a/b/c".to_string();
+                rtn.path.para = "a/b/c".to_string();
                 rtn.content = "100".to_string();
                 rtn
             },

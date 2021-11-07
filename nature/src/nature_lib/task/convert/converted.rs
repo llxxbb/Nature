@@ -17,7 +17,7 @@ impl Converted {
         let mut instances = instances;
 
         // init meta and [from]
-        let from = FromInstance::from(&task.from);
+        let from = InstanceLocator::from(&task.from);
         let _ = set_source_and_target_meta(&mut instances, &from, &task.target.to)?;
 
         // check id
@@ -54,17 +54,17 @@ fn converted_none(carrier: &RawTask) -> Converted {
     }
 }
 
-fn set_source_and_target_meta(instances: &mut Vec<Instance>, from: &FromInstance, target_meta: &Meta) -> Result<()> {
+fn set_source_and_target_meta(instances: &mut Vec<Instance>, from: &InstanceLocator, target_meta: &Meta) -> Result<()> {
     match target_meta.get_meta_type() {
         MetaType::Multi => {
             match target_meta.get_setting() {
-                Some(s) => s.set_instance_meta(instances, from)?,
+                Some(s) => Instance::init_meta(&s, instances, from)?,
                 None => return Err(NatureError::LogicalError("MetaType::Multi must has settings".to_string())),
             }
         }
         MetaType::Loop => {
             match target_meta.get_setting() {
-                Some(s) => s.set_instance_meta(instances, from)?,
+                Some(s) => Instance::init_meta(&s, instances, from)?,
                 None => return Err(NatureError::LogicalError("MetaType::Loop must has settings".to_string())),
             }
         }
@@ -73,14 +73,14 @@ fn set_source_and_target_meta(instances: &mut Vec<Instance>, from: &FromInstance
     Ok(())
 }
 
-fn set_all_instances(instances: &mut Vec<Instance>, from: &FromInstance, target_meta: &Meta) {
+fn set_all_instances(instances: &mut Vec<Instance>, from: &InstanceLocator, target_meta: &Meta) {
     instances.iter_mut().for_each(|n| {
-        n.data.meta = target_meta.meta_string();
+        n.path.meta = target_meta.meta_string();
         n.from = Some(from.clone());
     });
 }
 
-fn check_id(ins: &mut Vec<Instance>, from: &FromInstance, target: &Mission) -> Result<()> {
+fn check_id(ins: &mut Vec<Instance>, from: &InstanceLocator, target: &Mission) -> Result<()> {
     if ins.is_empty() {
         return Ok(());
     }
@@ -90,12 +90,12 @@ fn check_id(ins: &mut Vec<Instance>, from: &FromInstance, target: &Mission) -> R
             ins[0].id = id.parse()?;
         }
         if let Some(para) = target.sys_context.get(CONTEXT_TARGET_INSTANCE_PARA) {
-            ins[0].para = para.to_string();
+            ins[0].path.para = para.to_string();
         }
         ins[0].revise()?;
         // set sys_context
         if !target.target_demand.dynamic_para.is_empty() {
-            let para = &ins[0].para.to_string();
+            let para = &ins[0].path.para.to_string();
             append_dynamic_para_from_mission(target, &mut &mut ins[0], &para)?
         }
         return Ok(());
@@ -111,7 +111,7 @@ fn check_id(ins: &mut Vec<Instance>, from: &FromInstance, target: &Mission) -> R
     for mut one in ins {
         if target.target_demand.append_para.len() > 0 {
             let result = get_para_and_key_from_para(&from.para, &target.target_demand.append_para)?;
-            one.para = append_para(&one.para, &result.0);
+            one.path.para = append_para(&one.path.para, &result.0);
             // set sys_context
             if !target.target_demand.dynamic_para.is_empty() {
                 append_dynamic_para_from_mission(target, &mut one, &result.0)?
@@ -136,7 +136,7 @@ fn append_dynamic_para_from_mission(target: &Mission, one: &mut &mut Instance, v
     Ok(())
 }
 
-fn bridge_context_id(instances: &mut Vec<Instance>, mission: &Mission, from: &FromInstance) {
+fn bridge_context_id(instances: &mut Vec<Instance>, mission: &Mission, from: &InstanceLocator) {
     if let Some(id) = mission.sys_context.get(CONTEXT_TARGET_INSTANCE_ID) {
         for instance in instances {
             instance.data.sys_context.insert(CONTEXT_TARGET_INSTANCE_ID.to_string(), id.to_string());
@@ -148,7 +148,7 @@ fn bridge_context_id(instances: &mut Vec<Instance>, mission: &Mission, from: &Fr
     }
 }
 
-fn bridge_context_para(instances: &mut Vec<Instance>, mission: &Mission, from: &FromInstance) {
+fn bridge_context_para(instances: &mut Vec<Instance>, mission: &Mission, from: &InstanceLocator) {
     if let Some(para) = mission.sys_context.get(CONTEXT_TARGET_INSTANCE_PARA) {
         for instance in instances {
             instance.data.sys_context.insert(CONTEXT_TARGET_INSTANCE_PARA.to_string(), para.to_string());
@@ -175,14 +175,14 @@ fn verify_state(task: &TaskForConvert, instances: &mut Vec<Instance>, last_state
     let temp_states = ins.states.clone();
     match last_state {
         None => {
-            if task.from.meta == task.target.to.meta_string() {
-                ins.state_version = task.from.state_version + 1;
+            if task.from.path.meta == task.target.to.meta_string() {
+                ins.path.state_version = task.from.path.state_version + 1;
             } else {
-                ins.state_version = 1;
+                ins.path.state_version = 1;
             }
         }
         Some(x) => {
-            ins.state_version = x.state_version + 1;
+            ins.path.state_version = x.path.state_version + 1;
             ins.states = x.states.clone();
         }
     };
@@ -209,7 +209,7 @@ mod sys_context_test {
         let mut ins: Vec<Instance> = vec![Instance::default()];
         let mut mission = Mission::default();
         mission.id_bridge = true;
-        let mut from = FromInstance::default();
+        let mut from = InstanceLocator::default();
         from.id = 123;
         bridge_context_id(&mut ins, &mission, &from);
         assert_eq!("123", ins[0].sys_context.get("target.id").unwrap());
@@ -221,7 +221,7 @@ mod sys_context_test {
         let mut mission = Mission::default();
         mission.sys_context.insert("target.id".to_string(), "abc".to_string());
         mission.id_bridge = true;
-        bridge_context_id(&mut ins, &mission, &FromInstance::default());
+        bridge_context_id(&mut ins, &mission, &InstanceLocator::default());
         assert_eq!("abc", ins[0].sys_context.get("target.id").unwrap());
     }
 }
@@ -239,8 +239,8 @@ mod test {
     fn upstream_test() {
         let mut from_ins = Instance::default();
         from_ins.id = 567;
-        from_ins.meta = "B:from:1".to_string();
-        from_ins.state_version = 2;
+        from_ins.path.meta = "B:from:1".to_string();
+        from_ins.path.state_version = 2;
         let meta = Meta::new("to", 1, MetaType::Business).unwrap();
         let task_key = from_ins.get_key();
         let task = TaskForConvert {
@@ -364,12 +364,12 @@ mod check_id_for_state {
         let rtn = check_id(vec, &from, &mission);
         assert_eq!(rtn.is_ok(), true);
         assert_eq!(vec[0].id, 0);
-        assert_eq!(vec[0].para, "a")
+        assert_eq!(vec[0].path.para, "a")
     }
 
     /// master is from
-    fn init_input() -> (FromInstance, Mission) {
-        let from = FromInstance::default();
+    fn init_input() -> (InstanceLocator, Mission) {
+        let from = InstanceLocator::default();
 
         let mut setting = MetaSetting::default();
         setting.is_state = true;
@@ -407,10 +407,10 @@ mod check_id_for_normal {
         mission.target_demand.append_para = vec![0, 2];
         mission.target_demand.dynamic_para = "(a)".to_string();
         let mut one = Instance::new("one").unwrap();
-        one.para = "a/b".to_string();
+        one.path.para = "a/b".to_string();
         let mut input = vec![one];
         let _ = check_id(&mut input, &from, &mission);
-        assert_eq!(input[0].para, "a/b/c/e");
+        assert_eq!(input[0].path.para, "a/b/c/e");
         assert_eq!(input[0].sys_context.get(CONTEXT_DYNAMIC_PARA).unwrap(), "[[\"(a)\",\"c/e\"]]");
     }
 
@@ -437,12 +437,14 @@ mod check_id_for_normal {
     }
 
     /// master is from
-    fn init_input() -> (FromInstance, Mission) {
-        let from = FromInstance {
+    fn init_input() -> (InstanceLocator, Mission) {
+        let from = InstanceLocator {
             id: 123,
-            meta: "from".to_string(),
-            para: "".to_string(),
-            state_version: 1,
+            modifier: Modifier {
+                meta: "from".to_string(),
+                para: "".to_string(),
+                state_version: 1,
+            },
         };
 
         let mut setting = MetaSetting::default();

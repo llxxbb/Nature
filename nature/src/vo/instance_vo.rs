@@ -3,7 +3,7 @@ use std::collections::HashSet;
 use std::convert::TryInto;
 use std::hash::Hash;
 
-use crate::domain::{BizObject, FromInstance, Instance, NatureError};
+use crate::domain::{BizObject, Instance, InstanceLocator, Modifier, NatureError};
 use crate::util::*;
 use crate::util::js_convert::try_to_i64;
 
@@ -50,17 +50,17 @@ impl From<Instance> for InstanceVO {
     fn from(ins: Instance) -> Self {
         InstanceVO {
             id: ins.id.to_string(),
-            meta: ins.meta.to_string(),
+            meta: ins.path.meta.to_string(),
             content: ins.content.to_string(),
             context: ins.context.clone(),
             sys_context: ins.sys_context.clone(),
             states: ins.states.clone(),
-            state_version: ins.state_version,
+            state_version: ins.path.state_version,
             from: match &ins.from {
                 None => None,
                 Some(fm) => Some(fm.into())
             },
-            para: ins.para.to_string(),
+            para: ins.path.para.to_string(),
             create_time: Some(ins.create_time.to_string()),
         }
     }
@@ -81,16 +81,18 @@ impl TryInto<Instance> for InstanceVO {
         };
         let rtn = Instance {
             id,
-            data: BizObject {
+            path: Modifier {
                 meta: self.meta.to_string(),
+                state_version: self.state_version,
+                para: self.para.to_string(),
+            },
+            data: BizObject {
                 content: self.content.to_string(),
                 context: self.context.clone(),
                 sys_context: self.sys_context.clone(),
                 states: self.states.clone(),
-                state_version: self.state_version,
-                from,
-                para: self.para.to_string(),
             },
+            from,
             create_time,
         };
         Ok(rtn)
@@ -111,23 +113,25 @@ pub struct FromInstanceVO {
     pub state_version: i32,
 }
 
-impl TryInto<FromInstance> for FromInstanceVO {
+impl TryInto<InstanceLocator> for FromInstanceVO {
     type Error = NatureError;
 
-    fn try_into(self) -> Result<FromInstance, Self::Error> {
+    fn try_into(self) -> Result<InstanceLocator, Self::Error> {
         let id: u64 = self.id.parse()?;
-        let rtn = FromInstance {
+        let rtn = InstanceLocator {
             id,
-            meta: self.meta.to_string(),
-            para: self.para.to_string(),
-            state_version: self.state_version,
+            modifier: Modifier {
+                meta: self.meta.to_string(),
+                para: self.para.to_string(),
+                state_version: self.state_version,
+            },
         };
         Ok(rtn)
     }
 }
 
-impl From<&FromInstance> for FromInstanceVO {
-    fn from(fi: &FromInstance) -> Self {
+impl From<&InstanceLocator> for FromInstanceVO {
+    fn from(fi: &InstanceLocator) -> Self {
         FromInstanceVO {
             id: fi.id.to_string(),
             meta: fi.meta.to_string(),

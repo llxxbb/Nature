@@ -40,7 +40,7 @@ async fn send_to_warehouse(para: Json<ConverterParameter>) -> HttpResponse {
 async fn add_score(para: Json<Vec<Instance>>) -> HttpResponse {
     let mut rtn = para.0;
     rtn.iter_mut().for_each(|one| {
-        if one.para.contains("subject2") {
+        if one.path.para.contains("subject2") {
             let points = u16::from_str(&one.content).unwrap();
             let content = (points + 4).to_string();
             one.data.content = content;

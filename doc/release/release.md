@@ -3,6 +3,8 @@
 ## Release 1.3.0 2021-11-02
 
 - change id from string to u64
+- optimize `Instance` structure
+- add JS call interface, use `String` as id or time to avoid `Long` type problem
 
 ## Release 1.2.0 2021-10-24
 

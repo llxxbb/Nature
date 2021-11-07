@@ -23,7 +23,7 @@ impl FilterBefore for ParaAsKey {
         }
 
         // get para part
-        let (part, _) = get_para_and_key_from_para(&ins.para, &cfg.part)?;
+        let (part, _) = get_para_and_key_from_para(&ins.path.para, &cfg.part)?;
 
         // construct result
         if cfg.plain {
@@ -77,7 +77,7 @@ mod test {
     async fn empty_content() {
         let svc = ParaAsKey {};
         let mut ins = Instance::default();
-        ins.para = "ll/xx/bb".to_string();
+        ins.path.para = "ll/xx/bb".to_string();
         svc.filter(&mut ins, r#"{"part":[1]}"#).await.unwrap();
         assert_eq!(ins.content, r#"["xx",""]"#)
     }
@@ -87,7 +87,7 @@ mod test {
         let svc = ParaAsKey {};
         let mut ins = Instance::default();
         ins.content = "happy".to_string();
-        ins.para = "ll/xx/bb".to_string();
+        ins.path.para = "ll/xx/bb".to_string();
         svc.filter(&mut ins, r#"{"part":[1]}"#).await.unwrap();
         assert_eq!(ins.content, r#"["xx","happy"]"#)
     }
@@ -96,7 +96,7 @@ mod test {
     async fn plain_context_empty() {
         let svc = ParaAsKey {};
         let mut ins = Instance::default();
-        ins.para = "ll/xx/bb".to_string();
+        ins.path.para = "ll/xx/bb".to_string();
         svc.filter(&mut ins, r#"{"part":[1],"plain":true}"#).await.unwrap();
         assert_eq!(ins.content, r#"["xx",]"#)
     }
@@ -106,7 +106,7 @@ mod test {
         let svc = ParaAsKey {};
         let mut ins = Instance::default();
         ins.content = "happy\"day\"".to_string();
-        ins.para = "ll/xx/bb".to_string();
+        ins.path.para = "ll/xx/bb".to_string();
         svc.filter(&mut ins, r#"{"part":[1],"plain":true}"#).await.unwrap();
         assert_eq!(ins.content, r#"["xx",happy"day"]"#)
     }

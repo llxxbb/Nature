@@ -75,13 +75,13 @@ impl From<&Instance> for InsCond {
     fn from(input: &Instance) -> Self {
         InsCond {
             id: input.id,
-            meta: input.meta.to_string(),
+            meta: input.path.meta.to_string(),
             key_gt: "".to_string(),
             key_ge: "".to_string(),
             key_lt: "".to_string(),
             key_le: "".to_string(),
-            para: input.para.to_string(),
-            state_version: input.state_version,
+            para: input.path.para.to_string(),
+            state_version: input.path.state_version,
             time_ge: None,
             time_lt: None,
             limit: 1,
@@ -89,8 +89,8 @@ impl From<&Instance> for InsCond {
     }
 }
 
-impl From<&FromInstance> for InsCond {
-    fn from(input: &FromInstance) -> Self {
+impl From<&InstanceLocator> for InsCond {
+    fn from(input: &InstanceLocator) -> Self {
         InsCond {
             id: input.id,
             meta: input.meta.to_string(),

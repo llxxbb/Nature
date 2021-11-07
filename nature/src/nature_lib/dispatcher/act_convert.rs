@@ -39,7 +39,7 @@ pub(crate) async fn do_convert(task: TaskForConvert, raw: RawTask) {
         return;
     }
     // init master
-    let meta = match C_M.get(&task.from.meta, &*D_M).await {
+    let meta = match C_M.get(&task.from.path.meta, &*D_M).await {
         Ok(m) => m,
         Err(e) => {
             warn!("get meta error: {}", e);
@@ -76,11 +76,11 @@ async fn handle_converted(converted: ConverterReturned, task: &TaskForConvert, r
             let _ = received_self_route(task, &raw, ins);
         }
         ConverterReturned::Delay { num: delay } => {
-            debug!("delay task from meta: {}", task.from.meta);
+            debug!("delay task from meta: {}", task.from.path.meta);
             let _ = D_T.update_execute_time(&raw.task_id, i64::from(delay)).await;
         }
         ConverterReturned::LogicalError { msg: ss } => {
-            warn!("executor returned logic err from : {}, task would be deleted", task.from.meta);
+            warn!("executor returned logic err from : {}, task would be deleted", task.from.path.meta);
             let _ = D_T.raw_to_error(&NatureError::LogicalError(ss), &raw).await;
         }
         ConverterReturned::EnvError { msg: e } => {
@@ -107,11 +107,11 @@ async fn init_target_id_for_sys_context(task: &mut TaskForConvert, from_instance
         return;
     }
     let master = setting.master.unwrap();
-    if master.eq(&from_instance.meta) {
+    if master.eq(&from_instance.path.meta) {
         task.target.sys_context.insert(CONTEXT_TARGET_INSTANCE_ID.to_string(), from_instance.id.to_string());
         return;
     }
-    let f_meta: Meta = C_M.get(&task.from.meta, &*D_M).await.unwrap();
+    let f_meta: Meta = C_M.get(&task.from.path.meta, &*D_M).await.unwrap();
     if f_meta.get_setting().is_none() {
         return;
     }

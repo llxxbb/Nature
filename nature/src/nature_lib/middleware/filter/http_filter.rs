@@ -33,7 +33,7 @@ mod test {
     #[allow(dead_code)]
     fn http_filter_test_ok() {
         let mut ins = Instance::default();
-        ins.para = "/subject2".to_string();
+        ins.path.para = "/subject2".to_string();
         ins.content = "100".to_string();
         let mut input: Vec<Instance> = vec![];
         input.push(ins);
@@ -45,7 +45,7 @@ mod test {
     #[test]
     fn http_filter_test_remote_unusable() {
         let mut ins = Instance::default();
-        ins.para = "/subject2".to_string();
+        ins.path.para = "/subject2".to_string();
         ins.content = "100".to_string();
         let mut input: Vec<Instance> = vec![];
         input.push(ins);

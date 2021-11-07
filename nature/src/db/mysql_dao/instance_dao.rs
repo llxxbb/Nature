@@ -115,7 +115,7 @@ impl InstanceDaoImpl {
         }
     }
 
-    pub async fn delete(ins: &Instance) -> Result<u64> {
+    pub async fn delete(ins: &InstanceLocator) -> Result<u64> {
         let sql = r"DELETE FROM instances
             WHERE meta = :meta and ins_id = :ins_id and para = :para";
         let p = params! {
@@ -132,10 +132,10 @@ impl InstanceDaoImpl {
     pub async fn select_last_target(from: &Instance, mission: &mut Mission) -> Result<Option<Instance>> {
         // init for MetaType::loop --------------------
         if mission.to.get_meta_type() == MetaType::Loop
-            && mission.to.meta_string() == from.meta {
+            && mission.to.meta_string() == from.path.meta {
             if let Some(setting) = mission.to.get_setting() {
                 if setting.only_one {
-                    debug!("make MetaType::Loop as last state for {}", from.meta);
+                    debug!("make MetaType::Loop as last state for {}", from.path.meta);
                     return Ok(Some(from.clone()));
                 }
             }
@@ -146,7 +146,7 @@ impl InstanceDaoImpl {
         }
         let para_part = &mission.target_demand.append_para;
         let para_id = if para_part.len() > 0 {
-            let id = get_para_and_key_from_para(&from.para, para_part)?.0;
+            let id = get_para_and_key_from_para(&from.path.para, para_part)?.0;
             mission.sys_context.insert(CONTEXT_TARGET_INSTANCE_PARA.to_string(), id.to_string());
             id
         } else {
@@ -156,7 +156,7 @@ impl InstanceDaoImpl {
             // context have target id
             Some(state_id) => state_id.to_string(),
             None => {
-                if mission.use_upstream_id || mission.to.check_master(&from.meta) {
+                if mission.use_upstream_id || mission.to.check_master(&from.path.meta) {
                     let from_id = format!("{}", from.id);
                     mission.sys_context.insert(CONTEXT_TARGET_INSTANCE_ID.to_string(), from_id.to_string());
                     from_id

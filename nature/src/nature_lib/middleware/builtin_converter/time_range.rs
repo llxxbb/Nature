@@ -57,7 +57,7 @@ pub fn time_range(input: &ConverterParameter) -> ConverterReturned {
         }
     };
     let time_long = if cfg.on_para {
-        let time_string = match get_para_and_key_from_para(&input.from.para, &vec![cfg.time_part]) {
+        let time_string = match get_para_and_key_from_para(&input.from.path.para, &vec![cfg.time_part]) {
             Err(err) => return ConverterReturned::LogicalError { msg: err.to_string() },
             Ok((p, _k)) => p
         };
@@ -73,7 +73,7 @@ pub fn time_range(input: &ConverterParameter) -> ConverterReturned {
         Err(err) => return ConverterReturned::LogicalError { msg: err.to_string() }
     };
     let mut instance = Instance::default();
-    instance.para = format!("{}{}{}", result.0, *SEPARATOR_INS_PARA, result.1);
+    instance.path.para = format!("{}{}{}", result.0, *SEPARATOR_INS_PARA, result.1);
     ConverterReturned::Instances { ins: vec![instance] }
 }
 

@@ -68,7 +68,7 @@ pub extern fn pay_count(para: &ConverterParameter) -> ConverterReturned {
 pub extern fn stock_out_application(para: &ConverterParameter) -> ConverterReturned {
     // Tn real application need to convert order to store_out_application.
     // but in this demo, we need not do anything.
-    dbg!(&para.master.as_ref().unwrap().meta);
+    dbg!(&para.master.as_ref().unwrap().path.meta);
     ConverterReturned::None
 }
 
@@ -80,7 +80,7 @@ pub extern fn go_express(para: &ConverterParameter) -> ConverterReturned {
     let mut ins = Instance::new("any one").unwrap();
     // ... some code to get express info from warehouse system,
     // the follow line simulate the express company name and the waybill id returned
-    ins.para = "/ems/".to_owned() + &format!("{}", para.from.id);
+    ins.path.para = "/ems/".to_owned() + &format!("{}", para.from.id);
     // return the waybill
     ConverterReturned::Instances { ins: vec![ins] }
 }
@@ -100,9 +100,9 @@ pub extern fn auto_sign(_para: &ConverterParameter) -> ConverterReturned {
 #[allow(unused_attributes)]
 #[allow(improper_ctypes_definitions)]
 pub extern fn multi_delivery(para: &ConverterParameter) -> ConverterReturned {
-    let para: &str = &para.from.para;
+    let para: &str = &para.from.path.para;
     let mut ins = Instance::new("abc").unwrap();
-    ins.para = match para {
+    ins.path.para = match para {
         "A/B" => "B/C".to_string(),
         "B/C" => "C/D".to_string(),
         "C/D" => "error".to_string(),

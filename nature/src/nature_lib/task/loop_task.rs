@@ -4,7 +4,7 @@ use crate::domain::*;
 pub async fn gen_loop_mission<MC, M>(ins: &Instance, mc_g: &MC, m_g: &M) -> Result<Vec<Mission>>
     where MC: MetaCache, M: MetaDao
 {
-    let meta = mc_g.get(&ins.meta, m_g).await?;
+    let meta = mc_g.get(&ins.path.meta, m_g).await?;
     if meta.get_meta_type() != MetaType::Loop {
         return Ok(vec![]);
     }

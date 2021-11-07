@@ -26,7 +26,7 @@ pub struct RawInstance {
 impl RawInstance {
     pub fn to(&self) -> Result<Instance> {
         let from = if self.from_key.eq("") { None } else {
-            Some(FromInstance::from_str(&self.from_key)?)
+            Some(InstanceLocator::from_str(&self.from_key)?)
         };
         let context = match self.context {
             None => HashMap::new(),
@@ -50,25 +50,27 @@ impl RawInstance {
         };
         Ok(Instance {
             id: self.ins_id,
-            data: BizObject {
+            path: Modifier {
                 meta: self.meta.clone(),
+                state_version: self.state_version,
+                para: self.para.clone(),
+            },
+            data: BizObject {
                 content: self.content.clone(),
                 context,
                 sys_context,
                 states,
-                state_version: self.state_version,
-                from,
-                para: self.para.clone(),
             },
+            from,
             create_time: time.timestamp_millis(),
         })
     }
 
     pub fn new(instance: &Instance) -> Result<RawInstance> {
         Ok(RawInstance {
-            meta: instance.meta.to_string(),
+            meta: instance.path.meta.to_string(),
             ins_id: instance.id,
-            para: instance.para.to_string(),
+            para: instance.path.para.to_string(),
             content: {
                 if instance.content.len() > *INSTANCE_CONTENT_MAX_LENGTH.deref() {
                     return Err(NatureError::SystemError("content's length can' be over : ".to_owned() + &INSTANCE_CONTENT_MAX_LENGTH.to_string()));
@@ -80,7 +82,7 @@ impl RawInstance {
                 0 => None,
                 _ => Some(serde_json::to_string(&instance.states)?)
             },
-            state_version: instance.state_version,
+            state_version: instance.path.state_version,
             create_time: Local.timestamp_millis(instance.create_time).naive_local(),
             sys_context: Self::context_to_raw(&instance.sys_context, "sys_context")?,
             from_key: match &instance.from {

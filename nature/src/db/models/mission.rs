@@ -121,7 +121,7 @@ impl Mission {
     }
 
     /// Check the instance's context, sys_context and states whether satisfy the Selector request
-    pub fn get_by_instance(instance: &Instance, relations: &Vec<Relation>, ctx_chk: ContextChecker, sta_chk: StateChecker) -> Vec<Mission> {
+    pub fn load_by_instance(instance: &Instance, relations: &Vec<Relation>, ctx_chk: ContextChecker, sta_chk: StateChecker) -> Vec<Mission> {
         if relations.is_empty() { return vec![]; }
         let mut rtn: Vec<Mission> = Vec::new();
         for r in relations {
@@ -209,7 +209,7 @@ fn get_delay(ins: &Instance, rela: &Relation) -> Result<i32> {
     let rtn: i32 = if rela.delay > 0 {
         rela.delay
     } else if rela.delay_on_pare.0 > 0 {
-        let rtn = get_para_and_key_from_para(&ins.para, &vec![rela.delay_on_pare.1])?;
+        let rtn = get_para_and_key_from_para(&ins.path.para, &vec![rela.delay_on_pare.1])?;
         let diff = Local.timestamp_millis(rtn.0.parse::<i64>()?).sub(Local::now()).num_seconds();
         diff as i32 + rela.delay_on_pare.0
     } else {
@@ -246,13 +246,13 @@ mod test {
         assert_eq!(result.is_err(), true);
 
         // para delay is set
-        ins.para = (Local::now().timestamp_millis() + 200000).to_string();
+        ins.path.para = (Local::now().timestamp_millis() + 200000).to_string();
         let result = get_delay(&ins, &relation).unwrap();
         assert_eq!(result >= 299 && result <= 300, true);
 
         // delay is set, delay is the high priority
         relation.delay = 50;
-        ins.para = Local::now().timestamp_millis().to_string();
+        ins.path.para = Local::now().timestamp_millis().to_string();
         let result = get_delay(&ins, &relation).unwrap();
         assert_eq!(result, 50);
     }
@@ -265,10 +265,10 @@ mod test {
         relation.selector = Some(selector);
         let relations = vec![relation];
         let mut instance = Instance::default();
-        let rtn = Mission::get_by_instance(&instance, &relations, context_check, state_check);
+        let rtn = Mission::load_by_instance(&instance, &relations, context_check, state_check);
         assert_eq!(rtn.is_empty(), true);
         instance.states.insert("a".to_string());
-        let rtn = Mission::get_by_instance(&instance, &relations, context_check, state_check);
+        let rtn = Mission::load_by_instance(&instance, &relations, context_check, state_check);
         assert_eq!(rtn.is_empty(), false);
     }
 
@@ -280,10 +280,10 @@ mod test {
         relation.selector = Some(selector);
         let relations = vec![relation];
         let mut instance = Instance::default();
-        let rtn = Mission::get_by_instance(&instance, &relations, context_check, state_check);
+        let rtn = Mission::load_by_instance(&instance, &relations, context_check, state_check);
         assert_eq!(rtn.is_empty(), true);
         instance.sys_context.insert("a".to_string(), "x".to_string());
-        let rtn = Mission::get_by_instance(&instance, &relations, context_check, state_check);
+        let rtn = Mission::load_by_instance(&instance, &relations, context_check, state_check);
         assert_eq!(rtn.is_empty(), false);
     }
 
@@ -295,10 +295,10 @@ mod test {
         relation.selector = Some(selector);
         let relations = vec![relation];
         let mut instance = Instance::default();
-        let rtn = Mission::get_by_instance(&instance, &relations, context_check, state_check);
+        let rtn = Mission::load_by_instance(&instance, &relations, context_check, state_check);
         assert_eq!(rtn.is_empty(), true);
         instance.context.insert("a".to_string(), "x".to_string());
-        let rtn = Mission::get_by_instance(&instance, &relations, context_check, state_check);
+        let rtn = Mission::load_by_instance(&instance, &relations, context_check, state_check);
         assert_eq!(rtn.is_empty(), false);
     }
 
@@ -321,7 +321,7 @@ mod test {
         relation.target_demand = target;
         relation.delay = 2;
         let relations = vec![relation];
-        let rtn = Mission::get_by_instance(&Instance::default(), &relations, context_check, state_check);
+        let rtn = Mission::load_by_instance(&Instance::default(), &relations, context_check, state_check);
         let rtn = &rtn[0];
         assert_eq!(rtn.delay, 2);
         assert_eq!(rtn.executor, executor);
@@ -333,20 +333,20 @@ mod test {
     #[test]
     fn many_relations() {
         let relations = vec![Relation::default(), Relation::default(), Relation::default()];
-        let rtn = Mission::get_by_instance(&Instance::default(), &relations, context_check, state_check);
+        let rtn = Mission::load_by_instance(&Instance::default(), &relations, context_check, state_check);
         assert_eq!(rtn.len(), 3);
     }
 
     #[test]
     fn one_relation_but_no_selector() {
         let relations = vec![Relation::default()];
-        let rtn = Mission::get_by_instance(&Instance::default(), &relations, context_check, state_check);
+        let rtn = Mission::load_by_instance(&Instance::default(), &relations, context_check, state_check);
         assert_eq!(rtn.len(), 1);
     }
 
     #[test]
     fn no_relation() {
-        let rtn = Mission::get_by_instance(&Instance::default(), &vec![], context_check, state_check);
+        let rtn = Mission::load_by_instance(&Instance::default(), &vec![], context_check, state_check);
         assert_eq!(rtn.is_empty(), true);
     }
 }

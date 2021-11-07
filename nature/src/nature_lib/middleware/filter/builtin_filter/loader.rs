@@ -23,7 +23,7 @@ impl FilterBefore for Loader {
             }
         };
         let time_range = match &setting.time_part {
-            Some(part) => match get_para_part(&ins.para, part) {
+            Some(part) => match get_para_part(&ins.path.para, part) {
                 Ok(pair) => (
                     Some(i64::from_str(&pair[0])? * 1000),
                     Some(i64::from_str(&pair[1])? * 1000)
@@ -39,7 +39,7 @@ impl FilterBefore for Loader {
             Some(first) => first.to_string(),
             None => setting.key_gt,
         };
-        debug!("loader for: {}, condition first: {}", ins.meta, first);
+        debug!("loader for: {}, condition first: {}", ins.path.meta, first);
 
         // init loop_id
         let loop_id = match ins.sys_context.get(CONTEXT_LOOP_ID) {
@@ -65,16 +65,16 @@ impl FilterBefore for Loader {
         let mut content: Vec<String> = vec![];
         let rtn: Vec<Instance> = self.dao.get_by_key_range(&condition).await?;
         let len = rtn.len();
-        debug!("loaded records: {} for: {} ", len, ins.meta);
+        debug!("loaded records: {} for: {} ", len, ins.path.meta);
 
         // set context
         if len == setting.page_size as usize {
             let next = rtn[len - 1].get_key();
             ins.sys_context.insert(CONTEXT_LOOP_NEXT.to_string(), next.to_string());
-            debug!("for meta: {} set the next loop from: {}", ins.meta, next);
+            debug!("for meta: {} set the next loop from: {}", ins.path.meta, next);
         } else {
             ins.sys_context.insert(CONTEXT_LOOP_FINISHED.to_string(), "".to_string());
-            debug!("finished loop for: {}", ins.meta);
+            debug!("finished loop for: {}", ins.path.meta);
         }
         // filter
         for mut one in rtn {
@@ -82,7 +82,7 @@ impl FilterBefore for Loader {
             content.push(one.content.to_string());
         }
         ins.content = serde_json::to_string(&content)?;
-        debug!("loaded content for: {} is: {}", ins.meta, ins.content);
+        debug!("loaded content for: {} is: {}", ins.path.meta, ins.content);
         Ok(())
     }
 }
@@ -141,7 +141,7 @@ mod loader_test {
     async fn with_sub_filter() {
         let loader = Loader { dao: Arc::new(Mocker {}) };
         let mut instance = Instance::default();
-        instance.para = "123/456".to_string();
+        instance.path.para = "123/456".to_string();
         instance.content = "lxb".to_string();
         let setting = r#"{"key_gt":"abc","key_lt":"def","time_part":[0,1],"filters":[
             {"protocol":"localRust","url":"nature_integrate_test_executor:append_star"},
@@ -155,7 +155,7 @@ mod loader_test {
     async fn no_sub_filter() {
         let loader = Loader { dao: Arc::new(Mocker {}) };
         let mut instance = Instance::default();
-        instance.para = "123/456".to_string();
+        instance.path.para = "123/456".to_string();
         instance.content = "lxb".to_string();
         let setting = r#"{"key_gt":"abc","key_lt":"def","time_part":[0,1],"filters":[]}"#;
         let _ = loader.filter(&mut instance, setting).await;

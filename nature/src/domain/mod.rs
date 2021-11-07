@@ -1,7 +1,7 @@
 pub use callback::*;
 pub use common::*;
 pub use converter::*;
-pub use from_instance::*;
+pub use instance_locator::*;
 pub use instance::*;
 pub use loop_context::*;
 pub use meta::*;
@@ -14,7 +14,7 @@ pub use target_state::*;
 pub mod callback;
 pub mod converter;
 pub mod common;
-pub mod from_instance;
+pub mod instance_locator;
 pub mod instance;
 pub mod loop_context;
 pub mod meta;

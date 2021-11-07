@@ -26,8 +26,8 @@ pub extern fn order_to_item(para: &ConverterParameter) -> ConverterReturned {
 
     let rtn: Vec<Instance> = content.iter().map(|one| {
         let mut ins = Instance::default();
-        ins.para = one.1.to_string();
-        ins.meta = one.0.to_string();
+        ins.path.para = one.1.to_string();
+        ins.path.meta = one.0.to_string();
         ins.content = one.2.to_string();
         ins
     }).collect();

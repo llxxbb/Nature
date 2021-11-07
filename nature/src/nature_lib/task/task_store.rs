@@ -70,7 +70,7 @@ impl TaskForStore {
     pub fn to_raw(&self) -> Result<RawTask> {
         let temp = TaskForStoreTemp::from(self.clone());
         let json = serde_json::to_string(&temp)?;
-        RawTask::from_str(&json, &self.instance.get_key(), TaskType::Store as i8, &self.instance.meta)
+        RawTask::from_str(&json, &self.instance.get_key(), TaskType::Store as i8, &self.instance.path.meta)
     }
 
     pub async fn from_raw<MC, M>(raw: &RawTask, mc_g: &MC, m_g: &M) -> Result<Self>
@@ -82,13 +82,13 @@ impl TaskForStore {
             next_mission: {
                 let mut rtn: Vec<Mission> = vec![];
                 for one in temp.next_mission {
-                    rtn.push(Mission::from(Mission::from_raw(&one, mc_g, m_g).await?))
+                    rtn.push(Mission::from_raw(&one, mc_g, m_g).await?)
                 }
                 rtn
             },
             previous_mission: match temp.previous_mission {
                 None => None,
-                Some(m) => Some(Mission::from(Mission::from_raw(&m, mc_g, m_g).await?))
+                Some(m) => Some(Mission::from_raw(&m, mc_g, m_g).await?)
             },
             need_cache: temp.need_cache,
         };
