@@ -24,7 +24,7 @@ Nature 所提供的接口都是基于 http 请求的。
 {"Ok":null}
 ```
 
-## /get_by_id
+## /get/byId
 
 用于查询给定 [Meta](meta.md) 和 id 的 `instance` 。
 
@@ -52,6 +52,6 @@ Nature 所提供的接口都是基于 http 请求的。
 {"Ok":[]}	// [] 为 instance 数组, 请参考数据定义中的 instance
 ```
 
-## /redo_task
+## /task/redo
 
 这个接口为 Nature 系统内部的接口，只需了解一下就可以了，您并不会直接使用这个接口。此接口用于重试失败的任务，由 `retry` 可执行程序进行调用。

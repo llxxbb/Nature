@@ -24,7 +24,7 @@ For input parameter, please refer to `DelayedInstances` in [Data Definition](dat
 {"Ok":null}
 ```
 
-## /get_by_id
+## /get/byId
 
 Used to query the `instance` of the given [Meta](meta.md) and id.
 
@@ -52,6 +52,6 @@ Please refer to the `KeyCondition` of [Data Definition](data-define.md) for inpu
 {"Ok":[]} // [] is instance array, please refer to Instance in the data definition
 ```
 
-## /redo_task
+## /task/redo
 
 This interface is the internal interface of the Nature system, you only need to understand it, you will not use this interface directly. This interface used to retry failed tasks and is called by the `retry` executable program.

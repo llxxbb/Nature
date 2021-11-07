@@ -17,6 +17,6 @@ lazy_static! {
         env::var("BUSY_SLEEP").unwrap_or_else(|_|"2".to_string()).parse::<u64>().unwrap()
     };
     pub static ref NATURE_SERVER_ADDRESS : String = {
-        env::var("NATURE_SERVER_ADDRESS").unwrap_or_else(|_|"http://localhost:8080/redo_task".to_string())
+        env::var("NATURE_SERVER_ADDRESS").unwrap_or_else(|_|"http://localhost:8080/task/redo".to_string())
     };
 }

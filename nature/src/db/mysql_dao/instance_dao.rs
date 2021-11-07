@@ -12,7 +12,7 @@ use crate::util::*;
 
 #[async_trait]
 pub trait KeyRange: Sync + Send {
-    async fn get_by_key_range(&self, f_para: &KeyCondition) -> Result<Vec<Instance>>;
+    async fn get_by_key_range(&self, f_para: &InsCond) -> Result<Vec<Instance>>;
 }
 
 lazy_static! {
@@ -76,7 +76,7 @@ impl InstanceDaoImpl {
         Ok(rtn)
     }
 
-    async fn select_last_state(f_para: &KeyCondition) -> Result<Option<Instance>> {
+    async fn select_last_state(f_para: &InsCond) -> Result<Option<Instance>> {
         let sql = r"SELECT meta, ins_id, para, content, context, states, state_version, create_time, sys_context, from_key
             FROM instances
             where meta = :meta and ins_id = :ins_id and para = :para
@@ -95,7 +95,7 @@ impl InstanceDaoImpl {
         }
     }
 
-    pub async fn select_by_id(f_para: KeyCondition) -> Result<Option<Instance>> {
+    pub async fn select_by_id(f_para: InsCond) -> Result<Option<Instance>> {
         let sql = r"SELECT meta, ins_id, para, content, context, states, state_version, create_time, sys_context, from_key
             FROM instances
             where meta = :meta and ins_id = :ins_id and para = :para and state_version = :state_version
@@ -167,7 +167,7 @@ impl InstanceDaoImpl {
         };
         let meta = mission.to.meta_string();
         debug!("get last state for meta {}", &meta);
-        let qc = KeyCondition::new(id.parse()?, &meta, &para_id, 0);
+        let qc = InsCond::new(id.parse()?, &meta, &para_id, 0);
         Self::select_last_state(&qc).await
     }
 
@@ -188,7 +188,7 @@ fn raw_to_number(row: Row) -> i32 {
 #[async_trait]
 impl KeyRange for InstanceDaoImpl {
     /// ins_key > and between time range
-    async fn get_by_key_range(&self, f_para: &KeyCondition) -> Result<Vec<Instance>> {
+    async fn get_by_key_range(&self, f_para: &InsCond) -> Result<Vec<Instance>> {
         let mut list: Vec<String> = vec![];
         // used to avoid repeat add conditions
         let mut set: HashSet<String> = HashSet::new();
@@ -332,7 +332,7 @@ mod test {
     #[allow(dead_code)]
     fn get_last_state_test() {
         env::set_var("DATABASE_URL", "mysql://root@localhost/nature");
-        let para = KeyCondition::new(0, "B:score/trainee/all-subject:1", "002", 0);
+        let para = InsCond::new(0, "B:score/trainee/all-subject:1", "002", 0);
         let result = Runtime::new().unwrap().block_on(InstanceDaoImpl::select_last_state(&para));
         let _ = dbg!(result);
     }
@@ -342,7 +342,7 @@ mod test {
     #[allow(dead_code)]
     fn query_by_id() {
         env::set_var("DATABASE_URL", "mysql://root@localhost/nature");
-        let para = KeyCondition {
+        let para = InsCond {
             id: 12345,
             meta: "B:sale/order:1".to_string(),
             key_gt: "".to_string(),
@@ -371,7 +371,7 @@ mod test {
         let ge_t = 1588508143000;
         let ge = Local.timestamp_millis(ge_t);
         dbg!(ge);
-        let para = KeyCondition {
+        let para = InsCond {
             id: 0,
             meta: "B:sale/order:1".to_string(),
             key_gt: "".to_string(),
@@ -398,7 +398,7 @@ mod test {
     #[ignore]
     async fn query_by_range() {
         env::set_var("DATABASE_URL", "mysql://root@localhost/nature");
-        let para = KeyCondition {
+        let para = InsCond {
             id: 0,
             meta: "".to_string(),
             key_gt: "B:sale/order:1|".to_string(),

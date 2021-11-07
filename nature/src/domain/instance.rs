@@ -80,14 +80,14 @@ impl Instance {
 
     pub async fn get_master<'a, F, ID>(&self, self_meta: &Meta, dao: ID) -> Result<Option<Instance>>
         where F: Future<Output=Result<Option<Instance>>>,
-              ID: Fn(KeyCondition) -> F
+              ID: Fn(InsCond) -> F
     {
         match self_meta.get_setting() {
             None => Ok(None),
             Some(setting) => match setting.master {
                 None => Ok(None),
                 Some(master) => {
-                    let condition = KeyCondition::new(self.id, &master, &self.para, 0);
+                    let condition = InsCond::new(self.id, &master, &self.para, 0);
                     let result = dao(condition);
                     Ok(result.await?)
                 }
@@ -121,9 +121,9 @@ impl DerefMut for Instance {
     }
 }
 
-impl Into<KeyCondition> for Instance {
-    fn into(self) -> KeyCondition {
-        KeyCondition {
+impl Into<InsCond> for Instance {
+    fn into(self) -> InsCond {
+        InsCond {
             id: self.id,
             meta: self.data.meta.to_string(),
             key_gt: "".to_string(),

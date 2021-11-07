@@ -49,7 +49,7 @@ impl FilterBefore for Loader {
         ins.sys_context.insert(CONTEXT_LOOP_ID.to_string(), loop_id.to_string());
 
         // load
-        let condition = KeyCondition {
+        let condition = InsCond {
             id: 0,
             meta: "".to_string(),
             key_gt: first,
@@ -176,7 +176,7 @@ mod loader_test {
 
     #[async_trait]
     impl KeyRange for Mocker {
-        async fn get_by_key_range(&self, _para: &KeyCondition) -> Result<Vec<Instance>> {
+        async fn get_by_key_range(&self, _para: &InsCond) -> Result<Vec<Instance>> {
             let mut one = Instance::default();
             one.content = "one".to_string();
             let mut two = Instance::default();

@@ -57,7 +57,7 @@ impl TaskForConvert {
             None => false,
         }
     }
-    pub async fn from_raw<T, MC, M>(raw: &RawTask, ins_g: fn(KeyCondition) -> T, mc_g: &MC, m_g: &M) -> Result<Self>
+    pub async fn from_raw<T, MC, M>(raw: &RawTask, ins_g: fn(InsCond) -> T, mc_g: &MC, m_g: &M) -> Result<Self>
         where T: Future<Output=Result<Option<Instance>>>, MC: MetaCache, M: MetaDao
     {
         let mr = MissionRaw::from_json(&raw.data)?;

@@ -76,7 +76,7 @@ pub fn send_to_warehouse_thread(para: ConverterParameter) {
     }
 }
 
-pub async fn get_by_meta(cond: &KeyCondition) -> Result<Vec<Instance>> {
+pub async fn get_by_meta(cond: &InsCond) -> Result<Vec<Instance>> {
     // let rtn = CLIENT.post(&*GET_BY_META).json(cond).send().await?.json::<ConverterReturned>().await?;
     let res = CLIENT.post(&*GET_BY_META).json(cond).send().await?;
     let rtn = res.json::<Result<Vec<Instance>>>().await?;

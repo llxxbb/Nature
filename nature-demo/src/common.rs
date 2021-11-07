@@ -5,18 +5,18 @@ use std::time::Duration;
 use reqwest::blocking::Client;
 use serde::Serialize;
 
-use nature::domain::{Instance, KeyCondition, NatureError, Result};
+use nature::domain::{InsCond, Instance, NatureError, Result};
 
 lazy_static! {
     pub static ref CLIENT : Client = Client::new();
 }
 
 pub static URL_INPUT: &str = "http://localhost:8080/input";
-pub static URL_GET_BY_ID: &str = "http://localhost:8080/get_by_id";
+pub static URL_GET_BY_ID: &str = "http://localhost:8080/get/byId";
 pub static URL_GET_BY_META: &str = "http://localhost:8080/get_by_key_range";
 
 pub fn send_instance(ins: &Instance) -> Result<u64> {
-    let response = CLIENT.post(URL_INPUT).json(ins).send();
+    let response = CLIENT.post(URL_INPUT).json(&ins).send();
     let id_s: String = response.unwrap().text().unwrap();
     if id_s.contains("Err") {
         return Err(NatureError::VerifyError(id_s));
@@ -24,7 +24,7 @@ pub fn send_instance(ins: &Instance) -> Result<u64> {
     serde_json::from_str(&id_s)?
 }
 
-pub fn get_by_id(cond: &KeyCondition) -> Option<Instance> {
+pub fn get_by_id(cond: &InsCond) -> Option<Instance> {
     // let rtn = CLIENT.post(&*GET_BY_META).json(cond).send().await?.json::<ConverterReturned>().await?;
     let response = CLIENT.post(URL_GET_BY_ID).json(cond).send();
     let msg = response.unwrap().text().unwrap();
@@ -60,7 +60,7 @@ pub fn get_instance_by_id(id: u64, meta_full: &str) -> Option<Instance> {
 
 pub fn get_state_instance_by_id(id: u64, meta_full: &str, sta_ver: i32) -> Option<Instance> {
     info!("get state instance by id {}", &id);
-    let para = KeyCondition::new(id, meta_full, "", sta_ver);
+    let para = InsCond::new(id, meta_full, "", sta_ver);
     let response = CLIENT.post(URL_GET_BY_ID).json(&para).send();
     let msg = response.unwrap().text().unwrap();
     if msg.eq(r#"{"Ok":null}"#) {
@@ -99,7 +99,7 @@ pub fn send_with_context<T>(meta_key: &str, bo: &T, context: &HashMap<String, St
 
 
 pub fn get_by_key(id: u64, meta: &str, para: &str, sta_version: i32) -> Option<Instance> {
-    let para = KeyCondition {
+    let para = InsCond {
         id: id,
         meta: meta.to_string(),
         key_gt: "".to_string(),

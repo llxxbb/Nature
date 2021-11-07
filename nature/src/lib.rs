@@ -20,3 +20,4 @@ pub mod retry_lib;
 pub mod domain;
 pub mod util;
 pub mod nature_lib;
+pub mod vo;

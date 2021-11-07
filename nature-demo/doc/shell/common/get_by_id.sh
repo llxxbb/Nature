@@ -14,4 +14,4 @@ JSON_STRING=$( jq -n \
 echo "$JSON_STRING"
 
 curl -H "Content-type: application/json" -X POST \
-     -d"$JSON_STRING" http://localhost:8080/get_by_id | jq '.Ok'
+     -d"$JSON_STRING" http://localhost:8080/get/byId | jq '.Ok'

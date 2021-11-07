@@ -14,8 +14,9 @@
 
 ### 未完成
 
-JS support
 
+JS support
+optimize JS structure
 
 
 

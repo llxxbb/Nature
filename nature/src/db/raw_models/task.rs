@@ -134,15 +134,15 @@ impl Into<Vec<(String, Value)>> for RawTask {
     }
 }
 
-impl TryInto<KeyCondition> for &RawTask {
+impl TryInto<InsCond> for &RawTask {
     type Error = NatureError;
 
-    fn try_into(self) -> Result<KeyCondition> {
+    fn try_into(self) -> Result<InsCond> {
         let temp: Vec<&str> = self.task_key.split(&*SEPARATOR_TASK_KEY).collect();
         if temp.len() != 4 {
             return Err(NatureError::VerifyError("error key format for task".to_string()));
         }
-        let rtn = KeyCondition {
+        let rtn = InsCond {
             id: temp[1].parse()?,
             meta: temp[0].to_string(),
             key_gt: "".to_string(),

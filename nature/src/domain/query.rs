@@ -1,14 +1,8 @@
 use crate::domain::*;
 use crate::util::*;
 
-/// Condition for querying multi-row of `Instance`
-/// key format [meta|id|para|status_version]
-/// gt: grate than, only valid on the last part of the [key]
-/// ge: grate than or equal, only valid on the last part of the [key]
-/// lt: less than, only valid on the last part of the [key]
-/// le: less than or equal, only valid on the last part of the [key]
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
-pub struct KeyCondition {
+#[derive(Debug, PartialEq, Serialize, Deserialize, Eq, Hash, Clone, Ord, PartialOrd)]
+pub struct InsCond {
     #[serde(skip_serializing_if = "is_default")]
     #[serde(default)]
     pub id: u64,
@@ -44,10 +38,10 @@ pub struct KeyCondition {
     pub limit: i32,
 }
 
-impl KeyCondition {
+impl InsCond {
     pub fn new(id: u64, meta: &str, para: &str, state_version: i32) -> Self {
-        KeyCondition {
-            id: id,
+        InsCond {
+            id,
             meta: meta.to_string(),
             key_gt: "".to_string(),
             key_ge: "".to_string(),
@@ -77,9 +71,9 @@ impl KeyCondition {
     }
 }
 
-impl From<&Instance> for KeyCondition {
+impl From<&Instance> for InsCond {
     fn from(input: &Instance) -> Self {
-        KeyCondition {
+        InsCond {
             id: input.id,
             meta: input.meta.to_string(),
             key_gt: "".to_string(),
@@ -95,9 +89,9 @@ impl From<&Instance> for KeyCondition {
     }
 }
 
-impl From<&FromInstance> for KeyCondition {
+impl From<&FromInstance> for InsCond {
     fn from(input: &FromInstance) -> Self {
-        KeyCondition {
+        InsCond {
             id: input.id,
             meta: input.meta.to_string(),
             key_gt: "".to_string(),
@@ -147,7 +141,7 @@ pub struct QueryByMeta {
 }
 
 #[cfg(test)]
-mod key_condition_test {
+mod ins_cond_test {
     use super::*;
 
     #[test]
@@ -160,14 +154,14 @@ mod key_condition_test {
                 "state_version": 0
             }
         "#;
-        let rtn = serde_json::from_str::<KeyCondition>(condition).unwrap();
+        let rtn = serde_json::from_str::<InsCond>(condition).unwrap();
         assert_eq!(rtn.id, 1)
     }
 
     #[test]
     #[ignore]
     fn to_json() {
-        let condition = KeyCondition {
+        let condition = InsCond {
             id: 0,
             meta: "$meta".to_string(),
             key_gt: "".to_string(),
