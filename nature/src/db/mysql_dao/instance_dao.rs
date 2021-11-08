@@ -104,7 +104,7 @@ impl InstanceDaoImpl {
         let p = params! {
             "meta" => f_para.meta.to_string(),
             "ins_id" => f_para.id,
-            "para" => f_para.para,
+            "para" => f_para.para.to_string(),
             "state_version" => f_para.state_version,
         };
         let rtn = MySql::fetch(sql, p, RawInstance::from).await?;
@@ -344,16 +344,18 @@ mod test {
         env::set_var("DATABASE_URL", "mysql://root@localhost/nature");
         let para = InsCond {
             id: 12345,
-            meta: "B:sale/order:1".to_string(),
-            key_gt: "".to_string(),
-            key_ge: "".to_string(),
-            key_lt: "".to_string(),
-            key_le: "".to_string(),
-            para: "".to_string(),
-            state_version: 0,
             time_ge: None,
             time_lt: None,
-            limit: 1,
+            other: NoIdCond {
+                meta: "B:sale/order:1".to_string(),
+                key_gt: "".to_string(),
+                key_ge: "".to_string(),
+                key_lt: "".to_string(),
+                key_le: "".to_string(),
+                para: "".to_string(),
+                state_version: 0,
+                limit: 1,
+            },
         };
         let result = Runtime::new().unwrap().block_on(InstanceDaoImpl::select_by_id(para));
         let _ = dbg!(result);
@@ -373,16 +375,18 @@ mod test {
         dbg!(ge);
         let para = InsCond {
             id: 0,
-            meta: "B:sale/order:1".to_string(),
-            key_gt: "".to_string(),
-            key_ge: "".to_string(),
-            key_lt: "".to_string(),
-            key_le: "".to_string(),
-            para: "".to_string(),
-            state_version: 0,
             time_ge: None,
             time_lt: None,
-            limit: 100,
+            other: NoIdCond {
+                meta: "B:sale/order:1".to_string(),
+                key_gt: "".to_string(),
+                key_ge: "".to_string(),
+                key_lt: "".to_string(),
+                key_le: "".to_string(),
+                para: "".to_string(),
+                state_version: 0,
+                limit: 100,
+            },
         };
         let dao = InstanceDaoImpl {};
 
@@ -400,20 +404,22 @@ mod test {
         env::set_var("DATABASE_URL", "mysql://root@localhost/nature");
         let para = InsCond {
             id: 0,
-            meta: "".to_string(),
-            key_gt: "B:sale/order:1|".to_string(),
-            key_ge: "".to_string(),
-            key_lt: "B:sale/order:2|".to_string(),
-            key_le: "".to_string(),
-            para: "".to_string(),
-            state_version: 0,
             time_ge: Some(
                 1596115430000,
             ),
             time_lt: Some(
                 1596115431000,
             ),
-            limit: 20,
+            other: NoIdCond {
+                meta: "".to_string(),
+                key_gt: "B:sale/order:1|".to_string(),
+                key_ge: "".to_string(),
+                key_lt: "B:sale/order:2|".to_string(),
+                key_le: "".to_string(),
+                para: "".to_string(),
+                state_version: 0,
+                limit: 20,
+            },
         };
         let dao = InstanceDaoImpl {};
 

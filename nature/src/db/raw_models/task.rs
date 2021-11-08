@@ -144,16 +144,18 @@ impl TryInto<InsCond> for &RawTask {
         }
         let rtn = InsCond {
             id: temp[1].parse()?,
-            meta: temp[0].to_string(),
-            key_gt: "".to_string(),
-            key_ge: "".to_string(),
-            key_lt: "".to_string(),
-            key_le: "".to_string(),
-            para: temp[2].to_string(),
-            state_version: i32::from_str(temp[3])?,
             time_ge: None,
             time_lt: None,
-            limit: 1,
+            other: NoIdCond {
+                meta: temp[0].to_string(),
+                key_gt: "".to_string(),
+                key_ge: "".to_string(),
+                key_lt: "".to_string(),
+                key_le: "".to_string(),
+                para: temp[2].to_string(),
+                state_version: i32::from_str(temp[3])?,
+                limit: 1,
+            },
         };
         Ok(rtn)
     }

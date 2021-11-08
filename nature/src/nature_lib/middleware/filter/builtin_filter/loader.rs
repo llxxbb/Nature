@@ -51,16 +51,18 @@ impl FilterBefore for Loader {
         // load
         let condition = InsCond {
             id: 0,
-            meta: "".to_string(),
-            key_gt: first,
-            key_ge: "".to_string(),
-            key_lt: setting.key_lt,
-            key_le: "".to_string(),
-            para: "".to_string(),
-            state_version: 0,
             time_ge: time_range.0,
             time_lt: time_range.1,
-            limit: setting.page_size as i32,
+            other: NoIdCond {
+                meta: "".to_string(),
+                key_gt: first,
+                key_ge: "".to_string(),
+                key_lt: setting.key_lt,
+                key_le: "".to_string(),
+                para: "".to_string(),
+                state_version: 0,
+                limit: setting.page_size as i32,
+            }
         };
         let mut content: Vec<String> = vec![];
         let rtn: Vec<Instance> = self.dao.get_by_key_range(&condition).await?;

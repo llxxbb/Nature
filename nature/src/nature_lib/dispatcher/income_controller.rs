@@ -134,7 +134,7 @@ async fn check_and_revise(instance: &mut Instance) -> Result<Meta> {
     let version = instance.path.state_version;
     if meta.is_state() && version > 1 {
         let mut kc: InsCond = instance.clone().into();
-        kc.state_version = version - 1;
+        kc.other.state_version = version - 1;
         let rtn = InstanceDaoImpl::select_by_id(kc).await?;
         if rtn.is_none() {
             return Err(NatureError::VerifyError("you can't skip state_version for instance".to_string()));

@@ -5,7 +5,7 @@ use std::time::Duration;
 use reqwest::blocking::Client;
 use serde::Serialize;
 
-use nature::domain::{InsCond, Instance, NatureError, Result};
+use nature::domain::{InsCond, Instance, NatureError, NoIdCond, Result};
 
 lazy_static! {
     pub static ref CLIENT : Client = Client::new();
@@ -97,20 +97,21 @@ pub fn send_with_context<T>(meta_key: &str, bo: &T, context: &HashMap<String, St
     serde_json::from_str(&id_s)?
 }
 
-
 pub fn get_by_key(id: u64, meta: &str, para: &str, sta_version: i32) -> Option<Instance> {
     let para = InsCond {
         id: id,
-        meta: meta.to_string(),
-        key_gt: "".to_string(),
-        key_ge: "".to_string(),
-        key_lt: "".to_string(),
-        key_le: "".to_string(),
-        para: para.to_string(),
-        state_version: sta_version,
         time_ge: None,
         time_lt: None,
-        limit: 11,
+        other: NoIdCond {
+            meta: meta.to_string(),
+            key_gt: "".to_string(),
+            key_ge: "".to_string(),
+            key_lt: "".to_string(),
+            key_le: "".to_string(),
+            para: para.to_string(),
+            state_version: sta_version,
+            limit: 11,
+        }
     };
     get_by_id(&para)
 }

@@ -21,7 +21,7 @@ async fn get_by_id(para: Json<InsCond>) -> HttpResponse {
 
 #[post("/instance/byIdJS")]
 async fn get_by_id_js(para: Json<InsCondVO>) -> HttpResponse {
-    debug!("/instance/byId : {:?}", &para.0);
+    debug!("/instance/byIdJS : {:?}", &para.0);
     let cond = para.0.try_into();
     if cond.is_err() { return web_result(cond); }
     let x = InstanceDaoImpl::select_by_id(cond.unwrap()).await;
@@ -38,7 +38,7 @@ async fn get_downstream_instance(from: String) -> HttpResponse {
 
 #[post("/instance/downstreamJS")]
 async fn get_downstream_instance_js(from: String) -> HttpResponse {
-    debug!("/instance/downstream : {:?}", &from);
+    debug!("/instance/downstreamJS : {:?}", &from);
     let x = InstanceDaoImpl::select_downstream(&from).await;
     let rtn: Result<Vec<InstanceVO>> = to_js_vec_output(x);
     web_result(rtn)
@@ -55,7 +55,7 @@ async fn get_by_key_range(para: Json<InsCond>) -> HttpResponse {
 /// fuzzy query
 #[post("/instance/byKeyJS")]
 async fn get_by_key_range_js(para: Json<InsCondVO>) -> HttpResponse {
-    debug!("/instance/byKey : {:?}", &para.0);
+    debug!("/instance/byKeyJS : {:?}", &para.0);
     let cond = para.0.try_into();
     if cond.is_err() { return web_result(cond); }
     let x = INS_RANGE.clone().get_by_key_range(&cond.unwrap()).await;

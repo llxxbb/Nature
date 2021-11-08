@@ -161,16 +161,18 @@ impl Into<InsCond> for Instance {
     fn into(self) -> InsCond {
         InsCond {
             id: self.id,
-            meta: self.path.meta.to_string(),
-            key_gt: "".to_string(),
-            key_ge: "".to_string(),
-            key_lt: "".to_string(),
-            key_le: "".to_string(),
-            para: self.path.para.to_string(),
-            state_version: self.path.state_version,
             time_ge: None,
             time_lt: None,
-            limit: 1,
+            other: NoIdCond {
+                meta: self.path.meta.to_string(),
+                key_gt: "".to_string(),
+                key_ge: "".to_string(),
+                key_lt: "".to_string(),
+                key_le: "".to_string(),
+                para: self.path.para.to_string(),
+                state_version: self.path.state_version,
+                limit: 1,
+            }
         }
     }
 }
