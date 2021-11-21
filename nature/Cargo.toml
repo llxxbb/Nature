@@ -1,6 +1,6 @@
 [package]
 name = "nature"
-version = "1.3.0"
+version = "1.4.0"
 authors = ["XueBin Li <llxxbb@yeah.net>"]
 edition = "2018"
 description = "Nature is a development support platform, it separates data definition from code, so it decouple the data from business system."

@@ -37,7 +37,7 @@ pub fn convert_before(para: &mut Instance, filter: Vec<Executor>) -> BoxFuture<R
     }.boxed()
 }
 
-pub async fn convert_after(para: &mut Vec<Instance>, filter: &Vec<Executor>) -> Result<()>
+pub async fn filter_result(para: &mut Vec<Instance>, filter: &Vec<Executor>) -> Result<()>
 {
     for f in filter {
         match f.protocol {

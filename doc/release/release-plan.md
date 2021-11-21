@@ -6,19 +6,16 @@
 - 应用情景支持，内部优先于外部（如网关）
 
 下面为正在开发的内容
+
 ## Release 1.4.0
 
+- Output `Instance` for `MetaType:Null`
+- 管理：支持异常数据的查询
 
 ### It should commit
 
-
 ### 未完成
 
-JS support
+异常数量查询
 
-
-
-
-
-
-
+异常列表查询，支持分页

@@ -53,6 +53,17 @@ impl IncomeController {
                 match raw {
                     None => Err(NatureError::VerifyError("task data missed, maybe it had done already.".to_string())),
                     Some(carrier) => match delayed.result {
+                        ConverterReturned::Instances { ins } => {
+                            let (task, last) = get_task_and_last(&carrier).await?;
+                            after_converted(&task, &carrier, ins, &last).await
+                        }
+                        ConverterReturned::SelfRoute { ins: sf } => {
+                            let (task, _last) = get_task_and_last(&carrier).await?;
+                            received_self_route(&task, &carrier, sf)
+                        }
+                        ConverterReturned::Delay { num: _ } => {
+                            Err(NatureError::VerifyError("callback can not process [ConverterReturned::Delay]".to_string()))
+                        }
                         ConverterReturned::LogicalError { msg: err } => {
                             let err = NatureError::LogicalError(err);
                             warn!("{}", err);
@@ -63,20 +74,12 @@ impl IncomeController {
                             warn!("{}", e);
                             Ok(())
                         }
-                        ConverterReturned::Delay { num: _ } => {
-                            Err(NatureError::VerifyError("callback can not process [ConverterReturned::Delay]".to_string()))
-                        }
-                        ConverterReturned::Instances { ins } => {
-                            let (task, last) = get_task_and_last(&carrier).await?;
-                            after_converted(&task, &carrier, ins, &last).await
-                        }
-                        ConverterReturned::SelfRoute { ins: sf } => {
-                            let (task, _last) = get_task_and_last(&carrier).await?;
-                            received_self_route(&task, &carrier, sf)
-                        }
                         ConverterReturned::None => {
-                            let (task, _last) = get_task_and_last(&carrier).await?;
-                            process_null(task.target.to.get_meta_type(), &delayed.task_id).await
+                            let (task, last) = get_task_and_last(&carrier).await?;
+                            // process_null(task.target.to.get_meta_type(), &delayed.task_id).await
+                            let mut ins = Instance::default();
+                            ins.path.meta = "N::1".to_string();
+                            after_converted(&task, &carrier, vec![ins], &last).await
                         }
                     }
                 }

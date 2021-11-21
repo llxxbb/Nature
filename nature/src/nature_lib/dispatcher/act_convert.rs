@@ -1,9 +1,9 @@
 use actix_rt::Runtime;
 
-use crate::db::{C_M, D_M, D_T, InstanceDaoImpl, MetaCache, Mission, RawTask, TaskDao};
+use crate::db::{C_M, D_M, D_T, InstanceDaoImpl, MetaCache, RawTask, TaskDao};
 use crate::domain::*;
-use crate::nature_lib::dispatcher::{after_converted, process_null, received_self_route};
-use crate::nature_lib::middleware::filter::convert_after;
+use crate::nature_lib::dispatcher::{after_converted, received_self_route};
+use crate::nature_lib::middleware::filter::filter_result;
 use crate::nature_lib::task::{call_executor, TaskForConvert};
 
 /// **Notice**: Can't use async under actix-rt directly, otherwise it can lead to "actix-rt overflow its stack".
@@ -56,7 +56,7 @@ pub(crate) async fn do_convert(task: TaskForConvert, raw: RawTask) {
         }
     };
     let rtn = call_executor(&mut task, &raw, &last, master).await;
-    match handle_converted(rtn, &task, &raw, &task.target, &last).await {
+    match handle_converted(rtn, &task, &raw, &last).await {
         Ok(()) => (),
         Err(NatureError::EnvironmentError(_)) => (),
         Err(e) => {
@@ -66,10 +66,10 @@ pub(crate) async fn do_convert(task: TaskForConvert, raw: RawTask) {
     }
 }
 
-async fn handle_converted(converted: ConverterReturned, task: &TaskForConvert, raw: &RawTask, mission: &Mission, last: &Option<Instance>) -> Result<()> {
+async fn handle_converted(converted: ConverterReturned, task: &TaskForConvert, raw: &RawTask, last: &Option<Instance>) -> Result<()> {
     match converted {
         ConverterReturned::Instances { ins: mut instances } => {
-            convert_after(&mut instances, &task.target.convert_after).await?;
+            filter_result(&mut instances, &task.target.convert_after).await?;
             after_converted(task, &raw, instances, &last).await?;
         }
         ConverterReturned::SelfRoute { ins } => {
@@ -87,7 +87,9 @@ async fn handle_converted(converted: ConverterReturned, task: &TaskForConvert, r
             warn!("executor returned env err: {}", e);
         }
         ConverterReturned::None => {
-            let _ = process_null(mission.to.get_meta_type(), &raw.task_id).await;
+            let mut ins = Instance::default();
+            ins.path.meta = "N::1".to_string();
+            after_converted(task, &raw, vec![ins], &last).await?;
         }
     }
     Ok(())

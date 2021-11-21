@@ -16,7 +16,6 @@
 - Optimize : MetaSetting: check type when set
 - Meta : add friendly name in config field
 
-
 ## Release 1.0.0 2021-05-29
 
 - add roadmap
@@ -83,11 +82,11 @@ Chinese doc: fix architecture.md
 - incompatible change: use decimal replace hexadecimal to represent the instance.id
 - remove u128 support
 - incompatible change: KeyCondition.id type changed to u64 from String
-- incompatible change: move need_all, need_any, need_none from TargetState to FlowSelector 
+- incompatible change: move need_all, need_any, need_none from TargetState to FlowSelector
 - incompatible change: merge TargetState to RelationTarget
 - incompatible change: context_name to dynamic_para
 - simplify the readme(CH && EN)
-- bug fix: if target last instance check failed, should return environment error 
+- bug fix: if target last instance check failed, should return environment error
 
 ## Release 0.19 2020-09-26
 
@@ -131,10 +130,10 @@ Chinese doc: fix architecture.md
 - MetaSetting: add `output_last` property. only used by `MetaType::Loop`, output the instance only when loop finished. This requires the multi_meta has only one item.
 - add pre-filter-builtin: task-checker: make sure the certain tasks are all done before execute a `Executor`
 - add pre-filter-builtin: para_as_key: convert para part as content key and old content as value
-- builtin-executor:merge 
+- builtin-executor:merge
   - support top
-  - rename Setting.key.VecTuple to Setting.key.Content. 
-- bug fix: meta load verify error 
+  - rename Setting.key.VecTuple to Setting.key.Content.
+- bug fix: meta load verify error
 - Optimize and bug fix: MetaType::Loop
 - bug fix: exchange the order of generate ID and Para
 - Optimize: make builtin:loader setting.time_part optional
@@ -146,7 +145,7 @@ Chinese doc: fix architecture.md
 - RelationTarget
   - rename from copy_para to append_para, and add append support
   - add property: context_name to form sys_context:para.dynamic
-- bug fix: break task process when task repeated 
+- bug fix: break task process when task repeated
 - builtin-merge: add KeyType::None support
 
 ## Release 0.12 2020-08-03
@@ -161,7 +160,7 @@ Chinese doc: fix architecture.md
   - set instance.sys_context with `loop.next`
   - gen next loop from `from.sys_context`
 - builtin-merge: rename from sum to `merge` and support batch mode.
-- builtin-time_range: 
+- builtin-time_range:
   - para_part -> time_part
 - fix bug for instance_dao::get_by_key_range
 - fix bug for task_dao::raw_to_error
@@ -180,7 +179,7 @@ Chinese doc: fix architecture.md
 
 ## Release 0.10 2020-06-27
 
-- built-in executor enhanced for `sum`: support five modes old,new,min,max,sum 
+- built-in executor enhanced for `sum`: support five modes old,new,min,max,sum
 - prevent sta_version skipping to avoid some invalid input
 - fix bug: copy_para does not work for state-target
 - fix bug: duplicate input status-instance cause error
@@ -201,7 +200,7 @@ Chinese doc: fix architecture.md
 - add interface `query_by_meta` for outside call
 - incompatible change: change `Instance` table design
 - incompatible change: change `task` table design
-- incompatible change: `conflict_avoid` rename to `cache_saved` 
+- incompatible change: `conflict_avoid` rename to `cache_saved`
 - incompatible change: `DelayedInstances` and `ConverterParameter`
 - incompatible change: rename `ParaForIDAndFrom` to `IDAndFrom`
 - incompatible change: rename `QueryByID` to `KeyCondition`
@@ -210,13 +209,13 @@ Chinese doc: fix architecture.md
 - builtin executor: timer
 - bug fixed: cache_saved is invalid
 - bug fixed: create_time unset for `MetaType::Multi`
-- bug fixed: task clean time is invalid 
+- bug fixed: task clean time is invalid
 
 ## Release 0.7 2020-4-30
 
 - builtin-executor sum
 - Relation Setting: add `target.upstream_para` support
-- incompatible change: target_states changed to target.state for relation-setting. 
+- incompatible change: target_states changed to target.state for relation-setting.
 - incompatible change: original `executor.filter` will rename to `executor.filter_after`
 - add `executor.filter_before` support.
 - bug fix: state instance deep conflicts when save will lead to actix-rt overflow its stack
@@ -227,7 +226,7 @@ Chinese doc: fix architecture.md
 ## Release 0.6 2020-4-13
 
 - multi-Executor is replaced with single-Executor for relation.
-- add filter support for executor 
+- add filter support for executor
 - add r2d2 support for mysql.
 
 ## Release 0.5 2020-4-6
@@ -243,7 +242,7 @@ Chinese doc: fix architecture.md
 
 - update actix-web to 2.0 version
 - use async replace actor to simplify code
-- execute `Executor` asynchronously 
+- execute `Executor` asynchronously
 
 ## Release 0.3.0 2020-3-29
 
@@ -254,8 +253,8 @@ Chinese doc: fix architecture.md
 
 - task will be remained after executed,
 - delete executed task after a given delay
-- bug fix: conflict with same source cause error task generated 
-- bug fix: retry module update times and time failed.  
+- bug fix: conflict with same source cause error task generated
+- bug fix: retry module update times and time failed.
 
 ## Release 0.1.0 2020-3-25
 
@@ -275,4 +274,3 @@ Chinese doc: fix architecture.md
 - 支持回调接口：`执行器`可长时间执行任务，并通过回调接口返回结果
 - 任务派发前要落盘，以防止`Meta`和`Relation`发生变化引起数据不一致。
 - 支持业务自定义参数作为主键的一部分，这有利于和外部项目集成。
-

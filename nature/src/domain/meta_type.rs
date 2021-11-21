@@ -10,6 +10,9 @@ pub enum MetaType {
     Null,
     Multi,
     Loop,
+    Template,
+    Private,
+    Couple,
 }
 
 impl Default for MetaType {
@@ -27,6 +30,9 @@ impl MetaType {
             MetaType::Null => "N".to_string(),
             MetaType::Multi => "M".to_string(),
             MetaType::Loop => "L".to_string(),
+            MetaType::Template => "T".to_string(),
+            MetaType::Private => "P".to_string(),
+            MetaType::Couple => "C".to_string(),
         }
     }
 
@@ -38,6 +44,9 @@ impl MetaType {
             "N" => Ok(MetaType::Null),
             "M" => Ok(MetaType::Multi),
             "L" => Ok(MetaType::Loop),
+            "T" => Ok(MetaType::Template),
+            "P" => Ok(MetaType::Private),
+            "C" => Ok(MetaType::Couple),
             _ => Err(NatureError::VerifyError("unknow prefix : [".to_string() + prefix + "]"))
         }
     }
@@ -71,6 +80,9 @@ mod test {
         assert_eq!("B", MetaType::Business.get_prefix());
         assert_eq!("M", MetaType::Multi.get_prefix());
         assert_eq!("L", MetaType::Loop.get_prefix());
+        assert_eq!("T", MetaType::Template.get_prefix());
+        assert_eq!("P", MetaType::Private.get_prefix());
+        assert_eq!("C", MetaType::Couple.get_prefix());
     }
 
     #[test]
@@ -81,6 +93,9 @@ mod test {
         assert_eq!(MetaType::Dynamic, MetaType::from_prefix("D").unwrap());
         assert_eq!(MetaType::Multi, MetaType::from_prefix("M").unwrap());
         assert_eq!(MetaType::Loop, MetaType::from_prefix("L").unwrap());
+        assert_eq!(MetaType::Template, MetaType::from_prefix("T").unwrap());
+        assert_eq!(MetaType::Private, MetaType::from_prefix("P").unwrap());
+        assert_eq!(MetaType::Couple, MetaType::from_prefix("C").unwrap());
         assert_eq!(Err(NatureError::VerifyError("unknow prefix : [/d]".to_string())), MetaType::from_prefix("/d"));
     }
 
