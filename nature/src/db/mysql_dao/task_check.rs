@@ -33,7 +33,7 @@ impl TaskChecker {
             None => Local::now().naive_local()
         };
         let sql = format!("SELECT count(1) as num
-                FROM nature.task
+                FROM task
                 WHERE 1=1{}{}{}{}
                     and task_state = :state
             ", time_ge, time_lt, task_gt, task_lt);

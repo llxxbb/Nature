@@ -7,6 +7,7 @@ use crate::db::raw_models::RawMeta;
 use crate::domain::*;
 
 lazy_static! {
+    // Dao of Meta
     pub static ref D_M: MetaDaoImpl = MetaDaoImpl {};
 }
 

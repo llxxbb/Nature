@@ -51,7 +51,7 @@ create TABLE `task` (
 	`task_key`	VARCHAR ( 511 ) NOT NULL COMMENT 'meta|id|para|sta_ver',
 	`task_type`	TINYINT NOT NULL,
 	`task_for`	VARCHAR ( 255 ) NOT NULL,
-	`task_state`	TINYINT NOT NULL,
+	`task_state`	TINYINT NOT NULL COMMENT '0: new, 1: down',
 	`data`	TEXT NOT NULL,
 	`create_time`	DATETIME NOT NULL,
 	`execute_time`	DATETIME NOT NULL,
@@ -70,5 +70,6 @@ create TABLE `task_error` (
 	`create_time`	DATETIME NOT NULL,
 	`msg`	VARCHAR ( 255 ) NOT NULL,
 	UNIQUE KEY `task_un` (`task_key`,`task_type`,`task_for`),
+    KEY `task_for_IDX` (`task_for`) USING BTREE,
 	PRIMARY KEY(`task_id`)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

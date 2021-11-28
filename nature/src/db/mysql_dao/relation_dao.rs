@@ -33,7 +33,7 @@ impl RelationDao for RelationDaoImpl {
     async fn get_relations<MC, M>(&self, from: &str, meta_cache_getter: &MC, meta_getter: &M) -> Relations
         where MC: MetaCache, M: MetaDao {
         let sql = r"SELECT id, from_meta, to_meta, settings, flag
-            FROM nature.relation
+            FROM relation
             where from_meta = :from_meta and flag = 1";
 
         let p = params! {
@@ -59,7 +59,7 @@ impl RelationDao for RelationDaoImpl {
         }
     }
     async fn insert(&self, one: RawRelation) -> Result<u64> {
-        let sql = r"INSERT INTO nature.relation
+        let sql = r"INSERT INTO relation
             (from_meta, to_meta, settings, flag)
             VALUES(:from_meta, :to_meta, :settings, :flag)";
 
@@ -70,7 +70,7 @@ impl RelationDao for RelationDaoImpl {
     }
 
     async fn delete(&self, one: RawRelation) -> Result<u64> {
-        let sql = r"DELETE FROM nature.relation
+        let sql = r"DELETE FROM relation
             WHERE from_meta=:from_meta AND to_meta=:to_meta";
 
         let p = params! {
@@ -84,7 +84,7 @@ impl RelationDao for RelationDaoImpl {
     }
     /// `from` and `to`'s form are full_key:version
     async fn update_flag(&self, from: &str, to: &str, flag_f: i32) -> Result<u64> {
-        let sql = r"UPDATE nature.relation
+        let sql = r"UPDATE relation
             SET settings='', flag=:flag
             WHERE from_meta=:from_meta AND to_meta=:to_meta";
 
@@ -139,7 +139,7 @@ impl RelationDao for RelationDaoImpl {
 
     async fn id_great_than(&self, from: i32, limit: i32) -> Result<Vec<RawRelation>> {
         let sql = r"SELECT id, from_meta, to_meta, settings, flag
-            FROM nature.relation
+            FROM relation
             WHERE id > :from
             order by id
             limit :limit";

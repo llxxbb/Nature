@@ -52,7 +52,7 @@ impl TaskDao for TaskDaoImpl {
 
     #[allow(dead_code)]
     async fn delete(&self, _record_id: &u64) -> Result<u64> {
-        let sql = r"DELETE FROM nature.task
+        let sql = r"DELETE FROM task
             WHERE task_id=:task_id";
 
         let p = params! {
@@ -113,7 +113,7 @@ impl TaskDao for TaskDaoImpl {
     }
 
     async fn update_execute_time(&self, _record_id: &u64, delay: i64) -> Result<u64> {
-        let sql = r"UPDATE nature.task
+        let sql = r"UPDATE task
             SET execute_time=:execute_time
             WHERE task_id=:task_id";
 
@@ -127,7 +127,7 @@ impl TaskDao for TaskDaoImpl {
     }
 
     async fn finish_task(&self, _record_id: &u64) -> Result<u64> {
-        let sql = r"UPDATE nature.task
+        let sql = r"UPDATE task
             SET task_state=1
             WHERE task_id=:task_id and task_state=0";
 
@@ -146,7 +146,7 @@ impl TaskDao for TaskDaoImpl {
 
     /// increase one times and delay `delay` seconds
     async fn increase_times_and_delay(&self, _record_id: &u64, delay: i32) -> Result<u64> {
-        let sql = r"UPDATE nature.task
+        let sql = r"UPDATE task
             SET execute_time=:execute_time, retried_times = retried_times+1
             WHERE task_id=:task_id";
 

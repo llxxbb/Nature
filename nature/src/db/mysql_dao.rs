@@ -1,6 +1,6 @@
 use std::env;
 
-use mysql_async::{Conn, Params, Pool, Row};
+use mysql_async::{Conn, from_row, Params, Pool, Row};
 use mysql_async::error::{DriverError, Error};
 use mysql_async::prelude::*;
 
@@ -8,10 +8,16 @@ pub use instance_dao::*;
 pub use meta_dao::*;
 pub use relation_dao::*;
 pub use task_dao::*;
+pub use task_err_dao::*;
 
 use crate::domain::*;
 
 pub mod task_check;
+mod instance_dao;
+mod meta_dao;
+mod relation_dao;
+mod task_dao;
+mod task_err_dao;
 
 lazy_static! {
    static ref POOL : Pool = get_conn();
@@ -20,13 +26,31 @@ lazy_static! {
 pub struct MySql;
 
 impl MySql {
+    /// count
+    pub async fn count<Q, P>(query: Q, params: P) -> Result<u32>
+        where
+            Q: AsRef<str>,
+            P: Into<Params>,
+    {
+        let conn = MySql::conn().await?;
+        match conn.first_exec(query, params).await {
+            Ok((_, rtn)) => match rtn {
+                Some(row) => {
+                    Ok(from_row(row))
+                }
+                None => Ok(0)
+            }
+            Err(e) => return Err(MysqlError(e).into())
+        }
+    }
+
     /// i(nsert) d(elete) u(pdate)
     pub async fn idu<Q, P>(query: Q, params: P) -> Result<u64>
         where
             Q: AsRef<str>,
             P: Into<Params>,
     {
-        let conn = MySql::get_conn().await?;
+        let conn = MySql::conn().await?;
         match conn.prep_exec(query, params).await {
             Ok(num) => {
                 match num.last_insert_id() {
@@ -44,7 +68,7 @@ impl MySql {
             P: Into<Params>,
             F: FnMut(Row) -> U,
     {
-        let conn = MySql::get_conn().await?;
+        let conn = MySql::conn().await?;
         match conn.prep_exec(query, params).await {
             Ok(rtn) => {
                 match rtn.map_and_drop(|one| fun(one)).await {
@@ -57,7 +81,7 @@ impl MySql {
     }
 
 
-    async fn get_conn() -> Result<Conn> {
+    async fn conn() -> Result<Conn> {
         match POOL.get_conn().await {
             Ok(conn) => Ok(conn),
             Err(e) => Err(MysqlError(e).into())
@@ -96,7 +120,3 @@ impl Into<NatureError> for MysqlError {
     }
 }
 
-mod instance_dao;
-mod meta_dao;
-mod relation_dao;
-mod task_dao;

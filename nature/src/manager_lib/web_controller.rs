@@ -3,7 +3,7 @@ use std::convert::TryInto;
 use actix_web::{get, HttpResponse, post, web};
 use actix_web::web::Json;
 
-use crate::db::{D_M, INS_RANGE, InstanceDaoImpl, MetaDao, RawMeta, RawRelation};
+use crate::db::{D_M, D_TE, INS_RANGE, InstanceDaoImpl, MetaDao, RawMeta, RawRelation, RawTaskError, TaskErrDao};
 use crate::domain::*;
 use crate::manager_lib::meta_service::MetaService;
 use crate::manager_lib::relation_service::RelationService;
@@ -117,6 +117,53 @@ async fn relation_update(_relation: Json<RawRelation>) -> HttpResponse {
     HttpResponse::Ok().body(format!("get from: {}", "from"))
 }
 
+/// ----------------------------------- Failed Tasks  ----------------------------------------------
+#[get("/failed/{task_for}{from}/{limit}")]
+async fn failed_from(web::Path((task_for, from, limit)): web::Path<(String, String, i32)>) -> HttpResponse {
+    let from_parse = from.parse::<u64>();
+    match from_parse {
+        Ok(i_from) => {
+            let rtn = D_TE.get(&task_for, limit, i_from).await;
+            web_result(rtn)
+        }
+        Err(e) => web_result::<Result<Vec<RawTaskError>>>(Err(NatureError::from(e)))
+    }
+}
+
+#[get("/failed/num/{task_for}")]
+async fn failed_num_from(web::Path(task_for): web::Path<String>) -> HttpResponse {
+    let x = D_TE.get_num(&task_for).await;
+    web_result(x)
+}
+
+#[post("/failed/delete")]
+async fn failed_delete(task_ids: Json<Vec<String>>) -> HttpResponse {
+    let has_err = task_ids.0.iter().find(|x| x.parse::<u64>().is_err());
+    if has_err.is_some() {
+        return web_result::<Result<i32>>(Err(NatureError::VerifyError("input err".to_string())));
+    }
+    let ids = task_ids.0.join(",");
+    let rtn = D_TE.delete(&ids).await;
+    web_result(rtn)
+}
+
+#[post("/failed/deleteFor")]
+async fn failed_delete_for(task_for: String) -> HttpResponse {
+    let rtn = D_TE.delete_for(&task_for).await;
+    web_result(rtn)
+}
+
+#[post("/failed/reset")]
+async fn failed_reset(task_ids: Json<Vec<String>>) -> HttpResponse {
+    let has_err = task_ids.0.iter().find(|x| x.parse::<u64>().is_err());
+    if has_err.is_some() {
+        return web_result::<Result<i32>>(Err(NatureError::VerifyError("input err".to_string())));
+    }
+    let ids = task_ids.0.join(",");
+    let rtn = D_TE.reset(&ids).await;
+    web_result(rtn)
+}
+
 
 pub fn manager_config(cfg: &mut web::ServiceConfig) {
     cfg.service(meta_id_great_than)
@@ -131,5 +178,11 @@ pub fn manager_config(cfg: &mut web::ServiceConfig) {
         .service(get_downstream_instance)
         .service(get_downstream_instance_js)
         .service(relation_id_great_than)
-        .service(relation_update);
+        .service(relation_update)
+        .service(failed_from)
+        .service(failed_num_from)
+        .service(failed_delete)
+        .service(failed_delete_for)
+        .service(failed_reset)
+    ;
 }

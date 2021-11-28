@@ -4,6 +4,7 @@ use mysql_async::{params, Row, Value};
 use crate::db::raw_models::RawTask;
 use crate::domain::*;
 
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, Eq, Hash)]
 pub struct RawTaskError {
     pub task_id: u64,
     pub task_key: String,
