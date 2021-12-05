@@ -118,7 +118,7 @@ async fn relation_update(_relation: Json<RawRelation>) -> HttpResponse {
 }
 
 /// ----------------------------------- Failed Tasks  ----------------------------------------------
-#[get("/failed/{task_for}{from}/{limit}")]
+#[post("/failed/{task_for}{from}/{limit}")]
 async fn failed_from(web::Path((task_for, from, limit)): web::Path<(String, String, i32)>) -> HttpResponse {
     let from_parse = from.parse::<u64>();
     match from_parse {

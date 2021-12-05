@@ -23,3 +23,4 @@ pub mod meta_type;
 pub mod query;
 pub mod target_state;
 pub mod state;
+pub mod task;

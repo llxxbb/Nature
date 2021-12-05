@@ -27,6 +27,8 @@ pub fn web_result<T>(x: Result<T>) -> HttpResponse
     HttpResponse::Ok().json(x)
 }
 
+pub mod str_2_64;
+
 #[cfg(test)]
 mod test {
     use crate::domain::*;
