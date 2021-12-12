@@ -33,7 +33,7 @@ Nature/.env 文件是项目的配置文件，将其拷贝到Nature/target目录�
 ```toml
 DATABASE_URL=mysql://root@localhost/nature
 
-NATURE_SERVER_ADDRESS=http://localhost:8080/task/redo
+REDO_URL=http://localhost:8080/task/redo
 
 SERVER_PORT_NATURE=8080
 ```

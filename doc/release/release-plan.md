@@ -7,15 +7,17 @@
 
 下面为正在开发的内容
 
-## Release 1.4.0
+Release 1.4.0
 
 - Output `Instance` for `MetaType:Null`
-- 管理：支持异常数据的查询
-
+- management：support failed task query
+- optimize: simplify Retry and make the config clear
+- 
 ### It should commit
 
 ### 未完成
 
-异常数量查询
+测试异常的任务
 
-异常列表查询，支持分页
+
+optimize: cancel run the same task when it has been finished.

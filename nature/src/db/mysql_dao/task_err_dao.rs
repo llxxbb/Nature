@@ -3,6 +3,7 @@ use mysql_async::params;
 use crate::db::MySql;
 use crate::db::raw_models::RawTaskError;
 use crate::domain::*;
+use crate::domain::task::TaskCondition;
 
 lazy_static! {
     // Dao of Task
@@ -11,7 +12,7 @@ lazy_static! {
 
 #[async_trait]
 pub trait TaskErrDao {
-    async fn get(&self, task_for: &str, limit: i32, from: u64) -> Result<Vec<RawTaskError>>;
+    async fn get(&self, para: &TaskCondition) -> Result<Vec<RawTaskError>>;
     async fn get_num(&self, task_for: &str) -> Result<u32>;
     async fn delete(&self, ids: &str) -> Result<u64>;
     async fn delete_for(&self, task_for: &str) -> Result<u64>;
@@ -23,7 +24,7 @@ pub struct TaskErrDaoImpl;
 
 #[async_trait]
 impl TaskErrDao for TaskErrDaoImpl {
-    async fn get(&self, task_for: &str, limit: i32, from: u64) -> Result<Vec<RawTaskError>> {
+    async fn get(&self, para: &TaskCondition) -> Result<Vec<RawTaskError>> {
         let sql = r"SELECT task_id, task_key, task_type, task_for, `data`, create_time, msg
             FROM task_error
             WHERE task_for = :task_for and task_id > :task_id
@@ -32,9 +33,9 @@ impl TaskErrDao for TaskErrDaoImpl {
             ";
 
         let p = params! {
-            "task_for" => task_for,
-            "task_id" => from,
-            "limit" => limit,
+            "task_for" => para.task_for.clone(),
+            "task_id" => para.id_from,
+            "limit" => para.limit,
         };
 
         let rtn = MySql::fetch(sql, p, RawTaskError::from).await?;
@@ -76,17 +77,14 @@ impl TaskErrDao for TaskErrDaoImpl {
     }
 
     async fn reset(&self, ids: &str) -> Result<u64> {
-        let sql = r"INSERT INTO task
-            (task_id, task_key, task_type, task_for, task_state, `data`,  retried_times)
+        // dbg!(ids);
+        let sql = format!("INSERT INTO task
+            (task_id, task_key, task_type, task_for, task_state, `data`, retried_times, create_time, execute_time)
             SELECT
-                task_id, task_key, task_type, task_for, 0 as task_state, `data`, 0 as retried_times
-            FROM task_error
-             WHERE task_id in (:ids)";
+                task_id, task_key, task_type, task_for, 0 as task_state, `data`, 0 as retried_times, now(), now()
+            FROM task_error te
+             WHERE te.task_id in ({})", ids);
 
-        let p = params! {
-            "ids" => ids,
-        };
-
-        MySql::idu(sql, p).await
+        MySql::idu(sql, ()).await
     }
 }

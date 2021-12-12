@@ -3,8 +3,9 @@ use std::convert::TryInto;
 use actix_web::{get, HttpResponse, post, web};
 use actix_web::web::Json;
 
-use crate::db::{D_M, D_TE, INS_RANGE, InstanceDaoImpl, MetaDao, RawMeta, RawRelation, RawTaskError, TaskErrDao};
+use crate::db::{D_M, D_TE, INS_RANGE, InstanceDaoImpl, MetaDao, RawMeta, RawRelation, TaskErrDao};
 use crate::domain::*;
+use crate::domain::task::TaskCondition;
 use crate::manager_lib::meta_service::MetaService;
 use crate::manager_lib::relation_service::RelationService;
 use crate::util::js_convert::{to_js_option_output, to_js_vec_output};
@@ -118,21 +119,16 @@ async fn relation_update(_relation: Json<RawRelation>) -> HttpResponse {
 }
 
 /// ----------------------------------- Failed Tasks  ----------------------------------------------
-#[post("/failed/{task_for}{from}/{limit}")]
-async fn failed_from(web::Path((task_for, from, limit)): web::Path<(String, String, i32)>) -> HttpResponse {
-    let from_parse = from.parse::<u64>();
-    match from_parse {
-        Ok(i_from) => {
-            let rtn = D_TE.get(&task_for, limit, i_from).await;
-            web_result(rtn)
-        }
-        Err(e) => web_result::<Result<Vec<RawTaskError>>>(Err(NatureError::from(e)))
-    }
+#[post("/failed")]
+async fn failed_from(para: Json<TaskCondition>) -> HttpResponse {
+    let rtn = D_TE.get(&para.0).await;
+    web_result(rtn)
 }
 
-#[get("/failed/num/{task_for}")]
-async fn failed_num_from(web::Path(task_for): web::Path<String>) -> HttpResponse {
-    let x = D_TE.get_num(&task_for).await;
+#[post("/failed/num")]
+async fn failed_num_from(para:Json<TaskCondition>) -> HttpResponse {
+    debug!("/failed/num : {:?}", &para.0);
+    let x = D_TE.get_num(&para.0.task_for).await;
     web_result(x)
 }
 
@@ -153,6 +149,7 @@ async fn failed_delete_for(task_for: String) -> HttpResponse {
     web_result(rtn)
 }
 
+/// reset by task id
 #[post("/failed/reset")]
 async fn failed_reset(task_ids: Json<Vec<String>>) -> HttpResponse {
     let has_err = task_ids.0.iter().find(|x| x.parse::<u64>().is_err());

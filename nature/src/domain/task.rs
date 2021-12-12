@@ -13,3 +13,21 @@ pub struct TaskCondition {
     #[serde(default)]
     pub limit: u32,
 }
+
+#[cfg(test)]
+mod test{
+    use crate::domain::task::TaskCondition;
+
+    #[test]
+    fn task_condition_test(){
+        let one = TaskCondition{
+            task_for: "".to_string(),
+            id_from: 0,
+            limit: 0
+        };
+        let rtn = serde_json::to_string(&one);
+        assert_eq!("{}", rtn.unwrap());
+        let two = serde_json::from_str("{}");
+        assert_eq!(one, two.unwrap());
+    }
+}
