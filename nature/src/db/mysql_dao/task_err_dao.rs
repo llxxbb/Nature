@@ -17,7 +17,7 @@ pub trait TaskErrDao {
     async fn delete(&self, ids: &str) -> Result<u64>;
     async fn delete_for(&self, task_for: &str) -> Result<u64>;
     /// move to task table and redo it
-    async fn reset(&self, ids: &str) -> Result<u64>;
+    async fn reset(&self, id: &u64) -> Result<u64>;
 }
 
 pub struct TaskErrDaoImpl;
@@ -76,14 +76,14 @@ impl TaskErrDao for TaskErrDaoImpl {
         MySql::idu(sql, p).await
     }
 
-    async fn reset(&self, ids: &str) -> Result<u64> {
+    async fn reset(&self, id: &u64) -> Result<u64> {
         // dbg!(ids);
         let sql = format!("INSERT INTO task
             (task_id, task_key, task_type, task_for, task_state, `data`, retried_times, create_time, execute_time)
             SELECT
                 task_id, task_key, task_type, task_for, 0 as task_state, `data`, 0 as retried_times, now(), now()
             FROM task_error te
-             WHERE te.task_id in ({})", ids);
+             WHERE te.task_id={}", id);
 
         MySql::idu(sql, ()).await
     }

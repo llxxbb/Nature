@@ -1,4 +1,5 @@
 use std::convert::TryInto;
+use std::num::ParseIntError;
 
 use actix_web::{get, HttpResponse, post, web};
 use actix_web::web::Json;
@@ -8,6 +9,7 @@ use crate::domain::*;
 use crate::domain::task::TaskCondition;
 use crate::manager_lib::meta_service::MetaService;
 use crate::manager_lib::relation_service::RelationService;
+use crate::manager_lib::task_err_service::TaskErrService;
 use crate::util::js_convert::{to_js_option_output, to_js_vec_output};
 use crate::util::web_result;
 use crate::vo::{InsCondVO, InstanceVO};
@@ -126,7 +128,7 @@ async fn failed_from(para: Json<TaskCondition>) -> HttpResponse {
 }
 
 #[post("/failed/num")]
-async fn failed_num_from(para:Json<TaskCondition>) -> HttpResponse {
+async fn failed_num_from(para: Json<TaskCondition>) -> HttpResponse {
     debug!("/failed/num : {:?}", &para.0);
     let x = D_TE.get_num(&para.0.task_for).await;
     web_result(x)
@@ -152,12 +154,12 @@ async fn failed_delete_for(task_for: String) -> HttpResponse {
 /// reset by task id
 #[post("/failed/reset")]
 async fn failed_reset(task_ids: Json<Vec<String>>) -> HttpResponse {
-    let has_err = task_ids.0.iter().find(|x| x.parse::<u64>().is_err());
-    if has_err.is_some() {
+    let ids: Vec<std::result::Result<u64, ParseIntError>> = task_ids.iter().map(|x| x.parse::<u64>()).collect();
+    if ids.iter().find(|x| x.is_err()).is_some() {
         return web_result::<Result<i32>>(Err(NatureError::VerifyError("input err".to_string())));
     }
-    let ids = task_ids.0.join(",");
-    let rtn = D_TE.reset(&ids).await;
+    let ids: Vec<u64> = ids.into_iter().map(|x| x.unwrap()).collect();
+    let rtn = TaskErrService::move_to_task(ids).await;
     web_result(rtn)
 }
 

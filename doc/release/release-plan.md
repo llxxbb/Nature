@@ -17,7 +17,7 @@ Release 1.4.0
 
 ### 未完成
 
+bug fix: insert error task to task table already exists.
 测试异常的任务
-
 
 optimize: cancel run the same task when it has been finished.

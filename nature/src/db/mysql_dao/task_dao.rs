@@ -11,14 +11,15 @@ lazy_static! {
 #[async_trait]
 pub trait TaskDao {
     async fn insert(&self, raw: &RawTask) -> Result<u64>;
-    async fn delete(&self, _record_id: &u64) -> Result<u64>;
-    async fn delete_finished(&self, _delay: i64) -> Result<u64>;
+    async fn delete(&self, record_id: &u64) -> Result<u64>;
+    async fn delete_finished(&self, delay: i64) -> Result<u64>;
     async fn raw_to_error(&self, err: &NatureError, raw: &RawTask) -> Result<u64>;
-    async fn get_overdue(&self, delay: i64, _limit: i64) -> Result<Vec<RawTask>>;
-    async fn update_execute_time(&self, _record_id: &u64, delay: i64) -> Result<u64>;
-    async fn finish_task(&self, _record_id: &u64) -> Result<u64>;
+    async fn get_overdue(&self, delay: i64, limit: i64) -> Result<Vec<RawTask>>;
+    async fn update_execute_time(&self, record_id: &u64, delay: i64) -> Result<u64>;
+    async fn finish_task(&self, record_id: &u64) -> Result<u64>;
     async fn increase_times_and_delay(&self, _record_id: &u64, delay: i32) -> Result<u64>;
-    async fn get(&self, _record_id: &u64) -> Result<Option<RawTask>>;
+    async fn get(&self, record_id: &u64) -> Result<Option<RawTask>>;
+    async fn reset(&self, task_id: &u64) -> Result<u64>;
 }
 
 pub struct TaskDaoImpl;
@@ -51,12 +52,12 @@ impl TaskDao for TaskDaoImpl {
     }
 
     #[allow(dead_code)]
-    async fn delete(&self, _record_id: &u64) -> Result<u64> {
+    async fn delete(&self, record_id: &u64) -> Result<u64> {
         let sql = r"DELETE FROM task
             WHERE task_id=:task_id";
 
         let p = params! {
-            "task_id" => _record_id,
+            "task_id" => record_id,
         };
 
         let rtn = MySql::idu(sql, p).await?;
@@ -64,12 +65,12 @@ impl TaskDao for TaskDaoImpl {
     }
 
     /// delete finished task after `delay` seconds
-    async fn delete_finished(&self, _delay: i64) -> Result<u64> {
+    async fn delete_finished(&self, delay: i64) -> Result<u64> {
         let sql = r"DELETE FROM task
             WHERE execute_time < date_sub(now(), interval :delay second) AND task_state = 1";
 
         let p = params! {
-            "delay" => _delay,
+            "delay" => delay,
         };
 
         let rtn = MySql::idu(sql, p).await?;
@@ -97,7 +98,7 @@ impl TaskDao for TaskDaoImpl {
         Ok(num)
     }
 
-    async fn get_overdue(&self, delay: i64, _limit: i64) -> Result<Vec<RawTask>> {
+    async fn get_overdue(&self, delay: i64, limit: i64) -> Result<Vec<RawTask>> {
         let sql = r"SELECT task_id, task_key, task_type, task_for, task_state, `data`, create_time, execute_time, retried_times
             FROM task
             WHERE execute_time < :execute_time and task_state = 0
@@ -106,13 +107,13 @@ impl TaskDao for TaskDaoImpl {
         let _execute_time = Local::now().checked_add_signed(Duration::seconds(delay)).unwrap().naive_local();
         let p = params! {
             "execute_time" => _execute_time,
-            "limit" => _limit,
+            "limit" => limit,
         };
 
         MySql::fetch(sql, p, RawTask::from).await
     }
 
-    async fn update_execute_time(&self, _record_id: &u64, delay: i64) -> Result<u64> {
+    async fn update_execute_time(&self, record_id: &u64, delay: i64) -> Result<u64> {
         let sql = r"UPDATE task
             SET execute_time=:execute_time
             WHERE task_id=:task_id";
@@ -120,24 +121,24 @@ impl TaskDao for TaskDaoImpl {
         let _time = Local::now().checked_add_signed(Duration::seconds(delay)).unwrap().naive_local();
         let p = params! {
             "execute_time" => _time,
-            "task_id" => _record_id,
+            "task_id" => record_id,
         };
         let rtn = MySql::idu(sql, p).await?;
         Ok(rtn)
     }
 
-    async fn finish_task(&self, _record_id: &u64) -> Result<u64> {
+    async fn finish_task(&self, record_id: &u64) -> Result<u64> {
         let sql = r"UPDATE task
             SET task_state=1
             WHERE task_id=:task_id and task_state=0";
 
         let p = params! {
-            "task_id" => _record_id,
+            "task_id" => record_id,
         };
         let rtn = match MySql::idu(sql, p).await {
             Ok(n) => n,
             Err(e) => {
-                warn!("**** save task error : {}", _record_id);
+                warn!("**** save task error : {}", record_id);
                 return Err(e);
             }
         };
@@ -159,13 +160,13 @@ impl TaskDao for TaskDaoImpl {
         Ok(rtn)
     }
 
-    async fn get(&self, _record_id: &u64) -> Result<Option<RawTask>> {
+    async fn get(&self, record_id: &u64) -> Result<Option<RawTask>> {
         let sql = r"SELECT task_id, task_key, task_type, task_for, task_state, `data`, create_time, execute_time, retried_times
             FROM task
             WHERE task_id=:task_id";
 
         let p = params! {
-            "task_id" => _record_id,
+            "task_id" => record_id,
         };
 
         let rtn = MySql::fetch(sql, p, RawTask::from).await?;
@@ -174,6 +175,18 @@ impl TaskDao for TaskDaoImpl {
             1 => Ok(Some(rtn[0].clone())),
             _ => Err(NatureError::SystemError("should less than 2 record return".to_string())),
         }
+    }
+
+    async fn reset(&self, task_id: &u64) -> Result<u64> {
+        let sql = r"update task set task_state=0, retried_times=0
+            WHERE task_id=:task_id";
+
+        let p = params! {
+            "task_id" => task_id,
+        };
+
+        let rtn = MySql::idu(sql, p).await?;
+        Ok(rtn)
     }
 }
 
