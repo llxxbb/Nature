@@ -9,6 +9,7 @@
 
 Release 1.5.0
 
+introduce WebAssembly for management, to simple the development
  
 ### It should commit
 

@@ -13,3 +13,12 @@ nature.sqlite-journal
 .run
 */*.bak_*
 */*.lck
+
+**/*.rs.bk
+nature-manager/target
+nature-manager/bin/
+nature-manager/pkg/
+nature-manager/wasm-pack.log
+nature-manager/www/node_modules
+nature-manager/www/dist
+/nature-manager/www/package-lock.json
