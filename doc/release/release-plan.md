@@ -7,17 +7,14 @@
 
 下面为正在开发的内容
 
-Release 1.4.0
+Release 1.5.0
 
-- Output `Instance` for `MetaType:Null`
-- management：support failed task query
-- optimize: simplify Retry and make the config clear
-- 
+ 
 ### It should commit
 
 ### 未完成
 
-- bug fix: insert error task to task table already exists.
+
 - 测试异常的任务
 
 optimize: cancel run the same task when it has been finished.

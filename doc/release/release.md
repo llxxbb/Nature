@@ -1,5 +1,12 @@
 # Release log
 
+## Release 1.4.0 2022-06-03
+
+- Output `Instance` for `MetaType:Null`
+- management：support failed task query
+- optimize: simplify Retry and make the config clear
+- bug fix: insert error task to task table already exists.
+
 ## Release 1.3.0 2021-11-02
 
 - change id from string to u64
