@@ -1,23 +1,28 @@
 <div align="center">
 
-  <h1><code>wasm-pack-template</code></h1>
+# Nature Manager
 
-  <strong>A template for kick starting a Rust and WebAssembly project using <a href="https://github.com/rustwasm/wasm-pack">wasm-pack</a>.</strong>
-
-  <p>
-    <a href="https://travis-ci.org/rustwasm/wasm-pack-template"><img src="https://img.shields.io/travis/rustwasm/wasm-pack-template.svg?style=flat-square" alt="Build Status" /></a>
-  </p>
-
-  <h3>
-    <a href="https://rustwasm.github.io/docs/wasm-pack/tutorials/npm-browser-packages/index.html">Tutorial</a>
-    <span> | </span>
-    <a href="https://discordapp.com/channels/442252698964721669/443151097398296587">Chat</a>
-  </h3>
-
-  <sub>Built with 🦀🕸 by <a href="https://rustwasm.github.io/">The Rust and WebAssembly Working Group</a></sub>
 </div>
 
-## About
+## Technology stack
+
+[rust wasm-pack](https://github.com/rustwasm/wasm-pack)
+
+[Element](https://element-plus.gitee.io/zh-CN/
+
+[Vue.js (vuejs.org)](https://cn.vuejs.org/)
+
+## Directory
+
+- /pkg : store built WebAssembly
+
+- /www: store the pages for web
+
+## start the app
+cd www
+npm run serve
+
+## About WebAssembly
 
 [**📚 Read this template tutorial! 📚**][template-docs]
 

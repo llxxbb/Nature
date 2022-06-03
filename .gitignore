@@ -5,12 +5,12 @@ output.log
 .cargo/
 .idea/
 .vscode/
+.run
 rls/
 target/
 nature.sqlite
 nature.sqlite-journal
 /out
-.run
 */*.bak_*
 */*.lck
 
