@@ -19,6 +19,7 @@ pub trait TaskDao {
     async fn finish_task(&self, record_id: &u64) -> Result<u64>;
     async fn increase_times_and_delay(&self, _record_id: &u64, delay: i32) -> Result<u64>;
     async fn get(&self, record_id: &u64) -> Result<Option<RawTask>>;
+    // reset task to unfinished and runtimes to 0
     async fn reset(&self, task_id: &u64) -> Result<u64>;
 }
 

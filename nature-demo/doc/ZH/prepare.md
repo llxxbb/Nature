@@ -6,7 +6,6 @@
 
 Nature 缺省使用  mysql 数据库，请自行准备，下面是自行编译的方法，以 windows 环境进行说明：
 
-
 ### 下载代码
 
 下载项目代码: https://github.com/llxxbb/Nature
@@ -25,7 +24,6 @@ cargo build
 - retry.exe : 为 Nature 重新加载因环境问题失败的任务，使其能够重新运行。
 - restful_executor.exe：服务于示例项目的基于restful的转换器实现
 
-
 ## 修改配置文件
 
 Nature/.env 文件是项目的配置文件，将其拷贝到Nature/target目录下，并修改相应的值，下面为缺省的值。
@@ -37,6 +35,7 @@ REDO_URL=http://localhost:8080/task/redo
 
 SERVER_PORT_NATURE=8080
 ```
+
 ## 创建数据库
 
 数据库的创建脚本位于Nature-DB/migrations目录下。如果你安装了diesel_cli，你可以在终端上运行下面的命令便可完成数据库的初始化：

@@ -1,4 +1,4 @@
-# 发布的功能
+# Release log
 
 ## Release 1.3.0 2021-11-02
 

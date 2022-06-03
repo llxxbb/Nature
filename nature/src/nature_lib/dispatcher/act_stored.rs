@@ -18,6 +18,7 @@ pub async fn channel_stored(task: TaskForStore, raw: RawTask) {
                 warn!("==== converter task saved failed : {}", rtn.err().unwrap().to_string());
                 return;
             }
+            // notation! can't use retains `raws`, otherwise faild task would never be executed.
             tokio::spawn(async move {
                 for t in converters {
                     if t.0.target.delay == 0 {

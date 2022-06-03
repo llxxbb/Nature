@@ -17,7 +17,10 @@ Release 1.4.0
 
 ### 未完成
 
-bug fix: insert error task to task table already exists.
-测试异常的任务
+- bug fix: insert error task to task table already exists.
+- 测试异常的任务
 
 optimize: cancel run the same task when it has been finished.
+
+文档：工作机制
+    对异常数据的处理机制

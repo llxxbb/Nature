@@ -37,8 +37,8 @@ Three types of `Executor` are defined in [Executor](executor.md): `converter`, `
 
 **Options**:
 
-| Option              | Description                                                  | Default value |
-| ------------------- | ------------------------------------------------------------ | ------------- |
+| Option              | Description                                                                                                                                                                                  | Default value |
+| ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------- |
 | dimension_separator | If the key value of the `Instance.content` is not the separated of the `Instance.para`,   you need to set this property. For example, the key is "a-1", this attribute should be set to "-". | /             |
 
 ### merge
@@ -47,12 +47,12 @@ Three types of `Executor` are defined in [Executor](executor.md): `converter`, `
 
 **Options**:
 
-| Option    | Description                                                  | Example   | Default Value |
-| --------- | ------------------------------------------------------------ | --------- | ------------- |
-| key       | There are three modes: Para, None and Content. See below for details | See below | None          |
+| Option    | Description                                                                                                                                                                               | Example   | Default Value |
+| --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------- | ------------- |
+| key       | There are three modes: Para, None and Content. See below for details                                                                                                                      | See below | None          |
 | when_same | how to handle the same `key`:<br />Old: Keep the old value<br />New: Keep the new value<br />Min: Take the smallest one<br />Max: Take the largest one <br />Sum: Take the sum of the two | "Old"     | "Sum"         |
-| sum_all   | whether to add the total field to the result                 | true      | false         |
-| top       | MaxTop(u16) reverse order topN<br />MinTop(u16) positive order topN<br />None No need for top, | MaxTop(5) | None          |
+| sum_all   | whether to add the total field to the result                                                                                                                                              | true      | false         |
+| top       | MaxTop(u16) reverse order topN<br />MinTop(u16) positive order topN<br />None No need for top,                                                                                            | MaxTop(5) | None          |
 
 #### Para mode
 
@@ -92,15 +92,15 @@ The statistical item has no key. This mode merges the upstream numeric arrays an
 
 Examples of upstream is as follows.
 
-| meta-string  | id   | content       |
-| ------------ | ---- | ------------- |
-| B:upstream:1 | 123  | ["1","3","5"] |
+| meta-string  | id  | content       |
+| ------------ | --- | ------------- |
+| B:upstream:1 | 123 | ["1","3","5"] |
 
 The combined downstream data is as follows:
 
-| meta-string | id   | content |
-| ----------- | ---- | ------- |
-| B:sum:1     | 123  | 9       |
+| meta-string | id  | content |
+| ----------- | --- | ------- |
+| B:sum:1     | 123 | 9       |
 
 #### Content Mode
 
@@ -114,15 +114,15 @@ Examples of option settings are as follows:
 
 The upstream example `Instance` is as follows. Note that `content` is an array of strings, and each string is an array with only two elements, the first is the `key` and the second is the `value`.
 
-| meta-string  | id   | content                                       |
-| ------------ | ---- | --------------------------------------------- |
-| B:upstream:1 | 123  | ["[\\"a\\":10]","[\\"b\\":2]","[\\"a\\":8] "] |
+| meta-string  | id  | content                                       |
+| ------------ | --- | --------------------------------------------- |
+| B:upstream:1 | 123 | ["[\\"a\\":10]","[\\"b\\":2]","[\\"a\\":8] "] |
 
 The merged downstream is as follows:
 
-| meta-string | id   | content         |
-| ----------- | ---- | --------------- |
-| B:old:1     | 123  | {"a":10, "b":2} |
+| meta-string | id  | content         |
+| ----------- | --- | --------------- |
+| B:old:1     | 123 | {"a":10, "b":2} |
 
 If the value of `when_same` is changed from Old to Min or New, the value of `content` will be: {"a":8, "b":2}
 
@@ -134,9 +134,9 @@ If the value of `when_same` is changed from Old to Min or New, the value of `con
 
 **Options**:
 
-| Option | Description                                                  | Example | Default Value |
-| ------ | ------------------------------------------------------------ | ------- | ------------- |
-| plain  | If false, the value of `value` will be put in double quotes. | true    | false         |
+| Option | Description                                                   | Example | Default Value |
+| ------ | ------------------------------------------------------------- | ------- | ------------- |
+| plain  | If false, the value of `value` will be put in double quotes.  | true    | false         |
 | part   | Which parts of the upstream `Instance.para` are used as input | [1]     |               |
 
 **Example**:
@@ -149,8 +149,8 @@ If configured as
 
 ```json
 {
-	"plain":true,
-	"part":[1]
+    "plain":true,
+    "part":[1]
 }
 ```
 
@@ -172,12 +172,12 @@ After executed, Instance.content becomes: ["ll/bb","123"], note that 123 is doub
 
 **Option**:
 
-| Option    | Description                                                  | Example   | Default Value |
-| --------- | ------------------------------------------------------------ | --------- | ------------- |
-| unit      | Interval span: s(econd), m(inute), h(our), d(ay), w(eek), M(onth), Y(ear) | see below | "s"           |
+| Option    | Description                                                                                                                                                                                                                                                                                                                           | Example   | Default Value |
+| --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------- | ------------- |
+| unit      | Interval span: s(econd), m(inute), h(our), d(ay), w(eek), M(onth), Y(ear)                                                                                                                                                                                                                                                             | see below | "s"           |
 | value     | If the `unit` value is "s","m","h","d", then `value` is the number of intervals (must be> 0)<br />If the unit value is "w","M ","y" then `value` is the offset; value can be <0, which means offset from the tail to the front. The range of values are as follows:<br />week: [-7, 6]<br /> month: [-20, 19]<br /> year: [-200, 199] | 5         | 1             |
-| on_para   | Where to take the time for calculation, if it is true, take it from the upstream `Instance.para`, otherwise take `Instance.create_time` | true      | false         |
-| time_part | Which part of the upstream `Instance.para` to take as the input time | 1         | 0             |
+| on_para   | Where to take the time for calculation, if it is true, take it from the upstream `Instance.para`, otherwise take `Instance.create_time`                                                                                                                                                                                               | true      | false         |
+| time_part | Which part of the upstream `Instance.para` to take as the input time                                                                                                                                                                                                                                                                  | 1         | 0             |
 
 Example of generating para: 1596207504/1596207505
 
@@ -189,12 +189,12 @@ Example of generating para: 1596207504/1596207505
 
 The ins_key structure used below is: meta-string:id:para.
 
-| Option    | Description                                                  | Example                                                      | Default Value |
-| --------- | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------- |
-| key_gt    | To form SQL where conditions: ins_key> {key_gt}              | B:sale/item/count:1\|0\|(item)/                              |               |
-| key_lt    | To form SQL where conditions: ins_key <{key_lt}              | B:sale/item/count:1\|0\|(item)0                              |               |
-| page_size | The size of a page of data                                   | 20                                                           | 100           |
-| time_part | Which two parts of upstream `Instance.para` are used as the start and end time | [0,1]                                                        |               |
+| Option    | Description                                                                                                               | Example                                                                                                                                                    | Default Value |
+| --------- | ------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------- |
+| key_gt    | To form SQL where conditions: ins_key> {key_gt}                                                                           | B:sale/item/count:1\|0\|(item)/                                                                                                                            |               |
+| key_lt    | To form SQL where conditions: ins_key <{key_lt}                                                                           | B:sale/item/count:1\|0\|(item)0                                                                                                                            |               |
+| page_size | The size of a page of data                                                                                                | 20                                                                                                                                                         | 100           |
+| time_part | Which two parts of upstream `Instance.para` are used as the start and end time                                            | [0,1]                                                                                                                                                      |               |
 | filters   | is an array of `Executor`, each is the definition of the convert_before interface, used for processing after data loaded. | [{"protocol":"localRust","url":"nature_integrate_test_executor:append_star"}, {"protocol":"localRust","url":"nature_integrate_test_executor:append_plus"}] |               |
 
 ### task-checker
@@ -203,8 +203,8 @@ The ins_key structure used below is: meta-string:id:para.
 
 **Options**:
 
-| Option    | Description                                                  | Example                         | Default Value |
-| --------- | ------------------------------------------------------------ | ------------------------------- | ------------- |
-| key_gt    | To form SQL where conditions task_key> {key_gt}              | B:sale/item/count:1\|0\|(item)/ |               |
-| key_lt    | To form SQL where conditions task_key< {key_lt}              | B:sale/item/count:1\|0\|(item)0 |               |
+| Option    | Description                                                                    | Example                         | Default Value |
+| --------- | ------------------------------------------------------------------------------ | ------------------------------- | ------------- |
+| key_gt    | To form SQL where conditions task_key> {key_gt}                                | B:sale/item/count:1\|0\|(item)/ |               |
+| key_lt    | To form SQL where conditions task_key< {key_lt}                                | B:sale/item/count:1\|0\|(item)0 |               |
 | time_part | Which two parts of upstream `Instance.para` are used as the start and end time | [0,1]                           |               |

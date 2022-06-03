@@ -18,15 +18,15 @@ Even if two `Meta` have established `Relation`, it may not be executed. It depen
 
 ```json
 {
-    "selector": {...}, 			// default null, select the upstream that meets the conditions. See "Selector" below
+    "selector": {...},             // default null, select the upstream that meets the conditions. See "Selector" below
     "executor": {...}, // default null, specify Executor. See "Executor" below
-    "convert_before": [{...}], 	// Pre-executor, you can specify multiple, will be execute in the given order.
-    "convert_after": [{...}], 	// Post Executor, you can specify multiple, will be execute in the given order.
-    "use_upstream_id": bool, 	// The newly generated Instance.id will use the upstream Instance.id
-    "target": {}, 				// default null, for downstream Instance intervention, see "downstream Intervention" below
-    "delay": 0, 				// default 0, the task will be executed after the specified number of seconds from the current time
-    "delay_on_para": [100,2], 	// default null, delay execution. The first value of the array is the delay in seconds, and the second value is the position of the base time, which is located in the upstream Instance.para.
-    "id_bridge": bool, 			// default false, the upstream id is not used downstream, but the downstream of the downstream will use it, then you need to set this value to true
+    "convert_before": [{...}],     // Pre-executor, you can specify multiple, will be execute in the given order.
+    "convert_after": [{...}],     // Post Executor, you can specify multiple, will be execute in the given order.
+    "use_upstream_id": bool,     // The newly generated Instance.id will use the upstream Instance.id
+    "target": {},                 // default null, for downstream Instance intervention, see "downstream Intervention" below
+    "delay": 0,                 // default 0, the task will be executed after the specified number of seconds from the current time
+    "delay_on_para": [100,2],     // default null, delay execution. The first value of the array is the delay in seconds, and the second value is the position of the base time, which is located in the upstream Instance.para.
+    "id_bridge": bool,             // default false, the upstream id is not used downstream, but the downstream of the downstream will use it, then you need to set this value to true
 }
 ```
 
@@ -39,7 +39,7 @@ The upstream and downstream must meet the specified conditions before Nature can
      "state_all": ["s1"], // default null, upstream must meet all specified states
      "state_any": ["s1"], // default null, upstream needs to satisfy one of the states
      "state_none": ["s1"], // default null, upstream cannot contain any given state
-	 "last_all": ["s1"], // default null, the downstream previous version must meet all specified states
+     "last_all": ["s1"], // default null, the downstream previous version must meet all specified states
      "last_any": ["s1"], // default null, the downstream previous version needs to meet one of the states
      "last_none": ["s1"], // default null, the downstream previous version cannot contain any given status
     "context_all": ["c1"], // default null, upstream must meet all specified context
@@ -58,33 +58,33 @@ The check order of conditions is: xxx_none, xxx_all, xxx_any.
 **Note**: Although both `context` and `sys_context` are KV types, when used as process selection conditions, Nature only handles the "K" but not the "V". This is considered for easy design. The form of "V" is determined by the business, it may be a URL,  "a|b|c" or a json, so it is not standardized. Nature also does not want to regulate this, which may limit business flexibility and reduce processing performance, but the "K" is very standardized, just a label, which is very convenient for Nature to process. Of course, there are problems with this approach. When `context` and `sys_context` are used as process choices, they lose the meaning of KV. For example: choosing different processing procedures according to gender:
 
 - Wrong way：
-
+  
   | KEY    | VALUE           |
   | ------ | --------------- |
   | gender | "boy" \| "girl" |
 
 - Correct way 1：
-
+  
   | KEY                       | VALUE |
   | ------------------------- | ----- |
   | gender.boy \| gender.girl | ""    |
-
+  
   The flow control settings are similar to:
-
+  
   - boy flow：relation1.selector.**context_all** = ["gender.boy"]
-
+  
   - girl flow：relation2.selector.**context_all** = ["gender.girl"]
 
 - Correct way 2：
-
+  
   | KEY          | VALUE |
   | ------------ | ----- |
   | gender.isBoy | ""    |
-
+  
   The flow control settings are similar to:
-
+  
   - boy flow：relation1.selector.**context_all** = ["gender.isBoy"]
-
+  
   - girl flow：relation2.selector.**context_none** = ["gender.isBoy"]
 
 ### Executor
@@ -93,7 +93,7 @@ The check order of conditions is: xxx_none, xxx_all, xxx_any.
 
 ```json
 {
-     "protocol": "http", 			// Communication protocol, see description below.
+     "protocol": "http",             // Communication protocol, see description below.
      "url": "http://my-executor/fun", // used to locate the of Executor
      "settings": "executor self settings", // see the description below.
 }
@@ -163,10 +163,10 @@ After the execution of `Executor` is completed, sometimes we want to append some
 
 ```json
 {
-     "state_add": ["s1"], 		// Default null, add a new state based on the previous state, the state must be defined in `Meta`.
-     "state_remove": ["s1"], 	// Default null, remove the specified state from the previous state.
-     "append_para": [2,1], 		// Default null, select a part from the upstream Instance.para and append it to the downstream Instance.para. See below for details.
-     "dynamic_para": String,	// see description below
+     "state_add": ["s1"],         // Default null, add a new state based on the previous state, the state must be defined in `Meta`.
+     "state_remove": ["s1"],     // Default null, remove the specified state from the previous state.
+     "append_para": [2,1],         // Default null, select a part from the upstream Instance.para and append it to the downstream Instance.para. See below for details.
+     "dynamic_para": String,    // see description below
 }
 ```
 

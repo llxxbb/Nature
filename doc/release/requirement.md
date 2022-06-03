@@ -8,7 +8,10 @@
   map, filter, sum, fold, groupBy, reduce.
 
 
-## Release 2.0
+## 
+
+
+## Release 3.0
 - 自路由：对`执行器`返回的自路由进行支持。
 
 - 行使网关职能，充当所以业务系统的入口。
