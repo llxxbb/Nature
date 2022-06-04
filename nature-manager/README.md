@@ -12,6 +12,10 @@
 
 [Vue.js (vuejs.org)](https://cn.vuejs.org/)
 
+## Make wasm package
+
+wasm-pack build --target web
+
 ## Directory
 
 - /pkg : store built WebAssembly
@@ -19,12 +23,13 @@
 - /www: store the pages for web
 
 ## start the app
+
 cd www
 npm run serve
 
 ## About WebAssembly
 
-[**ğŸ“š Read this template tutorial! ğŸ“š**][template-docs]
+[**?“š Read this template tutorial! ?“š**][template-docs]
 
 This template is designed for compiling Rust libraries into WebAssembly and
 publishing the resulting package to NPM.
@@ -35,9 +40,9 @@ templates and usages of `wasm-pack`.
 [tutorials]: https://rustwasm.github.io/docs/wasm-pack/tutorials/index.html
 [template-docs]: https://rustwasm.github.io/docs/wasm-pack/tutorials/npm-browser-packages/index.html
 
-## ğŸš´ Usage
+## ?š´ Usage
 
-### ğŸ‘ Use `cargo generate` to Clone this Template
+### ?‘ Use `cargo generate` to Clone this Template
 
 [Learn more about `cargo generate` here.](https://github.com/ashleygwilliams/cargo-generate)
 
@@ -46,25 +51,25 @@ cargo generate --git https://github.com/rustwasm/wasm-pack-template.git --name m
 cd my-project
 ```
 
-### ğŸ› ï¸ Build with `wasm-pack build`
+### ?› ?¸? Build with `wasm-pack build`
 
 ```
 wasm-pack build
 ```
 
-### ğŸ”¬ Test in Headless Browsers with `wasm-pack test`
+### ?”¬ Test in Headless Browsers with `wasm-pack test`
 
 ```
 wasm-pack test --headless --firefox
 ```
 
-### ğŸ Publish to NPM with `wasm-pack publish`
+### ? Publish to NPM with `wasm-pack publish`
 
 ```
 wasm-pack publish
 ```
 
-## ğŸ”‹ Batteries Included
+## ?”‹ Batteries Included
 
 * [`wasm-bindgen`](https://github.com/rustwasm/wasm-bindgen) for communicating
   between WebAssembly and JavaScript.
