@@ -61,4 +61,12 @@ vite: {
 
 需要VS code 需要安装 TypeScript Vue Plugin (Volar)
 
+### vetur could not find package.json
 
+在项目根目录下放置 vetur.config.js 文件，内容如下：
+
+module.exports = {
+
+   projects: ["./www"]    // 指向子目录中的 package.json 所在目录
+
+}
