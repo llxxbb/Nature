@@ -57,4 +57,8 @@ vite: {
 },
 ```
 
+### main.ts: Cannot find module './App.vue'
+
+需要VS code 需要安装 TypeScript Vue Plugin (Volar)
+
 

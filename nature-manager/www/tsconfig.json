@@ -1,44 +1,23 @@
 {
-    "compilerOptions": {
-      "target": "esnext",
-      "module": "esnext",
-      "strict": true,
-      "jsx": "preserve",
-      "importHelpers": true,
-      "moduleResolution": "node",
-      "experimentalDecorators": true,
-      "skipLibCheck": true,
-      "esModuleInterop": true,
-      "allowSyntheticDefaultImports": true,
-      "sourceMap": true,
-      "baseUrl": ".",
-      "types": [
-        "webpack-env",
-        "mocha",
-        "chai",
-        "element-plus/global"
-      ],
-      "paths": {
-        "@/*": [
-          "src/*"
-        ]
-      },
-      "lib": [
-        "esnext",
-        "dom",
-        "dom.iterable",
-        "scripthost"
-      ]
+  "compilerOptions": {
+    "target": "esnext",
+    "module": "esnext",
+    "strict": true,
+    "jsx": "preserve",
+    "moduleResolution": "node",
+    "useDefineForClassFields": true,
+    "skipLibCheck": true,
+
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "sourceMap": true,
+    "baseUrl": ".",
+
+    "paths": {
+      "~/*": ["src/*"]
     },
-    "include": [
-      "src/**/*.ts",
-      "src/**/*.tsx",
-      "src/**/*.vue",
-      "tests/**/*.ts",
-      "tests/**/*.tsx"
-    ],
-    "exclude": [
-      "node_modules"
-    ]
-  }
-  
+    "lib": ["esnext", "dom"],
+
+  },
+  "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue"]
+}

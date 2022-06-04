@@ -2,10 +2,8 @@ import { createApp } from 'vue'
 import 'uno.css'
 import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
+import "~/styles/index.scss";
 import App from './App.vue'
-
-// import * as wasm from "nature-manager";
-// wasm.greet()
 
 import init, {greet} from "nature-manager";
 init().then((_exports)=>{
