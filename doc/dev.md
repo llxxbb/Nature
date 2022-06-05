@@ -70,3 +70,7 @@ module.exports = {
    projects: ["./www"]    // 指向子目录中的 package.json 所在目录
 
 }
+
+### 图像居中
+
+[css如何让img垂直居中-css教程-PHP中文网](https://www.php.cn/css-tutorial-413180.html) 借鉴了其中的第二种方法

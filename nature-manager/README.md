@@ -8,9 +8,17 @@
 
 [rust wasm-pack](https://github.com/rustwasm/wasm-pack)
 
-[Element](https://element-plus.gitee.io/zh-CN/
+[Element-plus](https://element-plus.gitee.io/zh-CN/), Notice: not element-ui, element-ui suit for vue2
 
-[Vue.js (vuejs.org)](https://cn.vuejs.org/)
+[Vue.js](https://cn.vuejs.org/), here we use vue 3
+
+**icon**
+
+use package @iconify-json/ep", example : 
+
+> <i inline-flex i="dark:ep-moon ep-sunny" />
+
+`dark:ep-moon` and  `ep-sunny` are the icons we used to change theme.
 
 ## Make wasm package
 
@@ -29,8 +37,6 @@ npm run serve
 
 ## About WebAssembly
 
-[**?ìö Read this template tutorial! ?ìö**][template-docs]
-
 This template is designed for compiling Rust libraries into WebAssembly and
 publishing the resulting package to NPM.
 
@@ -40,9 +46,9 @@ templates and usages of `wasm-pack`.
 [tutorials]: https://rustwasm.github.io/docs/wasm-pack/tutorials/index.html
 [template-docs]: https://rustwasm.github.io/docs/wasm-pack/tutorials/npm-browser-packages/index.html
 
-## ?ö¥ Usage
+## Usage
 
-### ?êë Use `cargo generate` to Clone this Template
+### Use `cargo generate` to Clone this Template
 
 [Learn more about `cargo generate` here.](https://github.com/ashleygwilliams/cargo-generate)
 
@@ -51,25 +57,25 @@ cargo generate --git https://github.com/rustwasm/wasm-pack-template.git --name m
 cd my-project
 ```
 
-### ?õ†?∏? Build with `wasm-pack build`
+### Build with `wasm-pack build`
 
 ```
 wasm-pack build
 ```
 
-### ?î¨ Test in Headless Browsers with `wasm-pack test`
+### Test in Headless Browsers with `wasm-pack test`
 
 ```
 wasm-pack test --headless --firefox
 ```
 
-### ?éÅ Publish to NPM with `wasm-pack publish`
+### Publish to NPM with `wasm-pack publish`
 
 ```
 wasm-pack publish
 ```
 
-## ?îã Batteries Included
+## Batteries Included
 
 * [`wasm-bindgen`](https://github.com/rustwasm/wasm-bindgen) for communicating
   between WebAssembly and JavaScript.
