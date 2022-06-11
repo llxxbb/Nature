@@ -1,23 +1,16 @@
 <template>
   <el-config-provider namespace="ep">
-    <BaseHeader />
-    <div style="display: flex">
-      <BaseSide />
-      <div>
-        <img alt="Vue logo" class="element-plus-logo" src="./assets/logo.png" />
-        <IndexPage msg="Welcome to Your Vue.js App" />
-      </div>
-    </div>
+    <el-container>
+      <el-header><base-header /></el-header>
+      <el-main><domain-mode /></el-main>
+    </el-container>
   </el-config-provider>
 </template>
 
 <script lang="ts">
-// import IndexPage from "./components/IndexPage.vue";
-
 export default {
   name: "App",
-  components: {
-    // IndexPage,
-  },
+  components: {},
 };
 </script>
+    BaseHeader

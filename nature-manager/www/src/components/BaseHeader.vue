@@ -3,8 +3,9 @@ import { toggleDark } from "~/composables";
 </script>
 
 <template>
-  <el-menu class="el-menu-demo" mode="horizontal">
+  <el-menu class="el-menu-demo" mode="horizontal" :ellipsis="false">
     <logo-icon />
+    <div class="flex-grow" />
     <el-menu-item index="1">Domain Mode</el-menu-item>
     <el-menu-item index="2">Relation Mode</el-menu-item>
     <el-menu-item index="3">Instance Mode</el-menu-item>
@@ -20,15 +21,17 @@ import { toggleDark } from "~/composables";
 </template>
 
 <script lang="ts">
-
-import LogoIcon from '~/components/LogoIcon.vue'
+import LogoIcon from "~/components/LogoIcon.vue";
 
 export default {
-  components:{
-    LogoIcon
-  }
+  components: {
+    LogoIcon,
+  },
 };
 </script>
 
-
+<style lang="sass" scoped>
+.flex-grow
+  flex-grow: 3
+</style>>
 

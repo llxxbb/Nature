@@ -1,0 +1,1 @@
+<template><div>Relation Editor</div></template>

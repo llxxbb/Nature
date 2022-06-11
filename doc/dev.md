@@ -6,6 +6,10 @@
 
 必须使用 element-plus 版本
 
+### element-plus 中的样式修改
+
+[vue中令人头疼的element-ui组件默认css样式修改 - 掘金 (juejin.cn)](https://juejin.cn/post/7011016159545786376)
+
 ### npm run serve 报错
 
 错误内容为：
@@ -74,3 +78,15 @@ module.exports = {
 ### 图像居中
 
 [css如何让img垂直居中-css教程-PHP中文网](https://www.php.cn/css-tutorial-413180.html) 借鉴了其中的第二种方法
+
+### eslint 报错
+
+试用了下面的几种都有问题
+
+    "@babel/eslint-parser": "^7.18.2",
+
+    "@typescript-eslint/parser": "^5.27.1",
+
+    "eslint-plugin-vue": "^9.1.0",
+
+    "babel-eslint": "^10.1.0",

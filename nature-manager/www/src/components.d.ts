@@ -5,21 +5,29 @@ import '@vue/runtime-core'
 
 declare module '@vue/runtime-core' {
   export interface GlobalComponents {
-    BaseHeader: typeof import('./components/layouts/BaseHeader.vue')['default']
-    BaseSide: typeof import('./components/layouts/BaseSide.vue')['default']
-    ElCol: typeof import('element-plus/es')['ElCol']
+    BaseHeader: typeof import('./components/BaseHeader.vue')['default']
+    DomainMode: typeof import('./components/DomainMode.vue')['default']
+    ElCard: typeof import('element-plus/es')['ElCard']
     ElConfigProvider: typeof import('element-plus/es')['ElConfigProvider']
-    ElIcon: typeof import('element-plus/es')['ElIcon']
+    ElContainer: typeof import('element-plus/es')['ElContainer']
+    ElHeader: typeof import('element-plus/es')['ElHeader']
+    ElInput: typeof import('element-plus/es')['ElInput']
+    ElMain: typeof import('element-plus/es')['ElMain']
     ElMenu: typeof import('element-plus/es')['ElMenu']
     ElMenuItem: typeof import('element-plus/es')['ElMenuItem']
-    ElMenuItemGroup: typeof import('element-plus/es')['ElMenuItemGroup']
     ElRow: typeof import('element-plus/es')['ElRow']
-    ElSubMenu: typeof import('element-plus/es')['ElSubMenu']
-    IndexPage: typeof import('./components/IndexPage.vue')['default']
+    ElSpace: typeof import('element-plus/es')['ElSpace']
+    InstanceList: typeof import('./components/instance/InstanceList.vue')['default']
+    InstanceProperty: typeof import('./components/instance/InstanceProperty.vue')['default']
     LogoIcon: typeof import('./components/LogoIcon.vue')['default']
+    MetaProperty: typeof import('./components/meta/MetaProperty.vue')['default']
+    MetaTree: typeof import('./components/meta/MetaTree.vue')['default']
+    RelationEditor: typeof import('./components/relation/RelationEditor.vue')['default']
+    RelationList: typeof import('./components/relation/RelationList.vue')['default']
+    RelationProperty: typeof import('./components/relation/RelationProperty.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
   }
 }
 
-export { }
+export {}
