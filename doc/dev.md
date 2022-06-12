@@ -10,6 +10,12 @@
 
 [vue中令人头疼的element-ui组件默认css样式修改 - 掘金 (juejin.cn)](https://juejin.cn/post/7011016159545786376)
 
+### 脚本中不能直径试用 assets 中的图片
+
+需要先导入才可以使用。如
+
+> import logo from "~/assets/logo.png";
+
 ### npm run serve 报错
 
 错误内容为：

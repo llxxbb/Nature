@@ -1,13 +1,7 @@
 <template>
   <div class="tablebox">
     <div class="imgbox">
-      <img
-        @click="showTips()"
-        alt="Nature logo"
-        width="32"
-        height="32"
-        src="../assets/logo.png"
-      />
+      <img alt="Nature logo" width="32" height="32" src="../assets/logo.png" />
     </div>
     <span style="line-height: var(--ep-menu-item-height)">Nature</span>
   </div>
