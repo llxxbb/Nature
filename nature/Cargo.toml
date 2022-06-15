@@ -34,25 +34,25 @@ lazy_static = "1.4"
 lru_time_cache = "0.11"
 futures = "0.3"
 async-trait = "0.1"
-itertools = "0.9.0"
-uuid = { version = "0.8", features = ["v3"], optional = true }
-backtrace = "0.3.63"
+itertools = "0.10.3"
+uuid = { version = "1.1", features = ["v3"], optional = true }
+backtrace = "0.3.65"
 
 # for local executor implement
-libloading = "0.5"
+libloading = "0.7.3"
 
 # log
-log = "0.4"
-env_logger = "0.7"
+log = "0.4.17"
+env_logger = "0.9.0"
 
 #config
-dotenv = "0.15"
+dotenv = "0.15.0"
 
 # manager_lib
-reqwest = { version = "0.10", features = ["blocking", "json"] }
-actix-web = "3"
-actix-rt = "1"
-actix-cors = "0.5"
+reqwest = { version = "0.11.10", features = ["blocking", "json"] }
+actix-web = "4.0.1"
+actix-rt = "2.7.0"
+actix-cors = "0.6.1"
 tokio = { version = "1.19", features = ["full"] }
 
 #db

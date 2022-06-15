@@ -35,6 +35,13 @@ impl From<std::num::ParseIntError> for NatureError {
     }
 }
 
+impl From<libloading::Error> for NatureError {
+    fn from(e: libloading::Error) -> Self {
+        NatureError::SystemError(e.to_string())
+    }
+}
+
+
 impl<T> From<SendError<T>> for NatureError {
     fn from(err: SendError<T>) -> Self {
         NatureError::EnvironmentError(err.to_string())

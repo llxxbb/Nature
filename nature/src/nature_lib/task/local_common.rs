@@ -34,7 +34,7 @@ pub async fn local_execute<T: RefUnwindSafe, R>(executor: &str, para: &T) -> Res
             let mut lib_cache = lib_cache.unwrap();
             let path = entry.path.clone();
             // debug!("load library for :[{}]", path);
-            let cfg_lib = lib_cache.entry(path.clone()).or_insert_with(move || {
+            let cfg_lib = lib_cache.entry(path.clone()).or_insert_with(move || unsafe {
                 match lib::Library::new(path.clone()) {
                     Err(e) => {
                         warn!("load local lib error for path {}, error : {}", path, e);

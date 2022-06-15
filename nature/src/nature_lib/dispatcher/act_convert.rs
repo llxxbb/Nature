@@ -9,7 +9,7 @@ use crate::nature_lib::task::{call_executor, TaskForConvert};
 /// **Notice**: Can't use async under actix-rt directly, otherwise it can lead to "actix-rt overflow its stack".
 /// So changed it to traditional mpsc
 pub fn channel_convert(store: (TaskForConvert, RawTask)) {
-    let mut runtime = match Runtime::new() {
+    let runtime = match Runtime::new() {
         Ok(r) => r,
         Err(e) => {
             warn!("get tokio runtime error : {}", e.to_string());

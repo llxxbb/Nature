@@ -70,21 +70,22 @@ async fn get_by_key_range_js(para: Json<InsCondVO>) -> HttpResponse {
 
 /// batch query the metas, `from` is index of `id`, ascending order
 #[get("/metaIdGreatThan/{from}/{limit}")]
-async fn meta_id_great_than(web::Path((from, limit)): web::Path<(i32, i32)>) -> HttpResponse {
+async fn meta_id_great_than(path: web::Path<(i32, i32)>) -> HttpResponse {
+    let (from, limit) = path.into_inner();
     let range = MetaService::id_great_than(from, limit).await;
     web_result(range)
 }
 
 /// add one meta
 #[post("/meta/add")]
-async fn meta_add(web::Path(raw): web::Path<RawMeta>) -> HttpResponse {
-    let rtn = D_M.insert(&raw).await;
+async fn meta_add(raw: web::Path<RawMeta>) -> HttpResponse {
+    let rtn = D_M.insert(&raw.into_inner()).await;
     web_result(rtn)
 }
 
 #[get("/meta/delete/{name}")]
-async fn meta_delete(web::Path(name): web::Path<String>) -> HttpResponse {
-    let meta = Meta::from_string(&name);
+async fn meta_delete(name: web::Path<String>) -> HttpResponse {
+    let meta = Meta::from_string(&name.into_inner());
     if meta.is_err() {
         return web_result::<String>(Err(meta.err().unwrap()));
     }
@@ -100,16 +101,17 @@ async fn meta_update(raw: Json<RawMeta>) -> HttpResponse {
 
 /// check meta whether used
 #[get("/metaUsed/{name}")]
-async fn meta_used(web::Path(name): web::Path<String>) -> HttpResponse {
+async fn meta_used(name: web::Path<String>) -> HttpResponse {
     // TODO
-    HttpResponse::Ok().body(format!("get from: {}", name))
+    HttpResponse::Ok().body(format!("get from: {}", name.into_inner()))
 }
 
 /// ----------------------------------- Relation ----------------------------------------------
 
 /// batch query the relations, `from` is index of `id`, ascending order
 #[get("/relationIdGreatThan/{from}/{limit}")]
-async fn relation_id_great_than(web::Path((from, limit)): web::Path<(i32, i32)>) -> HttpResponse {
+async fn relation_id_great_than(path: web::Path<(i32, i32)>) -> HttpResponse {
+    let (from, limit) = path.into_inner();
     let range = RelationService::id_great_than(from, limit).await;
     web_result(range)
 }
