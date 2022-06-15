@@ -53,7 +53,7 @@ reqwest = { version = "0.10", features = ["blocking", "json"] }
 actix-web = "3"
 actix-rt = "1"
 actix-cors = "0.5"
-tokio = { version = "0.2", features = ["full"] }
+tokio = { version = "1.19", features = ["full"] }
 
 #db
 mysql_async = "0.23"
