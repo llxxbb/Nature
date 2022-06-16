@@ -5,8 +5,7 @@ import '@vue/runtime-core'
 
 declare module '@vue/runtime-core' {
   export interface GlobalComponents {
-    BaseHeader: typeof import('./components/layout/BaseHeader.vue')['default']
-    DomainMode: typeof import('./components/DomainMode.vue')['default']
+    DomainMode: typeof import('./components/meta/DomainMode.vue')['default']
     ElCol: typeof import('element-plus/es')['ElCol']
     ElConfigProvider: typeof import('element-plus/es')['ElConfigProvider']
     ElContainer: typeof import('element-plus/es')['ElContainer']
@@ -21,7 +20,7 @@ declare module '@vue/runtime-core' {
     ElRow: typeof import('element-plus/es')['ElRow']
     InstanceList: typeof import('./components/instance/InstanceList.vue')['default']
     InstanceProperty: typeof import('./components/instance/InstanceProperty.vue')['default']
-    LogoIcon: typeof import('./components/LogoIcon.vue')['default']
+    LogoMenu: typeof import('./components/LogoMenu.vue')['default']
     MetaProperty: typeof import('./components/meta/MetaProperty.vue')['default']
     MetaTree: typeof import('./components/meta/MetaTree.vue')['default']
     ModeTool: typeof import('./components/ModeTool.vue')['default']
