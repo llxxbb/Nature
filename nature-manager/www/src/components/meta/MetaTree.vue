@@ -2,11 +2,6 @@
   <div>
     <el-row>
       <span id="meta-list">Meta List</span>
-      <el-input
-        v-model="query"
-        placeholder="find a domain"
-        @input="onQueryChanged"
-      />
     </el-row>
     <el-tree-v2
       ref="treeRef"

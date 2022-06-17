@@ -3,7 +3,7 @@
     <el-dropdown>
       <div style="display: flex; flex: 1">
         <el-image
-          style="width: 32px; height: 32px; padding: 10px"
+          style="width: 32px; height: 32px; padding-right: 10px"
           :src="logo"
           fit="fill"
         />
@@ -28,14 +28,16 @@
             @click="setMode(NatureMode.Instance)"
             >Instance Mode</el-dropdown-item
           >
+          <el-dropdown-item divided @click="toggleDark()">
+            <span style="padding-right: 10px">theme</span>
+            <i inline-flex i="dark:ep-moon ep-sunny" />
+          </el-dropdown-item>
         </el-dropdown-menu>
       </template>
     </el-dropdown>
     <el-col :span="1"></el-col>
-    <span class="padding">
-      {{ getModeTitle(mode) }}:
-      <mode-tool></mode-tool>
-    </span>
+    <span class="padding"> {{ getModeTitle(mode) }}: </span>
+    <el-row style="flex: 1"><mode-tool :mode="mode"></mode-tool></el-row>
   </el-row>
 </template>
 
@@ -71,7 +73,7 @@ export default {
 
 <style lang="scss" scoped>
 .padding {
-  padding-top: 18px;
+  padding-top: 8px;
 }
 </style>
 

@@ -1,15 +1,17 @@
-<template></template>
+<template>
+  <meta-tool v-if="isDomain()"></meta-tool>
+</template>
 
 <script>
-import { NatureMode, getModeTitle } from "~/business/enum/mode.ts";
+import { NatureMode } from "~/business/enum/mode.ts";
 
 export default {
   props: {
     mode: NatureMode,
   },
   methods: {
-    getMode() {
-      return getModeTitle(this.mode);
+    isDomain() {
+      return this.mode == NatureMode.Domain;
     },
   },
 };
