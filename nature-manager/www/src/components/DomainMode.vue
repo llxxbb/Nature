@@ -11,5 +11,12 @@
   </el-container>
 </template>
 
-<style scoped>
-</style>
+<script>
+export default {
+  methods: {
+    hello() {
+      console.info("hello");
+    },
+  },
+};
+</script>>

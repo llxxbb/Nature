@@ -6,15 +6,15 @@
       @input="onQueryChanged"
     />
   </el-col>
-  <el-icon> <search /> </el-icon>
+  <!-- <el-icon> <search /> </el-icon> -->
 </template>
 
 <script lang="ts">
-import { Search } from "@element-plus/icons-vue";
+// import { Search } from "@element-plus/icons-vue";
 
 export default {
   components: {
-    Search,
+    // Search,
   },
   data() {
     return {

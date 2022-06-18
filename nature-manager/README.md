@@ -2,6 +2,16 @@
 
 # Nature Manager
 
+## how to use
+
+you can change mode by press: **Ctrl + [key]**, where the [key] is defined below:
+
+| key | meaning       |
+| --- | ------------- |
+| d   | Domain Mode   |
+| r   | Relation Mode |
+| i   | Instance Mode |
+
 </div>
 
 ## Technology stack
@@ -16,7 +26,9 @@
 
 use package @iconify-json/ep", example : 
 
-> <i inline-flex i="dark:ep-moon ep-sunny" />
+```html
+<i inline-flex i="dark:ep-moon ep-sunny" />
+```
 
 `dark:ep-moon` and  `ep-sunny` are the icons we used to change theme.
 
