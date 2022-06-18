@@ -1,16 +1,16 @@
 <template>
-  <el-row>
+  <el-row style="align-items: center">
     <el-dropdown>
-      <div style="display: flex; flex: 1">
+      <el-row style="align-items: center">
         <el-image
           style="width: 32px; height: 32px; padding-right: 10px"
           :src="logo"
           fit="fill"
         />
-        <span class="padding">
+        <span>
           Nature <el-icon> <arrow-down /> </el-icon>
         </span>
-      </div>
+      </el-row>
       <template #dropdown>
         <el-dropdown-menu>
           <el-dropdown-item
@@ -36,8 +36,10 @@
       </template>
     </el-dropdown>
     <el-col :span="1"></el-col>
-    <span class="padding"> {{ getModeTitle(mode) }}: </span>
-    <el-row style="flex: 1"><mode-tool :mode="mode"></mode-tool></el-row>
+    <span> {{ getModeTitle(mode) }}: </span>
+    <el-row style="flex: 1; align-items: center"
+      ><mode-tool :mode="mode"></mode-tool
+    ></el-row>
   </el-row>
 </template>
 
@@ -70,10 +72,3 @@ export default {
   props: {},
 };
 </script>
-
-<style lang="scss" scoped>
-.padding {
-  padding-top: 8px;
-}
-</style>
-
