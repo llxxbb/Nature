@@ -1,8 +1,14 @@
 <template>
   <el-config-provider namespace="ep">
     <el-container>
-      <el-header class="header"><logo-menu ref="logo"></logo-menu></el-header>
-      <el-main><domain-mode ref="domain" /></el-main>
+      <el-header class="header"
+        ><mode-header ref="logo" @modeChanged="changeEvent"></mode-header
+      ></el-header>
+      <el-main>
+        <domain-mode v-show="isMode(0)" />
+        <relation-mode v-show="isMode(1)" />
+        <instance-mode v-show="isMode(2)" />
+      </el-main>
     </el-container>
   </el-config-provider>
 </template>
@@ -10,6 +16,11 @@
 <script lang="ts">
 import { NatureMode } from "./business/enum/mode";
 export default {
+  data() {
+    return {
+      mode: NatureMode.Domain,
+    };
+  },
   name: "App",
   methods: {
     changeMode(event: Event, mode: NatureMode) {
@@ -33,6 +44,12 @@ export default {
           }
         }
       }
+    },
+    isMode(mode: NatureMode): boolean {
+      return mode == this.mode;
+    },
+    changeEvent(mode: NatureMode) {
+      this.mode = mode;
     },
   },
   mounted() {

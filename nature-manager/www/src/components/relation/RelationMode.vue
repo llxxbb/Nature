@@ -1,1 +1,3 @@
-<template>Relation Mode</template>
+<template>
+  <el-container> Relation Mode </el-container>
+</template>

@@ -17,7 +17,7 @@
             :key="i"
             @click="setMode(i)"
           >
-            <i v-if="selectedMode(i)" inline-flex i="ep-check" />{{
+            <i v-show="selectedMode(i)" inline-flex i="ep-check" />{{
               getMenuTitle(i)
             }}
           </el-dropdown-item>
@@ -63,10 +63,12 @@ export default {
     },
     setMode(mode: NatureMode) {
       this.mode = mode;
+      this.$emit("modeChanged", mode);
     },
     changeTheme() {
       toggleDark();
     },
   },
+  emits: ["modeChanged"],
 };
 </script>

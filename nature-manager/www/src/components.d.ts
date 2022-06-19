@@ -25,6 +25,8 @@ declare module '@vue/runtime-core' {
     MetaProperty: typeof import('./components/meta/MetaProperty.vue')['default']
     MetaTool: typeof import('./components/meta/MetaTool.vue')['default']
     MetaTree: typeof import('./components/meta/MetaTree.vue')['default']
+    ModeController: typeof import('./components/ModeController.vue')['default']
+    ModeHeader: typeof import('./components/ModeHeader.vue')['default']
     ModeTool: typeof import('./components/ModeTool.vue')['default']
     RelationEditor: typeof import('./components/relation/RelationEditor.vue')['default']
     RelationList: typeof import('./components/relation/RelationList.vue')['default']
