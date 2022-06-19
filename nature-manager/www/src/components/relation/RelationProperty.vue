@@ -1,7 +1,7 @@
 <template>
   <el-card shadow="hover">
     <template #header>
-      <span>Relation List</span>
+      <span>Relation Property</span>
     </template>
     <div></div>
   </el-card>

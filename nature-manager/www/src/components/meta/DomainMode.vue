@@ -2,10 +2,9 @@
   <el-container>
     <meta-tree style="flex: 0 0 480px" />
     <el-space :fill="true">
-      <meta-property style="width: 240px" />
-      <relation-list style="flex: 1 0 240px" />
+      <meta-base-property style="width: 240px" />
+      <meta-extend-property style="flex: 1 0 240px" />
     </el-space>
-    <el-container style="flex-wrap: wrap" :fill="'true'"> </el-container>
   </el-container>
 </template>
 
