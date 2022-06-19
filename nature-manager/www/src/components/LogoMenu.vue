@@ -12,15 +12,16 @@
       </el-row>
       <template #dropdown>
         <el-dropdown-menu>
-          <el-dropdown-item @click="setMode(0)">
-            <i v-if="selectedMode(0)" inline-flex i="ep-check" />Domain Mode
+          <el-dropdown-item
+            v-for="i in getModes()"
+            :key="i"
+            @click="setMode(i)"
+          >
+            <i v-if="selectedMode(i)" inline-flex i="ep-check" />{{
+              getMenuTitle(i)
+            }}
           </el-dropdown-item>
-          <el-dropdown-item @click="setMode(1)">
-            <i v-if="selectedMode(1)" inline-flex i="ep-check" />Relation Mode
-          </el-dropdown-item>
-          <el-dropdown-item @click="setMode(2)">
-            <i v-if="selectedMode(2)" inline-flex i="ep-check" />Instance Mode
-          </el-dropdown-item>
+
           <el-dropdown-item divided @click="changeTheme()">
             <span style="padding-right: 10px">theme</span>
             <i inline-flex i="dark:ep-moon ep-sunny" />
@@ -39,6 +40,7 @@
 <script lang="ts">
 import { NatureMode, getModeTitle } from "~/business/enum/mode";
 import { toggleDark } from "~/composables";
+import { range } from "~/util";
 
 export default {
   data() {
@@ -47,6 +49,12 @@ export default {
     };
   },
   methods: {
+    getModes() {
+      return range(0, 3);
+    },
+    getMenuTitle(mode: NatureMode) {
+      return getModeTitle(mode);
+    },
     initTitle(): String {
       return getModeTitle(this.mode);
     },

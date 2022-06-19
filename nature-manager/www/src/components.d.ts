@@ -5,12 +5,8 @@ import '@vue/runtime-core'
 
 declare module '@vue/runtime-core' {
   export interface GlobalComponents {
-    DomainMode: typeof import('./components/DomainMode.vue')['default']
-    ElButton: typeof import('element-plus/es')['ElButton']
+    DomainMode: typeof import('./components/meta/DomainMode.vue')['default']
     ElCard: typeof import('element-plus/es')['ElCard']
-    ElCheck: typeof import('element-plus/es')['ElCheck']
-    ElCheckbox: typeof import('element-plus/es')['ElCheckbox']
-    ElCheckTag: typeof import('element-plus/es')['ElCheckTag']
     ElCol: typeof import('element-plus/es')['ElCol']
     ElConfigProvider: typeof import('element-plus/es')['ElConfigProvider']
     ElContainer: typeof import('element-plus/es')['ElContainer']
@@ -18,13 +14,12 @@ declare module '@vue/runtime-core' {
     ElDropdownItem: typeof import('element-plus/es')['ElDropdownItem']
     ElDropdownMenu: typeof import('element-plus/es')['ElDropdownMenu']
     ElHeader: typeof import('element-plus/es')['ElHeader']
-    ElIcon: typeof import('element-plus/es')['ElIcon']
-    ElImage: typeof import('element-plus/es')['ElImage']
     ElInput: typeof import('element-plus/es')['ElInput']
     ElMain: typeof import('element-plus/es')['ElMain']
     ElRow: typeof import('element-plus/es')['ElRow']
     ElSpace: typeof import('element-plus/es')['ElSpace']
     InstanceList: typeof import('./components/instance/InstanceList.vue')['default']
+    InstanceMode: typeof import('./components/instance/InstanceMode.vue')['default']
     InstanceProperty: typeof import('./components/instance/InstanceProperty.vue')['default']
     LogoMenu: typeof import('./components/LogoMenu.vue')['default']
     MetaProperty: typeof import('./components/meta/MetaProperty.vue')['default']
@@ -33,6 +28,7 @@ declare module '@vue/runtime-core' {
     ModeTool: typeof import('./components/ModeTool.vue')['default']
     RelationEditor: typeof import('./components/relation/RelationEditor.vue')['default']
     RelationList: typeof import('./components/relation/RelationList.vue')['default']
+    RelationMode: typeof import('./components/relation/RelationMode.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
   }
