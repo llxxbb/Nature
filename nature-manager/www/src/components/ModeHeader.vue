@@ -21,11 +21,6 @@
               getMenuTitle(i)
             }}
           </el-dropdown-item>
-
-          <el-dropdown-item divided @click="changeTheme()">
-            <span style="padding-right: 10px">theme</span>
-            <i inline-flex i="dark:ep-moon ep-sunny" />
-          </el-dropdown-item>
         </el-dropdown-menu>
       </template>
     </el-dropdown>
@@ -39,7 +34,6 @@
 
 <script lang="ts">
 import { NatureMode, getModeTitle } from "~/business/enum/mode";
-import { toggleDark } from "~/composables";
 import { range } from "~/util";
 
 export default {
@@ -64,9 +58,6 @@ export default {
     setMode(mode: NatureMode) {
       this.mode = mode;
       this.$emit("modeChanged", mode);
-    },
-    changeTheme() {
-      toggleDark();
     },
   },
   emits: ["modeChanged"],

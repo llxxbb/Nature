@@ -1,16 +1,14 @@
 <template>
-  <el-config-provider namespace="ep">
-    <el-container>
-      <el-header class="header"
-        ><mode-header ref="logo" @modeChanged="changeEvent"></mode-header
-      ></el-header>
-      <el-main>
-        <domain-mode v-show="isMode(0)" />
-        <relation-mode v-show="isMode(1)" />
-        <instance-mode v-show="isMode(2)" />
-      </el-main>
-    </el-container>
-  </el-config-provider>
+  <el-container style="height: 100%">
+    <el-header class="header"
+      ><mode-header ref="logo" @modeChanged="changeEvent"></mode-header
+    ></el-header>
+    <el-main>
+      <domain-mode v-show="isMode(0)" />
+      <relation-mode v-show="isMode(1)" />
+      <instance-mode v-show="isMode(2)" />
+    </el-main>
+  </el-container>
 </template>
 
 <script lang="ts">
@@ -66,7 +64,10 @@ export default {
   border-bottom-style: outset
   border-bottom-color: cornsilk
 
-.ep-header
-  margin: 10px
-  height: 42px
+.el-header
+  padding: 10px
+  --el-header-height: 52px
+
+.el-main
+  --el-main-padding: 5px
 </style>
