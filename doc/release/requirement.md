@@ -11,7 +11,9 @@
 
 ## Release 2.0
 
-实用的 UI 界面，实用 vue 实现
+实用的管理 UI 界面，实用 vue 实现， 含有 dashboard
+
+
 
 支持 tidb
 
