@@ -22,6 +22,9 @@ introduce WebAssembly for management, to simple the development
 ### 未完成
 
 - 测试异常的任务
+### plan
+
+dynamic component for vue [组件基础 | Vue.js (vuejs.org)](https://v3.cn.vuejs.org/guide/component-basics.html#%E5%8A%A8%E6%80%81%E7%BB%84%E4%BB%B6)
 
 optimize: cancel run the same task when it has been finished.
 

@@ -1,78 +1,78 @@
 <template>
-  <div>
-    <el-row>
-      <span id="meta-list">Meta List</span>
-    </el-row>
+  <div ref="treeContainer" style="flex: 1">
+    <!-- <el-button @click="treeHeight">click</el-button> -->
     <el-tree-v2
-      ref="treeRef"
-      :data="data"
+      ref="tree"
+      :data="createData(4, 30, 5)"
       :props="props"
-      :filter-method="filterMethod"
-      :height="208"
+      :height="treeHeight"
     />
   </div>
 </template>
 
-<script lang="ts" setup>
-import { ref } from "vue";
+<script lang="ts">
 import { ElTreeV2 } from "element-plus";
-import type { TreeNode } from "element-plus/es/components/tree-v2/src/types";
-
+import { onMounted } from "@vue/runtime-core";
 interface Tree {
   id: string;
   label: string;
   children?: Tree[];
 }
 
-const getKey = (prefix: string, id: number) => {
-  return `${prefix}-${id}`;
-};
-
-const createData = (
-  maxDeep: number,
-  maxChildren: number,
-  minNodesNumber: number,
-  deep = 1,
-  key = "node"
-): Tree[] => {
-  let id = 0;
-  return Array.from({ length: minNodesNumber })
-    .fill(deep)
-    .map(() => {
-      const childrenNumber =
-        deep === maxDeep ? 0 : Math.round(Math.random() * maxChildren);
-      const nodeKey = getKey(key, ++id);
-      return {
-        id: nodeKey,
-        label: nodeKey,
-        children: childrenNumber
-          ? createData(maxDeep, maxChildren, childrenNumber, deep + 1, nodeKey)
-          : undefined,
-      };
-    });
-};
-
-const query = ref("");
-const treeRef = ref<InstanceType<typeof ElTreeV2>>();
-const data = createData(4, 30, 5);
-const props = {
-  value: "id",
-  label: "label",
-  children: "children",
-};
-
-const onQueryChanged = (query: string) => {
-  // TODO: fix typing when refactor tree-v2
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-expect-error
-  treeRef.value!.filter(query);
-};
-const filterMethod = (query: string, node: TreeNode) => {
-  return node.label!.includes(query);
+export default {
+  data() {
+    return {
+      props: {
+        value: "id",
+        label: "label",
+        children: "children",
+      },
+      treeHeight: window.innerHeight - 52
+    };
+  },
+  // setup() {
+  //   onMounted(() => {
+  //     // console.info(this.$refs.treeContainer.offsetHeight);
+  //     // this.$refs.tree.height = this.$refs.treeContainer.offsetHeight;
+  //     this.$refs.tree.height = window.innerHeight - 52;
+  //   });
+  // },
+  methods: {
+    getKey(prefix: string, id: number) {
+      return `${prefix}-${id}`;
+    },
+    createData(
+      maxDeep: number,
+      maxChildren: number,
+      minNodesNumber: number,
+      deep = 1,
+      key = "node"
+    ): Tree[] {
+      let id = 0;
+      return Array.from({ length: minNodesNumber })
+        .fill(deep)
+        .map(() => {
+          const childrenNumber =
+            deep === maxDeep ? 0 : Math.round(Math.random() * maxChildren);
+          const nodeKey = this.getKey(key, ++id);
+          return {
+            id: nodeKey,
+            label: nodeKey,
+            children: childrenNumber
+              ? this.createData(
+                  maxDeep,
+                  maxChildren,
+                  childrenNumber,
+                  deep + 1,
+                  nodeKey
+                )
+              : undefined,
+          };
+        });
+    },
+  },
 };
 </script>
 
 <style lang="sass" scoped>
-#meta-list
-  width: 20%
 </style>

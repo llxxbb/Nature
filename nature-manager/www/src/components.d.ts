@@ -18,6 +18,7 @@ declare module '@vue/runtime-core' {
     ElMain: typeof import('element-plus/es')['ElMain']
     ElRow: typeof import('element-plus/es')['ElRow']
     ElSpace: typeof import('element-plus/es')['ElSpace']
+    ElTreeV2: typeof import('element-plus/es')['ElTreeV2']
     InstanceList: typeof import('./components/instance/InstanceList.vue')['default']
     InstanceMode: typeof import('./components/instance/InstanceMode.vue')['default']
     InstanceProperty: typeof import('./components/instance/InstanceProperty.vue')['default']

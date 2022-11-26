@@ -1,13 +1,13 @@
 <template>
   <el-container id="domainMode" style="height:100%">
     <el-col :span="12">
-      <meta-tree style="flex: 0 0 480px" />
+      <meta-tree style="flex: 1" />
     </el-col>
-    <el-divider direction="vertical" />
+    <el-divider direction="vertical"  />
     <el-col :span="12">
       <el-space
         direction="vertical"
-        :size="small"
+        :size="space"
         style="width: 100%; align-items: inherit"
       >
         <meta-base-property style="height:50%"/>
@@ -19,6 +19,11 @@
 
 <script>
 export default {
+  data(){
+    return{
+      space: "small"
+    }
+  },
   methods: {},
 };
 </script>>
