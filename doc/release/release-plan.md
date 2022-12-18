@@ -9,7 +9,6 @@
 
 Release 1.5.0
 
-
 ### It should commit
 
 ### 未完成
@@ -23,4 +22,4 @@ Release 1.5.0
 optimize: cancel run the same task when it has been finished.
 
 文档：工作机制
-    对异常数据的处理机制
+对异常数据的处理机制
