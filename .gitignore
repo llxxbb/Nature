@@ -18,7 +18,7 @@ nature.sqlite-journal
 nature-manager/target
 nature-manager/bin/
 nature-manager/pkg/
-nature-manager/wasm-pack.log
-nature-manager/www/node_modules
-nature-manager/www/dist
+nature-manager/node_modules
+nature-manager/dist
 /nature-manager/www/package-lock.json
+
