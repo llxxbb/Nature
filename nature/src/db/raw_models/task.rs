@@ -5,7 +5,7 @@ use std::str::FromStr;
 
 use chrono::prelude::*;
 use lazy_static::__Deref;
-use mysql_async::{params, Row, Value};
+use mysql_async::{params, Params, Row};
 use serde::Serialize;
 
 use crate::db::TaskDao;
@@ -118,8 +118,8 @@ impl From<Row> for RawTask {
     }
 }
 
-impl Into<Vec<(String, Value)>> for RawTask {
-    fn into(self) -> Vec<(String, Value)> {
+impl Into<Params> for RawTask {
+    fn into(self) -> Params {
         params! {
             "task_id" => self.task_id,
             "task_key" => self.task_key,

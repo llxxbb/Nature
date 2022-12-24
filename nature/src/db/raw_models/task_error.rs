@@ -1,5 +1,5 @@
 use chrono::prelude::*;
-use mysql_async::{params, Row, Value};
+use mysql_async::{params, Params, Row};
 
 use crate::db::raw_models::RawTask;
 use crate::domain::*;
@@ -45,8 +45,8 @@ impl From<Row> for RawTaskError {
     }
 }
 
-impl Into<Vec<(String, Value)>> for RawTaskError {
-    fn into(self) -> Vec<(String, Value)> {
+impl Into<Params> for RawTaskError {
+    fn into(self) -> Params {
         params! {
             "task_id" => self.task_id,
             "task_key" => self.task_key,

@@ -1,7 +1,7 @@
 use std::convert::TryInto;
 
 use chrono::prelude::*;
-use mysql_async::{params, Row, Value};
+use mysql_async::{params, Params, Row};
 
 use crate::domain::*;
 
@@ -102,8 +102,8 @@ impl From<Row> for RawMeta {
     }
 }
 
-impl Into<Vec<(String, Value)>> for RawMeta {
-    fn into(self) -> Vec<(String, Value)> {
+impl Into<Params> for RawMeta {
+    fn into(self) -> Params {
         params! {
             "meta_type" => self.meta_type,
             "meta_key" => self.meta_key,

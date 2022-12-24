@@ -1,4 +1,4 @@
-use mysql_async::{params, Value};
+use mysql_async::{params, Params};
 use mysql_async::Row;
 use serde_json;
 
@@ -45,8 +45,8 @@ impl From<Row> for RawRelation {
     }
 }
 
-impl Into<Vec<(String, Value)>> for RawRelation {
-    fn into(self) -> Vec<(String, Value)> {
+impl Into<Params> for RawRelation {
+    fn into(self) -> Params {
         params! {
             "from_meta" => self.from_meta,
             "to_meta" => self.to_meta,

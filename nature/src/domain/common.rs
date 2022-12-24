@@ -52,3 +52,9 @@ impl From<std::io::Error> for NatureError {
         NatureError::EnvironmentError(err.to_string())
     }
 }
+
+impl From<libloading::Error> for NatureError {
+    fn from(err: libloading::Error) -> Self {
+        NatureError::EnvironmentError(err.to_string())
+    }
+}

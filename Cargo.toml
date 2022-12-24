@@ -3,6 +3,5 @@
 members = [
     "nature",
     "nature-demo",
-    "test-executor",
-    "nature-manager"
+    "test-executor"
 ]

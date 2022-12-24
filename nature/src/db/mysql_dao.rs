@@ -1,8 +1,7 @@
 use std::env;
 
-use mysql_async::{Conn, from_row, Params, Pool, Row};
-use mysql_async::error::{DriverError, Error};
-use mysql_async::prelude::*;
+use mysql_async::{Conn, DriverError, Error, from_row, Params, Pool, Row};
+use mysql_async::prelude::{Query, Queryable, StatementLike, WithParams};
 
 pub use instance_dao::*;
 pub use meta_dao::*;
@@ -27,14 +26,11 @@ pub struct MySql;
 
 impl MySql {
     /// count
-    pub async fn count<Q, P>(query: Q, params: P) -> Result<u32>
-        where
-            Q: AsRef<str>,
-            P: Into<Params>,
+    pub async fn count(query: &str, params: Params) -> Result<u32>
     {
-        let conn = MySql::conn().await?;
-        match conn.first_exec(query, params).await {
-            Ok((_, rtn)) => match rtn {
+        let mut conn = MySql::conn().await?;
+        match query.with(params).first(&mut conn).await {
+            Ok(rtn) => match rtn {
                 Some(row) => {
                     Ok(from_row(row))
                 }
@@ -45,13 +41,11 @@ impl MySql {
     }
 
     /// i(nsert) d(elete) u(pdate)
-    pub async fn idu<Q, P>(query: Q, params: P) -> Result<u64>
-        where
-            Q: AsRef<str>,
-            P: Into<Params>,
+    pub async fn idu<P>(query: &str, params: P) -> Result<u64>
+        where P: Into<Params>
     {
         let conn = MySql::conn().await?;
-        match conn.prep_exec(query, params).await {
+        match query.to_string().with(params.into()).run(conn).await {
             Ok(num) => {
                 match num.last_insert_id() {
                     Some(id) => Ok(id),
@@ -64,17 +58,15 @@ impl MySql {
 
     pub async fn fetch<Q, P, F, U>(query: Q, params: P, mut fun: F) -> Result<Vec<U>>
         where
-            Q: AsRef<str>,
-            P: Into<Params>,
+            Q: AsRef<str> + StatementLike,
+            P: Into<Params> + Send,
             F: FnMut(Row) -> U,
     {
-        let conn = MySql::conn().await?;
-        match conn.prep_exec(query, params).await {
+        let mut conn = MySql::conn().await?;
+        match conn.exec(query, params).await {
             Ok(rtn) => {
-                match rtn.map_and_drop(|one| fun(one)).await {
-                    Ok((_, rtn)) => Ok(rtn),
-                    Err(e) => Err(MysqlError(e).into())
-                }
+                let map = rtn.into_iter().map(|one| fun(one)).collect();
+                Ok(map)
             }
             Err(e) => Err(MysqlError(e).into())
         }
@@ -92,11 +84,11 @@ impl MySql {
 fn get_conn() -> Pool {
     let database_url = env::var("DATABASE_URL")
         .expect("DATABASE_URL must be set");
-    Pool::new(database_url)
+    Pool::new(database_url.as_str())
 }
 
 
-pub struct MysqlError(mysql_async::error::Error);
+pub struct MysqlError(Error);
 
 impl Into<NatureError> for MysqlError {
     fn into(self) -> NatureError {
@@ -114,7 +106,6 @@ impl Into<NatureError> for MysqlError {
                 1062 => NatureError::DaoDuplicated(msg),
                 _ => NatureError::EnvironmentError(msg)
             }
-            Error::Tls(_) => NatureError::LogicalError(msg),
             Error::Url(_) => NatureError::LogicalError(msg),
         }
     }

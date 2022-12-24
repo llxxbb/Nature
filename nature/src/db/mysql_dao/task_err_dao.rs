@@ -85,6 +85,6 @@ impl TaskErrDao for TaskErrDaoImpl {
             FROM task_error te
              WHERE te.task_id={}", id);
 
-        MySql::idu(sql, ()).await
+        MySql::idu(&sql, ()).await
     }
 }

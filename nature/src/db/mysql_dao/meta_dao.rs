@@ -1,6 +1,6 @@
 use std::future::Future;
 
-use mysql_async::{params, Value};
+use mysql_async::{params, Params};
 
 use crate::db::MySql;
 use crate::db::raw_models::RawMeta;
@@ -69,7 +69,7 @@ impl MetaDao for MetaDaoImpl {
         let sql = r"INSERT INTO meta
             (meta_type, meta_key, description, version, states, fields, config, flag, create_time)
             VALUES(:meta_type, :meta_key, :description, :version, :states, :fields, :config, :flag, :create_time)";
-        let p: Vec<(String, Value)> = define.clone().into();
+        let p: Params = define.clone().into();
         let rtn = MySql::idu(sql, p).await?;
         debug!("Saved meta : {}:{}:{}", define.meta_type, define.meta_key, define.version);
         Ok(rtn)
@@ -85,7 +85,7 @@ impl MetaDao for MetaDaoImpl {
             meta_type=:meta_type,
             meta_key=:meta_key
         WHERE id=:id AND version=:version;";
-        let p: Vec<(String, Value)> = define.clone().into();
+        let p: Params = define.clone().into();
         let rtn = MySql::idu(sql, p).await?;
         debug!("updated meta : {}:{}:{}", define.meta_type, define.meta_key, define.version);
         Ok(rtn)

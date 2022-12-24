@@ -43,7 +43,7 @@ impl TaskForConvert {
             let json = MissionRaw::from(x.target.clone()).to_json()?;
             let mut car = RawTask::from_str(&json, &key, TaskType::Convert as i8, &c.to.meta_string())?;
             if c.delay > 0 {
-                car.execute_time = Local::now().add(FixedOffset::east(c.delay)).naive_local()
+                car.execute_time = Local::now().add(FixedOffset::east_opt(c.delay).unwrap()).naive_local()
             }
             new_carriers.push((x, car));
         }

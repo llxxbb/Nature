@@ -34,7 +34,7 @@ impl From<Instance> for InstanceVO {
                 None => None,
                 Some(fm) => Some(fm.into())
             },
-            create_time: Some(Local.timestamp_millis(ins.create_time).naive_local()),
+            create_time: Some(Local.timestamp_millis_opt(ins.create_time).unwrap().naive_local()),
             data: ins.data.clone(),
         }
     }

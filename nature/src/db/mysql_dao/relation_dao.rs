@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-use mysql_async::{params, Value};
+use mysql_async::{params, Params};
 
 use crate::db::{MetaCache, MetaDao, Relation, RelationSettings};
 use crate::db::raw_models::RawRelation;
@@ -63,7 +63,7 @@ impl RelationDao for RelationDaoImpl {
             (from_meta, to_meta, settings, flag)
             VALUES(:from_meta, :to_meta, :settings, :flag)";
 
-        let p: Vec<(String, Value)> = one.clone().into();
+        let p: Params = one.clone().into();
         let rtn = MySql::idu(sql, p).await?;
         debug!("Saved relation : {} -> {}", one.from_meta, one.to_meta);
         Ok(rtn)

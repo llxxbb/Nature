@@ -4,7 +4,7 @@ use std::str::FromStr;
 
 use chrono::prelude::*;
 use lazy_static::__Deref;
-use mysql_async::{params, Row, Value};
+use mysql_async::{params, Params, Row};
 use serde_json;
 
 use crate::domain::*;
@@ -83,7 +83,7 @@ impl RawInstance {
                 _ => Some(serde_json::to_string(&instance.states)?)
             },
             state_version: instance.path.state_version,
-            create_time: Local.timestamp_millis(instance.create_time).naive_local(),
+            create_time: Local.timestamp_millis_opt(instance.create_time).unwrap().naive_local(),
             sys_context: Self::context_to_raw(&instance.sys_context, "sys_context")?,
             from_key: match &instance.from {
                 None => "".to_string(),
@@ -123,8 +123,8 @@ impl From<Row> for RawInstance {
     }
 }
 
-impl Into<Vec<(String, Value)>> for RawInstance {
-    fn into(self) -> Vec<(String, Value)> {
+impl Into<Params> for RawInstance {
+    fn into(self) -> Params {
         params! {
             "meta" => self.meta,
             "ins_id" => self.ins_id,

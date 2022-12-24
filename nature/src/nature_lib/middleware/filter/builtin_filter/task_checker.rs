@@ -56,8 +56,8 @@ impl Setting {
                 Ok(rtn) => {
                     let t_ge = i64::from_str(&rtn[0])? * 1000;
                     let t_lt = i64::from_str(&rtn[1])? * 1000;
-                    let t_ge = Local.timestamp_millis(t_ge).naive_local();
-                    let t_lt = Local.timestamp_millis(t_lt).naive_local();
+                    let t_ge = Local.timestamp_millis_opt(t_ge).unwrap().naive_local();
+                    let t_lt = Local.timestamp_millis_opt(t_lt).unwrap().naive_local();
                     (Some(t_ge), Some(t_lt))
                 }
                 Err(e) => {

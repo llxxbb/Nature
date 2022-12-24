@@ -2,7 +2,7 @@ use std::collections::HashSet;
 use std::sync::Arc;
 
 use chrono::{Local, TimeZone};
-use mysql_async::{params, Row, Value};
+use mysql_async::{params, Params, Row};
 
 use crate::db::Mission;
 use crate::db::mysql_dao::MySql;
@@ -27,7 +27,7 @@ impl InstanceDaoImpl {
         let sql = r"INSERT INTO instances
             (meta, ins_id, para, content, context, states, state_version, create_time, sys_context, from_key)
             VALUES(:meta,:ins_id,:para,:content,:context,:states,:state_version,:create_time,:sys_context,:from_key)";
-        let vec: Vec<(String, Value)> = new.into();
+        let vec: Params = new.into();
         let rtn: u64 = match MySql::idu(sql, vec).await {
             Ok(n) => n,
             Err(e) => {
@@ -242,8 +242,8 @@ impl KeyRange for InstanceDaoImpl {
 
         let p = params! {
             "meta" => f_para.meta.to_string(),
-            "time_ge" => Local.timestamp_millis(time_ge_v).naive_local(),
-            "time_lt" => Local.timestamp_millis(time_lt_v).naive_local(),
+            "time_ge" => Local.timestamp_millis_opt(time_ge_v).unwrap().naive_local(),
+            "time_lt" => Local.timestamp_millis_opt(time_lt_v).unwrap().naive_local(),
             "limit" => limit,
         };
         dbg!(&sql);

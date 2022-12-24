@@ -1,7 +1,7 @@
 use std::ops::{Add, Sub};
 use std::str::FromStr;
 
-use chrono::{Date, Datelike, Duration, Local, NaiveDate, NaiveDateTime, TimeZone};
+use chrono::{Datelike, DateTime, Duration, Local, NaiveDate, NaiveDateTime, TimeZone};
 
 use crate::domain::*;
 use crate::util::*;
@@ -86,7 +86,7 @@ static DAY: i64 = 1000 * 60 * 60 * 24;
 
 impl Setting {
     fn get_time(&self, ins_time: i64) -> Result<(i64, i64)> {
-        let time = Local.timestamp_millis(ins_time).naive_local();
+        let time = Local.timestamp_millis_opt(ins_time).unwrap().naive_local();
 
         let unit = self.unit.as_ref();
         let interval: i64 = if self.value == 0 {
@@ -139,7 +139,7 @@ impl Setting {
         } else {
             7 - value + offset
         };
-        let rtn = Local.ymd(nd.year(), nd.month(), nd.day()).sub(Duration::days(diff_day as i64)).and_hms(0, 0, 0).timestamp_millis();
+        let rtn = Local.with_ymd_and_hms(nd.year(), nd.month(), nd.day(), 0, 0, 0).unwrap().sub(Duration::days(diff_day as i64)).timestamp_millis();
         Ok((rtn, rtn + 7 * DAY))
     }
 
@@ -149,8 +149,8 @@ impl Setting {
             return Err(NatureError::LogicalError("the `value` must in [-20,19]".to_string()));
         }
         let offset = nd.day0() as i16;
-        let this_month = Local.ymd(nd.year(), nd.month(), 1);
-        let next_month = get_next_month(&this_month.naive_local());
+        let this_month = Local.with_ymd_and_hms(nd.year(), nd.month(), 1, 0, 0, 0).unwrap();
+        let next_month = get_next_month(&this_month.naive_local().date());
         let mut value = self.value;
         if value < 0 {
             let days = next_month.sub(this_month).num_days();
@@ -158,25 +158,25 @@ impl Setting {
         }
         let rtn = if value <= offset {
             // `begin` in this month and `end` in next month
-            let begin = Local.ymd(nd.year(), nd.month(), (value + 1) as u32).and_hms(0, 0, 0);
+            let begin = Local.with_ymd_and_hms(nd.year(), nd.month(), (value + 1) as u32, 0, 0, 0).unwrap();
             let left = begin.timestamp_millis();
             let right = if self.value >= 0 {
-                next_month.add(Duration::days(self.value as i64)).and_hms(0, 0, 0).timestamp_millis()
+                next_month.add(Duration::days(self.value as i64)).timestamp_millis()
             } else {
-                let next_next = get_next_month(&next_month.naive_local());
-                let end = next_next.sub(Duration::days(-self.value as i64)).and_hms(0, 0, 0);
+                let next_next = get_next_month(&next_month.naive_local().date());
+                let end = next_next.sub(Duration::days(-self.value as i64));
                 end.timestamp_millis()
             };
             (left, right)
         } else {
             // `begin` in previous month and `end` in this month
             if self.value >= 0 {
-                let left = get_previous_month(&this_month.naive_local()).add(Duration::days(self.value as i64)).and_hms(0, 0, 0).timestamp_millis();
-                let right = this_month.add(Duration::days(self.value as i64)).and_hms(0, 0, 0).timestamp_millis();
+                let left = get_previous_month(&this_month.naive_local().date()).add(Duration::days(self.value as i64)).timestamp_millis();
+                let right = this_month.add(Duration::days(self.value as i64)).timestamp_millis();
                 (left, right)
             } else {
-                let left = this_month.sub(Duration::days(-self.value as i64)).and_hms(0, 0, 0).timestamp_millis();
-                let right = next_month.sub(Duration::days(-self.value as i64)).and_hms(0, 0, 0).timestamp_millis();
+                let left = this_month.sub(Duration::days(-self.value as i64)).timestamp_millis();
+                let right = next_month.sub(Duration::days(-self.value as i64)).timestamp_millis();
                 (left, right)
             }
         };
@@ -187,8 +187,8 @@ impl Setting {
         if self.value > 199 || self.value < -200 {
             return Err(NatureError::LogicalError("value must in [-7,6]".to_string()));
         }
-        let year_begin = Local.ymd(nd.year(), 1, 1);
-        let today = Local.ymd(nd.year(), nd.month(), nd.day());
+        let year_begin = Local.with_ymd_and_hms(nd.year(), 1, 1, 0, 0, 0).unwrap();
+        let today = Local.with_ymd_and_hms(nd.year(), nd.month(), nd.day(), 0, 0, 0).unwrap();
         let offset = today.sub(year_begin).num_days() as i16;
         let mut value = self.value;
         if value < 0 {
@@ -199,14 +199,14 @@ impl Setting {
         } else {
             365 - value + offset
         };
-        let left = today.sub(Duration::days(diff_day as i64)).and_hms(0, 0, 0);
+        let left = today.sub(Duration::days(diff_day as i64));
         let right = if self.value >= 0 {
-            Local.ymd(left.year() + 1, left.month(), left.day())
+            Local.with_ymd_and_hms(left.year() + 1, left.month(), left.day(), 0, 0, 0).unwrap()
         } else {
-            let end = Local.ymd(left.year() + 2, 1, 1);
+            let end = Local.with_ymd_and_hms(left.year() + 2, 1, 1, 0, 0, 0).unwrap();
             end.sub(Duration::days(-self.value as i64))
         };
-        Ok((left.timestamp_millis(), right.and_hms(0, 0, 0).timestamp_millis()))
+        Ok((left.timestamp_millis(), right.timestamp_millis()))
     }
 }
 
@@ -221,19 +221,19 @@ impl Default for Setting {
     }
 }
 
-fn get_next_month(nd: &NaiveDate) -> Date<Local> {
+fn get_next_month(nd: &NaiveDate) -> DateTime<Local> {
     if nd.month() < 12 {
-        Local.ymd(nd.year(), nd.month() + 1, 1)
+        Local.with_ymd_and_hms(nd.year(), nd.month() + 1, 1, 0, 0, 0).unwrap()
     } else {
-        Local.ymd(nd.year() + 1, 1, 1)
+        Local.with_ymd_and_hms(nd.year() + 1, 1, 1, 0, 0, 0).unwrap()
     }
 }
 
-fn get_previous_month(nd: &NaiveDate) -> Date<Local> {
+fn get_previous_month(nd: &NaiveDate) -> DateTime<Local> {
     if nd.month() > 1 {
-        Local.ymd(nd.year(), nd.month() - 1, 1)
+        Local.with_ymd_and_hms(nd.year(), nd.month() - 1, 1, 0, 0, 0).unwrap()
     } else {
-        Local.ymd(nd.year() - 1, 12, 1)
+        Local.with_ymd_and_hms(nd.year() - 1, 12, 1, 0, 0, 0).unwrap()
     }
 }
 

@@ -210,7 +210,7 @@ fn get_delay(ins: &Instance, rela: &Relation) -> Result<i32> {
         rela.delay
     } else if rela.delay_on_pare.0 > 0 {
         let rtn = get_para_and_key_from_para(&ins.path.para, &vec![rela.delay_on_pare.1])?;
-        let diff = Local.timestamp_millis(rtn.0.parse::<i64>()?).sub(Local::now()).num_seconds();
+        let diff = Local.timestamp_millis_opt(rtn.0.parse::<i64>()?).unwrap().sub(Local::now()).num_seconds();
         diff as i32 + rela.delay_on_pare.0
     } else {
         0

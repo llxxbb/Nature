@@ -1,8 +1,9 @@
 use chrono::{Duration, Local};
-use mysql_async::{params, Value};
-use crate::domain::*;
+use mysql_async::{params, Params};
+
 use crate::db::MySql;
 use crate::db::raw_models::{RawTask, RawTaskError};
+use crate::domain::*;
 
 lazy_static! {
     pub static ref D_T: TaskDaoImpl = TaskDaoImpl {};
@@ -32,7 +33,7 @@ impl TaskDao for TaskDaoImpl {
             (task_id, task_key, task_type, task_for, task_state, `data`, create_time, execute_time, retried_times)
             VALUES(:task_id, :task_key, :task_type, :task_for, :task_state, :data, :create_time, :execute_time, :retried_times)";
 
-        let p: Vec<(String, Value)> = raw.clone().into();
+        let p: Params = raw.clone().into();
         let num: u64 = match MySql::idu(sql, p).await {
             Ok(n) => {
                 debug!("---- saved task KEY: {} FOR: {} TYPE: {}", &raw.task_key, &raw.task_for, raw.task_type);
@@ -84,7 +85,7 @@ impl TaskDao for TaskDaoImpl {
             VALUES(:task_id, :task_key, :task_type, :task_for, :data, :create_time, :msg)";
 
         let rd = RawTaskError::from_raw(err, raw);
-        let p: Vec<(String, Value)> = rd.into();
+        let p: Params = rd.into();
         let num = match MySql::idu(sql, p).await {
             Ok(num) => {
                 self.delete(&raw.task_id).await?;
