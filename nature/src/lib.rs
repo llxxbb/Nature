@@ -21,3 +21,4 @@ pub mod domain;
 pub mod util;
 pub mod nature_lib;
 pub mod vo;
+pub mod common;

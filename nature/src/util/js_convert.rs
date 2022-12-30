@@ -1,4 +1,4 @@
-use crate::domain::common::*;
+use crate::common::*;
 
 pub fn try_to_i64(input: Option<String>) -> Result<Option<i64>> {
     match input {

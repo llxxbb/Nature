@@ -2,7 +2,7 @@ use std::fmt::Debug;
 
 use actix_web::HttpResponse;
 
-use crate::domain::Result;
+use crate::common::Result;
 
 /// This is only used for serialize
 pub fn is_one(num: &i32) -> bool {

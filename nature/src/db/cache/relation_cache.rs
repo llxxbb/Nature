@@ -2,6 +2,7 @@ use std::sync::Mutex;
 use std::time::Duration;
 
 use lru_time_cache::LruCache;
+use crate::common::NatureError;
 
 use crate::db::{MetaCache, MetaDao, Relation, RelationDao, Relations};
 use crate::domain::*;

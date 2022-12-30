@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
-use nature::domain::{Instance, NatureError, Result};
+use nature::common::*;
+use nature::domain::Instance;
 use nature::util::*;
 
 #[no_mangle]

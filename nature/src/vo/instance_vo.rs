@@ -3,7 +3,8 @@ use std::hash::Hash;
 
 use chrono::{Local, NaiveDateTime, TimeZone};
 
-use crate::domain::{BizObject, Instance, InstanceLocator, Modifier, NatureError};
+use crate::domain::{BizObject, Instance, InstanceLocator, Modifier};
+use crate::common::NatureError;
 use crate::util::*;
 
 /// A snapshot for a particular `Meta`

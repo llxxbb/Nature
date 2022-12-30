@@ -3,8 +3,8 @@ use std::collections::HashMap;
 use merge::merge;
 use scatter::scatter;
 use time_range::time_range;
+use crate::common::*;
 
-use crate::domain::*;
 /// built-in xecutor
 use crate::nature_lib::task::Execute;
 

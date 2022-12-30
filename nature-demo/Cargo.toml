@@ -20,17 +20,18 @@ dotenv = "0.15"
 
 # log
 log = "0.4"
-env_logger = "0.7"
+env_logger = "0.10.0"
 
 # web
-reqwest = { version = "0.10", features = ["blocking", "json"] }
-actix-web = "2.0"
-actix-rt = "1.0"
-tokio = { version = "0.2", features = ["full"] }
+reqwest = { version = "0.11.13", features = ["blocking", "json"] }
+actix-web = "4.2.1"
+actix-rt = "2.7.0"
+tokio = { version = "1.23.0", features = ["full"] }
 
 [lib]
 name="nature_demo"
-crate-type = ["cdylib"]
+path = "src/lib.rs"    # The source file of the target.
+#crate-type = ["cdylib"]
 
 [[bin]]
 name="nature_demo_restful"

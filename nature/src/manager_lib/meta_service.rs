@@ -1,5 +1,5 @@
+use crate::common::Result;
 use crate::db::{D_M, MetaDao, RawMeta};
-use crate::domain::*;
 use crate::util::*;
 
 pub struct MetaService {}

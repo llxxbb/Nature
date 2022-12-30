@@ -1,4 +1,3 @@
-use serde::Deserialize;
 use serde_json::value::RawValue;
 
 use crate::domain::*;

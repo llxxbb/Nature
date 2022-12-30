@@ -1,5 +1,5 @@
+use crate::common::Result;
 use crate::db::{D_R, RawRelation, RelationDao};
-use crate::domain::*;
 use crate::util::*;
 
 pub struct RelationService {}

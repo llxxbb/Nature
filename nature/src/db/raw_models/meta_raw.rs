@@ -2,6 +2,7 @@ use std::convert::TryInto;
 
 use chrono::prelude::*;
 use mysql_async::{params, Params, Row};
+use crate::common::NatureError;
 
 use crate::domain::*;
 

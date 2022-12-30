@@ -9,7 +9,7 @@ pub use relation_dao::*;
 pub use task_dao::*;
 pub use task_err_dao::*;
 
-use crate::domain::*;
+use crate::common::*;
 
 pub mod task_check;
 mod instance_dao;

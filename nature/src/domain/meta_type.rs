@@ -1,4 +1,4 @@
-use crate::domain::*;
+use crate::common::*;
 use crate::util::*;
 
 /// Every `Meta` must have a type

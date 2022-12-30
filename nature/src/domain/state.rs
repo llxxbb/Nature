@@ -1,6 +1,5 @@
 use std::fmt::Write;
-
-use crate::domain::*;
+use crate::common::*;
 
 /// It can't have the state with same name.
 pub type States = Vec<State>;

@@ -1,4 +1,5 @@
-use nature::domain::{ConverterParameter, ConverterReturned, Instance, Result};
+use nature::domain::{ConverterParameter, ConverterReturned, Instance};
+use nature::common::*;
 
 use crate::entry::Order;
 

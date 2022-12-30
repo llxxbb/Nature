@@ -2,7 +2,7 @@ use reqwest::Client;
 use serde::de::DeserializeOwned;
 use serde::Serialize;
 
-use crate::domain::*;
+use crate::common::Result;
 
 lazy_static! {
     static ref CLIENT : Client = Client::new();

@@ -5,9 +5,9 @@ use reqwest::Client;
 use cfg::*;
 use delay::*;
 use sleep::*;
+use crate::common::NatureError;
 
 use crate::db::{D_T, RawTask, TaskDao};
-use crate::domain::*;
 
 lazy_static! {
     static ref CLIENT : Client = Client::new();

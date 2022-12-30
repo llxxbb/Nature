@@ -1,8 +1,8 @@
 use mysql_async::params;
 
+use crate::common::Result;
 use crate::db::MySql;
 use crate::db::raw_models::RawTaskError;
-use crate::domain::*;
 use crate::domain::task::TaskCondition;
 
 lazy_static! {

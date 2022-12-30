@@ -1,6 +1,7 @@
 use std::convert::TryInto;
+use crate::common::NatureError;
 
-use crate::domain::{DynamicConverter, NatureError, SelfRouteInstance};
+use crate::domain::{DynamicConverter, SelfRouteInstance};
 use crate::vo::InstanceVO;
 
 #[derive(Serialize, Deserialize, Debug, Default, Clone, PartialEq)]

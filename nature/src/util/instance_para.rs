@@ -1,6 +1,6 @@
 use std::panic::catch_unwind;
+use crate::common::*;
 
-use crate::domain::*;
 use crate::util::*;
 
 pub fn append_para(para: &str, part: &str) -> String {

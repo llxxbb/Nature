@@ -1,6 +1,5 @@
 use std::convert::TryFrom;
-
-use crate::domain::*;
+use crate::common::*;
 
 pub enum TaskType {
     Store = 1,

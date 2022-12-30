@@ -1,6 +1,5 @@
 use crate::db::{D_T, D_TE, TaskDao, TaskErrDao};
-use crate::domain::NatureError;
-use crate::domain::Result;
+use crate::common::*;
 
 pub struct TaskErrService;
 

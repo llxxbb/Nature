@@ -1,11 +1,11 @@
 extern crate libloading as lib;
 
-use crate::domain::*;
 use std::panic::{catch_unwind, RefUnwindSafe};
 use std::sync::Mutex;
 use std::time::Duration;
 
 use lru_time_cache::LruCache;
+use crate::common::*;
 
 type CALLER<'a, T, R> = lib::Symbol<'a, fn(&T) -> R>;
 type LIB = Option<lib::Library>;
@@ -34,7 +34,7 @@ pub async fn local_execute<T: RefUnwindSafe, R>(executor: &str, para: &T) -> Res
             let mut lib_cache = lib_cache.unwrap();
             let path = entry.path.clone();
             // debug!("load library for :[{}]", path);
-            let cfg_lib = lib_cache.entry(path.clone()).or_insert_with(move || {
+            let cfg_lib = lib_cache.entry(path.clone()).or_insert_with(move || unsafe {
                 match lib::Library::new(path.clone()) {
                     Err(e) => {
                         warn!("load local lib error for path {}, error : {}", path, e);

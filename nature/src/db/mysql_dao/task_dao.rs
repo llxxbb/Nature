@@ -1,9 +1,9 @@
 use chrono::{Duration, Local};
 use mysql_async::{params, Params};
 
+use crate::common::*;
 use crate::db::MySql;
 use crate::db::raw_models::{RawTask, RawTaskError};
-use crate::domain::*;
 
 lazy_static! {
     pub static ref D_T: TaskDaoImpl = TaskDaoImpl {};

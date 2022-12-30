@@ -1,6 +1,6 @@
-use std::prelude::rust_2021::TryInto;
-
-use crate::domain::{InsCond, NatureError, NoIdCond};
+use std::convert::TryInto;
+use crate::domain::{InsCond, NoIdCond};
+use crate::common::NatureError;
 use crate::util::is_default;
 use crate::util::js_convert::try_to_i64;
 

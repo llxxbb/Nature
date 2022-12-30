@@ -2,8 +2,8 @@ use mysql_async::{params, Params};
 use mysql_async::Row;
 use serde_json;
 
+use crate::common::Result;
 use crate::db::RelationSettings;
-use crate::domain::*;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct RawRelation {

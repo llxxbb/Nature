@@ -15,6 +15,8 @@ use reqwest::blocking::Client as BClient;
 use reqwest::Client;
 
 use nature::domain::*;
+use nature::common::*;
+
 
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
