@@ -2,7 +2,9 @@
 
 [English](README_EN.md)|中文
 
-如果你是第一次了解 Nature , 建议你从头到尾阅读这些 Demo。 每个章节都包含一些不同的 **Nature 要点**，以说明如何用 Nature 独有的方式来解决问题。本示例在windows环境进行演示，如何启动 Nature 项目请参考：[项目准备](doc/ZH/prepare.md)
+如果你是第一次了解 Nature , 建议你从头到尾阅读这些 Demo。 每个章节都包含一些不同的 **Nature 要点**，以说明如何用 Nature 独有的方式来解决问题。
+
+为了能够运行本示例程序，请先进行一些[准备工作](doc/ZH/prepare.md)
 
 ## 网上商城订单处理
 
