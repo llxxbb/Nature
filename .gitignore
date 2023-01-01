@@ -1,24 +1,17 @@
 Cargo.lock.bak
-Cargo.lock
 Nature.iml
 output.log
-.cargo/
+
 .idea/
 .vscode/
-rls/
-target/
-nature.sqlite
-nature.sqlite-journal
-/out
 .run
+target/
+executor/
 */*.bak_*
 */*.lck
 
+**/.cargo/
 **/*.rs.bk
-nature-manager/target
-nature-manager/bin/
-nature-manager/pkg/
 nature-manager/node_modules
-nature-manager/dist
-/nature-manager/www/package-lock.json
+
 

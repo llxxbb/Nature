@@ -9,12 +9,19 @@
 
 Release 1.5.0
 
+- 修正 nature-demo/doc/ZH/prepare.md 中的问题.
+- 将 NatureError 和 Result 移动到 common 模块下。
+- release 中包含 demo 所需的执行器和可执行文件
+- 修订 Readme 文件
+- 增加本地 executor 位置的设定。
+
 ### It should commit
+
 
 ### 未完成
 
-整理功能列表
-重新 README，体现数据，数据驱动
+remove support for sqlite
+
 为META 和 relation 增加 id 字段。
 
 - 测试异常的任务

@@ -58,6 +58,11 @@ lazy_static! {
         rtn
     };
 
+    pub static ref EXECUTOR_PATH : String = {
+        let rtn = env::var("EXECUTOR_PATH").unwrap_or_else(|_| "executor/".to_string());
+        info!("EXECUTOR_PATH: {}", rtn);
+        rtn
+    };
 }
 
 pub fn show_config() {
@@ -73,6 +78,7 @@ pub fn show_config() {
     let _ = INSTANCE_CONTEXT_MAX_LENGTH.to_string();
     let _ = TASK_CONTENT_MAX_LENGTH.to_string();
     let _ = QUERY_SIZE_LIMIT.to_string();
+    let _ = EXECUTOR_PATH.to_string();
     info!("nature settings -------------------------");
 }
 
