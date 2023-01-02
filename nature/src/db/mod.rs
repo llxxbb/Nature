@@ -1,5 +1,4 @@
 pub use cache::*;
-pub use conn::*;
 pub use models::*;
 pub use mysql_dao::*;
 pub use orm::*;
@@ -11,4 +10,7 @@ mod mysql_dao;
 mod raw_models;
 mod models;
 
-mod conn;
+#[cfg(test)]
+pub mod test{
+    pub static CONN_STR: &str = "mysql://root@localhost/nature";
+}

@@ -55,6 +55,7 @@ impl RelationCache for RelationCacheImpl {
 #[cfg(test)]
 mod test {
     use crate::db::{RawMeta, RawRelation};
+    use crate::common::Result;
 
     use super::*;
 

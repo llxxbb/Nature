@@ -141,7 +141,7 @@ mod test_from_raw {
             flag: 1,
         };
         let mg = MetaMock {};
-        let mut rt = Runtime::new().unwrap();
+        let rt = Runtime::new().unwrap();
         let rtn = rt.block_on(Relation::from_raw(raw, &MetaCacheMasterMock {}, &mg)).unwrap();
         assert_eq!(rtn.executor.protocol, Protocol::Auto);
     }
@@ -156,7 +156,7 @@ mod test_from_raw {
             flag: 1,
         };
         let mg = MetaMock {};
-        let mut rt = Runtime::new().unwrap();
+        let rt = Runtime::new().unwrap();
         let rtn = rt.block_on(Relation::from_raw(raw, &MetaCacheMock {}, &mg));
         assert_eq!(rtn.err().unwrap().to_string().contains("relation[B:from:1  --->  B:to:1]"), true);
     }
@@ -188,7 +188,7 @@ mod test_from_raw {
             flag: 1,
         };
         let mg = MetaMock {};
-        let mut rt = Runtime::new().unwrap();
+        let rt = Runtime::new().unwrap();
         let rtn = rt.block_on(Relation::from_raw(raw, &MetaCacheMock {}, &mg));
         assert_eq!(rtn.is_ok(), true);
     }

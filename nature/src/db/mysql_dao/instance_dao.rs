@@ -372,7 +372,7 @@ mod test {
         let _ = InstanceDaoImpl::insert(&ins).await;
 
         let ge_t = 1588508143000;
-        let ge = Local.timestamp_millis(ge_t);
+        let ge = Local.timestamp_millis_opt(ge_t).unwrap();
         dbg!(ge);
         let para = InsCond {
             id: 0,

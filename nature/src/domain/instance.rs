@@ -7,8 +7,8 @@ use std::ops::{Deref, DerefMut};
 use chrono::prelude::*;
 use futures::Future;
 use itertools::Itertools;
-use crate::common::*;
 
+use crate::common::*;
 use crate::db::relation_target::RelationTarget;
 use crate::domain::*;
 use crate::util::*;
@@ -65,6 +65,25 @@ impl Instance {
             from: None,
             create_time: 0,
         })
+    }
+
+    pub fn new_with_null_meta() -> Self {
+        Instance {
+            id: 0,
+            path: Modifier {
+                meta: format!("{}{}{}{}1", MetaType::Null.get_prefix(), *SEPARATOR_META, "null", *SEPARATOR_META),
+                para: "".to_string(),
+                state_version: 0,
+            },
+            data: BizObject {
+                content: "".to_string(),
+                context: HashMap::new(),
+                sys_context: HashMap::new(),
+                states: HashSet::new(),
+            },
+            from: None,
+            create_time: 0,
+        }
     }
 
     pub fn revise(&mut self) -> Result<&mut Self> {
@@ -173,7 +192,7 @@ impl Into<InsCond> for Instance {
                 para: self.path.para.to_string(),
                 state_version: self.path.state_version,
                 limit: 1,
-            }
+            },
         }
     }
 }
@@ -284,6 +303,12 @@ mod test {
         assert_eq!(ins.path.meta, "B:hello:1");
         let ins = Instance::new("/hello").unwrap();
         assert_eq!(ins.path.meta, "B:hello:1");
+    }
+
+    #[test]
+    fn instance_new_with_null_meta() {
+        let ins = Instance::new_with_null_meta();
+        assert_eq!(ins.path.meta, "N:null:1");
     }
 
     #[test]

@@ -34,4 +34,3 @@ SQLITE3_LIB_DIR = sqlite3.lib path
 + attach dll path to `PATH` ENV， this is critical step
 
 + add config for cargo （if necessary）
-

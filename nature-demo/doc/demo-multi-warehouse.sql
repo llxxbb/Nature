@@ -18,8 +18,8 @@ VALUES('B', 'warehouse/third', '', 1, '', '', '');
 
 INSERT INTO relation
 (from_meta, to_meta, settings)
-VALUES('B:order:1', 'B:warehouse/self:1', '{"selector":{"context_all":["self"]}}');
+VALUES('B:order:1', 'B:warehouse/self:1', '{"selector":{"context_all":["self"]},"executor":{"protocol":"localRust","url":"nature_demo:multi_warehouse"}}');
 
 INSERT INTO relation
 (from_meta, to_meta, settings)
-VALUES('B:order:1', 'B:warehouse/third:1', '{"selector":{"context_all":["third"]}}');
+VALUES('B:order:1', 'B:warehouse/third:1', '{"selector":{"context_all":["third"]},"executor":{"protocol":"localRust","url":"nature_demo:multi_warehouse"}}');

@@ -132,7 +132,7 @@ mod test {
     use chrono::prelude::*;
     use tokio::runtime::Runtime;
 
-    use crate::db::CONN_STR;
+    use crate::db::test::CONN_STR;
 
     use super::*;
 
@@ -156,7 +156,7 @@ mod test {
         let meta = "B:test:100";
         let m = Meta::from_string(meta).unwrap();
         // delete if it exists
-        let mut runtime = Runtime::new().unwrap();
+        let runtime = Runtime::new().unwrap();
         if let Ok(Some(_)) = runtime.block_on(D_M.get("B:test:100")) {
             let _ = runtime.block_on(D_M.delete(&m));
         }

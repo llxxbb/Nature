@@ -30,14 +30,16 @@ VALUES('B', 'warehouse/third', '', 1, '', '', '');
 ```mysql
 INSERT INTO relation
 (from_meta, to_meta, settings)
-VALUES('B:order:1', 'B:warehouse/self:1', '{"selector":{"context_all":["self"]}}');
+VALUES('B:order:1', 'B:warehouse/self:1', '{"selector":{"context_all":["self"]},"executor":{"protocol":"localRust","url":"nature_demo:multi_warehouse"}}');
 
 INSERT INTO relation
 (from_meta, to_meta, settings)
-VALUES('B:order:1', 'B:warehouse/third:1', '{"selector":{"context_all":["third"]}}');
+VALUES('B:order:1', 'B:warehouse/third:1', '{"selector":{"context_all":["third"]},"executor":{"protocol":"localRust","url":"nature_demo:multi_warehouse"}}');
 ```
 
 这里我们会看到之前没有使用过的新的 `selector`: `context_all`。其作用是：订单的上下文中如果有 “self” 就会创建 `warehouse/self` 实例， 如果订单上下文中如果含有 “third” 就会生成 `warehouse/third` 实例。如果 context 里同时含有 self 和 third 则会同时生成两个实例，当然这在库房情景中是一种错误的设置方式。
+
+执行器的代码请参考：nature-demo::executor::emall::multi_warehouse
 
 订单数据的输入请请看示例代码：nature-demo::multi_warehouse::multi_warehouse。
 
@@ -51,19 +53,19 @@ nature.exe
 cargo.exe test --color=always --package nature-demo --lib multi_warehouse::multi_warehouse
 ```
 
-在 `multi_warehouse` 里一共提交了 A、B、C、D 四个订单，A的上下文是 self， B的上下文是 third， C的上下文 是 self 和 third.  D没有上下文。
+在 `multi_warehouse` 里一共提交了 A、B、C、D 四个订单，A的上下文是 self， B的上下文是 third， 订单 C 的上下文 是 self 和 third.  D没有上下文。
 
-**Nature 要点**：C的 context 设置是错误的，这里只是演示`选择器`的工作方式。但这种使用方式在其它场景下可能会非常有用，如对用户的兴趣进行分类统计时，一条上游数据就需要同时匹配多条下游数据。
+**Nature 要点**：订单 C 的 context 设置是错误的，因为订单不可能同时分配给两个库房，这里故为为之只是演示一个上游数据可以命中多个`选择器`。但这种使用方式在其它场景下可能会非常有用，如对用户的兴趣进行分类统计时，一条上游数据就需要同时匹配多条下游数据。
 
 运行后的数据如下：
 
-| ins_key                                                 | content | context                         | from_key                                         |
-| ------------------------------------------------------- | ------- | ------------------------------- | ------------------------------------------------ |
-| B:order:1\|38b047cd1ef153bdd636426fb9dd428e\|           | "D"     |                                 |                                                  |
-| B:order:1\|74c5d1d825d15cac88330edb45268624\|           | "C"     | {"self":"self","third":"third"} |                                                  |
-| B:order:1\|a75366d1b120cb8b633d05fd2eff3426\|           | "B"     | {"third":"third"}               |                                                  |
-| B:order:1\|fb7ca936097235b790390b68d1fba90c\|           | "A"     | {"self":"self"}                 |                                                  |
-| B:warehouse/self:1\|13e769c238d944909e349b9ca51bdc8d\|  |         |                                 | B:order:1\|fb7ca936097235b790390b68d1fba90c\|\|0 |
-| B:warehouse/self:1\|70a8d67d64bd2b86253d7c4452056685\|  |         |                                 | B:order:1\|74c5d1d825d15cac88330edb45268624\|\|0 |
-| B:warehouse/third:1\|8aa0337559cd5091d83ce40d3442a76d\| |         |                                 | B:order:1\|74c5d1d825d15cac88330edb45268624\|\|0 |
-| B:warehouse/third:1\|d264929013427f9b9739abb87e9d7ff2\| |         |                                 | B:order:1\|a75366d1b120cb8b633d05fd2eff3426\|\|0 |
+| ins_key                                   | content | context                         | from_key                            |
+| ----------------------------------------- | ------- | ------------------------------- | ----------------------------------- |
+| B:order:1\|1487267541922457568            | "A"     | {"self":"self"}                 |                                     |
+| B:order:1\|5511124463593097989            | "B"     | {"third":"third"}               |                                     |
+| B:order:1\|9688354360942590765            | "D"     |                                 |                                     |
+| B:order:1\|13159812850727140160           | "C"     | {"self":"self","third":"third"} |                                     |
+| B:warehouse/self:1\|11492880383379452140  | "C"     |                                 | B:order:1\|13159812850727140160\||0 |
+| B:warehouse/self:1\|18375946125590662357  | "A"     |                                 | B:order:1\|1487267541922457568\||0  |
+| B:warehouse/third:1\|11492880383379452140 | "C"     |                                 | B:order:1\|13159812850727140160\||0 |
+| B:warehouse/third:1\|15760981570053939593 | "B"     |                                 | B:order:1\|5511124463593097989\||0  |

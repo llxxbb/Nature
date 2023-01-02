@@ -192,7 +192,7 @@ Nature 用一对一这种简单关系来诠释完整的业务模型，其复杂�
 
 - [使用 Relation](doc/ZH/help/relation.md)
 
-- [内置执行器](doc/ZH/help/built-in.md)
+- [执行器](doc/ZH/help/executor.md)
 
 - [任务](doc/ZH/help/task.md)
 

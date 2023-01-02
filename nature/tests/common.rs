@@ -6,9 +6,7 @@ use futures::executor::block_on;
 
 use nature::nature_lib::web_init::web_init;
 
-#[allow(dead_code)]
-//pub static CONN_STR : &str = "mysql://root@localhost/nature";
-pub static CONN_STR: &str = "nature.sqlite";
+pub static CONN_STR : &str = "mysql://root@localhost/nature";
 
 pub fn test_init() {
     env::set_var("DATABASE_URL", CONN_STR);

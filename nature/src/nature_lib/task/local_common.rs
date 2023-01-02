@@ -7,7 +7,7 @@ use std::time::Duration;
 use lru_time_cache::LruCache;
 
 use crate::common::*;
-use crate::util::EXECUTOR_PATH;
+use crate::util::PLUGIN_PATH;
 
 type CALLER<'a, T, R> = lib::Symbol<'a, fn(&T) -> R>;
 type LIB = Option<lib::Library>;
@@ -37,7 +37,7 @@ pub async fn local_execute<T: RefUnwindSafe, R>(executor: &str, para: &T) -> Res
             let path = entry.path.clone();
             // debug!("load library for :[{}]", path);
             let cfg_lib = lib_cache.entry(path.clone()).or_insert_with(move || unsafe {
-                match lib::Library::new(EXECUTOR_PATH.to_string() + &path) {
+                match lib::Library::new(PLUGIN_PATH.to_string() + &path) {
                     Err(e) => {
                         warn!("load local lib error for path {}, error : {}", path, e);
                         None
@@ -96,6 +96,7 @@ fn entry_from_str(path: &str) -> Result<LibraryEntry> {
 #[cfg(test)]
 mod test {
     use futures::executor::block_on;
+    use crate::domain::{ConverterParameter, ConverterReturned, Instance};
 
     use super::*;
 

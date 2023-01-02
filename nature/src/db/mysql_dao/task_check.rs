@@ -63,7 +63,7 @@ mod test {
 
     use chrono::{Local, TimeZone};
 
-    use crate::db::CONN_STR;
+    use crate::db::test::CONN_STR;
 
     use super::*;
 
@@ -93,7 +93,7 @@ mod test {
         let condition = Condition {
             key_gt: "B:sale/item/count:1|0|".to_string(),
             key_lt: "B:sale/item/count:2|0|".to_string(),
-            time_ge: Some(Local.ymd(2020, 8, 7).and_hms(0, 0, 0).naive_local()),
+            time_ge: Some(Local.with_ymd_and_hms(2020, 8, 7,0,0,0).unwrap().naive_local()),
             time_lt: Some(Local::now().naive_local()),
             state: 1,
         };

@@ -58,9 +58,9 @@ lazy_static! {
         rtn
     };
 
-    pub static ref EXECUTOR_PATH : String = {
-        let rtn = env::var("EXECUTOR_PATH").unwrap_or_else(|_| "executor/".to_string());
-        info!("EXECUTOR_PATH: {}", rtn);
+    pub static ref PLUGIN_PATH : String = {
+        let rtn = env::var("PLUGIN_PATH").unwrap_or_else(|_| "plugin/".to_string());
+        info!("PLUGIN_PATH: {}", rtn);
         rtn
     };
 }
@@ -78,7 +78,7 @@ pub fn show_config() {
     let _ = INSTANCE_CONTEXT_MAX_LENGTH.to_string();
     let _ = TASK_CONTENT_MAX_LENGTH.to_string();
     let _ = QUERY_SIZE_LIMIT.to_string();
-    let _ = EXECUTOR_PATH.to_string();
+    let _ = PLUGIN_PATH.to_string();
     info!("nature settings -------------------------");
 }
 

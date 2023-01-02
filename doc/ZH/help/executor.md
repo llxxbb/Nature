@@ -1,6 +1,10 @@
 # Executor
 
-除了[内建 Executor](built-in.md) 和自动化的 `Executor` 外，您需要按照 Nature 给定的接口协议进行 `Executor` 编码实现并部署。`Executor` 须定义在 [Relation](relation.md) 里并由 Nature 负责调用。Nature 目前有三种形式的 `Executor`：
+对于通用的，Nature 封装了一些[内建 Executor](built-in.md) ，但这远远不能满足您业务上的需要，还需要您按照 Nature 给定的接口协议进行 `Executor` 开发并部署。当`Executor`部署完成后，还需要在 [Relation](relation.md) 里定义这些 `Executor`，这样在运行时 Nature 才会调用这些 `Executor`。
+
+## `Executor`的类型
+
+Nature 目前有三种形式的 `Executor`：
 
 - converter: 用于 [Meta](meta.md) 间 `Instance` 的转换。
 - convert_before: 用于 `Instance` 转换前的预处理，如数据格式的修正，数据加载等。
@@ -23,7 +27,22 @@
 
 ### localRust协议实现方式
 
-为本地 lib 包，生成的包需要与 nature 可执行文件置于同一目录下 。下面为本地包的生成方法参考：
+为本地 lib 包，这些包需要放置到 .env 配置文件 PLUGIN_PATH 属性指定的目录内,缺省为与 nature 可执行文件同级的 plugin 目录）。如果本地 lib 包较多，为了更好的区分三种类型的 executor，建议lib文件的命名如下：
+
+| lib 所包含的`Executor`类型 | 建议前缀 | 示例       |
+| -------------------- | ---- | -------- |
+| convert_before       | b_   | b_e-mall |
+| convert_after        | a_   | a_e-mall |
+| converter            | c_   | c_e-mall |
+| 包含多种类型的`Executor`    | m_   | m_e-mall |
+
+**注意**：
+
+- 请保证 lib 文件名与 Relation 中定义的名称一致。
+
+- Relation 中对于 lib 包的定义可以不用包含扩展名。
+
+下面为本地包的生成方法参考：
 
 用 Rust 创建一个 lib 项目。cargo.toml 需要包含类似于下面的内容。
 
@@ -39,7 +58,7 @@ crate-type = ["cdylib"]
 #[no_mangle]
 #[allow(improper_ctypes_definitions)]
 pub extern fn your_func<T,R>(para: T) -> R {
-	// your logic
+    // your logic
 }
 ```
 
@@ -49,7 +68,7 @@ pub extern fn your_func<T,R>(para: T) -> R {
 #[no_mangle]
 #[allow(improper_ctypes_definitions)]
 pub extern fn order_should_pay(para: ConverterParameter) -> ConverterReturned {
-	// your logic
+    // your logic
 }
 ```
 
@@ -62,21 +81,21 @@ pub extern fn order_should_pay(para: ConverterParameter) -> ConverterReturned {
 入参为 `Instance`, 出参为  `Result<Instance>`，请见[数据定义](data-define.md)里的 `Instance`，出参的 json 形式如下：
 
 1. 正常情况下请输出下面的内容，Ok 的值为改变后的 `instance` 对象，
-
+   
    ```json
    {"Ok":{}}
    ```
 
 2. 如果处理过程中遇到问题，则返回下面的内容:
-
+   
    ```json
-   {"Err":{"LogicalError":"err message"}}	
+   {"Err":{"LogicalError":"err message"}}    
    ```
-
+   
    或
-
+   
    ```json
-   {"Err":{"EnvironmentError":"err message"}}	
+   {"Err":{"EnvironmentError":"err message"}}    
    ```
 
 ## convert_after 接口形式
@@ -84,10 +103,9 @@ pub extern fn order_should_pay(para: ConverterParameter) -> ConverterReturned {
 入参为`Vec<Instance>`, 出参为  `Result<Vec<Instance>>`，请见[数据定义](data-define.md)里的 `Instance`，出参的 json 形式如下：
 
 1. 正常情况下请输出下面的内容，Ok 的值为改变后的 `instance` 对象数组。
-
+   
    ```json
    {"Ok":[]}
    ```
 
 2. 如果处理过程中遇到问题，请参考 `convert_before` 的问题处理方式
-

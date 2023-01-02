@@ -37,9 +37,9 @@
 
 **选项**：
 
-| 选项                | 说明                                                         | 缺省值 |
-| ------------------- | ------------------------------------------------------------ | ------ |
-| dimension_separator | 如果上游 `Instance.content` 中的 key 值不是 `Instance.para` 的分隔符则需要设置此属性。 如 key 值是 “a-1”， 则此属性应设置为 “-”。 | /      |
+| 选项                  | 说明                                                                                             | 缺省值 |
+| ------------------- | ---------------------------------------------------------------------------------------------- | --- |
+| dimension_separator | 如果上游 `Instance.content` 中的 key 值不是 `Instance.para` 的分隔符则需要设置此属性。 如 key 值是 “a-1”， 则此属性应设置为 “-”。 | /   |
 
 ### merge
 
@@ -47,12 +47,12 @@
 
 **选项**：
 
-| 选项      | 说明                                                         | 示例      | 缺省值 |
-| --------- | ------------------------------------------------------------ | --------- | ------ |
-| key       | 有三种模式：Para，None和Content。下面会具体说明              | 见下      | None   |
-| when_same | 如何处置相同的 `key`：<br />Old：保留旧值<br />New：保留新值<br />Min：取最小的一个<br />Max：取最大的一个<br />Sum：取两者的和 | “Old”     | “Sum”  |
-| sum_all   | 是否需要在结果中添加 total 字段。                            | true      | false  |
-| top       | MaxTop(u16) 倒序 topN<br />MinTop(u16) 正序 topN<br />None 不需要 top, | MaxTop(5) | None   |
+| 选项        | 说明                                                                                        | 示例        | 缺省值   |
+| --------- | ----------------------------------------------------------------------------------------- | --------- | ----- |
+| key       | 有三种模式：Para，None和Content。下面会具体说明                                                           | 见下        | None  |
+| when_same | 如何处置相同的 `key`：<br />Old：保留旧值<br />New：保留新值<br />Min：取最小的一个<br />Max：取最大的一个<br />Sum：取两者的和 | “Old”     | “Sum” |
+| sum_all   | 是否需要在结果中添加 total 字段。                                                                      | true      | false |
+| top       | MaxTop(u16) 倒序 topN<br />MinTop(u16) 正序 topN<br />None 不需要 top,                           | MaxTop(5) | None  |
 
 #### Para模式
 
@@ -92,15 +92,15 @@
 
 上游数据示例如下。
 
-| meta-string  | id   | content       |
-| ------------ | ---- | ------------- |
-| B:upstream:1 | 123  | ["1","3","5"] |
+| meta-string  | id  | content       |
+| ------------ | --- | ------------- |
+| B:upstream:1 | 123 | ["1","3","5"] |
 
 合并好的下游数据如下：
 
-| meta-string | id   | content |
-| ----------- | ---- | ------- |
-| B:sum:1     | 123  | 9       |
+| meta-string | id  | content |
+| ----------- | --- | ------- |
+| B:sum:1     | 123 | 9       |
 
 #### Content模式
 
@@ -114,15 +114,15 @@
 
 上游示例 `Instance` 如下。注意`content` 为字符串数组，每个字符串又是一个只有两个元素的数组，第一个为key，第二个为值。
 
-| meta-string  | id   | content                                      |
-| ------------ | ---- | -------------------------------------------- |
-| B:upstream:1 | 123  | ["[\\"a\\":10]","[\\"b\\":2]","[\\"a\\":8]"] |
+| meta-string  | id  | content                                      |
+| ------------ | --- | -------------------------------------------- |
+| B:upstream:1 | 123 | ["[\\"a\\":10]","[\\"b\\":2]","[\\"a\\":8]"] |
 
 合并好的下游数据如下：
 
-| meta-string | id   | content         |
-| ----------- | ---- | --------------- |
-| B:old:1     | 123  | {"a":10, "b":2} |
+| meta-string | id  | content         |
+| ----------- | --- | --------------- |
+| B:old:1     | 123 | {"a":10, "b":2} |
 
 如果设置中的 `when_same` 值将 Old 换成 Min 或 New 则 `instance.content` 的值将会是： {"a":8, "b":2}
 
@@ -134,10 +134,10 @@
 
 **选项**：
 
-| 选项  | 说明                                           | 示例 | 缺省值 |
-| ----- | ---------------------------------------------- | ---- | ------ |
-| plain | 如果为 false 则 `value` 的值会放到双引号中去。 | true | false  |
-| part  | 取上游的 `Instance.para`中的哪几个部分作为输入 | [1]  |        |
+| 选项    | 说明                              | 示例   | 缺省值   |
+| ----- | ------------------------------- | ---- | ----- |
+| plain | 如果为 false 则 `value` 的值会放到双引号中去。 | true | false |
+| part  | 取上游的 `Instance.para`中的哪几个部分作为输入 | [1]  |       |
 
 **示例**：
 
@@ -149,8 +149,8 @@ Instance.content = 123
 
 ```json
 {
-	"plain":true,
-	"part":[1]
+    "plain":true,
+    "part":[1]
 }
 ```
 
@@ -160,7 +160,7 @@ Instance.content = 123
 
 ```json
 {
-	"part":[0,2]
+    "part":[0,2]
 }
 ```
 
@@ -172,16 +172,16 @@ Instance.content = 123
 
 **选项**：
 
-| 选项      | 说明                                                         | 示例 | 缺省值 |
-| --------- | ------------------------------------------------------------ | ---- | ------ |
-| unit      | 区间跨度：s(econd), m(inute), h(our), d(ay), w(eek), M(onth), Y(ear) | 见下 | "s"    |
-| value     | 如果 `unit` 的值是 "s","m","h","d" 则 `value` 为间隔数（须 > 0）<br />如果 `unit` 的值是 "w","M","y" 则 `value` 为偏移量; value 可以 < 0, 意味着从尾端向前端偏移。取值范围如下：<br />week : [-7, 6]<br /> month : [-20, 19]<br /> year : [-200, 199] | 5    | 1      |
-| on_para   | 从哪里取用于计算的时间，如果为 true 则从上游的 `Instance.para`中取，否则取`Instance.create_time` | true | false  |
-| time_part | 取上游的 `Instance.para`中的哪一个部分作为输入时间           | 1    | 0      |
+| 选项        | 说明                                                                                                                                                                                                        | 示例   | 缺省值   |
+| --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---- | ----- |
+| unit      | 区间跨度：s(econd), m(inute), h(our), d(ay), w(eek), M(onth), Y(ear)                                                                                                                                           | 见下   | "s"   |
+| value     | 如果 `unit` 的值是 "s","m","h","d" 则 `value` 为间隔数（须 > 0）<br />如果 `unit` 的值是 "w","M","y" 则 `value` 为偏移量; value 可以 < 0, 意味着从尾端向前端偏移。取值范围如下：<br />week : [-7, 6]<br /> month : [-20, 19]<br /> year : [-200, 199] | 5    | 1     |
+| on_para   | 从哪里取用于计算的时间，如果为 true 则从上游的 `Instance.para`中取，否则取`Instance.create_time`                                                                                                                                    | true | false |
+| time_part | 取上游的 `Instance.para`中的哪一个部分作为输入时间                                                                                                                                                                         | 1    | 0     |
 
 生成para示例：1596207504/1596207505
 
-### instance-loader 
+### instance-loader
 
 **作用**：依据给定的条件检索出一批 `Instance`，提取出所有的 `content` 属性形成数组，并替换掉 `Executor` 入参[ConverterParameter](data-define.md) 中的 `from.content`。
 
@@ -189,13 +189,13 @@ Instance.content = 123
 
 下面用到的 ins_key 构成形式为：meta-string:id:para.
 
-| 选项      | 说明                                                         | 示例                                                         | 缺省值 |
-| --------- | ------------------------------------------------------------ | ------------------------------------------------------------ | ------ |
-| key_gt    | 形成SQL where 条件 ins_key > {key_gt}                        | B:sale/item/count:1\|0\|(item)/                              |        |
-| key_lt    | 形成SQL where 条件 ins_key < {key_lt}                        | B:sale/item/count:1\|0\|(item)0                              |        |
-| page_size | 一页数据的大小                                               | 20                                                           | 100    |
-| time_part | 从上游 `Instance.para` 的哪两个部分取值作为开始和结束时间    | [0,1]                                                        |        |
-| filters   | 是一个`Executor`数组，每个都是convert_before 接口的定义，用于数据加载后的处理。 | [ {"protocol":"localRust","url":"nature_integrate_test_executor:append_star"},     {"protocol":"localRust","url":"nature_integrate_test_executor:append_plus"} ] |        |
+| 选项        | 说明                                                   | 示例                                                                                                                                                               | 缺省值 |
+| --------- | ---------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | --- |
+| key_gt    | 形成SQL where 条件 ins_key > {key_gt}                    | B:sale/item/count:1\|0\|(item)/                                                                                                                                  |     |
+| key_lt    | 形成SQL where 条件 ins_key < {key_lt}                    | B:sale/item/count:1\|0\|(item)0                                                                                                                                  |     |
+| page_size | 一页数据的大小                                              | 20                                                                                                                                                               | 100 |
+| time_part | 从上游 `Instance.para` 的哪两个部分取值作为开始和结束时间                | [0,1]                                                                                                                                                            |     |
+| filters   | 是一个`Executor`数组，每个都是convert_before 接口的定义，用于数据加载后的处理。 | [ {"protocol":"localRust","url":"nature_integrate_test_executor:append_star"},     {"protocol":"localRust","url":"nature_integrate_test_executor:append_plus"} ] |     |
 
 ### task-checker
 
@@ -203,8 +203,8 @@ Instance.content = 123
 
 **选项**：
 
-| 选项      | 说明                                                      | 示例                            | 缺省值 |
-| --------- | --------------------------------------------------------- | ------------------------------- | ------ |
-| key_gt    | 形成SQL where 条件 task_key > {key_gt}                    | B:sale/item/count:1\|0\|(item)/ |        |
-| key_lt    | 形成SQL where 条件 task_key< {key_lt}                     | B:sale/item/count:1\|0\|(item)0 |        |
-| time_part | 从上游 `Instance.para` 的哪两个部分取值作为开始和结束时间 | [0,1]                           |        |
+| 选项        | 说明                                    | 示例                              | 缺省值 |
+| --------- | ------------------------------------- | ------------------------------- | --- |
+| key_gt    | 形成SQL where 条件 task_key > {key_gt}    | B:sale/item/count:1\|0\|(item)/ |     |
+| key_lt    | 形成SQL where 条件 task_key< {key_lt}     | B:sale/item/count:1\|0\|(item)0 |     |
+| time_part | 从上游 `Instance.para` 的哪两个部分取值作为开始和结束时间 | [0,1]                           |     |

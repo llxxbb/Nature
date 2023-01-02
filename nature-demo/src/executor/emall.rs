@@ -112,3 +112,13 @@ pub extern fn multi_delivery(para: &ConverterParameter) -> ConverterReturned {
     ConverterReturned::Instances { ins: vec![ins] }
 }
 
+#[no_mangle]
+#[allow(unused_attributes)]
+#[allow(improper_ctypes_definitions)]
+pub extern fn multi_warehouse(para: &ConverterParameter) -> ConverterReturned {
+    let mut ins = Instance::new_with_null_meta();
+    ins.content = para.from.content.to_string();
+    // return the waybill
+    ConverterReturned::Instances { ins: vec![ins] }
+}
+

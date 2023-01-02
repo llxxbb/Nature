@@ -196,7 +196,7 @@ impl TaskDao for TaskDaoImpl {
 mod test {
     use std::env;
 
-    use crate::db::CONN_STR;
+    use crate::db::test::CONN_STR;
 
     use super::*;
 

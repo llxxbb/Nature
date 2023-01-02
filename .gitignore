@@ -6,7 +6,7 @@ output.log
 .vscode/
 .run
 target/
-executor/
+plugin/
 */*.bak_*
 */*.lck
 

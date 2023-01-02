@@ -160,7 +160,7 @@ mod test {
 
     use std::env;
 
-    use crate::db::{C_M, CONN_STR, D_M};
+    use crate::db::{C_M, test::CONN_STR, D_M};
 
     use super::*;
 

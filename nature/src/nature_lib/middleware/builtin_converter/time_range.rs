@@ -2,8 +2,8 @@ use std::ops::{Add, Sub};
 use std::str::FromStr;
 
 use chrono::{Datelike, DateTime, Duration, Local, NaiveDate, NaiveDateTime, TimeZone};
-use crate::common::*;
 
+use crate::common::*;
 use crate::domain::*;
 use crate::util::*;
 
@@ -254,7 +254,7 @@ mod timer_setting_test {
     #[ignore]
     #[test]
     fn my_test() {
-        let time = Local.timestamp_millis(1596636033000).naive_local();
+        let time = Local.timestamp_millis_opt(1596636033000).unwrap().naive_local();
         dbg!(&time);
     }
 
@@ -281,7 +281,7 @@ mod timer_setting_test {
 
     #[test]
     fn second_test() {
-        let time = Local.ymd(2020, 5, 1).and_hms_milli(18, 36, 23, 123).timestamp_millis();
+        let time = Local.datetime_from_str("2020-05-01 18:36:23.123 +0800", "%Y-%m-%d %H:%M:%S%.3f %z").unwrap().timestamp_millis();
         let mut setting = Setting {
             unit: "s".to_string(),
             value: 0,
@@ -290,23 +290,23 @@ mod timer_setting_test {
         };
         let rtn = setting.get_time(time).unwrap();
         let cmp = (
-            Local.ymd(2020, 5, 1).and_hms(18, 36, 23).timestamp_millis() / 1000,
-            Local.ymd(2020, 5, 1).and_hms(18, 36, 24).timestamp_millis() / 1000,
+            Local.with_ymd_and_hms(2020, 5, 1, 18, 36, 23).unwrap().timestamp_millis() / 1000,
+            Local.with_ymd_and_hms(2020, 5, 1, 18, 36, 24).unwrap().timestamp_millis() / 1000,
         );
         assert_eq!(rtn, cmp);
         // test interval
         setting.value = 15;
         let rtn = setting.get_time(time).unwrap();
         let cmp = (
-            Local.ymd(2020, 5, 1).and_hms(18, 36, 15).timestamp_millis() / 1000,
-            Local.ymd(2020, 5, 1).and_hms(18, 36, 30).timestamp_millis() / 1000
+            Local.with_ymd_and_hms(2020, 5, 1,18,36,15).unwrap().timestamp_millis() / 1000,
+            Local.with_ymd_and_hms(2020, 5, 1,18,36,30).unwrap().timestamp_millis() / 1000
         );
         assert_eq!(rtn, cmp);
     }
 
     #[test]
     fn minute_test() {
-        let time = Local.ymd(2020, 5, 1).and_hms_milli(18, 36, 23, 123).timestamp_millis();
+        let time = Local.datetime_from_str("2020-05-01 18:36:23.123 +0800", "%Y-%m-%d %H:%M:%S%.3f %z").unwrap().timestamp_millis();
         let mut setting = Setting {
             unit: "m".to_string(),
             value: 0,
@@ -315,23 +315,23 @@ mod timer_setting_test {
         };
         let rtn = setting.get_time(time).unwrap();
         let cmp = (
-            Local.ymd(2020, 5, 1).and_hms(18, 36, 0).timestamp_millis() / 1000,
-            Local.ymd(2020, 5, 1).and_hms(18, 37, 0).timestamp_millis() / 1000
+            Local.with_ymd_and_hms(2020, 5, 1,18, 36, 0).unwrap().timestamp_millis() / 1000,
+            Local.with_ymd_and_hms(2020, 5, 1,18, 37, 0).unwrap().timestamp_millis() / 1000
         );
         assert_eq!(rtn, cmp);
         // test interval
         setting.value = 10;
         let rtn = setting.get_time(time).unwrap();
         let cmp = (
-            Local.ymd(2020, 5, 1).and_hms(18, 30, 0).timestamp_millis() / 1000,
-            Local.ymd(2020, 5, 1).and_hms(18, 40, 0).timestamp_millis() / 1000
+            Local.with_ymd_and_hms(2020, 5, 1,18, 30, 0).unwrap().timestamp_millis() / 1000,
+            Local.with_ymd_and_hms(2020, 5, 1,18, 40, 0).unwrap().timestamp_millis() / 1000
         );
         assert_eq!(rtn, cmp);
     }
 
     #[test]
     fn hour_test() {
-        let time = Local.ymd(2020, 5, 1).and_hms_milli(18, 36, 23, 123).timestamp_millis();
+        let time = Local.datetime_from_str("2020-05-01 18:36:23.123 +0800", "%Y-%m-%d %H:%M:%S%.3f %z").unwrap().timestamp_millis();
         let mut setting = Setting {
             unit: "h".to_string(),
             value: 0,
@@ -340,23 +340,23 @@ mod timer_setting_test {
         };
         let rtn = setting.get_time(time).unwrap();
         let cmp = (
-            Local.ymd(2020, 5, 1).and_hms(18, 0, 0).timestamp_millis() / 1000,
-            Local.ymd(2020, 5, 1).and_hms(19, 0, 0).timestamp_millis() / 1000
+            Local.with_ymd_and_hms(2020, 5, 1,18, 0, 0).unwrap().timestamp_millis() / 1000,
+            Local.with_ymd_and_hms(2020, 5, 1,19, 0, 0).unwrap().timestamp_millis() / 1000
         );
         assert_eq!(rtn, cmp);
         // test interval
         setting.value = 4;
         let rtn = setting.get_time(time).unwrap();
         let cmp = (
-            Local.ymd(2020, 5, 1).and_hms(16, 0, 0).timestamp_millis() / 1000,
-            Local.ymd(2020, 5, 1).and_hms(20, 0, 0).timestamp_millis() / 1000
+            Local.with_ymd_and_hms(2020, 5, 1,16, 0, 0).unwrap().timestamp_millis() / 1000,
+            Local.with_ymd_and_hms(2020, 5, 1,20, 0, 0).unwrap().timestamp_millis() / 1000
         );
         assert_eq!(rtn, cmp);
     }
 
     #[test]
     fn day_test() {
-        let time = Local.ymd(2020, 5, 1).and_hms_milli(18, 36, 23, 123).timestamp_millis();
+        let time = Local.datetime_from_str("2020-05-01 18:36:23.123 +0800", "%Y-%m-%d %H:%M:%S%.3f %z").unwrap().timestamp_millis();
         let mut setting = Setting {
             unit: "d".to_string(),
             value: 0,
@@ -365,8 +365,8 @@ mod timer_setting_test {
         };
         let rtn = setting.get_time(time).unwrap();
         let cmp = (
-            Local.ymd(2020, 5, 1).and_hms(0, 0, 0).timestamp_millis() / 1000,
-            Local.ymd(2020, 5, 2).and_hms(0, 0, 0).timestamp_millis() / 1000
+            Local.with_ymd_and_hms(2020, 5, 1,0, 0, 0).unwrap().timestamp_millis() / 1000,
+            Local.with_ymd_and_hms(2020, 5, 2,0, 0, 0).unwrap().timestamp_millis() / 1000
         );
         // let ttt = Local.timestamp_millis(1588291200000).naive_local();
         // let offset = Local.offset_from_local_date(&ttt.date());
@@ -378,8 +378,8 @@ mod timer_setting_test {
         setting.value = 3;
         let rtn = setting.get_time(time).unwrap();
         let cmp = (
-            Local.ymd(2020, 4, 29).and_hms(0, 0, 0).timestamp_millis() / 1000,
-            Local.ymd(2020, 5, 2).and_hms(0, 0, 0).timestamp_millis() / 1000
+            Local.with_ymd_and_hms(2020, 4, 29,0, 0, 0).unwrap().timestamp_millis() / 1000,
+            Local.with_ymd_and_hms(2020, 5, 2,0, 0, 0).unwrap().timestamp_millis() / 1000
         );
         assert_eq!(rtn, cmp);
     }
@@ -387,7 +387,7 @@ mod timer_setting_test {
     #[test]
     fn week_test() {
         // the `value` is positive and before the real time
-        let time = Local.ymd(2020, 5, 1).and_hms_milli(18, 36, 23, 123).timestamp_millis();
+        let time = Local.datetime_from_str("2020-05-01 18:36:23.123 +0800", "%Y-%m-%d %H:%M:%S%.3f %z").unwrap().timestamp_millis();
         let mut setting = Setting {
             unit: "w".to_string(),
             value: 0,
@@ -396,32 +396,32 @@ mod timer_setting_test {
         };
         let rtn = setting.get_time(time).unwrap();
         let cmp = (
-            Local.ymd(2020, 4, 27).and_hms(0, 0, 0).timestamp_millis(),
-            Local.ymd(2020, 5, 4).and_hms(0, 0, 0).timestamp_millis()
+            Local.with_ymd_and_hms(2020, 4, 27,0, 0, 0).unwrap().timestamp_millis(),
+            Local.with_ymd_and_hms(2020, 5, 4,0, 0, 0).unwrap().timestamp_millis()
         );
         assert_eq!(rtn, cmp);
         // the `value` is positive and after the real time
         setting.value = 6;
         let rtn = setting.get_time(time).unwrap();
         let cmp = (
-            Local.ymd(2020, 4, 26).and_hms(0, 0, 0).timestamp_millis(),
-            Local.ymd(2020, 5, 3).and_hms(0, 0, 0).timestamp_millis()
+            Local.with_ymd_and_hms(2020, 4, 26,0, 0, 0).unwrap().timestamp_millis(),
+            Local.with_ymd_and_hms(2020, 5, 3,0, 0, 0).unwrap().timestamp_millis()
         );
         assert_eq!(rtn, cmp);
         // the `value` is negative and before the real time
         setting.value = -7;
         let rtn = setting.get_time(time).unwrap();
         let cmp = (
-            Local.ymd(2020, 4, 27).and_hms(0, 0, 0).timestamp_millis(),
-            Local.ymd(2020, 5, 4).and_hms(0, 0, 0).timestamp_millis()
+            Local.with_ymd_and_hms(2020, 4, 27,0, 0, 0).unwrap().timestamp_millis(),
+            Local.with_ymd_and_hms(2020, 5, 4,0, 0, 0).unwrap().timestamp_millis()
         );
         assert_eq!(rtn, cmp);
         // the `value` is negative and after the real time
         setting.value = -1;
         let rtn = setting.get_time(time).unwrap();
         let cmp = (
-            Local.ymd(2020, 4, 26).and_hms(0, 0, 0).timestamp_millis(),
-            Local.ymd(2020, 5, 3).and_hms(0, 0, 0).timestamp_millis()
+            Local.with_ymd_and_hms(2020, 4, 26,0, 0, 0).unwrap().timestamp_millis(),
+            Local.with_ymd_and_hms(2020, 5, 3,0, 0, 0).unwrap().timestamp_millis()
         );
         assert_eq!(rtn, cmp);
         // range test
@@ -436,7 +436,7 @@ mod timer_setting_test {
     #[test]
     fn month_test() {
         // the `value` is positive and before the real time
-        let time = Local.ymd(2020, 5, 28).and_hms_milli(18, 36, 23, 123).timestamp_millis();
+        let time = Local.datetime_from_str("2020-05-28 18:36:23.123 +0800", "%Y-%m-%d %H:%M:%S%.3f %z").unwrap().timestamp_millis();
         let mut setting = Setting {
             unit: "M".to_string(),
             value: 0,
@@ -445,32 +445,32 @@ mod timer_setting_test {
         };
         let rtn = setting.get_time(time).unwrap();
         let cmp = (
-            Local.ymd(2020, 5, 1).and_hms(0, 0, 0).timestamp_millis(),
-            Local.ymd(2020, 6, 1).and_hms(0, 0, 0).timestamp_millis()
+            Local.with_ymd_and_hms(2020, 5, 1,0, 0, 0).unwrap().timestamp_millis(),
+            Local.with_ymd_and_hms(2020, 6, 1,0, 0, 0).unwrap().timestamp_millis()
         );
         assert_eq!(rtn, cmp);
         // the `value` is positive and after the real time
         setting.value = 6;
         let rtn = setting.get_time(time).unwrap();
         let cmp = (
-            Local.ymd(2020, 5, 7).and_hms(0, 0, 0).timestamp_millis(),
-            Local.ymd(2020, 6, 7).and_hms(0, 0, 0).timestamp_millis()
+            Local.with_ymd_and_hms(2020, 5, 7,0, 0, 0).unwrap().timestamp_millis(),
+            Local.with_ymd_and_hms(2020, 6, 7,0, 0, 0).unwrap().timestamp_millis()
         );
         assert_eq!(rtn, cmp);
         // the `value` is negative and before the real time
         setting.value = -5;
         let rtn = setting.get_time(time).unwrap();
         let cmp = (
-            Local.ymd(2020, 5, 27).and_hms(0, 0, 0).timestamp_millis(),
-            Local.ymd(2020, 6, 26).and_hms(0, 0, 0).timestamp_millis()
+            Local.with_ymd_and_hms(2020, 5, 27,0, 0, 0).unwrap().timestamp_millis(),
+            Local.with_ymd_and_hms(2020, 6, 26,0, 0, 0).unwrap().timestamp_millis()
         );
         assert_eq!(rtn, cmp);
         // the `value` is negative and after the real time
         setting.value = -1;
         let rtn = setting.get_time(time).unwrap();
         let cmp = (
-            Local.ymd(2020, 4, 30).and_hms(0, 0, 0).timestamp_millis(),
-            Local.ymd(2020, 5, 31).and_hms(0, 0, 0).timestamp_millis()
+            Local.with_ymd_and_hms(2020, 4, 30,0, 0, 0).unwrap().timestamp_millis(),
+            Local.with_ymd_and_hms(2020, 5, 31,0, 0, 0).unwrap().timestamp_millis()
         );
         assert_eq!(rtn, cmp);
         // range test
@@ -491,7 +491,7 @@ mod timer_setting_test {
     #[test]
     fn year_test() {
         // the `value` is positive and before the real time
-        let time = Local.ymd(2020, 11, 21).and_hms_milli(18, 36, 23, 123).timestamp_millis();
+        let time = Local.datetime_from_str("2020-11-21 18:36:23.123 +0800", "%Y-%m-%d %H:%M:%S%.3f %z").unwrap().timestamp_millis();
         let mut setting = Setting {
             unit: "y".to_string(),
             value: 0,
@@ -500,32 +500,32 @@ mod timer_setting_test {
         };
         let rtn = setting.get_time(time).unwrap();
         let cmp = (
-            Local.ymd(2020, 1, 1).and_hms(0, 0, 0).timestamp_millis(),
-            Local.ymd(2021, 1, 1).and_hms(0, 0, 0).timestamp_millis()
+            Local.with_ymd_and_hms(2020, 1, 1,0, 0, 0).unwrap().timestamp_millis(),
+            Local.with_ymd_and_hms(2021, 1, 1,0, 0, 0).unwrap().timestamp_millis()
         );
         assert_eq!(rtn, cmp);
         // the `value` is positive and after the real time
         setting.value = 6;
         let rtn = setting.get_time(time).unwrap();
         let cmp = (
-            Local.ymd(2020, 1, 7).and_hms(0, 0, 0).timestamp_millis(),
-            Local.ymd(2021, 1, 7).and_hms(0, 0, 0).timestamp_millis()
+            Local.with_ymd_and_hms(2020, 1, 7,0, 0, 0).unwrap().timestamp_millis(),
+            Local.with_ymd_and_hms(2021, 1, 7,0, 0, 0).unwrap().timestamp_millis()
         );
         assert_eq!(rtn, cmp);
         // the `value` is negative and before the real time
         setting.value = -1;
         let rtn = setting.get_time(time).unwrap();
         let cmp = (
-            Local.ymd(2019, 12, 31).and_hms(0, 0, 0).timestamp_millis(),
-            Local.ymd(2020, 12, 31).and_hms(0, 0, 0).timestamp_millis()
+            Local.with_ymd_and_hms(2019, 12, 31,0, 0, 0).unwrap().timestamp_millis(),
+            Local.with_ymd_and_hms(2020, 12, 31,0, 0, 0).unwrap().timestamp_millis()
         );
         assert_eq!(rtn, cmp);
         // the `value` is negative and after the real time
         setting.value = -50;
         let rtn = setting.get_time(time).unwrap();
         let cmp = (
-            Local.ymd(2020, 11, 11).and_hms(0, 0, 0).timestamp_millis(),
-            Local.ymd(2021, 11, 12).and_hms(0, 0, 0).timestamp_millis()
+            Local.with_ymd_and_hms(2020, 11, 11,0, 0, 0).unwrap().timestamp_millis(),
+            Local.with_ymd_and_hms(2021, 11, 12,0, 0, 0).unwrap().timestamp_millis()
         );
         assert_eq!(rtn, cmp);
         // range test

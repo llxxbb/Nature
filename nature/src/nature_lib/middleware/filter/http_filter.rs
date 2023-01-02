@@ -25,6 +25,7 @@ pub async fn http_filter<T: Serialize + DeserializeOwned>(address: &str, para: &
 #[cfg(test)]
 mod test {
     use tokio::runtime::Runtime;
+    use crate::domain::Instance;
 
     use super::*;
 
@@ -37,7 +38,7 @@ mod test {
         ins.content = "100".to_string();
         let mut input: Vec<Instance> = vec![];
         input.push(ins);
-        let mut runtime = Runtime::new().unwrap();
+        let runtime = Runtime::new().unwrap();
         let _rtn = runtime.block_on(http_filter("http://127.0.0.1:8082/add_score", &mut input));
         assert_eq!(input[0].content, "104");
     }
@@ -49,7 +50,7 @@ mod test {
         ins.content = "100".to_string();
         let mut input: Vec<Instance> = vec![];
         input.push(ins);
-        let mut runtime = Runtime::new().unwrap();
+        let runtime = Runtime::new().unwrap();
         let rtn = runtime.block_on(http_filter("http://error.com", &mut input));
         dbg!(&rtn);
         assert!(rtn.is_err());

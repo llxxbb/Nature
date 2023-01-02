@@ -66,7 +66,7 @@ impl From<Meta> for RawMeta {
 impl TryInto<Meta> for RawMeta {
     type Error = NatureError;
 
-    fn try_into(self) -> std::result::Result<Meta, Self::Error> {
+    fn try_into(self) -> Result<Meta, Self::Error> {
         let mut rtn = Meta::new(&self.meta_key, self.version as u32, MetaType::from_prefix(&self.meta_type)?)?;
         if let Some(s) = &self.states {
             if !s.is_empty() {
@@ -123,6 +123,7 @@ impl Into<Params> for RawMeta {
 #[cfg(test)]
 mod test {
     use super::*;
+    use crate::common::Result;
 
     #[test]
     fn try_into_test() {
