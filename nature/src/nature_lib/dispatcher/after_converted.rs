@@ -1,4 +1,6 @@
+use std::ops::Deref;
 use std::str::FromStr;
+use actix_web::web::Data;
 use crate::common::*;
 
 use crate::db::{D_T, Mission, MissionRaw, RawTask, TaskDao, TaskType};
@@ -6,8 +8,13 @@ use crate::domain::*;
 use crate::nature_lib::dispatcher::{channel_batch, channel_store, get_store_task};
 use crate::nature_lib::task::{Converted, TaskForConvert};
 use crate::util::*;
+use crate::util::web_context::WebContext;
 
-pub async fn after_converted(task: &TaskForConvert, convert_task: &RawTask, instances: Vec<Instance>, last_state: &Option<Instance>) -> Result<()> {
+pub async fn after_converted(task: &TaskForConvert,
+                             convert_task: &RawTask,
+                             instances: Vec<Instance>,
+                             last_state: &Option<Instance>,
+                             context: Data<WebContext>) -> Result<()> {
     // debug!("executor returned {} instances for `Meta`: {:?}, from {}", instances.len(), &task.target.to.meta_string(), task.from.get_key());
     match Converted::gen(&task, &convert_task, instances, last_state) {
         Ok(rtn) => {
@@ -25,11 +32,11 @@ pub async fn after_converted(task: &TaskForConvert, convert_task: &RawTask, inst
                 1 => {
                     if state_loop_check(task, &rtn.converted[0], convert_task).await { return Ok(()); }
                     match *SWITCH_SAVE_DIRECTLY_FOR_ONE {
-                        true => save_one(rtn, &task.target).await,
-                        false => save_batch(rtn).await
+                        true => save_one(rtn, &task.target, context).await,
+                        false => save_batch(rtn, context).await
                     }
                 }
-                _ => save_batch(rtn).await
+                _ => save_batch(rtn, context).await
             }
         }
         Err(err) => {
@@ -115,7 +122,7 @@ fn gen_instance_for_loop(ins: &mut Instance, task: &TaskForConvert) -> Result<()
     // fix ins.para
     fix_loop_id(ins, task)?;
 
-    let raw = MissionRaw::from(task.target.clone()).to_json()?;
+    let raw = MissionRaw::from(task.target.deref().clone()).to_json()?;
     ins.sys_context.insert(CONTEXT_LOOP_TASK.to_string(), raw);
     Ok(())
 }
@@ -156,20 +163,20 @@ async fn state_loop_check(task: &TaskForConvert, ins: &Instance, raw: &RawTask) 
 }
 
 /// `previous_mission`: is the `Mission` generated the `Converted`
-async fn save_one(converted: Converted, previous_mission: &Mission) -> Result<()> {
+async fn save_one(converted: Converted, previous_mission: &Mission, context: Data<WebContext>) -> Result<()> {
     let instance = &converted.converted[0];
     let task = get_store_task(&instance, Some(previous_mission.clone())).await?;
-    let rtn = channel_store(task, converted.done_task).await?;
+    let rtn = channel_store(task, converted.done_task, context).await?;
     Ok(rtn)
 }
 
-async fn save_batch(converted: Converted) -> Result<()> {
+async fn save_batch(converted: Converted, context: Data<WebContext>) -> Result<()> {
     let mut raw = RawTask::new(&converted.converted, &converted.done_task.task_key, TaskType::Batch as i8, "")?;
     let num = D_T.insert(&raw).await?;
     let _ = D_T.finish_task(&converted.done_task.task_id).await?;
     if num > 0 {
         raw.task_id = num;
-        let _ = channel_batch(converted.converted, raw).await;
+        let _ = channel_batch(converted.converted, raw, context).await;
     }
     Ok(())
 }

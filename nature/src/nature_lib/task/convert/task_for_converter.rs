@@ -1,26 +1,27 @@
 use std::convert::TryInto;
-use std::ops::Add;
+use std::ops::{Add, Deref};
 
 use chrono::{FixedOffset, Local};
 use futures::Future;
-use crate::common::*;
 
+use crate::common::*;
 use crate::db::{MetaCache, MetaDao, Mission, MissionRaw, RawTask, TaskType};
 use crate::domain::*;
 use crate::nature_lib::task::TaskForStore;
 
 #[derive(Debug, Clone)]
 pub struct TaskForConvert {
-    pub from: Instance,
-    pub target: Mission,
+    pub from: Box<Instance>,
+    pub target: Box<Mission>,
+    // need insert context to mission in some situations
     pub conflict_version: i32,
 }
 
 impl Default for TaskForConvert {
     fn default() -> Self {
         TaskForConvert {
-            from: Instance::default(),
-            target: Mission::default(),
+            from: Box::new(Instance::default()),
+            target: Box::new(Mission::default()),
             conflict_version: 0,
         }
     }
@@ -28,20 +29,20 @@ impl Default for TaskForConvert {
 
 
 impl TaskForConvert {
-    pub fn gen_task(task: &TaskForStore) -> Result<Vec<(TaskForConvert, RawTask)>>
+    pub fn gen_task(task: TaskForStore) -> Result<Vec<(TaskForConvert, RawTask)>>
     {
         let mut new_carriers: Vec<(TaskForConvert, RawTask)> = Vec::new();
         let missions = task.next_mission.clone();
         for c in missions {
-            let from = task.instance.clone();
+            let from = Box::new(task.instance.clone());
             let key = from.get_key();
             let x = TaskForConvert {
                 from,
-                target: c.clone(),
+                target: Box::new(c.clone()),
                 conflict_version: 0,
             };
             // debug!("generate convert task: from:{}, to:{},", x.from.meta, x.target.to.meta_string());
-            let json = MissionRaw::from(x.target.clone()).to_json()?;
+            let json = MissionRaw::from(x.target.deref().clone()).to_json()?;
             let mut car = RawTask::from_str(&json, &key, TaskType::Convert as i8, &c.to.meta_string())?;
             if c.delay > 0 {
                 car.execute_time = Local::now().add(FixedOffset::east_opt(c.delay).unwrap()).naive_local()
@@ -67,8 +68,8 @@ impl TaskForConvert {
             None => return Err(NatureError::EnvironmentError("can't find instance".to_string())),
             Some(ins) => {
                 TaskForConvert {
-                    from: ins,
-                    target: Mission::from_raw(&mr, mc_g, m_g).await?,
+                    from: Box::new(ins),
+                    target: Box::new(Mission::from_raw(&mr, mc_g, m_g).await?),
                     conflict_version: 0,
                 }
             }

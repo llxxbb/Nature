@@ -1,19 +1,21 @@
 use std::convert::TryFrom;
-use crate::common::*;
 
+use actix_web::web::Data;
+
+use crate::common::*;
 use crate::db::{C_M, C_R, D_M, D_R, D_T, InstanceDaoImpl, MetaCache, Mission, RawTask, RelationCache, TaskDao, TaskType};
 use crate::db::flow_tool::{context_check, state_check};
 use crate::domain::*;
 use crate::nature_lib::dispatcher::*;
 use crate::nature_lib::task::{TaskForConvert, TaskForStore};
 use crate::util::*;
-use crate::util::channels::CHANNEL_CONVERT;
+use crate::util::web_context::WebContext;
 
 pub struct IncomeController {}
 
 impl IncomeController {
     /// born an instance which is the beginning of the changes.
-    pub async fn input(mut instance: Instance) -> Result<u64> {
+    pub async fn input(mut instance: Instance, context: Data<WebContext>) -> Result<u64> {
         let meta = check_and_revise(&mut instance).await?;
         let relations = C_R.get(&meta, &*D_R, &*C_M, &*D_M).await?;
         let mission = Mission::load_by_instance(&instance, &relations, context_check, state_check);
@@ -25,14 +27,14 @@ impl IncomeController {
         let num = D_T.insert(&raw).await?;
         if num > 0 {
             raw.task_id = num;
-            channel_store(task, raw).await?;
+            channel_store(task, raw, context).await?;
         }
         Ok(instance.id)
     }
 
 
     /// born an instance which is the beginning of the changes.
-    pub async fn self_route(instance: SelfRouteInstance) -> Result<String> {
+    pub async fn self_route(instance: SelfRouteInstance, context: Data<WebContext>) -> Result<String> {
         let _ = instance.verify()?;
         // Convert a Self-Route-Instance to Normal Instance
         let mut ins = instance.to_instance();
@@ -43,12 +45,12 @@ impl IncomeController {
         let num = D_T.insert(&raw).await?;
         if num > 0 {
             raw.task_id = num;
-            channel_store(task, raw).await?;
+            channel_store(task, raw, context).await?;
         }
         Ok(uuid)
     }
 
-    pub async fn callback(delayed: DelayedInstances) -> Result<()> {
+    pub async fn callback(delayed: DelayedInstances, context: Data<WebContext>) -> Result<()> {
         match D_T.get(&delayed.task_id).await {
             Ok(raw) => {
                 match raw {
@@ -56,7 +58,7 @@ impl IncomeController {
                     Some(carrier) => match delayed.result {
                         ConverterReturned::Instances { ins } => {
                             let (task, last) = get_task_and_last(&carrier).await?;
-                            after_converted(&task, &carrier, ins, &last).await
+                            after_converted(&task, &carrier, ins, &last, context).await
                         }
                         ConverterReturned::SelfRoute { ins: sf } => {
                             let (task, _last) = get_task_and_last(&carrier).await?;
@@ -80,7 +82,7 @@ impl IncomeController {
                             // process_null(task.target.to.get_meta_type(), &delayed.task_id).await
                             let mut ins = Instance::default();
                             ins.path.meta = "N::1".to_string();
-                            after_converted(&task, &carrier, vec![ins], &last).await
+                            after_converted(&task, &carrier, vec![ins], &last, context).await
                         }
                     }
                 }
@@ -89,29 +91,29 @@ impl IncomeController {
         }
     }
 
-    pub async fn redo_task(raw: RawTask) -> Result<()> {
+    pub async fn redo_task(raw: RawTask, context: Data<WebContext>) -> Result<()> {
         // TODO check busy first
         match TaskType::try_from(raw.task_type)? {
             TaskType::Store => {
                 let rtn = TaskForStore::from_raw(&raw, &*C_M, &*D_M).await?;
                 debug!("--redo store task for task : {:?}", &rtn);
-                channel_stored(rtn, raw).await;
+                channel_stored(rtn, raw, context).await;
             }
             TaskType::Convert => {
                 let rtn = TaskForConvert::from_raw(&raw, InstanceDaoImpl::select_by_id, &*C_M, &*D_M).await?;
                 debug!("--redo convert task: from:{}, to:{}", rtn.from.path.meta, rtn.target.to.meta_string());
-                CHANNEL_CONVERT.sender.lock().unwrap().send((rtn, raw))?;
+                context.chanel.sender.lock().unwrap().send((rtn, raw, context.clone()))?;
             }
             TaskType::Batch => {
                 let rtn = serde_json::from_str(&raw.data)?;
                 debug!("--redo batch task for task : {:?}", &rtn);
-                channel_batch(rtn, raw).await;
+                channel_batch(rtn, raw, context).await;
             }
         }
         Ok(())
     }
 
-    pub async fn batch(batch: Vec<Instance>) -> Result<()> {
+    pub async fn batch(batch: Vec<Instance>, context: Data<WebContext>) -> Result<()> {
         let id = generate_id(&batch)?;
         let mut raw = RawTask::new(&batch, &id.to_string(), TaskType::Batch as i8, &batch[0].path.meta)?;
         let num = D_T.insert(&raw).await?;
@@ -119,7 +121,7 @@ impl IncomeController {
             return Ok(());
         }
         raw.task_id = num;
-        let rtn = channel_batch(batch, raw).await;
+        let rtn = channel_batch(batch, raw, context).await;
         Ok(rtn)
     }
 }

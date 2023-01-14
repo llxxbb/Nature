@@ -1,16 +1,18 @@
 use std::thread::sleep;
 use std::time::Duration;
-use crate::common::*;
 
+use actix_web::web::Data;
+
+use crate::common::*;
 use crate::db::{C_M, C_R, D_M, D_R, InstanceDaoImpl, MetaCache, Mission, RawTask, RelationCache};
 use crate::db::flow_tool::{context_check, state_check};
 use crate::domain::*;
 use crate::nature_lib::dispatcher::channel_stored;
 use crate::nature_lib::task::{CachedKey, TaskForConvert, TaskForStore};
 use crate::nature_lib::task::gen_loop_mission;
-use crate::util::channels::CHANNEL_CONVERT;
+use crate::util::web_context::WebContext;
 
-pub async fn channel_store(task: TaskForStore, carrier: RawTask) -> Result<()> {
+pub async fn channel_store(task: TaskForStore, carrier: RawTask, context: Data<WebContext>) -> Result<()> {
     match InstanceDaoImpl::insert(&task.instance).await {
         Ok(_) => {
             // debug!("saved instance for: {}, task for: {:?}", &task.instance.meta, &task.next_mission);
@@ -18,31 +20,31 @@ pub async fn channel_store(task: TaskForStore, carrier: RawTask) -> Result<()> {
             // tokio::spawn(async move {
             //     after_saved(task, carrier).await
             // });
-            let _ = after_saved(task, carrier).await;
+            let _ = after_saved(task, carrier, context).await;
             Ok(())
         }
         Err(NatureError::DaoDuplicated(_)) => {
-            duplicated_instance(task, carrier).await
+            duplicated_instance(task, carrier, context).await
         }
         Err(e) => Err(e)
     }
 }
 
-async fn after_saved(task: TaskForStore, carrier: RawTask) -> Result<()> {
+async fn after_saved(task: TaskForStore, carrier: RawTask, context: Data<WebContext>) -> Result<()> {
     let need_cache = task.need_cache;
     let key = &task.instance.get_key();
-    channel_stored(task, carrier).await;
+    channel_stored(task, carrier, context).await;
     if need_cache {
         CachedKey::set(key);
     }
     Ok(())
 }
 
-async fn duplicated_instance(task: TaskForStore, carrier: RawTask) -> Result<()> {
+async fn duplicated_instance(task: TaskForStore, carrier: RawTask, context: Data<WebContext>) -> Result<()> {
     // process meta which is not status----------------
     if task.instance.path.state_version == 0 {
         warn!("instance already exists, meta: {}, id: {}", task.instance.path.meta, task.instance.id);
-        return after_saved(task, carrier).await;
+        return after_saved(task, carrier, context).await;
     }
     // process status-meta-------------------
     let ins_from = match task.instance.from.clone() {
@@ -60,14 +62,14 @@ async fn duplicated_instance(task: TaskForStore, carrier: RawTask) -> Result<()>
         warn!("same source for meta: {}, replaced with old instance", &task.instance.path.meta);
         let task = TaskForStore::new(ins, task.next_mission.clone(), None, false);
         // maybe send failed for the previous process, so send it again, otherwise can't send it any more
-        channel_stored(task, carrier.clone()).await;
+        channel_stored(task, carrier.clone(), context).await;
         return Ok(());
     } else {
         warn!("conflict for state-meta: [{}] on version : {}", &task.instance.path.meta, task.instance.path.state_version);
         sleep(Duration::from_millis(10));
         let mut rtn = TaskForConvert::from_raw(&carrier, InstanceDaoImpl::select_by_id, &*C_M, &*D_M).await?;
         rtn.conflict_version = task.instance.path.state_version;
-        CHANNEL_CONVERT.sender.lock().unwrap().send((rtn, carrier))?;
+        context.chanel.sender.lock().unwrap().send((rtn, carrier, context.clone()))?;
         Ok(())
     }
 }

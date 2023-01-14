@@ -1,32 +1,30 @@
+use std::ops::Deref;
 use std::sync::mpsc::*;
 use std::sync::Mutex;
 use std::thread;
 use std::thread::JoinHandle;
 
+use actix_web::web::Data;
+
+use crate::db::RawTask;
 use crate::nature_lib::dispatcher::channel_convert;
-use crate::db::*;
-use crate::nature_lib::task::*;
+use crate::nature_lib::task::TaskForConvert;
+use crate::util::web_context::WebContext;
 
-lazy_static! {
-    pub static ref CHANNEL_CONVERT : Channel<(TaskForConvert,RawTask)> = Channel::new();
-}
-
-pub fn start_receive_threads() -> Vec<JoinHandle<()>> {
+pub fn start_receive_threads(context: Data<WebContext>) -> Vec<JoinHandle<()>> {
     let mut threads: Vec<JoinHandle<()>> = Vec::new();
-    threads.push(start_thread(&CHANNEL_CONVERT.receiver, channel_convert));
+    threads.push(start_thread(context, channel_convert));
     info!("--------------------nature threads initialized---------------------");
     threads
 }
 
 
-fn start_thread<T, F>(receiver: &'static Mutex<Receiver<T>>, f: F) -> JoinHandle<()>
+fn start_thread<F>(ctx: Data<WebContext>, f: F) -> JoinHandle<()>
     where
-        T: Send,
-        F: 'static + Fn(T) + Send
+        F: Fn((TaskForConvert, RawTask, Data<WebContext>)) + Send + 'static
 {
-    use std::ops::Deref;
     thread::spawn(move || {
-        let guard = receiver.lock().unwrap();
+        let guard = ctx.chanel.receiver.lock().unwrap();
         let receiver = guard.deref();
         for next in receiver {
             f(next);

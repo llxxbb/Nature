@@ -1,15 +1,17 @@
 use actix_rt::Runtime;
+use actix_web::web::Data;
 
+use crate::common::*;
 use crate::db::{C_M, D_M, D_T, InstanceDaoImpl, MetaCache, RawTask, TaskDao};
 use crate::domain::*;
-use crate::common::*;
 use crate::nature_lib::dispatcher::{after_converted, received_self_route};
 use crate::nature_lib::middleware::filter::filter_result;
 use crate::nature_lib::task::{call_executor, TaskForConvert};
+use crate::util::web_context::WebContext;
 
 /// **Notice**: Can't use async under actix-rt directly, otherwise it can lead to "actix-rt overflow its stack".
 /// So changed it to traditional mpsc
-pub fn channel_convert(store: (TaskForConvert, RawTask)) {
+pub fn channel_convert(store: (TaskForConvert, RawTask, Data<WebContext>)) {
     let runtime = match Runtime::new() {
         Ok(r) => r,
         Err(e) => {
@@ -17,10 +19,10 @@ pub fn channel_convert(store: (TaskForConvert, RawTask)) {
             return;
         }
     };
-    runtime.block_on(do_convert(store.0, store.1));
+    runtime.block_on(do_convert(store.0, store.1, store.2));
 }
 
-pub(crate) async fn do_convert(task: TaskForConvert, raw: RawTask) {
+pub(crate) async fn do_convert(task: TaskForConvert, raw: RawTask, context: Data<WebContext>) {
     // debug!("---task for convert: from:{}, to {}", task.from.meta, task.target.to.meta_string());
     let protocol = task.target.executor.protocol.clone();
     let mut from_instance = task.from.clone();
@@ -36,7 +38,7 @@ pub(crate) async fn do_convert(task: TaskForConvert, raw: RawTask) {
         Ok(last) => last
     };
     if Protocol::Auto == protocol {
-        let _ = after_converted(&task, &raw, vec![Instance::default()], &last).await;
+        let _ = after_converted(&task, &raw, vec![Instance::default()], &last, context).await;
         return;
     }
     // init master
@@ -57,7 +59,7 @@ pub(crate) async fn do_convert(task: TaskForConvert, raw: RawTask) {
         }
     };
     let rtn = call_executor(&mut task, &raw, &last, master).await;
-    match handle_converted(rtn, &task, &raw, &last).await {
+    match handle_converted(rtn, &task, &raw, &last, context).await {
         Ok(()) => (),
         Err(NatureError::EnvironmentError(_)) => (),
         Err(e) => {
@@ -67,11 +69,15 @@ pub(crate) async fn do_convert(task: TaskForConvert, raw: RawTask) {
     }
 }
 
-async fn handle_converted(converted: ConverterReturned, task: &TaskForConvert, raw: &RawTask, last: &Option<Instance>) -> Result<()> {
+async fn handle_converted(converted: ConverterReturned,
+                          task: &TaskForConvert,
+                          raw: &RawTask,
+                          last: &Option<Instance>,
+                          context: Data<WebContext>) -> Result<()> {
     match converted {
         ConverterReturned::Instances { ins: mut instances } => {
             filter_result(&mut instances, &task.target.convert_after).await?;
-            after_converted(task, &raw, instances, &last).await?;
+            after_converted(task, &raw, instances, &last, context).await?;
         }
         ConverterReturned::SelfRoute { ins } => {
             let _ = received_self_route(task, &raw, ins);
@@ -90,7 +96,7 @@ async fn handle_converted(converted: ConverterReturned, task: &TaskForConvert, r
         ConverterReturned::None => {
             let mut ins = Instance::default();
             ins.path.meta = "N::1".to_string();
-            after_converted(task, &raw, vec![ins], &last).await?;
+            after_converted(task, &raw, vec![ins], &last, context).await?;
         }
     }
     Ok(())

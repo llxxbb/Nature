@@ -1,8 +1,8 @@
 use std::panic::catch_unwind;
-use crate::common::NatureError;
 
-use crate::db::RawTask;
+use crate::common::NatureError;
 use crate::db::flow_tool::state_check;
+use crate::db::RawTask;
 use crate::domain::*;
 use crate::nature_lib::middleware::builtin_converter::BuiltIn;
 use crate::nature_lib::middleware::filter::convert_before;
@@ -29,7 +29,7 @@ pub async fn call_executor(task: &mut TaskForConvert, raw: &RawTask, last_target
         _ => ()
     };
     let para = ConverterParameter {
-        from: task.from.clone(),
+        from: *task.from.clone(),
         last_state: last_target.clone(),
         task_id: raw.task_id.clone(),
         master,

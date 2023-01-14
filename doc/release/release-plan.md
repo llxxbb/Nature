@@ -24,8 +24,10 @@ Release 1.5.0
 
 ### 未完成
 
+优化状态数据处理
+优化 TaskForConvert
+优化 RawTask
 引入 snowflake id 生成器
-
 为META 和 relation 增加 id 字段。
 
 - 测试异常的任务

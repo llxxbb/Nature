@@ -1,3 +1,5 @@
+use std::ops::Deref;
+
 use crate::common::*;
 use crate::db::{Mission, RawTask};
 use crate::domain::*;
@@ -18,7 +20,7 @@ impl Converted {
         let mut instances = instances;
 
         // init meta and [from]
-        let from = InstanceLocator::from(&task.from);
+        let from = InstanceLocator::from(task.from.deref());
         let _ = set_source_and_target_meta(&mut instances, &from, &task.target.to)?;
 
         // check id
@@ -245,8 +247,8 @@ mod test {
         let meta = Meta::new("to", 1, MetaType::Business).unwrap();
         let task_key = from_ins.get_key();
         let task = TaskForConvert {
-            from: from_ins,
-            target: Mission {
+            from: Box::new(from_ins),
+            target: Box::new(Mission {
                 downstream: DownStream {
                     to: meta.clone(),
                     down_selector: None,
@@ -259,7 +261,7 @@ mod test {
                     id_bridge: false,
                 },
                 sys_context: Default::default(),
-            },
+            }),
             conflict_version: 0,
         };
         let raw = RawTask {
@@ -290,7 +292,7 @@ mod test {
     fn target_states_test() {
         let task = TaskForConvert {
             from: Default::default(),
-            target: Mission {
+            target: Box::new(Mission {
                 downstream: DownStream {
                     to: {
                         let mut m = Meta::from_string("B:hello:1").unwrap();
@@ -311,8 +313,9 @@ mod test {
                     delay: 0,
                     id_bridge: false,
                 },
-                sys_context: Default::default(),
-            },
+                sys_context: Default::default()
+                ,
+            }),
             conflict_version: 0,
         };
         let mut ins = vec![Instance::new("test").unwrap()];
