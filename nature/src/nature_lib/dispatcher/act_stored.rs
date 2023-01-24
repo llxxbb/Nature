@@ -25,7 +25,7 @@ pub async fn channel_stored(task: TaskForStore, raw: RawTask, context: Data<WebC
             tokio::spawn(async move {
                 for t in converters {
                     if t.0.target.delay == 0 {
-                        let _ = context.sender.send((t.0, t.1, context.clone()));
+                        let _ = context.sender.send((t.0, t.1, context.clone())).await;
                     }
                 }
             });

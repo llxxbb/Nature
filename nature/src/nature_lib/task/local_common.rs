@@ -35,11 +35,12 @@ pub async fn local_execute<T: RefUnwindSafe, R>(executor: &str, para: &T) -> Res
             }
             let mut lib_cache = lib_cache.unwrap();
             let path = entry.path.clone();
+            let real_path = PLUGIN_PATH.to_string() + &path;
             // debug!("load library for :[{}]", path);
             let cfg_lib = lib_cache.entry(path.clone()).or_insert_with(move || unsafe {
-                match lib::Library::new(PLUGIN_PATH.to_string() + &path) {
+                match lib::Library::new(&real_path) {
                     Err(e) => {
-                        warn!("load local lib error for path {}, error : {}", path, e);
+                        warn!("load local lib error for path {}, error : {}", real_path, e);
                         None
                     }
                     Ok(local_lib) => Some(local_lib)

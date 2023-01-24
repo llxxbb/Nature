@@ -1,5 +1,3 @@
-use std::sync::mpsc::Sender;
-
 use crate::common::Result;
 use crate::db::{MetaCache, MetaDao, Mission, MissionRaw, RawTask, TaskType};
 use crate::domain::*;
@@ -48,10 +46,6 @@ impl From<TaskForStore> for TaskForStoreTemp {
 }
 
 impl TaskForStore {
-    pub fn send(&self, raw: &RawTask, sender: &Sender<(TaskForStore, RawTask)>) {
-        let _ = sender.send((self.to_owned(), raw.to_owned()));
-    }
-
     pub fn for_dynamic(instance: &Instance, dynamic: Vec<DynamicConverter>, previous_mission: Option<Mission>, need_cache: bool) -> Result<TaskForStore> {
         let target = Mission::for_dynamic(dynamic)?;
         // save to task to make it can redo
