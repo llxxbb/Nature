@@ -1,6 +1,6 @@
 [package]
 name = "nature"
-version = "1.4.0"
+version = "1.5.0"
 authors = ["XueBin Li <llxxbb@yeah.net>"]
 edition = "2018"
 description = "Nature is a development support platform, it separates data definition from code, so it decouple the data from business system."
@@ -35,6 +35,8 @@ lru_time_cache = "0.11"
 futures = "0.3"
 async-trait = "0.1"
 itertools = "0.10"
+async-channel = "1.8.0"
+
 
 # for local executor implement
 libloading = "0.7"

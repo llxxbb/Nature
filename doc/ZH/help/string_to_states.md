@@ -12,8 +12,7 @@ There are four special characters used to express the states:
 | --------- | -------------------------------------- |
 | ,         | separator for normal, mutex and parent |
 | \|        | mutex normal and parent                |
-| [         | parent begin                           |
-| ]         | parent end                             |
+| []        | parent begin and end                   |
 
 They can embed to each other, for example "p[a,b|c[d,e|f]]"
 
@@ -38,6 +37,3 @@ how to distinguish the end of the `normal` and `mutex`: when fine "|" mark it, w
 ## process flow
 
 process the character one by one of the string.
-
-
-

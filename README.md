@@ -222,6 +222,4 @@ js 在处理 i64 或 u64 时会有精度问题，为此 `nature.exe` 和 `manage
 
 请参考：[服务治理咋这么难？我想得换个治法了](https://www.cnblogs.com/llxxbb/p/serviceGovernance.html)。
 
-本项目的主体功能已经完善，现正在寻求合作，有意者请发邮件309577603@qq.com，微信： llxxbb76
-
 [更新日志](doc/release/release.md) 

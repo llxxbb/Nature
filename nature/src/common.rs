@@ -2,7 +2,7 @@ use std;
 use std::error::Error;
 use std::fmt;
 use std::fmt::{Display, Formatter};
-use std::sync::mpsc::SendError;
+use async_channel::SendError;
 
 pub type Result<T> = std::result::Result<T, NatureError>;
 
@@ -35,12 +35,6 @@ impl From<std::num::ParseIntError> for NatureError {
     }
 }
 
-impl<T> From<SendError<T>> for NatureError {
-    fn from(err: SendError<T>) -> Self {
-        NatureError::EnvironmentError(err.to_string())
-    }
-}
-
 impl From<reqwest::Error> for NatureError {
     fn from(err: reqwest::Error) -> Self {
         NatureError::EnvironmentError(err.to_string())
@@ -56,5 +50,11 @@ impl From<std::io::Error> for NatureError {
 impl From<libloading::Error> for NatureError {
     fn from(err: libloading::Error) -> Self {
         NatureError::EnvironmentError(err.to_string())
+    }
+}
+
+impl<T> From<SendError<T>> for NatureError {
+    fn from(err: SendError<T>) -> Self {
+        NatureError::SystemError(err.to_string())
     }
 }

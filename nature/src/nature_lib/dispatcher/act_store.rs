@@ -69,7 +69,7 @@ async fn duplicated_instance(task: TaskForStore, carrier: RawTask, context: Data
         sleep(Duration::from_millis(10));
         let mut rtn = TaskForConvert::from_raw(&carrier, InstanceDaoImpl::select_by_id, &*C_M, &*D_M).await?;
         rtn.conflict_version = task.instance.path.state_version;
-        context.chanel.sender.lock().unwrap().send((rtn, carrier, context.clone()))?;
+        context.sender.send((rtn, carrier, context.clone())).await?;
         Ok(())
     }
 }

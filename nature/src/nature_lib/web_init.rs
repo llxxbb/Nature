@@ -16,17 +16,25 @@ use crate::util::web_context::WebContext;
 
 lazy_static! {
     pub static ref SERVER_PORT:String={
-    env::var("SERVER_PORT_NATURE").unwrap_or_else(|_| "8080".to_string())
+        env::var("SERVER_PORT_NATURE").unwrap_or_else(|_| "8080".to_string())
+    };
+    pub static ref CHANNEL_SIZE:usize={
+        env::var("CHANNEL_SIZE").unwrap_or_else(|_| "1000".to_string()).parse().unwrap()
     };
 }
 
 pub async fn web_init() -> std::io::Result<()> {
-    let context = Data::new(WebContext::new());
+    let (sx, rx) = async_channel::bounded(*CHANNEL_SIZE);
+
+    let context = Data::new(WebContext {
+        sender: sx
+    });
+
 
     dotenv().ok();
     let _ = env_logger::init();
     show_config();
-    let _ = start_receive_threads(context.clone());
+    let _ = start_receive_threads(rx);
     HttpServer::new(move || {
         let cors = Cors::permissive();
         App::new()

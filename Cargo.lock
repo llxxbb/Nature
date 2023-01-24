@@ -254,6 +254,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8da52d66c7071e2e3fa2a1e5c6d088fec47b593032b254f5e980de8ea54454d6"
 
 [[package]]
+name = "async-channel"
+version = "1.8.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "cf46fee83e5ccffc220104713af3292ff9bc7c64c7de289f66dae8e38d826833"
+dependencies = [
+ "concurrent-queue",
+ "event-listener",
+ "futures-core",
+]
+
+[[package]]
 name = "async-trait"
 version = "0.1.61"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -518,6 +529,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "concurrent-queue"
+version = "2.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c278839b831783b70278b14df4d45e1beb1aad306c07bb796637de9a0e323e8e"
+dependencies = [
+ "crossbeam-utils",
+]
+
+[[package]]
 name = "convert_case"
 version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -766,6 +786,12 @@ dependencies = [
  "cc",
  "libc",
 ]
+
+[[package]]
+name = "event-listener"
+version = "2.5.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0206175f82b8d6bf6652ff7d71a1e27fd2e4efde587fd368662814d6ec1d9ce0"
 
 [[package]]
 name = "fastrand"
@@ -1564,11 +1590,12 @@ dependencies = [
 
 [[package]]
 name = "nature"
-version = "1.4.0"
+version = "1.5.0"
 dependencies = [
  "actix-cors",
  "actix-rt",
  "actix-web",
+ "async-channel",
  "async-trait",
  "chrono",
  "dotenv",
@@ -1590,7 +1617,7 @@ dependencies = [
 
 [[package]]
 name = "nature-demo"
-version = "1.4.0"
+version = "1.5.0"
 dependencies = [
  "actix-rt",
  "actix-web",
@@ -1610,7 +1637,7 @@ dependencies = [
 
 [[package]]
 name = "nature_integrate_test_executor"
-version = "1.4.0"
+version = "1.5.0"
 dependencies = [
  "nature",
 ]

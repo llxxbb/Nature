@@ -34,3 +34,12 @@ SQLITE3_LIB_DIR = sqlite3.lib path
 + attach dll path to `PATH` ENV， this is critical step
 
 + add config for cargo （if necessary）
+
+### lock-free for channel
+
+The self-contained channel + Mutex combination is a lock structure, but crossbeam is a lock-free data structure.
+
+这里使用 smol 的 async_channel 库
+
+[Rust 并发编程 - Thread Pool - 简书 (jianshu.com)](https://www.jianshu.com/p/f4d853c0ef1e)
+[【Rust每周一库】smol - 异步rumtime - Rust语言中文社区 (rustcc.cn)](https://rustcc.cn/article?id=2a02d42f-4b27-40f1-ad0e-2015d3413bb7)

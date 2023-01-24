@@ -1,9 +1,10 @@
 use actix_web::web::Data;
+
 use crate::db::{D_T, RawTask, TaskDao};
 use crate::nature_lib::task::{TaskForConvert, TaskForStore};
 use crate::util::web_context::WebContext;
 
-pub async fn channel_stored(task: TaskForStore, raw: RawTask, context :Data<WebContext>) {
+pub async fn channel_stored(task: TaskForStore, raw: RawTask, context: Data<WebContext>) {
     // for m in &task.next_mission {
     //     debug!("-- next mission: from:{}, to:{}", task.instance.meta, m.to.meta_string());
     // }
@@ -21,11 +22,10 @@ pub async fn channel_stored(task: TaskForStore, raw: RawTask, context :Data<WebC
                 return;
             }
             // notation! can't use retains `raws`, otherwise faild task would never be executed.
-            let data = context.clone();
             tokio::spawn(async move {
                 for t in converters {
                     if t.0.target.delay == 0 {
-                        let _ = data.chanel.sender.lock().unwrap().send((t.0,t.1,context.clone()));
+                        let _ = context.sender.send((t.0, t.1, context.clone()));
                     }
                 }
             });

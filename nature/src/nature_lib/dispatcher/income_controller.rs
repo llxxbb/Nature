@@ -102,7 +102,7 @@ impl IncomeController {
             TaskType::Convert => {
                 let rtn = TaskForConvert::from_raw(&raw, InstanceDaoImpl::select_by_id, &*C_M, &*D_M).await?;
                 debug!("--redo convert task: from:{}, to:{}", rtn.from.path.meta, rtn.target.to.meta_string());
-                context.chanel.sender.lock().unwrap().send((rtn, raw, context.clone()))?;
+                context.sender.send((rtn, raw, context.clone())).await?;
             }
             TaskType::Batch => {
                 let rtn = serde_json::from_str(&raw.data)?;

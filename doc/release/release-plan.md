@@ -9,6 +9,7 @@
 
 Release 1.5.0
 
+- use async_channel to replace the rust native channel.
 - 将 NatureError 和 Result 移动到 common 模块下。
 - release 中包含 demo 所需的执行器和可执行文件
 - 文档修复
@@ -23,6 +24,15 @@ Release 1.5.0
 ### It should commit
 
 ### 未完成
+
+use async_channel to replace the rust native channel
+
+检查 channel_convert 是不是足够轻量，因为它是第一个接受者。可考虑多个线程进行接收。
+
+移除 channel_convert 对 block_on 的使用
+去除 actix_rt 的使用 act_convert::channel_convert 使用了阻塞模式,参考
+历史关键修复参考：2020/4/25 10:25 dcdfb51bb7e62b921cc43b98e2087734c165238a
+
 
 优化状态数据处理
 优化 TaskForConvert

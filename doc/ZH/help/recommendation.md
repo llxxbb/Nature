@@ -1,9 +1,10 @@
 # 使用建议
 
 ## context 和 para 的区别
-  - context 是K-V 而 para 只有 V
-  - para可以唯一标记一个 `Instance` 而 context 没有这种属性。
-  - 对 Nature 而言 para 不能用于流程控制， 而 context 则可以。
+
+- context 是K-V 而 para 只有 V
+- para可以唯一标记一个 `Instance` 而 context 没有这种属性。
+- 对 Nature 而言 para 不能用于流程控制， 而 context 则可以。
 
 ## 流程编排方法
 
@@ -37,4 +38,3 @@
 ## 如何修复不可变更的数据
 
 Nature 没有变更数据的能力，如果数据真的有问题，可以采用对冲的方法进行修正。
-
