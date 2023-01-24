@@ -137,13 +137,11 @@ fn default_100() -> u16 { 100 }
 
 #[cfg(test)]
 mod loader_test {
-    use std::env;
     use super::*;
 
     /// if test failed please rebuild the `nature_integrate_test_executor`
     #[tokio::test]
     async fn with_sub_filter() {
-        env::set_var("PLUGIN_PATH", "./");
         let loader = Loader { dao: Arc::new(Mocker {}) };
         let mut instance = Instance::default();
         instance.path.para = "123/456".to_string();

@@ -41,7 +41,13 @@ pub async fn local_execute<T: RefUnwindSafe, R>(executor: &str, para: &T) -> Res
                 match lib::Library::new(&real_path) {
                     Err(e) => {
                         warn!("load local lib error for path {}, error : {}", real_path, e);
-                        None
+                        match lib::Library::new("./".to_owned() + &path) {
+                            Err(e) => {
+                                warn!("load local lib error from work directory, error : {}", e);
+                                None
+                            }
+                            Ok(local_lib) => Some(local_lib)
+                        }
                     }
                     Ok(local_lib) => Some(local_lib)
                 }
@@ -97,6 +103,7 @@ fn entry_from_str(path: &str) -> Result<LibraryEntry> {
 #[cfg(test)]
 mod test {
     use futures::executor::block_on;
+
     use crate::domain::{ConverterParameter, ConverterReturned, Instance};
 
     use super::*;

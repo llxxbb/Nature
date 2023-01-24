@@ -16,7 +16,7 @@ Release 1.5.0
   - Readme.md
   - doc/ZH/help/executor.md
   - nature-demo/doc/ZH/prepare.md
-- 规定将插件统一放到 plugin 目录下，可通过 .env 配置文件中的 PLUGIN_PATH 进行重定义。
+- 插件的位置可通过 .env 配置文件中的 PLUGIN_PATH 进行定义，或者在工作目录下查找。
 - 去除对 sqlite 的支持
 - Instance 增加 new_with_empty_meta()方法。
 - 多库房示例项目: 修正数据重复问题。
@@ -25,7 +25,6 @@ Release 1.5.0
 
 ### 未完成
 
-use async_channel to replace the rust native channel
 
 检查 channel_convert 是不是足够轻量，因为它是第一个接受者。可考虑多个线程进行接收。
 

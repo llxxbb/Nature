@@ -27,7 +27,7 @@ Nature 目前有三种形式的 `Executor`：
 
 ### localRust协议实现方式
 
-为本地 lib 包，这些包需要放置到 .env 配置文件 PLUGIN_PATH 属性指定的目录内,缺省为与 nature 可执行文件同级的 plugin 目录）。如果本地 lib 包较多，为了更好的区分三种类型的 executor，建议lib文件的命名如下：
+为本地 lib 包，这些包需要放置到 .env 配置文件 PLUGIN_PATH 属性指定的目录下或与 nature 可执行文件同级的目录下，**注意**：该目录不支持子目录的查找。如果本地 lib 包较多，为了更好的区分三种类型的 executor，建议lib文件的命名如下：
 
 | lib 所包含的`Executor`类型 | 建议前缀 | 示例       |
 | -------------------- | ---- | -------- |
