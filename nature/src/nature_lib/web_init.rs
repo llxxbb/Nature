@@ -10,7 +10,7 @@ use actix_web::web::Data;
 use dotenv::dotenv;
 
 use crate::nature_lib::web_controller::*;
-use crate::util::channels::start_receive_threads;
+use crate::util::channels::loop_receiver;
 use crate::util::show_config;
 use crate::util::web_context::WebContext;
 
@@ -34,7 +34,7 @@ pub async fn web_init() -> std::io::Result<()> {
     dotenv().ok();
     let _ = env_logger::init();
     show_config();
-    let _ = start_receive_threads(rx);
+    let _ = loop_receiver(rx).await;
     HttpServer::new(move || {
         let cors = Cors::permissive();
         App::new()

@@ -1,4 +1,3 @@
-use actix_rt::Runtime;
 use actix_web::web::Data;
 
 use crate::common::*;
@@ -11,15 +10,8 @@ use crate::util::web_context::WebContext;
 
 /// **Notice**: Can't use async under actix-rt directly, otherwise it can lead to "actix-rt overflow its stack".
 /// So changed it to traditional mpsc
-pub fn channel_convert(store: (TaskForConvert, RawTask, Data<WebContext>)) {
-    let runtime = match Runtime::new() {
-        Ok(r) => r,
-        Err(e) => {
-            warn!("get tokio runtime error : {}", e.to_string());
-            return;
-        }
-    };
-    runtime.block_on(do_convert(store.0, store.1, store.2));
+pub async fn channel_convert(store: (TaskForConvert, RawTask, Data<WebContext>)) {
+    do_convert(store.0, store.1, store.2).await;
 }
 
 pub(crate) async fn do_convert(task: TaskForConvert, raw: RawTask, context: Data<WebContext>) {
