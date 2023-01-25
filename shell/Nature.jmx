@@ -77,10 +77,10 @@
           <boolProp name="LoopController.continue_forever">false</boolProp>
           <intProp name="LoopController.loops">-1</intProp>
         </elementProp>
-        <stringProp name="ThreadGroup.num_threads">50</stringProp>
-        <stringProp name="ThreadGroup.ramp_time">10</stringProp>
+        <stringProp name="ThreadGroup.num_threads">20</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">5</stringProp>
         <boolProp name="ThreadGroup.scheduler">true</boolProp>
-        <stringProp name="ThreadGroup.duration">300</stringProp>
+        <stringProp name="ThreadGroup.duration">180</stringProp>
         <stringProp name="ThreadGroup.delay"></stringProp>
         <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
       </ThreadGroup>
@@ -91,7 +91,7 @@
             <collectionProp name="Arguments.arguments">
               <elementProp name="" elementType="HTTPArgument">
                 <boolProp name="HTTPArgument.always_encode">false</boolProp>
-                <stringProp name="Argument.value">{ &quot;data&quot;: { &quot;meta&quot;: &quot;B:sale/order:1&quot;, &quot;content&quot;: &quot;{ \&quot;user_id\&quot;:${user_id}, \&quot;price\&quot;:${__jexl3(${price}*${buy_num})}, \&quot;items\&quot;:[ { \&quot;item\&quot;:{ \&quot;id\&quot;:${product_id}, \&quot;name\&quot;:\&quot;${__RandomString(10,abcdefg)}\&quot;, \&quot;price\&quot;:${price} }, \&quot;num\&quot;:${buy_num} }], \&quot;address\&quot;:\&quot;a.b.c\&quot;}&quot; } }</stringProp>
+                <stringProp name="Argument.value">{ &quot;path&quot;: {&quot;meta&quot;: &quot;B:sale/order:1&quot;}, &quot;data&quot;: { &quot;content&quot;: &quot;{ \&quot;user_id\&quot;:${user_id}, \&quot;price\&quot;:${__jexl3(${price}*${buy_num})}, \&quot;items\&quot;:[ { \&quot;item\&quot;:{ \&quot;id\&quot;:${product_id}, \&quot;name\&quot;:\&quot;${__RandomString(10,abcdefg)}\&quot;, \&quot;price\&quot;:${price} }, \&quot;num\&quot;:${buy_num} }], \&quot;address\&quot;:\&quot;a.b.c\&quot;}&quot; } }</stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
               </elementProp>
             </collectionProp>
@@ -207,7 +207,7 @@
             <collectionProp name="Arguments.arguments">
               <elementProp name="" elementType="HTTPArgument">
                 <boolProp name="HTTPArgument.always_encode">false</boolProp>
-                <stringProp name="Argument.value">{ &quot;data&quot;: { &quot;meta&quot;: &quot;B:sale/order:1&quot;, &quot;content&quot;: &quot;{ \&quot;user_id\&quot;:${user_id}, \&quot;price\&quot;:${__jexl3(${price}*${buy_num})}, \&quot;items\&quot;:[ { \&quot;item\&quot;:{ \&quot;id\&quot;:${product_id}, \&quot;name\&quot;:\&quot;${__RandomString(10,abcdefg)}\&quot;, \&quot;price\&quot;:${price} }, \&quot;num\&quot;:${buy_num} }], \&quot;address\&quot;:\&quot;a.b.c\&quot;}&quot; } }</stringProp>
+                <stringProp name="Argument.value">{ &quot;path&quot;: {&quot;meta&quot;: &quot;B:sale/order:1&quot;}, &quot;data&quot;: { &quot;content&quot;: &quot;{ \&quot;user_id\&quot;:${user_id}, \&quot;price\&quot;:${__jexl3(${price}*${buy_num})}, \&quot;items\&quot;:[ { \&quot;item\&quot;:{ \&quot;id\&quot;:${product_id}, \&quot;name\&quot;:\&quot;${__RandomString(10,abcdefg)}\&quot;, \&quot;price\&quot;:${price} }, \&quot;num\&quot;:${buy_num} }], \&quot;address\&quot;:\&quot;a.b.c\&quot;}&quot; } }</stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
               </elementProp>
             </collectionProp>

@@ -8,6 +8,7 @@ use sleep::*;
 use crate::common::NatureError;
 
 use crate::db::{D_T, RawTask, TaskDao};
+use crate::util::logger::logger_init;
 
 lazy_static! {
     static ref CLIENT : Client = Client::new();
@@ -15,7 +16,7 @@ lazy_static! {
 
 pub async fn start() {
     dotenv::dotenv().ok();
-    let _ = env_logger::init();
+    logger_init();
     let mut last_delay: u64 = 0;
     info!("----------- {} : {}------------", "base_delay", *BASE_DELAY);
     info!("----------- {} : {}------------", "load_size", *LOAD_SIZE);

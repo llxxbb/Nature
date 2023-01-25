@@ -15,3 +15,4 @@ pub mod sys_config;
 pub mod channels;
 pub mod js_convert;
 pub mod web_context;
+pub mod logger;

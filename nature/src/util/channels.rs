@@ -14,7 +14,6 @@ pub async fn loop_receiver(receiver: Receiver<(TaskForConvert, RawTask, Data<Web
                 Ok(r) => channel_convert(r).await,
                 Err(e) => error!("{}", e)
             }
-            info!("--------------------receive loop---------------------");
         }
     });
 }

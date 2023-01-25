@@ -167,7 +167,7 @@ impl InstanceDaoImpl {
             }
         };
         let meta = mission.to.meta_string();
-        debug!("get last state for meta {}", &meta);
+        // debug!("get last state for meta {}", &meta);
         let qc = InsCond::new(id.parse()?, &meta, &para_id, 0);
         Self::select_last_state(&qc).await
     }

@@ -63,6 +63,18 @@ lazy_static! {
         info!("PLUGIN_PATH: {}", rtn);
         rtn
     };
+
+    pub static ref SERVER_PORT:String={
+        let rtn = env::var("SERVER_PORT_NATURE").unwrap_or_else(|_| "8080".to_string());
+        info!("SERVER_PORT_NATURE: {}", rtn);
+        rtn
+    };
+
+    pub static ref CHANNEL_BUNDLE_SIZE:usize={
+        let rtn = env::var("CHANNEL_SIZE").unwrap_or_else(|_| "10".to_string()).parse().unwrap();
+        info!("CHANNEL_BUNDLE_SIZE: {}", rtn);
+        rtn
+    };
 }
 
 pub fn show_config() {
@@ -79,6 +91,8 @@ pub fn show_config() {
     let _ = TASK_CONTENT_MAX_LENGTH.to_string();
     let _ = QUERY_SIZE_LIMIT.to_string();
     let _ = PLUGIN_PATH.to_string();
+    let _ = SERVER_PORT.to_string();
+    let _ = CHANNEL_BUNDLE_SIZE.to_string();
     info!("nature settings -------------------------");
 }
 

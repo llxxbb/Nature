@@ -6,6 +6,7 @@ use actix_web::middleware::Logger;
 use dotenv::dotenv;
 
 use crate::manager_lib::web_controller::manager_config;
+use crate::util::logger::logger_init;
 
 lazy_static! {
     static ref SERVER_PORT:String={
@@ -20,7 +21,7 @@ lazy_static! {
 
 pub async fn web_init() -> std::io::Result<()> {
     dotenv().ok();
-    let _ = env_logger::init();
+    logger_init();
     HttpServer::new(|| {
         let cors = Cors::permissive();
         App::new()
