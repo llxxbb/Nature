@@ -9,8 +9,8 @@
 
 Release 1.5.0
 
+- update to 2021 rust edition
 - use async_channel to replace the rust native channel.
-- 将 channel_convert 中的阻塞代码改为异步代码  
 - 将 NatureError 和 Result 移动到 common 模块下。
 - release 中包含 demo 所需的执行器和可执行文件
 - 文档修复
