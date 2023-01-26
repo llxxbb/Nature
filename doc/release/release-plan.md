@@ -27,8 +27,9 @@ Release 1.5.0
 
 ### 未完成
 
-修正 shell/Nature.jmx 中的问题
-检查 channel_convert 是不是足够轻量，因为它是第一个接受者。可考虑多个线程进行接收。
+check unused package
+
+使用它 Rwlock 取代缓存的 Mutex
 
 优化状态数据处理
 优化 TaskForConvert
@@ -42,3 +43,5 @@ optimize: cancel run the same task when it has been finished.
 
 文档：工作机制
 对异常数据的处理机制
+
+检查 channel_convert 是不是足够轻量，因为它是第一个接受者。可考虑多个线程进行接收。
