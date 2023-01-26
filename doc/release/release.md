@@ -1,5 +1,20 @@
 # Release log
 
+## Release 1.5.0 2022-01-26
+
+- update to 2021 rust edition  
+- use async_channel to replace the rust native channel.  
+- plugins directory can be configured in .env file, the property is `PLUGIN_PATH`, or you can put them under the work directory .
+- use Local-Time for logger  
+- move `NatureError` and `Result` to `common` module。  
+- includes all executable files and executors which demo need in release package 
+- doc repair
+  - Readme.md  
+  - doc/ZH/help/executor.md  
+  - nature-demo/doc/ZH/prepare.md  
+- remove the support for sqlite.
+- demo for multi-warehouse: fix data duplicate problem.
+
 ## Release 1.4.0 2022-06-03
 
 - Output `Instance` for `MetaType:Null`

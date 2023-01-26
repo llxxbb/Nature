@@ -7,21 +7,7 @@
 
 下面为正在开发的内容
 
-Release 1.5.0
-
-- update to 2021 rust edition
-- use async_channel to replace the rust native channel.
-- use Local-Time for logger
-- 将 NatureError 和 Result 移动到 common 模块下。
-- release 中包含 demo 所需的执行器和可执行文件
-- 文档修复
-  - Readme.md
-  - doc/ZH/help/executor.md
-  - nature-demo/doc/ZH/prepare.md
-- 插件的位置可通过 .env 配置文件中的 PLUGIN_PATH 进行定义，或者在工作目录下查找。
-- 去除对 sqlite 的支持
-- Instance 增加 new_with_empty_meta()方法。
-- 多库房示例项目: 修正数据重复问题。
+Release 1.6.0
 
 ### It should commit
 
