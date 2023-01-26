@@ -18,7 +18,7 @@ use nature::domain::*;
 use nature::common::*;
 
 
-#[actix_rt::main]
+#[actix_web::main]
 async fn main() -> std::io::Result<()> {
     dotenv().ok();
     let _ = env_logger::init();
