@@ -1,12 +1,14 @@
+cargo build --manifest-path=../Cargo.toml -r
+
 set RELEASE_PATH="..\\..\\Nature-Release"
 
 if not exist %RELEASE_PATH% md %RELEASE_PATH%
 
 copy /Y ..\NATURE\.env %RELEASE_PATH%
-copy /Y ..\target\debug\nature.exe %RELEASE_PATH%
-copy /Y ..\target\debug\retry.exe %RELEASE_PATH%
-copy /Y ..\target\debug\nature_demo.dll %RELEASE_PATH%
-copy /Y ..\target\debug\nature_demo_restful.exe %RELEASE_PATH%
+copy /Y ..\target\release\nature.exe %RELEASE_PATH%
+copy /Y ..\target\release\retry.exe %RELEASE_PATH%
+copy /Y ..\target\release\nature_demo.dll %RELEASE_PATH%
+copy /Y ..\target\release\nature_demo_restful.exe %RELEASE_PATH%
 copy /Y schema.sql %RELEASE_PATH%
 
 del %RELEASE_PATH%\release.zip

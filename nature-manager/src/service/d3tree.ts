@@ -231,7 +231,7 @@ function dragEvent(enter: d3.Selection<SVGGElement, d3.HierarchyPointNode<unknow
     var drag = d3.drag()
         .on("start", (e, d) => {
             hideContextMenu(ParaData);
-            changeCurrent(e, d as HierarchyPointNode<D3Node>)
+            changeCurrent(e, d as HierarchyPointNode<any>)
             const one = (d as HierarchyPointNode<D3Node>);
             // the root node can't be moved
             if (one.parent) {
@@ -346,7 +346,7 @@ function showNodeContextMenu(e: any, node: d3.HierarchyPointNode<unknown> | unkn
     if (!ParaData.event) return;
     if (ParaData.event.hideLayoutMenu)
         ParaData.event.hideLayoutMenu();
-    let d = node as HierarchyPointNode<D3Node>
+    let d = node as HierarchyPointNode<any>
     changeCurrent(e, d);
     if (ParaData.event && ParaData.event.showNodeMenu)
         ParaData.event.showNodeMenu(e, d.data);

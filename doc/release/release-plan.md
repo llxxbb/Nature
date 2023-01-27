@@ -13,8 +13,8 @@ Release 1.6.0
 
 ### 未完成
 
-check unused package
-
+验证管理端是否正常工作
+使用 cached 替代 lru_time_cache
 使用它 Rwlock 取代缓存的 Mutex
 
 优化状态数据处理

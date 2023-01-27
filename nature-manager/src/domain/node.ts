@@ -144,7 +144,7 @@ export enum Shape {
 export class TreePara {
     target: string = "";
     size: SvgSize = {} as any;
-    data: D3Node = {} as any;
+    data: any = {};
     event?: TreeEvent;
     shape: Shape = Shape.circle;
 }
